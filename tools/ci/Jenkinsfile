@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                powershell label: '', script: '''
+                    scons
+                '''    
+            }
+        }
+        stage('Test') {
+            steps {
+                powershell label: '', script: '''
+
+                '''
+            }
+        }
+        stage('MDK_Build'){
+            steps {
+                powershell label: '', script: '''
+                    scons toolchain=mdk operation=build
+                '''    
+            }
+        }
+        stage('MDK_Test') {
+            steps {
+                powershell label: '', script: '''
+
+                '''
+            }
+        }
+        stage('Doc_Build') {
+            steps {
+                bat label: '', script: '''
+                    cd doc
+                    mkdir _build
+                    make html
+                '''
+            }
+        }
+    }
+    post {
+        unsuccessful  {
+            emailext body: '$DEFAULT_CONTENT' , subject: '$DEFAULT_SUBJECT' , to: 'jwzhang,mingzhou,xtzhang,weiyu,xwcai,lhyan,zxguo,jxia,gbzhang'
+        }
+    }
+}

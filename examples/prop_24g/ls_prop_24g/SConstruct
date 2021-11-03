@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../')
+env['OPT_LVL'] = ' -Os '
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'app_prop_24g.c',
+    'app_user_24g.c',
+]
+inc = [
+    '.'
+]
+env.app_build('ls_prop_24g',src,inc, ble = False, prop_24g = True)
