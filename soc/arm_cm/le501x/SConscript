@@ -1,0 +1,148 @@
+import os
+import sys
+Import('env')
+env['CPU'] = 'cortex-m0'
+
+def plf_postaction(target,ble,mesh,prop_24g):
+    stack_hex = None
+    if mesh:
+        env.Append(LIBS = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o')))
+        stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
+    elif ble:
+        env.Append(LIBS = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o')))
+        stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+    elif prop_24g:
+        env.Append(LIBS = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/prop_24g_lib.o')))
+    target_path = str(target[0]).replace('.elf','')
+    app_hex = env.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+    env.AddPostAction(target[0],Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
+    info_sbl_hex = env.Command('build/le501x/info_sbl.hex',env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/bram.bin'),Action(env.subst('python $SDK_ROOT/tools/info_sbl_merge.py') + ' $SOURCE le501x $TARGET'))
+    if stack_hex is None:
+        production_hex_depends = [info_sbl_hex,app_hex]
+    else:
+        production_hex_depends = [info_sbl_hex,app_hex,stack_hex]
+    env.Command(target_path+'_production.hex',production_hex_depends, Action(env.subst('python $SDK_ROOT/tools/hexmerge.py') + ' $SOURCES > $TARGET'))
+
+
+
+def plf_build(name,app_src,with_startup,objprefix):
+    start_src = env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+        'arm_cm/le501x/compiler/$COMPILER/startup.S',
+    ])
+    sdk_src = []
+    sdk_src += env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+        'arm_cm/svcall.c',
+        'arm_cm/systick.c',
+        'arm_cm/swint_handler.c',
+        'arm_cm/le501x/cpu.c',
+        'arm_cm/le501x/platform.c',
+        'arm_cm/le501x/stack_var.c',
+        'arm_cm/le501x/compiler/$COMPILER/sleep_asm.S',
+        'arm_cm/le501x/compiler/$COMPILER/svcall_asm.S',
+        'arm_cm/le501x/compiler/$COMPILER/delay_asm.S',
+        'arm_cm/le501x/integration/lsqspi_msp.c',
+        'arm_cm/le501x/integration/uart_msp.c',
+        'arm_cm/le501x/integration/spi_msp.c',
+        'arm_cm/le501x/integration/adc_msp.c',
+        'arm_cm/le501x/integration/i2c_msp.c',
+        'arm_cm/le501x/integration/modem_rf_le501x.c',
+        'arm_cm/le501x/integration/modem_rf_le501x_24g.c',
+        'arm_cm/le501x/integration/calc_acc.c',
+        'arm_cm/le501x/integration/lscache_msp.c',
+        'arm_cm/le501x/integration/io_config.c',
+        'arm_cm/le501x/integration/dmac_msp.c',
+        'arm_cm/le501x/integration/lspdm_msp.c',
+        'arm_cm/le501x/integration/lsiwdg_msp.c',
+        'arm_cm/le501x/integration/rtc_msp.c',
+        'arm_cm/le501x/integration/lstimer_msp.c',
+        'arm_cm/le501x/integration/ssi_msp.c',
+        'arm_cm/le501x/integration/trng_msp.c',
+        'arm_cm/le501x/integration/lspis_msp.c',
+        'arm_cm/le501x/integration/lscrypt_msp.c',
+        'arm_cm/le501x/integration/lsecc_msp.c',
+        'arm_cm/le501x/sleep.c',
+        'arm_cm/le501x/sys_stat.c',
+        'arm_cm/le501x/sw_timer_port.c',
+    ])
+    sdk_src += env.variant_dir_add_source('build/$IC/peripheral/','$SDK_ROOT/peripheral/',[
+        'src/flash_svcall.c',
+        'src/adc_dma.c',
+        'src/calc_div.c',
+        'src/dmac.c',
+        'src/lsadc.c',
+        'src/lscache.c',
+        'src/lscrypt.c',
+        'src/lsi2c.c',
+        'src/lsiwdg.c',
+        'src/lspdm_dma.c',
+        'src/lspdm.c',
+        'src/lspis.c',
+        'src/lsqspi.c',
+        'src/lsrtc.c',
+        'src/lsspi_dma.c',
+        'src/lsspi.c',
+        'src/lsssi_dma.c',
+        'src/lsssi.c',
+        'src/lstimer.c',
+        'src/lstrng.c',
+        'src/spi_flash_lsqspi.c',
+        'src/spi_flash.c',
+        'src/uart_dma.c',
+        'src/uart.c',
+        'src/lsecc.c',
+    ])
+    sdk_src += env.variant_dir_add_source('build/$IC/module/','$SDK_ROOT/module/',[
+        'common/common.c',
+        'common/circular_doubly_linked_list.c',
+        'common/linked_async_framework.c',
+        'common/async_call.c',
+        'common/sw_timer.c',
+        'calendar/calendar.c',
+        'crc/crc16.c',
+        'debug/log.c',
+        'debug/ls_dbg.c',
+        'debug/$BASE_ARCH/$COMPILER/ls_dbg_asm.S',
+        'debug/RTT/SEGGER_RTT.c',
+        'static_buffer/linked_buffer.c',
+        'static_buffer/fifo.c',
+        'tinyfs/tinyfs_nvm.c',
+        'tinyfs/tinyfs_write_cache.c',
+        'tinyfs/tinyfs.c',
+        'tinycrypt/lib/source/sha256.c',
+        'tinycrypt/lib/source/utils.c',
+        'adpcm/adpcm.c',
+        'micro-ecc/uECC.c',
+        'ble/ble_common_api.c',
+    ])
+    if env.get('LINKSCRIPT') is None:
+        env['LINKSCRIPT'] = File(env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/link_script.txt"))
+    env.add_include('$SDK_ROOT/',[
+        '.',
+        'peripheral/inc',
+        'peripheral/api',
+        'module/common',
+        'module/calendar',
+        'module/crc',
+        'module/debug',
+        'module/debug/RTT',
+        'module/static_buffer',
+        'module/tinyfs',
+        'module/tinycrypt/lib/include',
+        'module/micro-ecc',
+        'module/adpcm',
+        'module/ble',
+        'module/ble/prf',
+        'soc',
+        'soc/arm_cm',
+        'soc/arm_cm/cmsis',
+        'soc/arm_cm/le501x',
+        'soc/arm_cm/le501x/integration',
+    ])
+    print(env['CPPPATH'])
+    if with_startup:
+        return env.Program('build/le501x/'+name,sdk_src + start_src + app_src,OBJPREFIX = objprefix)
+    else:
+        return env.Program('build/le501x/'+name,sdk_src + app_src,OBJPREFIX = objprefix)
+
+env.plf_postaction = plf_postaction
+env.plf_build = plf_build

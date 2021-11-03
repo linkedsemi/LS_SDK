@@ -1,0 +1,18 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../')
+env['OPT_LVL'] = ' -Os '
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    'boot_ram_le501x.c'
+]
+inc = [
+    './'
+]
+env['LINKSCRIPT'] = File(env.subst('$SDK_ROOT/bootloader/boot_ram/le501x/bram_le501x.ld'))
+target = env.image_build('boot_ram',src,inc,with_startup=False)
+env.Append(CPPDEFINES = ['-DBOOT_RAM=1','-DGLOBAL_OUTPUT_LVL=0','NDEBUG'])
+env.Append(LINKFLAGS = ' -nostartfiles')
+bram_bin = env.Command('build/$IC/bram.bin',target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
+env.Install('$SDK_ROOT/soc/arm_cm/le501x/bin',bram_bin)
+env.Alias('install', '$SDK_ROOT/soc/arm_cm/le501x/bin')

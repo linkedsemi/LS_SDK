@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "marus25.cortex-debug",
+        "zixuanwang.linkerscript",
+        "keroc.hex-fmt",
+        "ms-python.python",
+        "lextudio.restructuredtext",
+        "dan-c-underwood.arm",
+        "webfreak.debug",
+        "zhwu95.riscv"
+    ]
+  }

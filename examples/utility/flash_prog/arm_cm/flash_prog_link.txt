@@ -1,0 +1,25 @@
+
+SECTIONS
+{
+	PrgCode :
+	{
+		KEEP(*(.text.Init))
+		KEEP(*(.text.UnInit))
+		KEEP(*(.text.BlankCheck))
+		KEEP(*(.text.EraseChip))
+		KEEP(*(.text.EraseSector))
+		KEEP(*(.text.ProgramPage))
+		KEEP(*(.text.Verify))
+		*(.text* .rodata*)
+	}
+	PrgData :
+	{
+		*(.data*)
+		*(.bss*)
+		*(COMMON)
+	}
+	DevDscr : 
+	{
+		KEEP(*(DevDscr))
+	} 
+}
