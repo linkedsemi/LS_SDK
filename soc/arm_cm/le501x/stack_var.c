@@ -94,7 +94,7 @@ struct{
 struct 
 {
     uint32_t env[2];
-}rx_buf[3]; 
+}rx_buf[6]; 
 
 struct{
     uint32_t env[2];
