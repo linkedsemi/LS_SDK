@@ -25,10 +25,12 @@ def plf_postaction(target,ble,mesh,prop_24g):
 
 
 
-def plf_build(name,app_src,with_startup,objprefix):
-    start_src = env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
-        'arm_cm/le501x/compiler/$COMPILER/startup.S',
-    ])
+def plf_build(name,app_src,rtos,with_startup,objprefix):
+    start_src = []
+    if with_startup:
+        start_src = env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+            'arm_cm/le501x/compiler/$COMPILER/startup.S',
+        ])
     sdk_src = []
     sdk_src += env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
         'arm_cm/svcall.c',
@@ -138,11 +140,25 @@ def plf_build(name,app_src,with_startup,objprefix):
         'soc/arm_cm/le501x',
         'soc/arm_cm/le501x/integration',
     ])
+    rtos_src = []
+    if not rtos is None:
+        rtos_src = env.variant_dir_add_source('build/$IC/rtos/','$SDK_ROOT/rtos/freertos/',[
+            'croutine.c',
+            'event_groups.c',
+            'list.c',
+            'queue.c',
+            'stream_buffer.c',
+            'tasks.c',
+            'timers.c',
+            'heap_4.c',
+        ])
+        rtos_src += env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+            'arm_cm/le501x/compiler/$COMPILER/port.c',
+            'arm_cm/le501x/freertos_adapt.c',
+        ])
+        env.add_include('$SDK_ROOT/',['rtos/freertos/include'])
     print(env['CPPPATH'])
-    if with_startup:
-        return env.Program('build/le501x/'+name,sdk_src + start_src + app_src,OBJPREFIX = objprefix)
-    else:
-        return env.Program('build/le501x/'+name,sdk_src + app_src,OBJPREFIX = objprefix)
+    return env.Program('build/le501x/'+name,sdk_src + start_src + app_src + rtos_src,OBJPREFIX = objprefix)
 
 env.plf_postaction = plf_postaction
 env.plf_build = plf_build

@@ -276,7 +276,7 @@ uint8_t get_wakeup_source()
     return SYSCFG->BKD[6];
 }
 
-void arm_cm_set_int_isr(uint8_t type,void (*isr)())
+void arm_cm_set_int_isr(int8_t type,void (*isr)())
 {
     ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
 }
@@ -462,7 +462,23 @@ uint32_t plf_get_reset_error()
     return reset_retain_ptr->reset_reason;
 }
 
-__attribute__((weak)) void ble_isr(){}
+__attribute__((weak)) void ble_sched(){}
+
+void ble_loop()
+{
+    while(1)
+    {
+        if(!ble_wkup_status_get())
+        {
+            ble_sched();
+            sleep_process();
+        }
+    }
+}
+
+__attribute__((weak)) uint32_t ble_isr(){return 0;}
+
+__attribute__((weak)) void ble_stack_isr(){ble_isr();}
 
 XIP_BANNED void BLE_Handler()
 {
@@ -481,7 +497,7 @@ XIP_BANNED void BLE_Handler()
     {
         spi_flash_xip_start();
     }
-    ble_isr();
+    ble_stack_isr();
     if(xip == false)
     {
         spi_flash_xip_stop();
