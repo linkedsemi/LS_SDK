@@ -16,6 +16,8 @@
 #include "lsrtc.h"
 #include "systick.h"
 #include "reg_lsgpio.h"
+#include "sys_stat.h"
+
 const uint16_t wkup_delay_us = 1500;
 static uint32_t CPU_PSP;
 static uint8_t CPU_CONTROL;
@@ -289,6 +291,30 @@ void deep_sleep()
     ble_radio_en_sync();
     systick_start();
     rco_freq_counting_start();
+}
+
+void uart_log_pause(void);
+void uart_log_resume(void);
+__attribute__((weak)) bool mac_sleep_check(){return false;}
+
+__attribute((weak)) void check_and_sleep()
+{
+    if(mac_sleep_check())
+    {
+        deep_sleep();
+    }
+}
+
+void sleep_process()
+{
+    uint32_t cpu_stat = enter_critical();
+    uart_log_pause();
+    if((peri_status_busy() || app_event_status_busy())==false)
+    {
+        check_and_sleep();
+    }
+    uart_log_resume();
+    exit_critical(cpu_stat);
 }
 
 bool timer_sleep(void);

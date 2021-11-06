@@ -17,19 +17,19 @@ def add_include(dir,path):
     env.Append(CPPPATH = inc_list)
     return inc_list
 
-def image_build(name,src,inc,with_startup = True,objprefix = ''):
+def image_build(name,src,inc,rtos = None,with_startup = True,objprefix = ''):
     env['PROJ_DIR'] = Dir('.')
     src_files = env.variant_dir_add_source('build/$IC/','./',src)
     env.add_include(Dir('.').path,inc)
     env.Append(LINKFLAGS = ' $GC_OPTION ')
-    target = env.plf_build(name,src_files,with_startup,objprefix)
+    target = env.plf_build(name,src_files,rtos,with_startup,objprefix)
     env.Depends(target,env['LINKSCRIPT'])
     if not 'mdk' in env['TOOLS']:
         env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     return target
 
-def app_build(app_name,src,inc,ble = True,mesh = False,prop_24g = False):
-    target = image_build(app_name,src,inc)
+def app_build(app_name,src,inc,ble = True,mesh = False,prop_24g = False,rtos = None):
+    target = image_build(app_name,src,inc,rtos)
     if not 'mdk' in env['TOOLS']:
         env.plf_postaction(target,ble,mesh,prop_24g)
 

@@ -67,6 +67,10 @@ void deep_sleep_no_ble(void);
 
 void ble_sleep(void);
 
+bool mac_sleep_check(void);
+
+void sleep_process(void);
+
 void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup);
 
 void ble_irq_clr_and_enable(void);
