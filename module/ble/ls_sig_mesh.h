@@ -132,6 +132,7 @@ enum mesh_feature
 enum mesh_provisioned_state
 {
     UNPROVISIONED_KO = 0x00,     /*!< The device was not a node*/
+    BEING_PROVISION,             /*!< The device being provision*/
     PROVISIONED_OK,               /*!< The device was a node*/
 };
 
