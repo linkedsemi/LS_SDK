@@ -63,6 +63,16 @@ host_test_build:
   script:
     - cd examples/ble/host_test ; scons
 
+rtc_build:
+  stage: build
+  script:
+    - cd examples/peripheral/rtc ; scons
+
+prop_24g_build:
+  stage: build
+  script:
+    - cd examples/prop_24g/ls_prop_24g ; scons
+
 coremark_build:
   stage: build
   script:
