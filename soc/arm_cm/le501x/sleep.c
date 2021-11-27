@@ -111,7 +111,7 @@ XIP_BANNED uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn);
 
 XIP_BANNED void after_wfi()
 {
-    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn));
+    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn)||__NVIC_GetPendingIRQ(EXTI_IRQn));
     wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     normal_sleep_set();
@@ -132,45 +132,48 @@ void clr_ble_wkup_req()
 
 XIP_BANNED void power_up_hardware_modules()
 {
-    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD,0)
-                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN,1);
-}
-
-XIP_BANNED void remove_hw_isolation()
-{
-    while((SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_SEC_PWR4_ST_MASK)));
+    uint32_t pmu_pwr = SYSCFG->PMU_PWR;
+    uint32_t clr_mask = 0;
+    uint32_t set_mask = 0;
+    if(pmu_pwr & ((uint32_t)SYSCFG_PERI_PWR2_ST_MASK))
+    {
+        clr_mask |= SYSCFG_PERI_PWR2_PD_MASK;
+        set_mask |= SYSCFG_PERI_ISO2_EN_MASK;
+    }
+    if(pmu_pwr & ((uint32_t)SYSCFG_SEC_PWR4_ST_MASK))
+    {
+        clr_mask |= SYSCFG_SEC_PWR4_PD_MASK;
+        set_mask |= SYSCFG_SEC_ISO4_EN_MASK;
+    }
+    MODIFY_REG(SYSCFG->PMU_PWR,clr_mask,set_mask);
+    do{
+        pmu_pwr = SYSCFG->PMU_PWR;
+    }while((pmu_pwr & ((uint32_t)SYSCFG_PERI_PWR2_ST_MASK)) || (pmu_pwr & ((uint32_t)SYSCFG_SEC_PWR4_ST_MASK)));
     SYSCFG->PMU_PWR = 0;
 }
 
 XIP_BANNED static void power_down_hardware_modules()
 {
-    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD, 1)
-                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN ,1);
+    if(SYSCFG->PMU_WKUP & (PA00_IO_WKUP|PA07_IO_WKUP|PB11_IO_WKUP|PB15_IO_WKUP)<<WKUP_EN_POS)
+    {
+        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_SEC_PWR4_PD, 1)
+                        | FIELD_BUILD(SYSCFG_SEC_ISO4_EN ,1);
+    }else
+    {
+        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1)
+                        | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
+                        | FIELD_BUILD(SYSCFG_SEC_PWR4_PD, 1)
+                        | FIELD_BUILD(SYSCFG_SEC_ISO4_EN ,1);
+    }
 }
 
 NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
 {
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
-    uint32_t exti_reg[5];
-    exti_reg[0] = EXTI->EICFG0;
-    exti_reg[1] = EXTI->EICFG1;
-    exti_reg[2] = EXTI->ERTS;
-    exti_reg[3] = EXTI->EFTS;
-    exti_reg[4] = EXTI->EIVS;
     power_down_hardware_modules();
     cpu_sleep_asm();
     power_up_hardware_modules();
-    remove_hw_isolation();
-    EXTI->EICFG0 = exti_reg[0];
-    EXTI->EICFG1 = exti_reg[1];
-    EXTI->ERTS = exti_reg[2];
-    EXTI->EFTS = exti_reg[3];
-    EXTI->EIER = exti_reg[4];
     __disable_irq();
     spi_flash_init();
     spi_flash_release_from_deep_power_down();
@@ -280,7 +283,7 @@ XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup
 
 void deep_sleep()
 {
-    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
+    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn|1<<EXTI_IRQn);
     SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
     systick_stop();
     cpu_flash_deep_sleep_and_recover();
@@ -333,25 +336,60 @@ bool ble_wkup_status_get(void)
     return waiting_ble_wkup_irq;
 }
 
+static bool exti_int_pending(uint8_t pin)
+{
+    uint8_t idx = pin&0xf;
+    uint8_t port = pin>>4;
+    if(EXTI->EEIFM & 1<<idx)
+    {
+        if(idx<8)
+        {
+            if((EXTI->EICFG0 >> (4*idx) & 0xf)==port)
+            {
+                return true;
+            }
+        }else
+        {
+            if((EXTI->EICFG1 >> (4*(idx-8)) & 0xf)==port)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void LPWKUP_Handler(void)
 {
     SYSCFG->PMU_WKUP &= ~(wkup_stat << WKUP_EN_POS);
     SYSCFG->PMU_WKUP |= wkup_stat << WKUP_EN_POS;
     if(wkup_stat&PB15_IO_WKUP)
     {
-        io_exti_callback(PB15);
+        if(exti_int_pending(PB15)==false)
+        {
+            io_exti_callback(PB15);
+        }
     }
     if(wkup_stat&PA00_IO_WKUP)
     {
-        io_exti_callback(PA00);
+        if(exti_int_pending(PA00)==false)
+        {
+            io_exti_callback(PA00);
+        }
     }
     if(wkup_stat&PA07_IO_WKUP)
     {
-        io_exti_callback(PA07);
+        if(exti_int_pending(PA07)==false)
+        {
+            io_exti_callback(PA07);
+        }
     }
     if(wkup_stat&PB11_IO_WKUP)
     {
-        io_exti_callback(PB11);
+        if(exti_int_pending(PB11)==false)
+        {
+            io_exti_callback(PB11);
+        }
     }
     if (wkup_stat & RTC_WKUP)
     {
