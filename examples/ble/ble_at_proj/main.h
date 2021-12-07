@@ -9,7 +9,6 @@
 #include <stdio.h>
 #define DEV_NAME_MAX_LEN 0x20
 extern uint8_t ble_device_name[DEV_NAME_MAX_LEN];
-extern uint16_t gattc_get_mtu(uint8_t conidx);
 
 uint8_t search_conidx(uint8_t con_idx);
 uint8_t search_client_conidx(uint8_t con_idx);
