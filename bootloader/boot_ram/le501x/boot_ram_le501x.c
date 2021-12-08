@@ -154,9 +154,10 @@ static void io_toggle_for_clock(uint8_t pin)
 {
     io_cfg_output(pin);
     uint8_t i;
-    for(i=0;i<10;++i)
+    for(i=0;i<80;++i)
     {
-        io_toggle_pin(pin);    
+        io_toggle_pin(pin);
+        DELAY_US(4);
     }
 }
 
