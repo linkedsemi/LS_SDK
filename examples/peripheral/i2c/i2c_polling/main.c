@@ -37,7 +37,7 @@ int main(void)
 	
   /*##-1- Configure the I2C peripheral ######################################*/
   I2cHandle.Instance             = I2C1;
-  I2cHandle.Init.ClockSpeed      = 1000000;
+  I2cHandle.Init.ClockSpeed      = 100000;
   I2cHandle.Init.OwnAddress1     = I2C_ADDRESS;
   I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
   I2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
