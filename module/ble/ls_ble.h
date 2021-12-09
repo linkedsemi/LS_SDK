@@ -240,6 +240,7 @@ enum prf_id
     PRF_FOTA_SERVER,                                /*!< FOTA server service*/ 
     PRF_HID,                                        /*!< HID profile*/ 
     PRF_BASS,                                       /*!< Battery service profile*/ 
+    PRF_ANCS,                                       /*!< Apple Notification Center Service*/
 };
 /**
   * @brief Profile added event.
