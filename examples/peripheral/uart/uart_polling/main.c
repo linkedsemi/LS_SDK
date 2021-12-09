@@ -31,6 +31,7 @@ int main()
 {
     sys_init_none();
     uart1_io_init(PB00,PB01);
+    io_pull_write(PB01, IO_PULL_UP);
     uart_init();
     uart_test();
     while(1)

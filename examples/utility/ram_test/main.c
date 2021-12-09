@@ -104,6 +104,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 static void uart_test_init(void)
 {
     uart1_io_init(PA10,PA11);
+    io_pull_write(PA11, IO_PULL_UP);
     UART_Config2.UARTX = UART1;
     UART_Config2.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Config2.Init.MSBEN = 0;

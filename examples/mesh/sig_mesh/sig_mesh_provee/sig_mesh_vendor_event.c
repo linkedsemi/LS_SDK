@@ -29,6 +29,7 @@ static uint32_t cnt_vendor_event_info=0;
 static void ls_uart_init(void)
 {
     uart1_io_init(PB00, PB01);
+    io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Server_Config.Init.MSBEN = 0;

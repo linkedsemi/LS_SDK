@@ -256,6 +256,7 @@ void io_exti_callback(uint8_t pin) // override io_exti_callback
 static void ls_uart_init(void)
 {
     uart1_io_init(PB00, PB01);
+    io_pull_write(PB01, IO_PULL_UP);
     UART_SIG_MESH_Config.UARTX = UART1;
     UART_SIG_MESH_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_SIG_MESH_Config.Init.MSBEN = 0;
