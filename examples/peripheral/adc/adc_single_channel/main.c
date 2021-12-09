@@ -27,7 +27,7 @@ static void lsadc_init(void)
     hadc.Init.ContinuousConvMode    = DISABLE;                        /* Continuous mode to have maximum conversion speed (no delay between conversions) */
     hadc.Init.TrigType      = ADC_INJECTED_SOFTWARE_TRIGT;            /* The reference voltage uses an internal reference */
     hadc.Init.Vref          = ADC_VREF_INSIDE;
-    hadc.Init.AdcCkDiv = ADC_CLOCK_DIV2;
+    hadc.Init.AdcCkDiv = ADC_CLOCK_DIV32;
 
     if (HAL_ADC_Init(&hadc) != HAL_OK)
     {
