@@ -22,6 +22,7 @@ static void ls_pdm_uart_init(void)
 {
 
     uart1_io_init(PB00, PB01);
+    io_pull_write(PB01, IO_PULL_UP);
     UART_PDM_Config.UARTX = UART1;
     UART_PDM_Config.DMAC_Instance = &dmac1_inst;
     UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3;
