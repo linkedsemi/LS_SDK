@@ -755,8 +755,6 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
         hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
-        hspi->pTxBuffPtr += sizeof(uint16_t);
-        hspi->TxXferCount--;
 			}
 
   }
@@ -766,9 +764,9 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
       /* Check TXE flag */
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
+         hspi->TxXferCount--;
         *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
         hspi->pTxBuffPtr++;
-        hspi->TxXferCount--;
 			}
   }
 	
@@ -1289,14 +1287,17 @@ static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  *(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
-  hspi->pTxBuffPtr++;
-  hspi->TxXferCount--;
-
-  if (hspi->TxXferCount == 0U)
+  if (hspi->TxXferCount != 0U)
+  {
+    *(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+    hspi->pTxBuffPtr++;
+    hspi->TxXferCount--;
+  }
+  else
   {
     SPI_CloseTx_ISR(hspi);
   }
+  
 }
 
 /**
@@ -1308,14 +1309,16 @@ static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 static void SPI_TxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
   /* Transmit data in 16 Bit mode */
-  hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
-  hspi->pTxBuffPtr += sizeof(uint16_t);
-  hspi->TxXferCount--;
-
-  if (hspi->TxXferCount == 0U)
-  {
-    SPI_CloseTx_ISR(hspi);
-  }
+   hspi->TxXferCount-= sizeof(uint16_t);
+   if (hspi->TxXferCount != 0U)
+   {
+     hspi->pTxBuffPtr += sizeof(uint16_t);
+     hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+   }
+   else
+   {
+     SPI_CloseTx_ISR(hspi);
+   }
 }
 
 /**
