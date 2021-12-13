@@ -3,16 +3,14 @@ import sys
 Import('env')
 env['CPU'] = 'cortex-m0'
 
-def plf_postaction(target,ble,mesh,prop_24g):
+def plf_postaction(target,ble,mesh):
     stack_hex = None
     if mesh:
-        env.Append(LIBS = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o')))
+        env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
         stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
     elif ble:
-        env.Append(LIBS = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o')))
+        env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))])
         stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
-    elif prop_24g:
-        env.Append(LIBS = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/prop_24g_lib.o')))
     target_path = str(target[0]).replace('.elf','')
     app_hex = env.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
     env.AddPostAction(target[0],Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
