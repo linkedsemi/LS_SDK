@@ -135,8 +135,6 @@ void app_user_24g_init(void)
 
 int main()
 {
-    extern void lib_fn_init(void);
-    lib_fn_init();
     sys_init_24g();
     RF_24g_Init();
     app_user_24g_init();

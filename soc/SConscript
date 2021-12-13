@@ -28,10 +28,10 @@ def image_build(name,src,inc,rtos = None,with_startup = True,objprefix = ''):
         env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     return target
 
-def app_build(app_name,src,inc,ble = True,mesh = False,prop_24g = False,rtos = None):
+def app_build(app_name,src,inc,ble = True,mesh = False,rtos = None):
     target = image_build(app_name,src,inc,rtos)
     if not 'mdk' in env['TOOLS']:
-        env.plf_postaction(target,ble,mesh,prop_24g)
+        env.plf_postaction(target,ble,mesh)
 
 env.variant_dir_add_source = variant_dir_add_source
 env.add_include = add_include
