@@ -1,10 +1,14 @@
 Import('env')
 
-tool = ARGUMENTS.get('toolchain','arm-gcc')
+tool = ARGUMENTS.get('tool','arm-gcc')
 env.Tool(tool,toolpath = ['$SDK_ROOT/tools'])
-if tool == 'mdk':
-    env['OPERATION'] = ARGUMENTS.get('operation','proj_gen')
-    env['COMPILER'] = 'armcc'
+if tool == 'progen':
+    env['IDE'] = ARGUMENTS.get('ide','uvision5')
+    ide_toolchain = {
+        'uvision5':'armcc',
+        'iar':'iar'
+    }
+    env['COMPILER'] = ide_toolchain[env['IDE']]
 else:
     env['COMPILER'] = 'gnu'
     env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar  ${OPT_LVL} -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
