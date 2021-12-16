@@ -1310,6 +1310,17 @@ void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint
 void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc);
 /**
  ****************************************************************************************
+ * \brief Set service/profile permission.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Start handle of the service/profile.
+ * \param[in]  perm                    Permission value to set. Refer to ::sec_lvl_type
+ *
+ ****************************************************************************************
+ */
+void gatt_manager_server_set_svc_permission(uint8_t con_idx, uint16_t handle, uint16_t perm);
+/**
+ ****************************************************************************************
  * \brief Send reply to read request from GATT client.
  *
  * \param[in]  con_idx                 Connection index.
@@ -1334,6 +1345,17 @@ void gatt_manager_server_read_req_reply(uint8_t con_idx,uint16_t handle,uint8_t 
  ****************************************************************************************
  */
 void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
+/**
+ ****************************************************************************************
+ * \brief Send service changed indication.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  start_handle            Start handle of attributes changed.
+ * \param[in]  end_handle              End handle of attributes changed.
+ *
+ ****************************************************************************************
+ */
+void gatt_manager_server_send_svc_changed_indication(uint8_t con_idx, uint16_t start_handle, uint16_t end_handle);
 /**
  ****************************************************************************************
  * \brief Send notification to client.
