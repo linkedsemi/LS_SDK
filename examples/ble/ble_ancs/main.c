@@ -343,6 +343,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         prf_added_handler(&evt->profile_added);
     break;
     case ADV_OBJ_CREATED:
+		{
         LS_ASSERT(evt->obj_created.status == 0);
         adv_obj_hdl = evt->obj_created.handle;
         uint16_t hid_uuid_value = 0x1812;
@@ -350,7 +351,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
                                                                      GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID, &hid_uuid_value, 2);
         (void)adv_data_length;
         dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
-    break;
+		}break;
     case ADV_STOPPED:
     
     break;

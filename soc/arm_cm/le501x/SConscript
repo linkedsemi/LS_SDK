@@ -7,10 +7,13 @@ def plf_postaction(target,ble,mesh):
     stack_hex = None
     if mesh:
         env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
-        stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
+        env['STACK_HEX'] = stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
     elif ble:
         env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))])
-        stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+        env['STACK_HEX'] = stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+    if 'progen' in env['TOOLS']:
+        return
+    env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     target_path = str(target[0]).replace('.elf','')
     app_hex = env.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
     env.AddPostAction(target[0],Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
@@ -155,7 +158,6 @@ def plf_build(name,app_src,rtos,with_startup,objprefix):
             'arm_cm/le501x/freertos_adapt.c',
         ])
         env.add_include('$SDK_ROOT/',['rtos/freertos/include'])
-    print(env['CPPPATH'])
     return env.Program('build/le501x/'+name,sdk_src + start_src + app_src + rtos_src,OBJPREFIX = objprefix)
 
 env.plf_postaction = plf_postaction
