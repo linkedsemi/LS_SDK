@@ -1,7 +1,5 @@
-#! armcc -E
 
 #define FLASH_BASE 0x18000000
-#define FLASH_BASE_USER 0x18005000
 #define FLASH_SIZE 0x40000
 #define FLASH_END (FLASH_BASE + FLASH_SIZE)
 #define RAM_BASE 0

@@ -52,7 +52,7 @@ def progen(target,source,env):
             stack_path = ''
         else:
             stack_path = os.path.relpath(env['STACK_HEX'].srcnode().abspath,env['SDK_ROOT'].abspath)
-        user_action1.text = "{} @L {} {}".format(root_relpath +'\\tools\\'+env['IC']+'\\after_build.bat',root_relpath,stack_path)
+        user_action1.text = "{} @L {} {} {}".format(root_relpath +'\\tools\\'+env['IC']+'\\after_build.bat',root_relpath,env['APP_IMAGE_BASE'],stack_path)
         et.write(file,xml_declaration=True,short_empty_elements=False)
         shutil.copy(env['SDK_ROOT'].abspath+'/tools/prog/LinkedSemi/LE501X.jlinkscript',os.path.join(os.path.join(env['IC'],env['IDE']),"JLinkSettings.jlinkscript"))
 

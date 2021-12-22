@@ -17,18 +17,15 @@ def add_include(dir,path):
     env.Append(CPPPATH = inc_list)
     return inc_list
 
-def image_build(name,src,inc,rtos = None,with_startup = True,objprefix = ''):
-    env['PROJ_DIR'] = Dir('.')
+def image_build(name,src,inc,ble=False,mesh=False,rtos = None,with_startup = True,objprefix = ''):
     src_files = env.variant_dir_add_source('build/$IC/','./',src)
     env.add_include(Dir('.').path,inc)
     env.Append(LINKFLAGS = ' $GC_OPTION ')
-    target = env.plf_build(name,src_files,rtos,with_startup,objprefix)
-    env.Depends(target,env['LINKSCRIPT'])
-    return target
+    return env.plf_build(name,src_files,rtos,with_startup,ble,mesh,objprefix)
 
 def app_build(app_name,src,inc,ble = True,mesh = False,rtos = None):
-    target = image_build(app_name,src,inc,rtos)
-    env.plf_postaction(target,ble,mesh)
+    target = image_build(app_name,src,inc,ble,mesh,rtos)
+    env.plf_postaction(target)
 
 env.variant_dir_add_source = variant_dir_add_source
 env.add_include = add_include

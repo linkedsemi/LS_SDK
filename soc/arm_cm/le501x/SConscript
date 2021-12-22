@@ -3,30 +3,23 @@ import sys
 Import('env')
 env['CPU'] = 'cortex-m0'
 
-def plf_postaction(target,ble,mesh):
-    stack_hex = None
-    if mesh:
-        env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
-        env['STACK_HEX'] = stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
-    elif ble:
-        env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))])
-        env['STACK_HEX'] = stack_hex = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+def plf_postaction(target):
     if 'progen' in env['TOOLS']:
         return
     env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     target_path = str(target[0]).replace('.elf','')
     app_hex = env.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
     env.AddPostAction(target[0],Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
-    info_sbl_hex = env.Command('build/le501x/info_sbl.hex',env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/bram.bin'),Action(env.subst('python $SDK_ROOT/tools/info_sbl_merge.py') + ' $SOURCE le501x $TARGET'))
-    if stack_hex is None:
+    info_sbl_hex = env.Command('build/le501x/info_sbl.hex',env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/bram.bin'),Action(env.subst('python $SDK_ROOT/tools/le501x/info_sbl_merge.py') + ' $SOURCE $APP_IMAGE_BASE $TARGET'))
+    if env.get('STACK_HEX') is None:
         production_hex_depends = [info_sbl_hex,app_hex]
     else:
-        production_hex_depends = [info_sbl_hex,app_hex,stack_hex]
+        production_hex_depends = [info_sbl_hex,app_hex,env['STACK_HEX']]
     env.Command(target_path+'_production.hex',production_hex_depends, Action(env.subst('python $SDK_ROOT/tools/hexmerge.py') + ' $SOURCES > $TARGET'))
 
 
 
-def plf_build(name,app_src,rtos,with_startup,objprefix):
+def plf_build(name,app_src,rtos,with_startup,ble,mesh,objprefix):
     start_src = []
     if with_startup:
         start_src = env.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
@@ -117,8 +110,6 @@ def plf_build(name,app_src,rtos,with_startup,objprefix):
         'micro-ecc/uECC.c',
         'ble/ble_common_api.c',
     ])
-    if env.get('LINKSCRIPT') is None:
-        env['LINKSCRIPT'] = File(env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/link_script.txt"))
     env.add_include('$SDK_ROOT/',[
         '.',
         'peripheral/inc',
@@ -158,7 +149,26 @@ def plf_build(name,app_src,rtos,with_startup,objprefix):
             'arm_cm/le501x/freertos_adapt.c',
         ])
         env.add_include('$SDK_ROOT/',['rtos/freertos/include'])
-    return env.Program('build/le501x/'+name,sdk_src + start_src + app_src + rtos_src,OBJPREFIX = objprefix)
+    if mesh:
+        env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
+        env['STACK_HEX'] = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
+        env['APP_IMAGE_BASE'] = 0x18056000
+        if env.get('LINKSCRIPT') is None:
+            env['LINKSCRIPT'] = File(env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mesh.ld"))
+    elif ble:
+        env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))])
+        env['STACK_HEX'] = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+        env['APP_IMAGE_BASE'] = 0x18034000
+        if env.get('LINKSCRIPT') is None:
+            env['LINKSCRIPT'] = File(env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/ble.ld"))
+    else:
+        env['APP_IMAGE_BASE'] = 0x18002000
+        if env.get('LINKSCRIPT') is None:
+            env['LINKSCRIPT'] = File(env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mcu.ld"))
+    env.Append(LIBPATH = [env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/")])
+    target =  env.Program('build/le501x/'+name,sdk_src + start_src + app_src + rtos_src,OBJPREFIX = objprefix)
+    env.Depends(target,[env['LINKSCRIPT'],env.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/common.ld")])
+    return target
 
 env.plf_postaction = plf_postaction
 env.plf_build = plf_build
