@@ -1,8 +1,3 @@
-MEMORY
-{
-  RAM (rwx) : ORIGIN = 0x0000, LENGTH = 0xc000
-  FLASH (rx) : ORIGIN = 0x18005000, LENGTH = 0x40000
-}
 
 SECTIONS
 {
@@ -101,11 +96,10 @@ SECTIONS
         PROVIDE(end = .);
         *(.heap*)
     } > RAM
-
-    .reset_retain MAX(__HeapLimit, 0x6AE8) (NOLOAD):
+    reset_retain_addr = MAX(__HeapLimit , 0x6AE8);
+    .reset_retain reset_retain_addr (NOLOAD):
     {
         . = ALIGN(4);
-        
         reset_retain_start = .;
         . += 2*4;
         reset_retain_end = .;
