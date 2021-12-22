@@ -218,14 +218,14 @@ void prf_ancs_callback_init(void (*cb)(enum ancs_evt_type,union ancs_evt_u *,uin
 
 void prf_ancs_enable_req(uint8_t con_idx,void *ancs_db);
 
-void prf_ancs_get_notification_attributes(uint32_t ntf_uid,uint16_t att_mask,uint16_t title_length,uint16_t subtitle_length,uint16_t message_length);
+void prf_ancs_get_notification_attributes(uint8_t con_idx,uint32_t ntf_uid,uint16_t att_mask,uint16_t title_length,uint16_t subtitle_length,uint16_t message_length);
 
-void prf_ancs_get_app_attributes(uint8_t *app_id,uint8_t att_mask);
+void prf_ancs_get_app_attributes(uint8_t con_idx,uint8_t *app_id,uint8_t att_mask);
 
-void prf_ancs_perform_notfication_action(uint32_t ntf_uid,uint8_t action_id);
+void prf_ancs_perform_notfication_action(uint8_t con_idx,uint32_t ntf_uid,uint8_t action_id);
 
-void prf_ancs_client_configuration_enable(void);
+void prf_ancs_client_configuration_enable(uint8_t con_idx);
 
-void prf_ancs_client_configuration_disable(void);
+void prf_ancs_client_configuration_disable(uint8_t con_idx);
 
 #endif

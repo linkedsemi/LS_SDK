@@ -40,13 +40,13 @@ union diss_evt_u
     struct diss_get_value_ind_evt get_value_ind;
 };
 
-void prf_dis_server_callback_init(void (*cb)(enum diss_evt_type,union diss_evt_u *,uint8_t));
+void prf_dis_server_callback_init(void (*cb)(enum diss_evt_type,union diss_evt_u *));
 
 void dev_manager_prf_dis_server_add(uint8_t sec_lvl,uint16_t features);
 
-void prf_diss_set_value_req(uint8_t con_idx,uint8_t value,uint8_t length,uint8_t *data);
+void prf_diss_set_value_req(uint8_t value,uint8_t length,uint8_t *data);
 
-void prf_diss_value_confirm(uint8_t con_idx,uint8_t value,uint8_t length,uint8_t *data);
+void prf_diss_value_confirm(uint8_t value,uint8_t length,uint8_t *data);
 
-
+uint8_t prf_diss_get_current_req_con_idx(void);
 #endif

@@ -88,30 +88,40 @@ struct hid_read_report_req_evt
     uint8_t  hid_idx;/**< HIDS Instance */
     uint8_t  type;/**< type of report ::app_hogpd_report_type */
     uint8_t  idx;/**< Report Instance - 0 for boot reports and report map */
+    uint8_t con_idx;/**< Connect id */
 };
 ///A structure for reporting information about write events
 struct hid_write_report_req_evt
 {
     uint16_t length;/**< The length of the data to be sent */
     uint8_t* value;/**< Point to the data address to send */
+    uint8_t con_idx;/**< Connect id */
 };
 ///Structure for the Report configuration events
 struct hid_ntf_cfg_evt
 {
     uint16_t value;/**< Notification Configuration Value */
+    uint8_t con_idx;/**< Connect id */
 };
+
+struct hid_ntf_done_evt
+{
+    uint8_t con_idx;/**< Connect id */
+};
+
 ///Information data Union used to read or write information events
 union hid_evt_u
 {
     struct hid_read_report_req_evt read_report_req;/**< ::hid_read_report_req_evt */
     struct hid_ntf_cfg_evt ntf_cfg;/**< ::hid_ntf_cfg_evt */
     struct hid_write_report_req_evt write_report_req;/**< ::hid_write_report_req_evt */
+    struct hid_ntf_done_evt ntf_done;/**< ::hid_ntf_done_evt */
 };
 
 /**  \brief Initializes the HID events that reports a request to the counterpart device
  *   \param[in] evt_cb  Callback function for HID events
  */
-void prf_hid_server_callback_init(void (*evt_cb)(enum hid_evt_type, union hid_evt_u *,uint8_t));
+void prf_hid_server_callback_init(void (*evt_cb)(enum hid_evt_type, union hid_evt_u *));
 
 /**  \brief Add the HID service to the database of the local device
  *   \param[in] sec_lvl Security level eg:default NO_SEC

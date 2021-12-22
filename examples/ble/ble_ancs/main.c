@@ -134,7 +134,7 @@ static void create_adv_obj()
     dev_manager_create_legacy_adv_object(&adv_param);
 }
 
-static void ancs_app_att_report(struct ancs_att_ind *param)
+static void ancs_app_att_report(uint8_t con_idx,struct ancs_att_ind *param)
 {
     uint8_t i;
     LOG_I("app att val:");
@@ -145,14 +145,14 @@ static void ancs_app_att_report(struct ancs_att_ind *param)
     LOG_RAW("\r\n");
 }
 
-static void ancs_ntf_att_report(struct ancs_att_ind *param)
+static void ancs_ntf_att_report(uint8_t con_idx,struct ancs_att_ind *param)
 {
     uint8_t i = 0;
     switch(param->att_id)
     {
         case NTF_ATT_ID_APP_ID:
             LOG_I("appid = %s", param->val);
-            prf_ancs_get_app_attributes(param->val,1<<APP_ATT_ID_DISPLAY_NAME);
+            prf_ancs_get_app_attributes(con_idx,param->val,1<<APP_ATT_ID_DISPLAY_NAME);
             break;
         case NTF_ATT_ID_TITLE:
             LOG_I("att id tile:");
@@ -198,12 +198,12 @@ static void ancs_ntf_att_report(struct ancs_att_ind *param)
     }
 }
 
-static void call_handler(struct ancs_ntf_src *ntf_src)
+static void call_handler(uint8_t con_idx,struct ancs_ntf_src *ntf_src)
 {
     switch(ntf_src->event_id)
     {
     case EVT_ID_NTF_ADDED:
-        prf_ancs_get_notification_attributes(ntf_src->ntf_uid,
+        prf_ancs_get_notification_attributes(con_idx,ntf_src->ntf_uid,
             1 << NTF_ATT_ID_APP_ID| 1 << NTF_ATT_ID_TITLE | 1 << NTF_ATT_ID_MSG | 1 << NTF_ATT_ID_POS_ACTION_LABEL | 1 << NTF_ATT_ID_NEG_ACTION_LABEL,
             20,0,20);
     break;
@@ -216,7 +216,7 @@ static void call_handler(struct ancs_ntf_src *ntf_src)
     }
 }
 
-static void ntf_src_handler(struct ancs_ntf_src *ntf_src)
+static void ntf_src_handler(uint8_t con_idx,struct ancs_ntf_src *ntf_src)
 {
     switch(ntf_src->cat_id)
     {
@@ -224,7 +224,7 @@ static void ntf_src_handler(struct ancs_ntf_src *ntf_src)
 
     break;
     case CAT_ID_CALL:
-        call_handler(ntf_src);
+        call_handler(con_idx,ntf_src);
     break;
     case CAT_ID_MISSED_CALL:
 
@@ -269,7 +269,7 @@ static void prf_ancs_callback(enum ancs_evt_type type,union ancs_evt_u *evt,uint
             tinyfs_write(ROOT_DIR,ANCS_DB_RECORD_NAME,evt->enable_rsp.ancs_db,ANCS_DB_SIZE);
             tinyfs_write_through();
         }
-        prf_ancs_client_configuration_enable();
+        prf_ancs_client_configuration_enable(con_idx);
     break;
     case ANCS_CLIENT_CONFIGURATION_ENABLED:
         LOG_I("ancs cl cfg enabled");
@@ -280,16 +280,16 @@ static void prf_ancs_callback(enum ancs_evt_type type,union ancs_evt_u *evt,uint
     case ANCS_NOTIFICATION_SOURCE:
         LOG_I("evt_id=0x%x, evt_flg=0x%x, cat_id=0x%x, cat_cnt=0x%x, ntf_uid=0x%x", 
             evt->ntf_src->event_id, evt->ntf_src->event_flags, evt->ntf_src->cat_id, evt->ntf_src->cat_cnt, evt->ntf_src->ntf_uid);
-        ntf_src_handler(evt->ntf_src);
+        ntf_src_handler(con_idx,evt->ntf_src);
     break;
     case ANCS_NOTIFICATION_ATTRIBUTES_REPORT:
-        ancs_ntf_att_report(evt->ntf_atts_report);
+        ancs_ntf_att_report(con_idx,evt->ntf_atts_report);
     break;
     case ANCS_NOTIFICATION_ATTRIBUTES_COMPLETE:
         LOG_I("GET NTF ATTS CMP");
     break;
     case ANCS_APP_ATTRIBUTES_REPORT:
-        ancs_app_att_report(evt->app_atts_report);
+        ancs_app_att_report(con_idx,evt->app_atts_report);
     break;
     case ANCS_APP_ATTRIBUTES_COMPLETE:
         LOG_I("GET APP ATTS CMP");
