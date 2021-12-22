@@ -22,7 +22,7 @@ struct bas_db_cfg
     uint8_t ntf_enable[BASS_NB_BAS_INSTANCES_MAX];
 };
 
-void prf_bass_server_callback_init(void (*evt_cb)(enum bass_evt_type, union bass_evt_u *,uint8_t));
+void prf_bass_server_callback_init(void (*evt_cb)(enum bass_evt_type, union bass_evt_u *));
 
 void dev_manager_prf_bass_server_add(uint8_t sec_lvl,struct bas_db_cfg*cfg,uint16_t len);
 

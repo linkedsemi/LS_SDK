@@ -50,10 +50,13 @@ union fotas_evt_u
 };
 
 
-void prf_fota_server_callback_init(void (*evt_cb)(enum fotas_evt_type,union fotas_evt_u *,uint8_t));
+void prf_fota_server_callback_init(void (*evt_cb)(enum fotas_evt_type,union fotas_evt_u *));
 
 void dev_manager_prf_fota_server_add(uint8_t sec_lvl);
 
-void prf_fotas_start_confirm(uint8_t con_idx,enum fota_start_cfm_status status);
+void prf_fotas_start_confirm(enum fota_start_cfm_status status);
+
+uint8_t prf_fotas_get_current_conidx(void);
+
 #endif
 

@@ -270,7 +270,7 @@ static void hid_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, 
     dev_name_ptr->length = APP_HID_DEV_NAME_LEN;
 }
 
-static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt, uint8_t con_idx)
+static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt)
 {
     uint16_t ntf_cfg;
     uint8_t ret;
@@ -305,7 +305,7 @@ static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt
     }
 }
 
-static void prf_batt_server_callback(enum bass_evt_type type, union bass_evt_u *evt, uint8_t con_idx)
+static void prf_batt_server_callback(enum bass_evt_type type, union bass_evt_u *evt)
 {
 
 }

@@ -111,7 +111,7 @@ static void dis_server_get_slv_pref_param(struct gap_dev_info_slave_pref_param *
     dev_slv_pref_param_ptr->conn_timeout  = 200;
 }
 
-static void dis_server_get_value(uint8_t value, uint8_t con_idx)
+static void dis_server_get_value(uint8_t value)
 {
     // Initialize length
     uint8_t len = 0;
@@ -161,11 +161,11 @@ static void dis_server_get_value(uint8_t value, uint8_t con_idx)
     }
     if(data)
     {
-        prf_diss_value_confirm(con_idx, value, len, data);
+        prf_diss_value_confirm(value, len, data);
     }   
 }
 
-static void prf_dis_server_callback(enum diss_evt_type type,union diss_evt_u *evt,uint8_t con_idx)
+static void prf_dis_server_callback(enum diss_evt_type type,union diss_evt_u *evt)
 {
     switch(type)
     {
@@ -173,7 +173,7 @@ static void prf_dis_server_callback(enum diss_evt_type type,union diss_evt_u *ev
 
     break;
     case DIS_SERVER_GET_VALUE_IND:
-        dis_server_get_value(evt->get_value_ind.value, con_idx);
+        dis_server_get_value(evt->get_value_ind.value);
     break;
     default:
         LS_ASSERT(0);

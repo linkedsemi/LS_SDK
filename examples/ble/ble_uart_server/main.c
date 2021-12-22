@@ -147,7 +147,7 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
         {
             status = FOTA_REQ_REJECTED;
         }
-        prf_fotas_start_confirm(con_idx, status);
+        prf_fotas_start_confirm(status);
     }break;
     case FOTAS_FINISH_EVT:
         if(evt->fotas_finish.integrity_checking_result)

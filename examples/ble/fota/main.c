@@ -35,7 +35,7 @@ bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signatur
 }
 #endif
 
-static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt,uint8_t con_idx)
+static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt)
 {
     switch(type)
     {
@@ -51,7 +51,7 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
         {
             status = FOTA_REQ_REJECTED;
         }
-        prf_fotas_start_confirm(con_idx, status);
+        prf_fotas_start_confirm(status);
     }break;
     case FOTAS_FINISH_EVT:
         if(evt->fotas_finish.integrity_checking_result)
