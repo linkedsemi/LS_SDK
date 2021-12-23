@@ -33,4 +33,15 @@ env.image_build = image_build
 env.app_build = app_build
 
 SConscript(dirs = env['BASE_ARCH'], exports = ['env'])
+flags = env.ParseFlags(ARGUMENTS.get('flags'))
+env.MergeFlags(flags)
+
+### default build parameters
+default_opt_level = '-Os'
+for v in flags['CCFLAGS']:
+    print(v)
+    if '-O' in v:
+        default_opt_level = ''
+        break
+env.MergeFlags(default_opt_level)
 
