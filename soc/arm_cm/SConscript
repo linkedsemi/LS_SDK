@@ -11,10 +11,10 @@ if tool == 'progen':
     env['COMPILER'] = ide_toolchain[env['IDE']]
 else:
     env['COMPILER'] = 'gnu'
-    env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar  ${OPT_LVL} -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
+    env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
-    env['ASFLAGS'] = '-c ${CCFLAGS} ${_CPPDEFFLAGS} '
+    env['ASFLAGS'] = ' -c ${CCFLAGS} '
     env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
