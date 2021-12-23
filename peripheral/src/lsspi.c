@@ -239,7 +239,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
   uint32_t             txallowed = 1U;
-  uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+  uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   /* Check Direction parameter */
   LS_ASSERT(IS_SPI_DIRECTION_2LINES_OR_1LINE(hspi->Init.Direction));
 
@@ -312,7 +312,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
-                hspi->TxXferCount--;
+                hspi->TxXferCount-=sizeof(uint16_t);
             }
         }
     }
@@ -391,7 +391,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
 {
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
-  uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+  uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   if ((hspi->Init.Mode == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES))
   {
     hspi->State = HAL_SPI_STATE_BUSY_RX;
@@ -480,7 +480,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
           /* read the received data */
         (* (uint16_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
         hspi->pRxBuffPtr += sizeof(uint16_t);
-        hspi->RxXferCount--;
+        hspi->RxXferCount-= sizeof(uint16_t);;
       }
     }
   }
@@ -520,7 +520,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
   HAL_SPI_StateTypeDef tmp_state;
   uint32_t             tickstart;
   uint32_t             txallowed = 1U;
-  uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+  uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   /* Variable used to alternate Rx and Tx during transfer */
   HAL_StatusTypeDef    errorcode = HAL_OK;
 
@@ -1271,7 +1271,7 @@ static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
   *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
   hspi->pRxBuffPtr += sizeof(uint16_t);
-  hspi->RxXferCount--;
+  hspi->RxXferCount-=sizeof(uint16_t);
 
   if (hspi->RxXferCount == 0U)
   {
@@ -1297,7 +1297,6 @@ static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   {
     SPI_CloseTx_ISR(hspi);
   }
-  
 }
 
 /**
@@ -1337,11 +1336,11 @@ static HAL_StatusTypeDef SPI_EndRxTransaction(SPI_HandleTypeDef *hspi,  uint32_t
     /* Disable SPI peripheral */
     __HAL_SPI_DISABLE(hspi);
   }
-
+   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   if ((hspi->Init.Mode == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES_RXONLY))
   {
     /* Wait the RXNE reset */
-    if(systick_poll_timeout(Tickstart,Timeout,spi_flag_poll1,hspi,SPI_FLAG_RXNE))
+    if(systick_poll_timeout(Tickstart,timeout,spi_flag_poll1,hspi,SPI_FLAG_RXNE))
     {
       SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_FLAG);
       return HAL_TIMEOUT;
@@ -1350,7 +1349,7 @@ static HAL_StatusTypeDef SPI_EndRxTransaction(SPI_HandleTypeDef *hspi,  uint32_t
   else
   {
     /* Control the BSY flag */
-    if(systick_poll_timeout(Tickstart,Timeout,spi_flag_poll1,hspi,SPI_FLAG_BSY))
+    if(systick_poll_timeout(Tickstart,timeout,spi_flag_poll1,hspi,SPI_FLAG_BSY))
     {
       SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_FLAG);
       return HAL_TIMEOUT;
@@ -1369,9 +1368,9 @@ static HAL_StatusTypeDef SPI_EndRxTransaction(SPI_HandleTypeDef *hspi,  uint32_t
   */
 static HAL_StatusTypeDef SPI_EndRxTxTransaction(SPI_HandleTypeDef *hspi, uint32_t Timeout, uint32_t Tickstart)
 {
-
+  uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   /* Control the BSY flag */
-  if(systick_poll_timeout(Tickstart,Timeout,spi_flag_poll1,hspi,SPI_FLAG_BSY))
+  if(systick_poll_timeout(Tickstart,timeout,spi_flag_poll1,hspi,SPI_FLAG_BSY))
   {
     SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_FLAG);
     return HAL_TIMEOUT;
