@@ -1,6 +1,7 @@
 import os
 env = Environment(ENV = os.environ)
 env['SDK_ROOT'] = Dir('../../../')
+env['IC'] = 'le501x'
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
     'boot_ram_le501x.c'
