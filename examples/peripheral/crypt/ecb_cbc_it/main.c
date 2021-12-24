@@ -32,7 +32,7 @@ enum lscrypt_type
     LSCRYPT_CBC_ENCRYPT_256,
     LSCRYPT_CBC_DECRYPT_256,
 };
-enum lscrypt_type lscrypt_type_flag = LSCRYPT_ECB_ENCRYPT_128;
+volatile enum lscrypt_type lscrypt_type_flag = LSCRYPT_ECB_ENCRYPT_128;
 
 /**cbc-ecb-key-ciphertext-128**/
 const uint32_t cbc_ecb_key_128[] = {
