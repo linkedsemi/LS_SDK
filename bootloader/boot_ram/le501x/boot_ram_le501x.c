@@ -319,7 +319,7 @@ void boot_ram_start(uint32_t exec_addr)
     boot_app(image_base);
 }
 
-void fault(void){}
+void fault(void){while(1);}
 
 const uint32_t vector[48] = {
     0xC000,
