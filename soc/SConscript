@@ -4,7 +4,8 @@ Import('env')
 plf = {
     'le501x': 'arm_cm',
 }
-env['IC'] = ARGUMENTS.get('ic','le501x')
+if env.get('IC') is None:
+    env['IC'] = ARGUMENTS.get('ic','le501x')
 env['BASE_ARCH'] = plf[env['IC']]
 env['CPPDEFINES'] = [env['IC'].upper()]
 
