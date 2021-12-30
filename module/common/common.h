@@ -41,4 +41,6 @@ void memset32(uint32_t *start,uint32_t data,uint32_t size_word);
 uint8_t count_trailing_zeros(uint32_t x);
 
 uint8_t count_leading_zeros(uint32_t x);
+
+uint32_t __div64_32(uint64_t *n, uint32_t base);
 #endif
