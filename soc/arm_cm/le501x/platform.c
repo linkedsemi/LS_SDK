@@ -202,7 +202,8 @@ void rco_freq_counting_start()
 
 uint64_t lpcycles_to_hus(uint32_t lpcycles)
 {
-    uint64_t hus = 2*(uint64_t)lpcycles*lsi_cnt_val/LSI_CNT_CYCLES;
+    uint64_t hus = 2*lsi_cnt_val*(uint64_t)lpcycles;
+    __div64_32(&hus,LSI_CNT_CYCLES);
     //LOG_I("%d,%d",lpcycles,hus);
     return hus;
 }
@@ -230,7 +231,8 @@ uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
         }
     }
     LS_ASSERT(lsi_cnt_val);
-    uint32_t lpcycles = LSI_CNT_CYCLES*625*(uint64_t)hs_cnt/2/lsi_cnt_val;
+    uint64_t lpcycles = LSI_CNT_CYCLES*625*(uint64_t)hs_cnt;
+    __div64_32(&lpcycles,2*lsi_cnt_val);
     //LOG_I("%d,%d,%d",lsi_cnt_val,lpcycles,hs_cnt);
     return lpcycles;
 }
