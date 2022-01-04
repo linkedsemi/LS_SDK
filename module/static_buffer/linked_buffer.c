@@ -12,10 +12,13 @@ __attribute__((weak)) uint16_t co_list_size(struct co_list *list){return 0;}
 
 ROM_SYMBOL void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt)
 {
-    memset(ref_cnt,0,buf_length);
     co_list_init(&ptr->allocatable);
     ptr->buf = buf;
     ptr->ref_cnt = ref_cnt;
+    if(ref_cnt)
+    {
+        memset(ref_cnt,0,buf_length);
+    }
     ptr->element_size = element_size;
     ptr->buf_length = buf_length;
     uint16_t i;
@@ -25,13 +28,15 @@ ROM_SYMBOL void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint1
     }
 }
 
-ROM_SYMBOL LL_PKT_ISR struct co_list_hdr * linked_buf_alloc(linked_buffer_t *ptr)
+ROM_SYMBOL LL_PKT_ISR void *linked_buf_alloc(linked_buffer_t *ptr)
 {
     struct co_list_hdr *hdr = co_list_pop_front(&ptr->allocatable);
     if(hdr)
     {
         uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
-        ptr->ref_cnt[idx] += 1;
+        if(ptr->ref_cnt){
+            ptr->ref_cnt[idx] += 1;
+        }
     }
     return hdr;
 }
@@ -50,29 +55,36 @@ LL_PKT_ISR static bool linked_buf_hdl_sanity_check(linked_buffer_t *buf_hdl,uint
 
 }
 
-ROM_SYMBOL LL_PKT_ISR uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
+ROM_SYMBOL LL_PKT_ISR uint8_t linked_buf_release(linked_buffer_t *ptr,void *hdr)
 {
-    LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
+    LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,hdr));
     uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
-    LINKED_BUF_ASSERT(ptr->ref_cnt[idx]);
-    ptr->ref_cnt[idx] -= 1;
-    if(ptr->ref_cnt[idx]==0)
+    if(ptr->ref_cnt)
+    {
+        LINKED_BUF_ASSERT(ptr->ref_cnt[idx]);
+        ptr->ref_cnt[idx] -= 1;
+        if(ptr->ref_cnt[idx]==0)
+        {
+            co_list_push_back(&ptr->allocatable, hdr);
+        }
+        return ptr->ref_cnt[idx];
+    }else
     {
         co_list_push_back(&ptr->allocatable, hdr);
+        return 0;
     }
-    return ptr->ref_cnt[idx];
 }
 
-ROM_SYMBOL LL_PKT_ISR uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL LL_PKT_ISR uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,void *hdr)
 {
-    uint8_t *elem = (uint8_t *)hdr;
+    uint8_t *elem = hdr;
     LINKED_BUF_ASSERT((elem-(uint8_t *)ptr->buf)%ptr->element_size==0);
     return (elem-(uint8_t *)ptr->buf)/ptr->element_size;
 }
 
-ROM_SYMBOL LL_PKT_ISR struct co_list_hdr *linked_buf_get_elem_by_idx(linked_buffer_t *ptr,uint16_t idx)
+ROM_SYMBOL LL_PKT_ISR void *linked_buf_get_elem_by_idx(linked_buffer_t *ptr,uint16_t idx)
 {
-    return (struct co_list_hdr *)&ptr->buf[ptr->element_size*idx];
+    return &ptr->buf[ptr->element_size*idx];
 }
 
 ROM_SYMBOL uint16_t linked_buf_available_size(linked_buffer_t *ptr)
@@ -87,20 +99,32 @@ ROM_SYMBOL LL_PKT_ISR bool linked_buf_is_allocatable(linked_buffer_t *ptr)
 
 ROM_SYMBOL uint8_t linked_buf_get_ref_cnt_by_idx(linked_buffer_t *ptr,uint16_t idx)
 {
-    return ptr->ref_cnt[idx];
+    if(ptr->ref_cnt)
+    {
+        return ptr->ref_cnt[idx];
+    }else
+    {
+        return 0;
+    }
 }
 
-ROM_SYMBOL uint8_t linked_buf_retain(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL uint8_t linked_buf_retain(linked_buffer_t *ptr,void *hdr)
 {
-    LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
+    LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,hdr));
     uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
-    return ++ptr->ref_cnt[idx];
+    if(ptr->ref_cnt)
+    {
+        return ++ptr->ref_cnt[idx];
+    }else
+    {
+        return 0;
+    }
 }
 
-ROM_SYMBOL bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL bool linked_buf_contain_element(linked_buffer_t *ptr,void *hdr)
 {
     bool contain = false;
-    if(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr))
+    if(linked_buf_hdl_sanity_check(ptr,hdr))
     {
         uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
         contain = linked_buf_get_ref_cnt_by_idx(ptr,idx) ? true : false;
