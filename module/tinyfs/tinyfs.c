@@ -108,7 +108,6 @@ typedef struct{
 
 typedef struct
 {
-    struct co_list_hdr hdr;
     storage_addr_t addr;
     node_idx_t child;
     node_idx_t adjacent;
@@ -169,7 +168,7 @@ static node_idx_t node_idx(tinyfs_node_t *ptr)
 {
     if(ptr)
     {
-        return linked_buf_get_elem_idx(&tinyfs_node, &ptr->hdr);
+        return linked_buf_get_elem_idx(&tinyfs_node, ptr);
     }else
     {
         return INVALID_NODE_IDX;
@@ -350,7 +349,7 @@ static tinyfs_node_t *node_alloc()
 
 static void node_free(tinyfs_node_t *ptr)
 {
-    linked_buf_release(&tinyfs_node,&ptr->hdr);
+    linked_buf_release(&tinyfs_node,ptr);
 }
 
 static uint16_t node_total_length(const tinyfs_node_t *const ptr)
@@ -1025,7 +1024,7 @@ static bool garbage_collect_try(uint16_t size)
 static bool if_dir_exist(tinyfs_node_t *dir)
 {
     bool exist = false;
-    if(linked_buf_contain_element(&tinyfs_node,&dir->hdr))
+    if(linked_buf_contain_element(&tinyfs_node,dir))
     {
         if(dir->child)
         {
