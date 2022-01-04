@@ -6,7 +6,6 @@
 
 struct builtin_timer
 {
-    struct co_list_hdr hdr;
     void (*timer_cb)(void *);
     void *param;
 };
