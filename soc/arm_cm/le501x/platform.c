@@ -64,7 +64,7 @@ static void irq_priority()
     NVIC->IP[2] = IRQ_NVIC_PRIO(CACHE_IRQn,3) | IRQ_NVIC_PRIO(TRNG_IRQn,3) | IRQ_NVIC_PRIO(IWDT_IRQn,3) | IRQ_NVIC_PRIO(CRYPT_IRQn,3);
     NVIC->IP[3] = IRQ_NVIC_PRIO(PDM_IRQn,3) | IRQ_NVIC_PRIO(BLE_WKUP_IRQn,1) | IRQ_NVIC_PRIO(ADC_IRQn,3) | IRQ_NVIC_PRIO(ADTIM1_IRQn,3);
     NVIC->IP[4] = IRQ_NVIC_PRIO(BSTIM1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMA1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMB1_IRQn,3) | IRQ_NVIC_PRIO(BLE_ERR_IRQn,1);
-    NVIC->IP[5] = IRQ_NVIC_PRIO(LVD33_IRQn,3) | IRQ_NVIC_PRIO(GPTIMC1_IRQn,3) | IRQ_NVIC_PRIO(LPTIM_IRQn,3) | IRQ_NVIC_PRIO(I2C1_IRQn,3);
+    NVIC->IP[5] = IRQ_NVIC_PRIO(LVD33_IRQn,0) | IRQ_NVIC_PRIO(GPTIMC1_IRQn,3) | IRQ_NVIC_PRIO(LPTIM_IRQn,3) | IRQ_NVIC_PRIO(I2C1_IRQn,3);
     NVIC->IP[6] = IRQ_NVIC_PRIO(I2C2_IRQn,3) | IRQ_NVIC_PRIO(SPI1_IRQn,3) | IRQ_NVIC_PRIO(SPI2_IRQn,3) | IRQ_NVIC_PRIO(UART1_IRQn,3);
     NVIC->IP[7] = IRQ_NVIC_PRIO(UART2_IRQn,3) | IRQ_NVIC_PRIO(UART3_IRQn,3) | IRQ_NVIC_PRIO(BLE_FIFO_IRQn,1) | IRQ_NVIC_PRIO(BLE_CRYPT_IRQn,1);
 }
@@ -118,10 +118,17 @@ static uint32_t flash_data_storage_base_offset()
     return config_word_get(DATA_STORAGE_BASE_OFFSET);
 }
 
+static void lvd33_irq_enable()
+{
+    __NVIC_ClearPendingIRQ(LVD33_IRQn);
+    __NVIC_EnableIRQ(LVD33_IRQn);
+}
+
 void irq_reinit()
 {
     irq_priority();
     NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
+    lvd33_irq_enable();
 }
 
 static void irq_init()
@@ -329,6 +336,30 @@ static void rco_val_init()
     SYSCFG->PMU_ANALOG = 0;
 }
 
+XIP_BANNED void LVD33_Handler()
+{
+    while(REG_FIELD_RD(SYSCFG->RSTST,SYSCFG_LVD33_FLAG))
+    {
+        REG_FIELD_WR(SYSCFG->RSTST,SYSCFG_LVD33_FLAG,1);
+    }
+}
+
+void lvd33_config()
+{
+    REG_FIELD_WR(SYSCFG->ANACFG0,SYSCFG_LVD_CTL,1);
+    REG_FIELD_WR(SYSCFG->CFG,SYSCFG_LVD33_INTE,1);
+}
+
+void lvd33_enable()
+{
+    REG_FIELD_WR(SYSCFG->ANACFG0,SYSCFG_LVD_EN,1);
+}
+
+void lvd33_disable()
+{
+    REG_FIELD_WR(SYSCFG->ANACFG0,SYSCFG_LVD_EN,0);
+}
+
 static void analog_init()
 {
     dcdc_on();
@@ -340,6 +371,7 @@ static void analog_init()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
     rco_val_init();
+    arm_cm_set_int_isr(LVD33_IRQn,LVD33_Handler);
 }
 
 static void var_init()

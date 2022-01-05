@@ -107,6 +107,14 @@ uint32_t get_app_image_base(void);
 
 uint32_t get_fota_image_base(void);
 
+void LVD33_Handler(void);
+
+void lvd33_config(void);
+
+void lvd33_enable(void);
+
+void lvd33_disable(void);
+
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))
 #define OSTICK_HS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step)/625)
