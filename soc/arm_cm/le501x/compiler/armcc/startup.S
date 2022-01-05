@@ -145,28 +145,6 @@ Reset_Handler   PROC
                 BX      R4
                 ENDP
 
-            AREA    |.text.Default_Handler|, CODE, READONLY
-
-; Dummy Exception Handlers (infinite loops which can be modified)
-
-Default_Handler PROC
-                EXPORT  NMI_Handler               [WEAK]
-                EXPORT  HardFault_Handler         [WEAK]
-                EXPORT  SVC_Handler               [WEAK]
-                EXPORT  PendSV_Handler            [WEAK]
-                EXPORT  SysTick_Handler           [WEAK]
-
-NMI_Handler      
-HardFault_Handler
-SVC_Handler      
-PendSV_Handler   
-SysTick_Handler  
-                B       .
-                ENDP
-                
-                ALIGN
-
-
 ; User Initial Stack & Heap
 
                 IF      :DEF:__MICROLIB
@@ -192,5 +170,25 @@ __user_initial_stackheap PROC
 
                 ENDIF
 
+                AREA    |.xip_banned|, CODE, READONLY
+
+; Dummy Exception Handlers (infinite loops which can be modified)
+
+Default_Handler PROC
+                EXPORT  NMI_Handler               [WEAK]
+                EXPORT  HardFault_Handler         [WEAK]
+                EXPORT  SVC_Handler               [WEAK]
+                EXPORT  PendSV_Handler            [WEAK]
+                EXPORT  SysTick_Handler           [WEAK]
+
+NMI_Handler      
+HardFault_Handler
+SVC_Handler      
+PendSV_Handler   
+SysTick_Handler  
+                B       .
+                ENDP
+                
+                ALIGN
 
                 END

@@ -304,6 +304,10 @@ void boot_ram_start(uint32_t exec_addr)
     io_init();
     swd_pull_down();
     trim_val_load();
+    lvd33_config();
+    lvd33_enable();
+    DELAY_US(200);
+    LVD33_Handler();
     uint32_t image_base;
     image_base = get_app_image_base();
     struct fota_image_info image;

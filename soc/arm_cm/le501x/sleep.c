@@ -286,9 +286,11 @@ void deep_sleep()
     NVIC->ICER[0] = ~(1<<LPWKUP_IRQn|1<<EXTI_IRQn);
     SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
     systick_stop();
+    lvd33_disable();
     cpu_flash_deep_sleep_and_recover();
     rco_freq_counting_config();
     wkup_ble();
+    lvd33_enable();
     irq_reinit();
     ble_wkup_status_set(true);
     ble_radio_en_sync();

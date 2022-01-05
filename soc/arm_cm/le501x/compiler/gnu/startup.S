@@ -172,6 +172,7 @@ Reset_Handler:
 	.size	Reset_Handler, . - Reset_Handler
 
 	.align	1
+    .section .xip_banned,"x"
 	.thumb_func
 	.weak	Default_Handler
 	.type	Default_Handler, %function
