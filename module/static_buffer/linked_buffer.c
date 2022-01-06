@@ -99,13 +99,8 @@ ROM_SYMBOL LL_PKT_ISR bool linked_buf_is_allocatable(linked_buffer_t *ptr)
 
 ROM_SYMBOL uint8_t linked_buf_get_ref_cnt_by_idx(linked_buffer_t *ptr,uint16_t idx)
 {
-    if(ptr->ref_cnt)
-    {
-        return ptr->ref_cnt[idx];
-    }else
-    {
-        return 0;
-    }
+    LINKED_BUF_ASSERT(ptr->ref_cnt);
+    return ptr->ref_cnt[idx];
 }
 
 ROM_SYMBOL uint8_t linked_buf_retain(linked_buffer_t *ptr,void *hdr)
@@ -126,8 +121,26 @@ ROM_SYMBOL bool linked_buf_contain_element(linked_buffer_t *ptr,void *hdr)
     bool contain = false;
     if(linked_buf_hdl_sanity_check(ptr,hdr))
     {
-        uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
-        contain = linked_buf_get_ref_cnt_by_idx(ptr,idx) ? true : false;
+        if(ptr->ref_cnt)
+        {
+            uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
+            contain = linked_buf_get_ref_cnt_by_idx(ptr,idx) ? true : false;
+        }else
+        {
+            contain = true;
+            struct co_list_hdr *avail = co_list_pick(&ptr->allocatable);
+            while(avail)
+            {
+                if(avail == hdr)
+                {
+                    contain = false;
+                    break; 
+                }else
+                {
+                    avail = co_list_next(avail);
+                }
+            }
+        }
     }
     return contain;
 }
