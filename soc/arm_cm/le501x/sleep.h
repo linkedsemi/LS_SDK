@@ -65,7 +65,7 @@ void deep_sleep(void);
 
 void deep_sleep_no_ble(void);
 
-void ble_sleep(void);
+void ble_sleep(int32_t);
 
 bool mac_sleep_check(void);
 
