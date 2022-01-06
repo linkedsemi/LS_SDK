@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "platform.h"
 #include "lsrtc.h"
@@ -9,6 +10,9 @@
 #include "cpu.h"
 #include "ls_dbg.h"
 #include "log.h"
+
+#define H_2_S_YEAR(y) (y + 2000 - 1900)
+#define S_2_H_YEAR(y) (y + 1900 - 2000)
 
 enum
 {
@@ -95,7 +99,8 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     calendar_time->sec  = REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_U);
     #if SDK_LSI_USED
     struct tm prev_tm;
-    prev_tm.tm_year = prev_cal.year - 1900;
+    memset(&prev_tm, 0, sizeof(prev_tm));
+    prev_tm.tm_year = H_2_S_YEAR(prev_cal.year);
     prev_tm.tm_mon = prev_cal.mon - 1;
     prev_tm.tm_mday = prev_cal.date;
     prev_tm.tm_hour = prev_time.hour;
@@ -104,7 +109,8 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     time_t prev_time_t = mktime(&prev_tm);
 
     struct tm cur_tm;
-    cur_tm.tm_year = calendar_cal->year - 1900;
+    memset(&cur_tm, 0, sizeof(cur_tm));
+    cur_tm.tm_year = H_2_S_YEAR(calendar_cal->year);
     cur_tm.tm_mon = calendar_cal->mon - 1;
     cur_tm.tm_mday = calendar_cal->date;
     cur_tm.tm_hour = calendar_time->hour;
@@ -119,16 +125,13 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     cur_time_t = prev_time_t + delta_seconds_counting;
     // LOG_I("lsi_cnt_val %d", get_lsi_cnt_val());
     struct tm* tm_ptr = localtime(&cur_time_t);
-    calendar_cal->year = tm_ptr->tm_year + 1900;
+    calendar_cal->year = S_2_H_YEAR(tm_ptr->tm_year);
     calendar_cal->mon = tm_ptr->tm_mon + 1;
     calendar_cal->date = tm_ptr->tm_mday;
     calendar_time->hour = tm_ptr->tm_hour;
     calendar_time->min = tm_ptr->tm_min;
     calendar_time->sec = tm_ptr->tm_sec;
     calendar_time->week = tm_ptr->tm_wday == 0 ? 7 : tm_ptr->tm_wday; // convert Sunday from 0 to 7
-    #ifdef __GNUC__
-    free(tm_ptr);
-    #endif
     #endif
     return result;
 }
