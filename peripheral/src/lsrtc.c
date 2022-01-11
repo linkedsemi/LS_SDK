@@ -9,6 +9,7 @@
 #include "field_manipulate.h"
 #include "cpu.h"
 #include "ls_dbg.h"
+#include "common.h"
 #include "log.h"
 
 #define H_2_S_YEAR(y) (y + 2000 - 1900)
@@ -58,6 +59,17 @@ void RTC_CalendarSet(calendar_cal_t *calendar_cal,calendar_time_t *calendar_time
     uint32_t cpu_stat = enter_critical();
     #if SDK_LSI_USED
     save_calendar_init_val(*(uint32_t*)calendar_cal, *(uint32_t*)calendar_time);
+    struct tm cur_tm;
+    memset(&cur_tm, 0, sizeof(cur_tm));
+    cur_tm.tm_year = H_2_S_YEAR(calendar_cal->year);
+    cur_tm.tm_mon = calendar_cal->mon - 1;
+    cur_tm.tm_mday = calendar_cal->date;
+    cur_tm.tm_hour = calendar_time->hour;
+    cur_tm.tm_min = calendar_time->min;
+    cur_tm.tm_sec = calendar_time->sec;
+    time_t cur_time_t = mktime(&cur_tm);
+    save_calendar_raw_val((uint32_t)cur_time_t);
+    save_seconds_remainder(0);
     #endif
     REG_FIELD_WR(RTC->CTRL,RTC_CTRL_RTCEN,0);
     
@@ -87,7 +99,9 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     #if SDK_LSI_USED
     calendar_cal_t prev_cal;
     calendar_time_t prev_time;
+    uint32_t prev_raw_val;
     load_calendar_init_val((uint32_t*)&prev_cal, (uint32_t*)&prev_time);
+    load_calendar_raw_val(&prev_raw_val);
     #endif
 
     calendar_cal->year  = REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_U);
@@ -117,13 +131,22 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     cur_tm.tm_min = calendar_time->min;
     cur_tm.tm_sec = calendar_time->sec;
     time_t cur_time_t = mktime(&cur_tm);
+    save_calendar_raw_val((uint32_t)cur_time_t);
 
-    uint32_t delta_seconds_counting = (uint32_t)(cur_time_t - prev_time_t);
-    // LOG_I("delta_seconds_counting1 %d", delta_seconds_counting);
-    delta_seconds_counting = (uint32_t)((uint64_t)delta_seconds_counting * 32768 * get_lsi_cnt_val() / (LSI_CNT_CYCLES * 1000000));
-    // LOG_I("delta_seconds_counting2 %d", delta_seconds_counting);
+    uint32_t delta_seconds_counting = (uint32_t)(cur_time_t - prev_raw_val);
+    uint64_t delta_seconds_numerator = (uint64_t)delta_seconds_counting * 32768 * get_lsi_cnt_val();
+    uint32_t delta_seconds_remainder = __div64_32(&delta_seconds_numerator, LSI_CNT_CYCLES * 1000000);
+    delta_seconds_counting = (uint32_t)delta_seconds_numerator;
+    uint32_t prev_remainder;
+    load_seconds_remainder(&prev_remainder);
+    prev_remainder += delta_seconds_remainder;
+    if (prev_remainder >= LSI_CNT_CYCLES * 1000000)
+    {
+        prev_remainder -= LSI_CNT_CYCLES * 1000000;
+        delta_seconds_counting++;
+    }
+    save_seconds_remainder(prev_remainder);
     cur_time_t = prev_time_t + delta_seconds_counting;
-    // LOG_I("lsi_cnt_val %d", get_lsi_cnt_val());
     struct tm* tm_ptr = localtime(&cur_time_t);
     calendar_cal->year = S_2_H_YEAR(tm_ptr->tm_year);
     calendar_cal->mon = tm_ptr->tm_mon + 1;
@@ -132,6 +155,7 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     calendar_time->min = tm_ptr->tm_min;
     calendar_time->sec = tm_ptr->tm_sec;
     calendar_time->week = tm_ptr->tm_wday == 0 ? 7 : tm_ptr->tm_wday; // convert Sunday from 0 to 7
+    save_calendar_init_val(*(uint32_t*)calendar_cal, *(uint32_t*)calendar_time);
     #endif
     return result;
 }
