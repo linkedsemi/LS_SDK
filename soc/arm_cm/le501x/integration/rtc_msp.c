@@ -31,10 +31,30 @@ void save_calendar_init_val(uint32_t cal, uint32_t time)
     SYSCFG->BKD[5] = time;
 }
 
+void save_calendar_raw_val(uint32_t raw_val)
+{
+    SYSCFG->BKD[3] = raw_val;
+}
+
+void save_seconds_remainder(uint32_t remainder)
+{
+    SYSCFG->BKD[2] = remainder;
+}
+
+void load_calendar_raw_val(uint32_t *raw_val)
+{
+    *raw_val = SYSCFG->BKD[3];
+}
+
 void load_calendar_init_val(uint32_t *cal, uint32_t *time)
 {
     *cal = SYSCFG->BKD[4];
     *time = SYSCFG->BKD[5];
+}
+
+void load_seconds_remainder(uint32_t *remainder)
+{
+    *remainder = SYSCFG->BKD[2];
 }
 #endif
 
