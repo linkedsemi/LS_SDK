@@ -368,6 +368,7 @@ HAL_StatusTypeDef HAL_TIM_Init(TIM_HandleTypeDef *htim)
   LS_ASSERT(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
   LS_ASSERT(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
   LS_ASSERT(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
+  LS_ASSERT(IS_TIM_TRGO_SOURCE(htim->Init.TrgoSource));
 
   if (htim->State == HAL_TIM_STATE_RESET)
   {
@@ -1857,6 +1858,7 @@ void TIM_Base_SetConfig(reg_timer_t *TIMx, TIM_Base_InitTypeDef *Structure)
   }
   
   TIMx->CR1|= TIMER_CR1_URS;
+  TIMx->CR2 |= (uint32_t)Structure->TrgoSource ;
 
   /* Generate an update event to reload the Prescaler
      and the repetition counter value immediately */

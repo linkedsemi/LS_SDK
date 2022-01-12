@@ -61,6 +61,7 @@ typedef struct
 
   uint32_t AutoReloadPreload;  /*!< Specifies the auto-reload preload.
                                    This parameter can be a value of @ref TIM_AutoReloadPreload */
+  uint32_t TrgoSource;
 } TIM_Base_InitTypeDef;
 /**
   * @}
