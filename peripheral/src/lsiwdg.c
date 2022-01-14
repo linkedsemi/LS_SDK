@@ -21,4 +21,9 @@ HAL_StatusTypeDef HAL_IWDG_Refresh(void)
     return HAL_OK;
 }
 
-
+HAL_StatusTypeDef HAL_IWDG_DeInit(void)
+{
+    REG_FIELD_WR(LSIWDG->IWDG_CON, IWDG_EN, 0);
+    HAL_IWDG_MSP_DeInit();
+    return HAL_OK;
+}
