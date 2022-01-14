@@ -205,7 +205,7 @@ bool get_con_status(uint8_t con_idx)
     }
 }
 
-uint16_t ble_get_mtu(con_idx)
+uint16_t ble_get_mtu(uint8_t con_idx)
 {
     return ble_mtu_array[con_idx];
 }
