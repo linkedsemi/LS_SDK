@@ -31,6 +31,11 @@ HAL_StatusTypeDef HAL_IWDG_Init(uint32_t LoadValue);
  */
 HAL_StatusTypeDef HAL_IWDG_Refresh(void);
 
+/** \brief LSIWDG DeInitialize 
+ *  \return status
+ */
+HAL_StatusTypeDef HAL_IWDG_DeInit(void);
+
 /** @}*/
 
 

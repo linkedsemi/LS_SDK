@@ -3,4 +3,6 @@
 
 void HAL_IWDG_MSP_Init(void);
 
+void HAL_IWDG_MSP_DeInit(void);
+
 #endif
