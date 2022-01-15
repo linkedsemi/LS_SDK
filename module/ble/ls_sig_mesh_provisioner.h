@@ -247,7 +247,7 @@ struct prover_confc_model_subs_app_status_ind_info
     uint32_t model_id;
     uint16_t value; //group_addr/appkey_id
 
-}__attribute__((packed));
+};
 
 struct prover_confc_model_pubs_status_ind_info
 {
@@ -262,7 +262,7 @@ struct prover_confc_model_pubs_status_ind_info
    uint8_t publish_retx_cont;
    uint8_t publish_retx_intv_step_solution;
    uint32_t model_id;
-}__attribute__ ((packed));
+};
 
 union ls_sig_mesh_provisioner_evt_u 
 {

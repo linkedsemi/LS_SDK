@@ -51,7 +51,7 @@ static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0};
 uint8_t rsp_data_info[40] = {0};
 uint8_t tmall_ModelHandle = 0;
 
-static uint16_t mesh_src_addr;
+static uint16_t provisioner_unicast_addr;
 static uint8_t adv_obj_hdl;
 static void create_adv_obj(void);
 
@@ -189,6 +189,7 @@ void disable_tx_unprov_beacon(void)
 
 void report_provisioner_unicast_address_ind(uint16_t unicast_address)
 {
+    provisioner_unicast_addr = unicast_address;
     tinyfs_write(mesh_dir, RECORD_KEY2, (uint8_t *)&unicast_address, sizeof(unicast_address));
     tinyfs_write_through();
 }
@@ -221,7 +222,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     case MESH_ACTIVE_DISABLE:
     {
         SIGMESH_UnbindAll();
-        ls_sig_mesh_platform_reset();
+        platform_reset(0);
     }
     break;
     case MESH_ACTIVE_REGISTER_MODEL:
@@ -254,10 +255,10 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         Node_Get_Proved_State = evt->st_proved.proved_state;
         if (Node_Get_Proved_State == PROVISIONED_OK)
         {
-            uint16_t length = sizeof(mesh_src_addr);
+            uint16_t length = sizeof(provisioner_unicast_addr);
             LOG_I("The node is provisioned");
             tmall_light_set_lightness(0xffff);
-            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&mesh_src_addr, &length);
+            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&provisioner_unicast_addr, &length);
         }
         else
         {

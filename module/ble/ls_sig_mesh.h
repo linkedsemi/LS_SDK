@@ -12,9 +12,11 @@
 typedef uint8_t SIGMESH_ModelHandle_TypeDef;
 typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 
+#define STATUS_SIGMESH_NO_ERROR     (0x0000)    /*!<SIG mesh No Error*/
+
 #define UUID_MESH_DEV_LEN (16)     /*!<Device UUID length*/
 #define MESH_AUTH_DATA_LEN (16)    /*!<Authentication data length*/
-#define MAX_MESH_MODEL_NB (14)     /*!< Max number of model in a node*/
+#define MAX_MESH_MODEL_NB (20)     /*!< Max number of model in a node*/
 #define MAX_MESH_MODEL_MSG_BUFFER  (380)  /*!< The buffer of model message*/
 
 #define UPADTE_GLP_STOP_TYPE 0xfe    /*!< To be updated the status of stop type by tmall genie GLP function to application*/
@@ -27,12 +29,28 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define GENERIC_LVL_CLIENT               (0x1003)  /*!< SIG Model Index of generic level client 0x1003*/
 #define LIGHTNESS_SERVER                 (0x1300)  /*!< SIG Model Index of light lightness server 0x1300*/
 #define LIGHTS_CTL_SERVER                (0x1303)  /*!< SIG Model Index of light control server 0x1303*/
+#define LIGHTS_CTLT_SERVER               (0x1306)  /*!< SIG Model Index of light CTL temperature server 0x1306*/
 #define LIGHTS_HSL_SERVER                (0x1307)  /*!< SIG Model Index of light HSL server 0x1307*/
+#define LIGHTS_HSLH_SERVER               (0x130A)  /*!< SIG Model Index of light HSL hue server 0x130A*/
+#define LIGHTS_HSLSAT_SERVER             (0x130B)  /*!< SIG Model Index of light HSL saturation server 0x130B*/
+#define LIGHTS_XYL_CLIENT                (0x130E)  /*!< SIG Model Index of light XYL server 0x130C*/
 #define VENDOR_TMALL_SERVER              (0x01A80000) /*!< Vendor Model Index of tmall genie server 0x01A80000*/
 #define VENDOR_USER_SERVER               (0x093A0001) /*!< Vendor Model Index of linkedsemi server 0x093A0001*/
 #define VENDOR_USER_CLIENT               (0x093A0002)  /*!< Vendor Model Index of linkedsemi client 0x093A0002*/
         
-        
+ //foundation model status opcode
+#define FOUNDATION_MDL_CONFG_APPKEY_STATUS                     (0x0380)  /*!< Application key status*/
+#define FOUNDATION_MDL_CONFG_FRIEND_STATUS                     (0x1180)  /*!< Friend status*/
+#define FOUNDATION_MDL_CONFG_GATT_PROXY_STATUS                 (0x1480)  /*!< GATT proxy status*/
+#define FOUNDATION_MDL_CONFG_KEY_REFRESH_PHASE_STATUS          (0x1780)  /*!< Key refresh phase status*/
+#define FOUNDATION_MDL_CONFG_MODEL_PUB_STATUS                  (0x1980)  /*!< Model publication status*/
+#define FOUNDATION_MDL_CONFG_MODEL_SUBS_STATUS                 (0x1F80)  /*!< Model subscription status*/
+#define FOUNDATION_MDL_CONFG_RELAY_STATUS                      (0x2880)  /*!< Relay status*/
+#define FOUNDATION_MDL_CONFG_LPN_POLLTIMEOUT_STATUS            (0x2E80)  /*!< Low power node PollTimeout status*/
+#define FOUNDATION_MDL_CONFG_HBEAT_SUBS_STATUS                 (0x3C80)  /*!< Heartbeat subscription status*/
+#define FOUNDATION_MDL_CONFG_MODEL_APP_STATUS                  (0x3E80)  /*!< Model application status*/
+#define FOUNDATION_MDL_CONFG_NETKEY_STATUS                     (0x4480)  /*!< Network key status*/
+
 //Generic OnOff        
 #define GENERIC_ONOFF_GET                (0x0182) /*!< Opcdoe of generic onoff get 0x0182*/
 #define GENERIC_ONOFF_SET                (0x0282) /*!< Opcdoe of generic onoff set 0x0282*/
@@ -49,16 +67,22 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define LIGHT_LIGHTNESS_SET              (0x4c82) /*!< Opcdoe of light lightness set 0x4c82*/
 #define LIGHT_LIGHTNESS_SET_UNAK         (0x4d82) /*!< Opcdoe of light lightness set unacknowleged 0x4d82*/
 #define LIGHT_LIGHTNESS_STATUS           (0x4e82) /*!< Opcdoe of light lightness status 0x4e82*/
+#define LIGHT_LIGHTNESS_RANGE_STATUS     (0x5882) /*!< Opcdoe of light lightness range status 0x5882*/
 
 //Light HSL
+#define LIGHT_HSL_HUE_STATUS             (0x7182)  /*!< Opcdoe of light hsl hue 0x7182*/
+#define LIGHT_HSL_SAT_STATUS             (0x7582)  /*!< Opcdoe of light hsl sat 0x7582*/
 #define LIGHT_HSL_SET                    (0x7682) /*!< Opcdoe of light hsl set 0x7682*/
 #define LIGHT_HSL_SET_UNACK              (0x7782) /*!< Opcdoe of light hsl set unacknowleged 0x7782*/
 #define LIGHT_HSL_STATUS                 (0x7882) /*!< Opcdoe of light hsl status 0x7882*/
+#define LIGHT_HSL_RANGE_STATUS           (0x7E82) /*!< Opcdoe of light hsl range status 0x7E82*/
 
 //Light CTL
 #define LIGHT_CTL_SET                    (0x5E82) /*!< Opcdoe of light ctl set 0x5E82*/
 #define LIGHT_CTL_SET_UNACK              (0x5F82) /*!< Opcdoe of light ctl set unacknowleged 0x5F82*/
 #define LIGHT_CTL_STATUS                 (0x6082) /*!< Opcdoe of light ctl status 0x6082*/
+#define LIGHT_CTL_TEMP_RANGE_STATUS      (0x6382)  /*!< Opcdoe of light ctl temperature range status 0x6382*/
+#define LIGHT_CTL_TEMP_STATUS            (0x6682) /*!< Opcdoe of light ctl temperature status 0x6682*/
 
 // tmall Vendor        
 #define APP_MESH_VENDOR_SET              (0x0001A8d1)  /*!< Vendor opcdoe of tmall genie set 0x0001A8d1*/
@@ -132,7 +156,7 @@ enum mesh_feature
 enum mesh_provisioned_state
 {
     UNPROVISIONED_KO = 0x00,     /*!< The device was not a node*/
-    BEING_PROVISION,             /*!< The device being provision*/
+    PROVISIONING,
     PROVISIONED_OK,               /*!< The device was a node*/
 };
 
@@ -417,7 +441,7 @@ struct model_rx_info
     uint32_t opcode;                  /*!< Operation code*/
     uint16_t rx_info_len;             /*!< message length*/
     uint8_t info[__LSSIGMESH_EMPTY];  /*!< message*/
-}__attribute__((packed));
+};
 
 /**
   * @brief State update indication structure for SIG Model
@@ -428,7 +452,7 @@ struct model_state_upd
     uint16_t state_id;               /*!< State identifier, @ref num mesh_state_idx*/
     uint32_t state;                  /*!<  New state value or targeted state value depending on transition time*/
     uint32_t trans_time_ms;          /*!<  Transition time in milliseconds*/
-}__attribute__((packed));
+};
 /**
   * @brief Report provisioning state
   */
@@ -436,7 +460,7 @@ struct report_mesh_prov_result_info
 {
     uint8_t state;                   /*!< Provisioning  state ,@ref enum mesh_provisioning_result*/
     uint16_t status;                 /*!< Provisioning failed reason*/
-}__attribute__((packed));
+};
 /**
   * @brief Report mesh timer state
   */
@@ -562,11 +586,6 @@ void dev_manager_prf_ls_sig_mesh_add(uint8_t sec_lvl, struct ls_sig_mesh_cfg *cf
  * @param param  Register Model informatin ,@ref struct mesh_model_info
  */
 void ls_sig_mesh_init(struct mesh_model_info *param);
-/**
- * @brief Node reset Operation
- * 
- */
-void ls_sig_mesh_platform_reset(void);
 /**
  * @brief Set the prov parameter
  * 
@@ -746,6 +765,13 @@ void ls_sig_mesh_set_proxy_con_interval(uint16_t *interval_ms);
  * @param interval_slot
  */
 void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot);
+/**
+ * @brief Inform Application about send status of foundation model config server
+ * 
+ * @param opcode
+ * @param status
+ */
+void prov_foundation_mdl_cfg_svr_rsp(uint32_t opcode,uint16_t status);
 
 /** @} */
 

@@ -77,11 +77,13 @@ static void prover_mesh_manager_rx_ind_callback(enum mesh_provisioner_rx_ind_typ
 {
    switch (type)
     {
-        case MESH_PROVER_ACTIVE_NODE_FOUND:
-        { 
+    case MESH_PROVER_ACTIVE_NODE_FOUND:
+    { 
             uint8_t dev_uuid[16]={0};
+            int8_t rssi;
             memcpy(&dev_uuid[0],&(evt->prover_node_scan_info.dev_uuid[0]),UUID_MESH_DEV_LEN);
-            at_prover_report_dev_uuid(&dev_uuid[0]);
+            rssi = evt->prover_node_scan_info.rssi;
+            at_prover_report_dev_uuid(&dev_uuid[0],rssi);
     }
     break;
     case MESH_PROVER_ACTIVE_NODE_GATT:
@@ -181,6 +183,9 @@ static void prover_mesh_manager_callback(enum mesh_provisioner_evt_type type, un
     }
     break;
     case MESH_PROVER_SET_DEV_RSP_INFO:
+    {
+       at_prover_report_node_info(node_unicast_address,netkey_lid,devkey_lid);
+    }
     break;
     case MESH_PROVER_IDENTIFY_REQ_IND_INFO:
     {
@@ -205,7 +210,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     case MESH_ACTIVE_DISABLE:
     {
         SIGMESH_UnbindAll();
-        ls_sig_mesh_platform_reset();
+        platform_reset(0);
     }
     break;
     case MESH_ACTIVE_REGISTER_MODEL:

@@ -13,8 +13,9 @@ void at_prover_ready_ind(void);
  * @brief 
  * 
  * @param param 
+ * @param rssi 
  */
-void at_prover_report_dev_uuid(uint8_t *param);
+void at_prover_report_dev_uuid(uint8_t *param,int8_t rssi);
 /**
  * @brief 
  * 
@@ -96,4 +97,12 @@ void at_prover_report_model_app_status(uint16_t unicast_addr,uint8_t model_app_s
  */
 void at_prover_report_model_pub_status(uint16_t unicast_addr,uint8_t model_app_status,int16_t element_addr,int16_t publish_addr,uint16_t app_key_id,bool cred_flag,uint8_t publish_ttl,uint32_t publish_period_ms,uint8_t publish_retx_cont,uint8_t publish_retx_intv_step_solution,uint32_t model_id);
 
+/**
+ * @brief 
+ * 
+ * @param unicast_addr 
+ * @param net_key_lid 
+ * @param dev_key_lid 
+ */
+void at_prover_report_node_info(uint16_t unicast_addr,uint16_t net_key_lid,uint16_t dev_key_lid);
 #endif // _AT_SIG_MESH_PROVER_CMD_IND_H_
