@@ -1,6 +1,7 @@
 #define LOG_TAG "MAIN"
 #include <string.h>
 #include <stdio.h>
+#include "cpu.h"
 #include "ls_ble.h"
 #include "platform.h"
 #include "ls_sig_mesh.h"
@@ -14,12 +15,13 @@
 #include "le501x.h"
 #include "sys_stat.h"
 #include "tmall_mesh_ctl.h"
-#include "tmall_light_cfg.h"
 #include "tmall_ais_cfg.h"
 #include "builtin_timer.h"
+#include "reg_syscfg.h"
+#include "io_config.h"
 
-static struct builtin_timer *tmall_gatt_timer_inst = NULL;
-static void ls_tmall_gatt_timer_cb(void *param);
+#define TMALL_GLP_ENABLE 1
+
 #define TMALL_GATT_TIMEOUT 5000
 #define ALI_COMPANY_ID 0x01a8
 #define COMPA_DATA_PAGES 1
@@ -42,6 +44,7 @@ bool sent_adv_ready=true;
 uint8_t vendor_tid = 0;
 #define RECORD_KEY1 1
 #define RECORD_KEY2 2
+#define RECORD_ST_GLP_NODE 3
 
 tinyfs_dir_t mesh_dir;
 struct mesh_model_info model_env;
@@ -51,17 +54,50 @@ static uint16_t gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
 SIGMESH_NodeInfo_TypeDef Node_Get_Proved_State = 0;
 SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
 SIGMESH_NodeInfo_TypeDef Node_Beacon_State = 0;
+static bool mesh_node_prov_state = false;
+#if (TMALL_GLP_ENABLE)
+#define TMALL_GLP_RST_FLAG 0x96966969
+#define TMALL_GLP_SLEEP_MS  1200
+#define TMALL_GLP_SCAN_MS   60
+#define PROXY_CON_INTERVAL_MS 1000  //100ms
+#define GATT_CON_INTERVAL_SLOT  1600 //160*625us=100ms
+#define PROXY_CON_INTERVAL_MS 1000  //100ms
+#define TMALL_GLP_DELY_TIMEOUT 100   //100ms
+#define TMALL_GLP_PROVISIONING_TIMEOUT 45000   //15s
+enum delay_status
+{
+  GLP_IDLE,  
+  GLP_DELAY_NODE_DELETE_START,
+  GLP_WAIT_START_PROVISIONING
+};
+
+
+enum st_tmall_glp
+{
+    ST_GLP_EN_TMALL_MESH = 0x0, 
+    ST_GLP_DIS_TMALL_MESH,
+    ST_GLP_TMALL_MESH_PROVISIONED        
+};
+
+static enum delay_status glp_dely_status = GLP_IDLE;
+static struct builtin_timer *tmall_glp_dly_timer_inst = NULL;
+uint8_t st_glp_node =ST_GLP_DIS_TMALL_MESH; 
+uint16_t len_st_glp_node=2; 
+static bool start_provisioning= false;
+static void ls_tmall_glp_dly_timer_cb(void *param);
+#endif
 
 static uint8_t ali_pid[TRIPLE_PID_LEN] = {0};
-uint32_t ali_pid_u32 = 12449;
-uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x28,0xfa,0x7a,0x3a,0xfe,0xd7};
-uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xe3,0x89,0x92,0x38,0xfa,0xbe,0x3c,0xef,0x10,0x12,0x8d,0x18,0xb1,0x47,0xb4,0xe9};
+uint32_t ali_pid_u32 = 9538314;
+uint8_t ali_mac[TRIPLE_MAC_LEN] ={0x50,0x3d,0xeb,0x7a,0xcd,0xa0};
+uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0x07,0xe3,0xc6,0x48,0x7c,0x69,0xb1,0x65,0x1c,0x2c,0xe7,0x91,0xd9,0x4b,0xd5,0xd6};
+
 static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0};
 
 uint8_t rsp_data_info[40] = {0};
 uint8_t tmall_ModelHandle = 0;
 
-static uint16_t provisioner_unicast_addr;
+static uint16_t mesh_src_addr;
 void create_adv_obj(void);
 
 static struct gatt_svc_env tmall_aiots_svc_env;
@@ -70,7 +106,6 @@ static uint8_t connect_id = 0xff;
 uint8_t adv_obj_hdl;
 uint8_t advertising_data[28];
 static uint8_t scan_response_data[31];
-
 
 #define TMALL_AIOTS_PID_SIZE          4
 #define TMALL_AIOTS_MAC_SIZE          6
@@ -304,7 +339,10 @@ void auto_check_unbind(void)
     if (coutinu_power_up_num > 4)
     {
         coutinu_power_up_num = 0;
+        st_glp_node = ST_GLP_DIS_TMALL_MESH;
+        tinyfs_write(mesh_dir, RECORD_ST_GLP_NODE, (uint8_t *)&st_glp_node, sizeof(len_st_glp_node));
         tinyfs_write(mesh_dir, RECORD_KEY1, &coutinu_power_up_num, sizeof(coutinu_power_up_num));
+        tinyfs_write_through();
         SIGMESH_UnbindAll();
     }
     else
@@ -337,43 +375,73 @@ void disable_tx_unprov_beacon(void)
     stop_tx_unprov_beacon();
 }
 
-void report_provisioner_unicast_address_ind(uint16_t unicast_address)
+#if (TMALL_GLP_ENABLE)
+static void ls_tmall_glp_dly_timer_cb(void *param)
 {
-    provisioner_unicast_addr = unicast_address;
+    switch(glp_dely_status)
+    {
+        case GLP_DELAY_NODE_DELETE_START:
+        {
+           gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
+           tinyfs_del_record(mesh_dir, RECORD_ST_GLP_NODE);
+           SIGMESH_UnbindAll();
+           platform_reset(0);
+        }
+        break;
+        case GLP_WAIT_START_PROVISIONING:
+        {
+            if (start_provisioning == false)
+            {
+               platform_reset(0);
+            }
+        }
+        default:
+          break;   
+    }  
+}
+
+static void ls_tmall_glp_dly_timer_init(void)
+{
+    tmall_glp_dly_timer_inst = builtin_timer_create(ls_tmall_glp_dly_timer_cb);
+}
+
+static void tmall_glp_enable_handler(void)
+{
+      struct start_glp_info param;
+         param.RxDelyMs = TMALL_GLP_SCAN_MS;
+         param.SleepIntvlMs = TMALL_GLP_SLEEP_MS;
+         start_glp_handler(&param);
+         app_status_set(false);
+}
+
+void ls_sig_mesh_set_proxy_con_interval(uint16_t *interval_ms)
+{
+    *interval_ms = PROXY_CON_INTERVAL_MS;
+}
+
+ void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot)  /**< 1slot=625us */
+ {
+    *interval_slot = GATT_CON_INTERVAL_SLOT;
+ }
+ 
+void prov_foundation_mdl_cfg_svr_rsp(uint32_t opcode,uint16_t status)
+{
+    if ((opcode == FOUNDATION_MDL_CONFG_MODEL_SUBS_STATUS) && (status == STATUS_SIGMESH_NO_ERROR) && (mesh_node_prov_state == true))
+    {
+        st_glp_node = ST_GLP_TMALL_MESH_PROVISIONED;
+        tinyfs_write(mesh_dir, RECORD_ST_GLP_NODE, (uint8_t *)&st_glp_node, sizeof(len_st_glp_node));
+        tinyfs_write_through();
+        tmall_glp_enable_handler();
+    }
+}
+#endif
+
+void prov_succeed_src_addr_ind(uint16_t unicast_address)
+{
+    mesh_src_addr = unicast_address;
     tinyfs_write(mesh_dir, RECORD_KEY2, (uint8_t *)&unicast_address, sizeof(unicast_address));
     tinyfs_write_through();
 }
-
-
-void ls_tmall_gatt_timer_init(void)
-{
-    tmall_gatt_timer_inst = builtin_timer_create(ls_tmall_gatt_timer_cb);
-}
-
-uint8_t state_unprov_beacn=0;
-static void ls_tmall_gatt_timer_cb(void *param)
-{
-    if(Node_Get_Proved_State == UNPROVISIONED_KO)
-    {
-     if (state_unprov_beacn == 1)
-    {
-        state_unprov_beacn=2;
-        enable_tx_unprov_beacon();
-        start_ls_sig_mesh_gatt(); 
-        LOG_I("start_unprov");
-    }
-    
-    if(state_unprov_beacn==0) 
-    {
-        state_unprov_beacn =1;
-         disable_tx_unprov_beacon();
-         stop_ls_sig_mesh_gatt();
-         builtin_timer_start(tmall_gatt_timer_inst, TMALL_GATT_TIMEOUT, NULL);
-         LOG_I("stop_unprov");
-    }
-    }
-}
-
 
 void ls_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len)
 {
@@ -410,13 +478,25 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
     switch (type)
     {
     case CONNECTED:
-         connect_id = con_idx;
+    {
+       if (mesh_node_prov_state == false) 
+       {
+          connect_id = con_idx;
+          start_provisioning = true;
+          builtin_timer_stop(tmall_glp_dly_timer_inst);
+       }
         LOG_I("connected!");
+    }
         break;
     case DISCONNECTED:
          LOG_I("DISCONNECTED!");
          LOG_I("disconnect_reason=%x",evt->disconnected.reason);
           gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
+         if (mesh_node_prov_state == false)
+         {
+           glp_dely_status = GLP_WAIT_START_PROVISIONING;
+           builtin_timer_start(tmall_glp_dly_timer_inst, TMALL_GLP_PROVISIONING_TIMEOUT, NULL);  
+         } 
         break;
     case CONN_PARAM_REQ:
          LOG_I("PARAM_REQ!");
@@ -461,7 +541,7 @@ static void generic_onoff_status_report(uint8_t model_index, uint32_t opcode)
     onoff_rsp.opcode = opcode;  
     onoff_rsp.dest_addr = gatt_mesh_src_addr;
     onoff_rsp.len = 1; 
-    onoff_rsp.info[0] = tmall_light_get_onoff();
+    onoff_rsp.info[0] = 0xff;
     model_send_info_handler(&onoff_rsp);
 }
 
@@ -470,16 +550,32 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     switch (type)
     {
     case MESH_ACTIVE_ENABLE:
-    {       
+    {   
+#if (TMALL_GLP_ENABLE)        
+       if (mesh_node_prov_state == true)
+        {
+           tmall_glp_enable_handler();
+        }
+
+        if (st_glp_node == ST_GLP_EN_TMALL_MESH) 
+       {
+           glp_dely_status = GLP_WAIT_START_PROVISIONING;
+           builtin_timer_start(tmall_glp_dly_timer_inst, TMALL_GLP_PROVISIONING_TIMEOUT, NULL);  
+       }
+#endif            
         gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
         TIMER_Set(2, 3000); //clear power up num
     }
     break;
     case MESH_ACTIVE_DISABLE:
     {
-        gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
-        SIGMESH_UnbindAll();
-        platform_reset(0);
+#if (TMALL_GLP_ENABLE)         
+        if (mesh_node_prov_state == true)
+#endif        
+        {
+          glp_dely_status = GLP_DELAY_NODE_DELETE_START;
+          builtin_timer_start(tmall_glp_dly_timer_inst, TMALL_GLP_DELY_TIMEOUT, NULL);  
+        }     
     }
     break;
     case MESH_ACTIVE_REGISTER_MODEL:
@@ -500,11 +596,12 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     case MESH_ACTIVE_MODEL_GROUP_MEMBERS:
     {
         LOG_I("Prov Succeed");
-        tmall_light_set_lightness(0xFFFF);
+        // tmall_light_set_lightness(0xFFFF);
     }
     break;
     case MESH_ACTIVE_MODEL_RSP_SENT:
     {
+        
         if (gatt_mesh_model_indx !=TMALL_GATT_MESH_MODEL_INDEX_INVALID)
         {
            if((gatt_mesh_model_indx++)<=model_env.nb_model)
@@ -523,14 +620,16 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         Node_Get_Proved_State = evt->st_proved.proved_state;
         if (Node_Get_Proved_State == PROVISIONED_OK)
         {
-            uint16_t length = sizeof(provisioner_unicast_addr);
-            LOG_I("src_addr=%x",provisioner_unicast_addr);
+            uint16_t length = sizeof(mesh_src_addr);
+            LOG_I("src_addr=%x",mesh_src_addr);
             LOG_I("The node is provisioned");
-            tmall_light_set_lightness(0xffff);
-            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&provisioner_unicast_addr, &length);
+            // tmall_light_set_lightness(0xffff);
+            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&mesh_src_addr, &length);    
+            mesh_node_prov_state = true;       
         }
         else
         {
+            mesh_node_prov_state = false;
             LOG_I("The node is not provisioned");
         }
         
@@ -570,7 +669,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     break;
     case MESH_STATE_UPD_IND:
     {
-        if ((Node_Get_Proved_State == PROVISIONED_OK) || (Node_Proved_State == MESH_PROV_SUCCEED))
+        if (mesh_node_prov_state == true)
         {
             if((evt->update_state_param.upd_type == UPADTE_TMALL_GATT_SRC_ADDR_TYPE) && (gatt_mesh_src_addr==TMALL_GATT_SRC_ADDR_INVALID))
             {
@@ -579,12 +678,46 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
                  gatt_mesh_model_indx=0;
                  generic_onoff_status_report(gatt_mesh_model_indx,GENERIC_ONOFF_STATUS);
             }
-        }      
+        }
+
+#if (TMALL_GLP_ENABLE)    
+        if(evt->update_state_param.upd_type == UPADTE_GLP_STOP_TYPE)
+        {  
+           start_provisioning = true;
+           builtin_timer_stop(tmall_glp_dly_timer_inst);
+        }
+
+        if (Node_Proved_State == MESH_PROV_FAILED)
+        {
+           glp_dely_status = GLP_WAIT_START_PROVISIONING;
+           builtin_timer_start(tmall_glp_dly_timer_inst, TMALL_GLP_PROVISIONING_TIMEOUT, NULL);  
+        }
+
+       if (evt->update_state_param.upd_type == UPADTE_GLP_STOP_TIMEOUT_TYPE)
+       {
+          app_status_set(false);		//false lowpower
+       } 
+#endif      
     }
-    break;
+    break; 
+    case MESH_GENIE_PROV_COMP:
+    {
+#if (TMALL_GLP_ENABLE)        
+        if (connect_id != INVALID_CON_IDX)
+        {
+           tmall_glp_enable_handler();
+        }
+ #endif       
+    }
+    break;    
     case MESH_REPOPT_PROV_RESULT:
     {
       	Node_Proved_State = evt->prov_rslt_sate.state;  
+        if (Node_Proved_State == MESH_PROV_SUCCEED)
+        {
+             mesh_node_prov_state = true;  
+        }
+       
     }
     break;
     case MESH_ACCEPT_MODEL_INFO:
@@ -656,7 +789,6 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         };
         dev_manager_set_mac_addr(&ali_mac[0]);
         dev_manager_stack_init(&cfg);
-
     }
     break;
 
@@ -688,22 +820,43 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     break;
     case PROFILE_ADDED:
     {
-        
         prf_ls_sig_mesh_callback_init(mesh_manager_callback);
-
-        model_env.nb_model = 5;
+        model_env.nb_model = 2;
         model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
         model_env.info[0].element_id = 0;
         model_env.info[1].model_id = VENDOR_TMALL_SERVER;
-        model_env.info[1].element_id = 0;
-        model_env.info[2].model_id = LIGHTNESS_SERVER;
-        model_env.info[2].element_id = 0;
-        model_env.info[3].model_id = LIGHTS_CTL_SERVER;
-        model_env.info[3].element_id = 0;
-        model_env.info[4].model_id = LIGHTS_HSL_SERVER;
-        model_env.info[4].element_id = 0;
+        model_env.info[1].element_id = 0;  
+         
+#if (TMALL_GLP_ENABLE) 
+        ls_tmall_glp_dly_timer_init();           
+       if ((tinyfs_read(mesh_dir, RECORD_ST_GLP_NODE, (uint8_t*)&st_glp_node, &len_st_glp_node)) !=TINYFS_NO_ERROR)
+       {
+          st_glp_node = ST_GLP_DIS_TMALL_MESH;
+          tinyfs_write(mesh_dir, RECORD_ST_GLP_NODE, (uint8_t *)&st_glp_node, sizeof(len_st_glp_node));
+          tinyfs_write_through();
+       }
+
+        if (SYSCFG->BKD[0] == TMALL_GLP_RST_FLAG)
+        {
+          SYSCFG->BKD[0] = 0;  
+          st_glp_node = ST_GLP_EN_TMALL_MESH; 
+        }
+
+        if ((st_glp_node == ST_GLP_TMALL_MESH_PROVISIONED) || (st_glp_node == ST_GLP_EN_TMALL_MESH))
+        {    
+            app_status_set(true);     
+            ls_sig_mesh_init(&model_env);
+        }
+        else
+        {
+           st_glp_node = ST_GLP_DIS_TMALL_MESH;
+           app_status_set(false);
+        }
+#else
+        app_status_set(true);
+        ls_tmall_glp_dly_timer_init();
         ls_sig_mesh_init(&model_env);
-        
+#endif        
     }
     break;
     default:
@@ -711,11 +864,18 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     }
 }
 
+void exti_io_enable(void)
+{
+    io_cfg_input(PA07);    //PA00 config input
+    io_pull_write(PA07, IO_PULL_UP);    //PA00 config pullup
+    io_exti_config(PA07,INT_EDGE_FALLING);    //PA00 interrupt falling edge
+    io_exti_enable(PA07,true);    //PA00 interrupt enable
+}
+
 int main()
 {
     sys_init_app();
-    tmall_light_init();
-    //exti_gpio_init();
+    exti_io_enable();
     gen_ali_authValue();
     ble_init();
     auto_check_unbind();
@@ -723,4 +883,17 @@ int main()
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
     ble_loop();
+}
+
+void io_exti_callback(uint8_t pin)
+{
+    if (pin == PA07)
+    {
+        if(st_glp_node == ST_GLP_DIS_TMALL_MESH)
+        {
+           disable_global_irq(); 
+           SYSCFG->BKD[0] = TMALL_GLP_RST_FLAG;
+          ls_sig_mesh_platform_reset();
+        } 
+    }
 }

@@ -13,46 +13,42 @@
 #include "field_manipulate.h"
 #include "le501x.h"
 #include "sig_mesh_ctl.h"
+#include "sig_light_cfg.h"
 #include "sig_mesh_vendor_event.h"
-#include "io_config.h"
 
 #define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
-#define MAX_NB_ADDR_REPLAY 5
+#define MAX_NB_ADDR_REPLAY 20
 #define PROV_AUTH_ACCEPT 1
 #define PROV_AUTH_NOACCEPT 0
 #define DEV_NAME_MAX_LEN 0x20
+
+uint8_t vendor_tid = 0;
 #define RECORD_KEY1 1
 #define RECORD_KEY2 2
-#define NODE_UNICAST_ADDR 0x03  /*!< unicast_address >= 0x0002*/
-#define GROUP_ADDR 0xC000  /*!< group_address >= 0xC000*/
-#define PROV_SUCCESS_LED  PA01 
-#define LED_ON  1
-#define LED_OFF 0
 
 tinyfs_dir_t ls_sigmesh_dir;
 struct mesh_model_info model_env;
 struct lpn_offer_info friendship_env;
 struct lpn_status_info local_lpn_env;
 SIGMESH_NodeInfo_TypeDef Node_Get_Proved_State = 0;
-SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
 
 static uint8_t dev_uuid[16] = {0x92,0x88,0x8A,0xFB,0xF0,0xCA,0x8F,0x45,0xB2,0xDF,0x93,0xEE,0x71,0x12,0x7C,0x68};
 static uint8_t auth_data[16] = {0xF4,0xC7,0x0B,0xE8,0x10,0xE1,0x3A,0xAE,0xF8,0x3B,0x05,0xD4,0xA1,0xDA,0x8C,0xF3};
 
-//just for auto prov mode
-uint8_t net_key[16] = {0x4D,0xC8,0x86,0xC8,0x0A,0x53,0xEF,0x80,0x5B,0x5C,0x30,0x59,0xF6,0xE3,0xA7,0xAD};
-uint8_t app_key[16] = {0x8E,0x40,0x71,0xA5,0x3F,0x7A,0xEA,0xF0,0x81,0xB9,0xCF,0x8B,0x83,0x05,0x12,0x52};
-
 char ble_device_name[DEV_NAME_MAX_LEN] = "ls_sig_mesh_provee_alexa";
 uint8_t rsp_data_info[40] = {0};
 struct mesh_publish_info_ind mesh_publish_env[MAX_MESH_MODEL_NB];
-static uint8_t model_tid = 0;
-static uint8_t vendor_model_tid = 0;
 
-static uint16_t mesh_src_addr;
+static uint16_t provisioner_unicast_addr;
 static uint8_t adv_obj_hdl;
+static bool mesh_node_prov_state = false;
 void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx, uint16_t model_cfg_idx);
+void app_generic_onoff_status_report(uint8_t onoff);
+void app_light_hsl_sat_status_report(void);
+void app_light_hsl_hue_status_report(void);
+void app_light_lightness_status_report(void);
+void app_light_ctl_temp_status_report(void);
 
 void auto_check_unbind(void)
 {
@@ -76,6 +72,7 @@ void auto_check_unbind(void)
     }
 }
 
+
 static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx)
 {
     switch (type)
@@ -85,12 +82,10 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
         break;
     case DISCONNECTED:
         LOG_I("disconnected");
-        break;
-    case CONN_PARAM_REQ:
-
-        break;
-    case CONN_PARAM_UPDATED:
-
+        if(mesh_node_prov_state == true)
+        {
+            ls_sig_mesh_proxy_adv_ctl(true);
+        }
         break;
     default:
 
@@ -103,32 +98,94 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     
 }
 
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx, uint16_t model_cfg_idx)
+void app_generic_onoff_status_report(uint8_t onoff)
 {
-    struct model_cli_trans_info param;
-        model_tid++;
-        param.mdl_lid = mesh_publish_env[model_idx].model_lid;
-        param.app_key_lid = model_env.app_key_lid;
-        param.dest_addr = mesh_publish_env[model_idx].addr;
-        LOG_I("mdl_lid=%x,dest_addr=%x,tx_msg=%x,model_tid=%x",param.mdl_lid,param.dest_addr,tx_msg,model_tid);
-        param.state_1 = tx_msg;
-        param.state_2 = 0x00;
-        param.delay_ms = 50;
-        param.trans_info = (uint16_t)(model_tid << 8);
-        param.trans_time_ms = 100;
-        mesh_standard_model_publish_message_handler(&param);
+    struct model_send_info onoff_rsp;
+    onoff_rsp.ModelHandle = model_env.info[MODEL0_GENERIC_ONOFF_SVC].model_lid; 
+    onoff_rsp.app_key_lid = model_env.app_key_lid; 
+    onoff_rsp.opcode = GENERIC_ONOFF_STATUS;  
+    onoff_rsp.dest_addr = provisioner_unicast_addr;
+    onoff_rsp.len = 1; 
+    onoff_rsp.info[0] = onoff;
+    model_send_info_handler(&onoff_rsp);
 }
 
-void app_vendor_model_tx_message_handler(uint8_t *data, uint8_t len)
+void app_generic_vendor_report(uint16_t dest_addr)
 {
-    struct vendor_model_publish_message tx_msg_info;
-    vendor_model_tid++;
-    tx_msg_info.ModelHandle = model_env.info[MODEL2_VENDOR_MODEL_CLI].model_lid;
-    tx_msg_info.TxHandle = vendor_model_tid;
-    tx_msg_info.MsgOpcode = APP_LS_SIG_MESH_VENDOR_SET;
-    tx_msg_info.MsgLength = len;
-    memcpy(&tx_msg_info.msg[0], data, tx_msg_info.MsgLength);
-    mesh_vendor_model_publish_message_handler(&tx_msg_info);
+    struct model_send_info onoff_rsp;
+    onoff_rsp.ModelHandle = model_env.info[MODEL2_VENDOR_MODEL_SVC].model_lid; 
+    onoff_rsp.app_key_lid = model_env.app_key_lid; 
+    onoff_rsp.opcode = APP_LS_SIG_MESH_VENDOR_STATUS;  
+    onoff_rsp.dest_addr = dest_addr;
+    onoff_rsp.len = 3; 
+    onoff_rsp.info[0] = 0x11;
+    onoff_rsp.info[1] = 0x22;
+    onoff_rsp.info[2] = 0x33;
+    model_send_info_handler(&onoff_rsp);
+}
+
+void app_light_lightness_status_report(void)
+{
+    struct model_send_info lightness_rsp;
+    lightness_rsp.ModelHandle = model_env.info[MODEL3_LIGHT_LIGHTNESS_SVC].model_lid; 
+    lightness_rsp.app_key_lid = model_env.app_key_lid; 
+    lightness_rsp.opcode = LIGHT_LIGHTNESS_RANGE_STATUS;  
+    lightness_rsp.dest_addr = provisioner_unicast_addr;
+    lightness_rsp.len = 2; 
+    lightness_rsp.info[0] = 0;
+    lightness_rsp.info[1] = 0;
+
+    model_send_info_handler(&lightness_rsp);
+}
+
+void app_light_ctl_temp_status_report(void)
+{
+    struct model_send_info ctl_temp_rsp;
+    ctl_temp_rsp.ModelHandle = model_env.info[MODEL4_LIGHT_CTL_SVC].model_lid; 
+    ctl_temp_rsp.app_key_lid = model_env.app_key_lid; 
+    ctl_temp_rsp.opcode = LIGHT_CTL_TEMP_STATUS;  
+    ctl_temp_rsp.dest_addr = provisioner_unicast_addr;
+    ctl_temp_rsp.len = 4; 
+    ctl_temp_rsp.info[0] = 0;
+    ctl_temp_rsp.info[1] = 0;
+    ctl_temp_rsp.info[2] = 0;
+    ctl_temp_rsp.info[3] = 0;
+
+    model_send_info_handler(&ctl_temp_rsp);
+}
+
+void app_light_hsl_hue_status_report(void)
+{
+    struct model_send_info hsl_hue_rsp;
+    hsl_hue_rsp.ModelHandle = model_env.info[MODEL5_LIGHT_HSL_SVC].model_lid; 
+    hsl_hue_rsp.app_key_lid = model_env.app_key_lid; 
+    hsl_hue_rsp.opcode = LIGHT_HSL_HUE_STATUS;  
+    hsl_hue_rsp.dest_addr = provisioner_unicast_addr;
+    hsl_hue_rsp.len = 2; 
+    hsl_hue_rsp.info[0] = 0;
+    hsl_hue_rsp.info[0] = 0;
+
+    model_send_info_handler(&hsl_hue_rsp);
+}
+
+void app_light_hsl_sat_status_report(void)
+{
+    struct model_send_info hsl_sta_rsp;
+    hsl_sta_rsp.ModelHandle = model_env.info[MODEL4_LIGHT_CTL_SVC].model_lid; 
+    hsl_sta_rsp.app_key_lid = model_env.app_key_lid; 
+    hsl_sta_rsp.opcode = LIGHT_HSL_SAT_STATUS;  
+    hsl_sta_rsp.dest_addr = provisioner_unicast_addr;
+    hsl_sta_rsp.len = 2; 
+    hsl_sta_rsp.info[0] = 0;
+    hsl_sta_rsp.info[0] = 0;
+    model_send_info_handler(&hsl_sta_rsp);
+}
+
+void report_provisioner_unicast_address_ind(uint16_t unicast_address)
+{
+    provisioner_unicast_addr = unicast_address;
+    tinyfs_write(ls_sigmesh_dir, RECORD_KEY2, (uint8_t *)&unicast_address, sizeof(unicast_address));
+    tinyfs_write_through();
 }
 
 static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt_u *evt)
@@ -202,15 +259,19 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         Node_Get_Proved_State = evt->st_proved.proved_state;
         if (Node_Get_Proved_State == PROVISIONED_OK)
         {
-            uint16_t length = sizeof(mesh_src_addr);
+            uint16_t length = sizeof(provisioner_unicast_addr);
             LOG_I("The node is provisioned");
-            tinyfs_read(ls_sigmesh_dir, RECORD_KEY2, (uint8_t *)&mesh_src_addr, &length);
-            io_write_pin(PROV_SUCCESS_LED,LED_ON);
+            ls_mesh_light_set_lightness(0xffff, LIGHT_LED_2);
+            ls_mesh_light_set_lightness(0xffff, LIGHT_LED_3);
+            tinyfs_read(ls_sigmesh_dir, RECORD_KEY2, (uint8_t *)&provisioner_unicast_addr, &length);
+            mesh_node_prov_state = true;
         }
         else
         {
             LOG_I("The node is not provisioned");
+            mesh_node_prov_state = false;
         }
+        
     }
     break;
     case MESH_GET_PROV_INFO:
@@ -247,7 +308,9 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         else if(evt->prov_rslt_sate.state == MESH_PROV_SUCCEED)
         {
             LOG_I("prov succeed");
-            io_write_pin(PROV_SUCCESS_LED,LED_ON);
+            mesh_node_prov_state = true;
+            ls_mesh_light_set_lightness(0xffff,LIGHT_LED_2);
+            ls_mesh_light_set_lightness(0xffff,LIGHT_LED_3);
         }
        else if(evt->prov_rslt_sate.state == MESH_PROV_FAILED)
         {
@@ -257,17 +320,21 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     break;
     case MESH_ACCEPT_MODEL_INFO:
     {
+         LOG_I("vendor info");
+         LOG_I("model_lid=%x,opcode=%x",evt->rx_msg.ModelHandle,evt->rx_msg.opcode);
+         LOG_HEX(&evt->rx_msg.info[0],evt->rx_msg.rx_info_len);
         if (evt->rx_msg.opcode == APP_LS_SIG_MESH_VENDOR_SET)
          {
-            if (model_env.info[MODEL2_VENDOR_MODEL_SVC].model_lid == evt->rx_msg.ModelHandle)
-            {
-                uint32_t cnt_message_tx= evt->rx_msg.info[0];
-                cnt_message_tx |= (uint32_t)(evt->rx_msg.info[1]<<8);
-                cnt_message_tx |= (uint32_t)(evt->rx_msg.info[2]<<16);
-                cnt_message_tx |= (uint32_t)(evt->rx_msg.info[3]<<24);
-                vendor_event_accept_info(&evt->rx_msg.info[0],evt->rx_msg.rx_info_len);
-            }
+
+            ls_mesh_light_set_onoff(evt->rx_msg.info[0], LIGHT_LED_1); 
+
+            app_generic_vendor_report(evt->rx_msg.source_addr);
          } 
+    }
+    break;
+    case MESH_STATE_UPD_IND:
+    {
+        sig_mesh_mdl_state_upd_hdl(&evt->mdl_state_upd_ind);
     }
     break;
     case MESH_REPORT_TIMER_STATE:
@@ -297,50 +364,23 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         
     }
     break;
-    case MESH_ACTIVE_AUTO_PROV:
-    {
-            struct mesh_auto_prov_info init_param;
-            init_param.model_nb = model_env.nb_model;
-			memcpy((uint8_t *)&init_param.unicast_addr,&dev_uuid[0],2); 
-            init_param.unicast_addr = NODE_UNICAST_ADDR; //Recommendation unicast_addr >= 0x0002
-            init_param.group_addr = GROUP_ADDR;//+group_para_handle();   //Recommendation group_addr >= 0xC000LOG_I()
-            init_param.model_info[MODEL0_GENERIC_ONOFF_SVC].model_id = model_env.info[MODEL0_GENERIC_ONOFF_SVC].model_id;
-            init_param.model_info[MODEL0_GENERIC_ONOFF_SVC].publish_flag = false;
-            init_param.model_info[MODEL0_GENERIC_ONOFF_SVC].subs_flag = true;
-
-            init_param.model_info[MODEL1_GENERIC_LEVEL_SVC].model_id = model_env.info[MODEL1_GENERIC_LEVEL_SVC].model_id;
-            init_param.model_info[MODEL1_GENERIC_LEVEL_SVC].publish_flag = false;
-            init_param.model_info[MODEL1_GENERIC_LEVEL_SVC].subs_flag = true;
-
-            init_param.model_info[MODEL2_VENDOR_MODEL_SVC].model_id = model_env.info[MODEL2_VENDOR_MODEL_SVC].model_id;
-            init_param.model_info[MODEL2_VENDOR_MODEL_SVC].publish_flag = false;
-            init_param.model_info[MODEL2_VENDOR_MODEL_SVC].subs_flag = true;
-
-            init_param.model_info[MODEL0_GENERIC_ONOFF_CLI].model_id = model_env.info[MODEL0_GENERIC_ONOFF_CLI].model_id;
-            init_param.model_info[MODEL0_GENERIC_ONOFF_CLI].publish_flag = true;
-            init_param.model_info[MODEL0_GENERIC_ONOFF_CLI].subs_flag = true;
-
-            init_param.model_info[MODEL1_GENERIC_LEVEL_CLI].model_id = model_env.info[MODEL1_GENERIC_LEVEL_CLI].model_id;
-            init_param.model_info[MODEL1_GENERIC_LEVEL_CLI].publish_flag = true;
-            init_param.model_info[MODEL1_GENERIC_LEVEL_CLI].subs_flag = true;
-
-            init_param.model_info[MODEL2_VENDOR_MODEL_CLI].model_id = model_env.info[MODEL2_VENDOR_MODEL_CLI].model_id;
-            init_param.model_info[MODEL2_VENDOR_MODEL_CLI].publish_flag = true;
-            init_param.model_info[MODEL2_VENDOR_MODEL_CLI].subs_flag = true;
-            memcpy(&init_param.app_key[0], &app_key[0], 16);
-            memcpy(&init_param.net_key[0], &net_key[0], 16);
-
-            ls_sig_mesh_auto_prov_handler(&init_param, true);
-    }
-    break;
     default:
-    {
-    }
-    break;
+     break;
     }
 }
 
-uint8_t usr_mac_addr[6]={NODE_UNICAST_ADDR,2,3,4,5,0xC6};
+void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len)
+{
+    uint8_t *pos;
+    pos = scan_rsp_data;
+    *pos++ = strlen(ble_device_name)+1;
+    *pos++ = '\x08';
+    memcpy(pos, ble_device_name, strlen((const char *)ble_device_name));
+    pos += strlen((const char *)ble_device_name);
+
+    *scan_rsp_data_len = ((uint32_t)pos - (uint32_t)(&scan_rsp_data[0]));
+}
+
 static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 {
     switch (type)
@@ -352,18 +392,16 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
             .controller_privacy = false,
         };
         dev_manager_stack_init(&cfg);
-        dev_manager_set_mac_addr(&usr_mac_addr[0]);
     }
     break;
-
     case STACK_READY:
     {
         uint8_t addr[6];
         struct ls_sig_mesh_cfg feature = {
-            .MeshFeatures = EN_RELAY_NODE | EN_MSG_API,
-            .MeshCompanyID = COMPANY_ID,
-            .MeshProID = 0x001A,
-            .MeshProVerID = 0x0001,
+            .MeshFeatures = EN_RELAY_NODE | EN_MSG_API | EN_PB_GATT | EN_PROXY_NODE,
+            .MeshCompanyID = 0x08b4,//COMPANY_ID,
+            .MeshProID = 0x000f,//0x001A,
+            .MeshProVerID = 0x0003,//0x0001,
             .MeshLocDesc = 0x0100,
             .NbAddrReplay  = MAX_NB_ADDR_REPLAY,
             .NbCompDataPage = COMPA_DATA_PAGES,
@@ -375,9 +413,10 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_get_identity_bdaddr(addr, &type);
         memcpy(&dev_uuid[0],addr,6);
         LOG_I("stack ready:");
-        LOG_HEX(addr,6);        
-        vendor_event_init(); 
+        LOG_HEX(addr,6);
         dev_manager_prf_ls_sig_mesh_add(NO_SEC, &feature);
+        ls_button_timer_init();
+//        vendor_event_init();
     }
     break;
     case PROFILE_ADDED:
@@ -386,7 +425,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 
         model_env.nb_model = USR_MODEL_MAX_NUM;
         model_env.app_key_lid = 0;
-        //server
+      
         model_env.info[MODEL0_GENERIC_ONOFF_SVC].sig_model_cfg_idx = MESH_MDL_CFG_ONOFF;
         model_env.info[MODEL0_GENERIC_ONOFF_SVC].element_id = 0;
         model_env.info[MODEL0_GENERIC_ONOFF_SVC].model_lid = 0;
@@ -401,25 +440,23 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[MODEL2_VENDOR_MODEL_SVC].element_id = 0;
         model_env.info[MODEL2_VENDOR_MODEL_SVC].model_lid = 0;
         model_env.info[MODEL2_VENDOR_MODEL_SVC].vendor_model_role = 0; //sever model
-        model_env.info[MODEL2_VENDOR_MODEL_SVC].model_id = VENDOR_USER_SERVER;
+        model_env.info[MODEL2_VENDOR_MODEL_SVC].model_id = VENDOR_USER_SERVER;     
+       
+        model_env.info[MODEL3_LIGHT_LIGHTNESS_SVC].sig_model_cfg_idx = MESH_MDL_CFG_LIGHTS_LN;
+        model_env.info[MODEL3_LIGHT_LIGHTNESS_SVC].element_id = 0;
+        model_env.info[MODEL3_LIGHT_LIGHTNESS_SVC].model_lid = 0;
+        model_env.info[MODEL3_LIGHT_LIGHTNESS_SVC].model_id = LIGHTNESS_SERVER;
 
-        //client
-        model_env.info[MODEL0_GENERIC_ONOFF_CLI].sig_model_cfg_idx = MESH_CMDL_CFG_IDX_GENC_ONOFF;
-        model_env.info[MODEL0_GENERIC_ONOFF_CLI].element_id = 0;
-        model_env.info[MODEL0_GENERIC_ONOFF_CLI].model_lid = 0;
-        model_env.info[MODEL0_GENERIC_ONOFF_CLI].model_id = GENERIC_ONOFF_CLIENT;
+        model_env.info[MODEL4_LIGHT_CTL_SVC].sig_model_cfg_idx = MESH_MDL_CFG_LIGHTS_CTL;
+        model_env.info[MODEL4_LIGHT_CTL_SVC].element_id = 0;
+        model_env.info[MODEL4_LIGHT_CTL_SVC].model_lid = 0;
+        model_env.info[MODEL4_LIGHT_CTL_SVC].model_id = LIGHTS_CTL_SERVER;
 
-        model_env.info[MODEL1_GENERIC_LEVEL_CLI].sig_model_cfg_idx = MESH_CMDL_CFG_IDX_GENC_LEVEL;
-        model_env.info[MODEL1_GENERIC_LEVEL_CLI].element_id = 0;
-        model_env.info[MODEL1_GENERIC_LEVEL_CLI].model_lid = 0;
-        model_env.info[MODEL1_GENERIC_LEVEL_CLI].model_id = GENERIC_LVL_CLIENT;
+        model_env.info[MODEL5_LIGHT_HSL_SVC].sig_model_cfg_idx = MESH_MDL_CFG_LIGHTS_HSL;
+        model_env.info[MODEL5_LIGHT_HSL_SVC].element_id = 0;
+        model_env.info[MODEL5_LIGHT_HSL_SVC].model_lid = 0;
+        model_env.info[MODEL5_LIGHT_HSL_SVC].model_id = LIGHTS_HSL_SERVER;
 
-        model_env.info[MODEL2_VENDOR_MODEL_CLI].vendor_model_cfg_idx = MESH_MDL_CFG_VENDORC_INFO;
-        model_env.info[MODEL2_VENDOR_MODEL_CLI].element_id = 0;
-        model_env.info[MODEL2_VENDOR_MODEL_CLI].model_lid = 0;
-        model_env.info[MODEL2_VENDOR_MODEL_CLI].vendor_model_role = 1; //client model
-        model_env.info[MODEL2_VENDOR_MODEL_CLI].model_id = VENDOR_USER_CLIENT;
-        
         ls_sig_mesh_init(&model_env);
     }
     break;
@@ -427,14 +464,6 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     {
         adv_obj_hdl = evt->obj_created.handle;
         LOG_I("adv obj hdl:%d",adv_obj_hdl);
-    }
-    break;
-    case ADV_STOPPED:
-    {
-    }
-    break;
-    case SCAN_STOPPED:
-    {
     }
     break;
     default:
@@ -446,8 +475,8 @@ int main()
 {
     sys_init_app();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
-    io_cfg_output(PROV_SUCCESS_LED);
-    io_write_pin(PROV_SUCCESS_LED,LED_OFF);
+    ls_mesh_pwm_init();
+    light_button_init();
     ble_init();
     auto_check_unbind();
     dev_manager_init(dev_manager_callback);

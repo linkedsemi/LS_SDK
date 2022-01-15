@@ -171,7 +171,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     case MESH_ACTIVE_DISABLE:
     {
         SIGMESH_UnbindAll();
-        ls_sig_mesh_platform_reset();
+        platform_reset(0);
     }
     break;
     case MESH_ACTIVE_REGISTER_MODEL:

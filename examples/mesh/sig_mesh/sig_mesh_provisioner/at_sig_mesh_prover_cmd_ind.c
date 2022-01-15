@@ -5,6 +5,7 @@
 #include "log.h"
 
 extern void hex_arr_to_str(uint8_t *str, const uint8_t hex_arr[], uint8_t arr_len);
+extern void dec_arr_to_str(uint8_t *str, const uint8_t hex_arr[], uint8_t arr_len);
 
 void at_prover_ready_ind(void)
 {
@@ -16,14 +17,28 @@ void at_prover_ready_ind(void)
     uart_write((uint8_t *)ind_msg,ind_len);
 }
 
-void at_prover_report_dev_uuid(uint8_t *param)
+void at_prover_report_dev_uuid(uint8_t *param,int8_t rssi)
 {
     uint8_t ind_len=0;
     char ind_msg[100]={0};
     uint8_t dev_uuid_str[UUID_MESH_DEV_LEN*2+1]={0};
+    uint8_t at_dev_rssi[sizeof(uint8_t)*2+1]={0};
+    uint8_t tmp_dev_rssi=0;
 
     hex_arr_to_str(dev_uuid_str,param,UUID_MESH_DEV_LEN);
     ind_len = sprintf(ind_msg,"\r\n+DEV_UUID:%s\r\n",dev_uuid_str);
+    uart_write((uint8_t *)ind_msg,ind_len);
+    
+    tmp_dev_rssi = abs(rssi);
+    dec_arr_to_str(at_dev_rssi,(uint8_t *)&tmp_dev_rssi,sizeof(uint8_t));
+    if (rssi>=0)
+    {
+       ind_len = sprintf(ind_msg,"\r\n+DEV_RSSI:%s\r\n",at_dev_rssi);
+    }
+    else
+    {
+       ind_len = sprintf(ind_msg,"\r\n+DEV_RSSI:-%s\r\n",at_dev_rssi);
+    }
     uart_write((uint8_t *)ind_msg,ind_len);
 }
 
@@ -291,4 +306,25 @@ void at_prover_report_model_pub_status(uint16_t unicast_addr,uint8_t model_app_s
      ind_len = sprintf(ind_msg,"+Publish_Retx_Intv_Step_Solution:%s\r\n",at_publish_retx_intv_step_solution);
      uart_write((uint8_t *)ind_msg,ind_len);
 
+}
+
+void at_prover_report_node_info(uint16_t unicast_addr,uint16_t net_key_lid,uint16_t dev_key_lid)
+{
+    uint8_t ind_len=0;
+    char ind_msg[100]={0};
+    uint8_t at_unicast_addr[sizeof(uint16_t)*2+1]={0};
+    uint8_t at_net_key_lid[sizeof(uint16_t)*2+1]={0};
+    uint8_t at_dev_key_lid[sizeof(uint16_t)*2+1]={0};
+
+    hex_arr_to_str(at_unicast_addr,(uint8_t *)&unicast_addr,sizeof(uint16_t));
+    ind_len = sprintf(ind_msg,"\r\n+Unicast_address:%s\r\n",at_unicast_addr);
+    uart_write((uint8_t *)ind_msg,ind_len);
+
+    hex_arr_to_str(at_net_key_lid,(uint8_t *)&net_key_lid,sizeof(uint16_t));
+    ind_len = sprintf(ind_msg,"\r\n+net_key_lid:%s\r\n",at_net_key_lid);
+    uart_write((uint8_t *)ind_msg,ind_len);
+
+    hex_arr_to_str(at_dev_key_lid,(uint8_t *)&dev_key_lid,sizeof(uint16_t));
+    ind_len = sprintf(ind_msg,"\r\n+dev_key_lid:%s\r\n",at_dev_key_lid);
+    uart_write((uint8_t *)ind_msg,ind_len);
 }
