@@ -386,7 +386,10 @@ static uint8_t ctrl_pkt_dispatch(const uint8_t *data,uint16_t length,uint8_t con
     case FOTAS_INTEGRITY_CHECK_REQ:
     {
         uint16_t last_sector_size = fotas_env.new_image.size % FOTAS_SECTOR_SIZE;
-        memset((uint8_t *)fotas_env.sector_buf + last_sector_size, 0xff, FOTAS_SECTOR_SIZE - last_sector_size);
+        if(last_sector_size)
+        {
+            memset((uint8_t *)fotas_env.sector_buf + last_sector_size, 0xff, FOTAS_SECTOR_SIZE - last_sector_size);
+        }
         program_last_sector_to_flash();
         fotas_env.finish_ind->integrity_checking_result = fw_digest_check();
         uint8_t digest_check_status = fotas_env.finish_ind->integrity_checking_result ? 0 : 0x80;
