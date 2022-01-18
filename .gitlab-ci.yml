@@ -81,7 +81,7 @@ coremark_build:
 flash_prog_build:
   stage: build
   script:
-    - cd examples/utility/flash_prog ; scons
+    - cd examples/utility/flash_prog/arm_cm ; scons
 
 ram_test_build:
   stage: build
