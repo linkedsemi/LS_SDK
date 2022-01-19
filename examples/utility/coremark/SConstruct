@@ -13,5 +13,6 @@ src = [
 inc = [
     '.'
 ]
-env['LINKSCRIPT'] = File(env.subst('$IC/ram_link.txt'))
-env.image_build('coremark',src,inc)
+#env['LINKSCRIPT'] = File(env.subst('$IC/ram_link.txt'))
+#env.image_build('coremark',src,inc)
+env.app_build('coremark',src,inc,ble = False)
