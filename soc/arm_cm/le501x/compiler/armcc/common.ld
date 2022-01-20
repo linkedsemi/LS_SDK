@@ -1,6 +1,6 @@
 
 #define FLASH_BASE 0x18000000
-#define FLASH_SIZE 0x40000
+#define FLASH_SIZE 0x80000
 #define FLASH_END (FLASH_BASE + FLASH_SIZE)
 #define RAM_BASE 0
 #define RAM_SIZE 0xc000
