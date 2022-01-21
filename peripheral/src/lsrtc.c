@@ -163,17 +163,19 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
 void RTC_wkuptime_set(uint32_t t_ms)
 {
     LS_ASSERT(t_ms > 0);
+    RTC_wkuptime_clr();
+    DELAY_US(50);
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKSCAL, WKSCAL_divided_16);
     #if SDK_LSI_USED
-    uint64_t numerator = t_ms * 16 * 1000 * LSI_CNT_CYCLES;
+    uint64_t numerator = (uint64_t)t_ms * 16 * 1000 * LSI_CNT_CYCLES;
     uint32_t denominator = 32768 * get_lsi_cnt_val();
-    uint32_t quotient = numerator / denominator;
-    uint32_t remainder = numerator % denominator;
+    uint32_t remainder = __div64_32(&numerator, denominator);
+    uint32_t quotient = (uint32_t)numerator;
     if (remainder >= denominator / 2)
     {
         quotient++;
     }
-    // LOG_I("t_ms: %d, quotient: %d, remainder: %d, lsi_cnt_val %d", t_ms, quotient, remainder, get_lsi_cnt_val());
+//    LOG_I("t_ms: %d, quotient: %d, remainder: %d, lsi_cnt_val %d", t_ms, quotient, remainder, get_lsi_cnt_val());
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKCAL, quotient);
     #else
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKCAL, (t_ms * 16)/1000);
