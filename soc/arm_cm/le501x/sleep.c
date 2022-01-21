@@ -326,10 +326,12 @@ bool timer_sleep(void);
 void deep_sleep_no_ble()
 {
     uint32_t cpu_stat = enter_critical();
+    uart_log_pause();
     if(timer_sleep())
     {
         deep_sleep();
     }
+    uart_log_resume();
     exit_critical(cpu_stat);
 }
 
