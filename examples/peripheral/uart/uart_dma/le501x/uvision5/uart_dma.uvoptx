@@ -2,7 +2,7 @@
 <ProjectOpt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_optx.xsd">
 	<SchemaVersion>1.0</SchemaVersion>
 	<Target>
-		<TargetName>uart_it</TargetName>
+		<TargetName>uart_dma</TargetName>
 		<ToolsetNumber>0x4</ToolsetNumber>
 		<ToolsetName>ARM-ADS</ToolsetName>
 		<TargetOption>

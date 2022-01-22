@@ -4,7 +4,7 @@
 	<Header>### uVision Project, (C) Keil Software</Header>
 	<Targets>
 		<Target>
-			<TargetName>uart_it</TargetName>
+			<TargetName>uart_dma</TargetName>
 			<ToolsetNumber>0x4</ToolsetNumber>
 			<ToolsetName>ARM-ADS</ToolsetName>
 			<TargetOption>
@@ -42,7 +42,7 @@
 						<InvalidFlash>1</InvalidFlash>
 					</TargetStatus>
 					<OutputDirectory>.\UVBuild\</OutputDirectory>
-					<OutputName>uart_it</OutputName>
+					<OutputName>uart_dma</OutputName>
 					<CreateExecutable>1</CreateExecutable>
 					<CreateLib>0</CreateLib>
 					<CreateHexFile>0</CreateHexFile>
