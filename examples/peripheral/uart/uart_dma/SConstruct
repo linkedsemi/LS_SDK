@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('uart_it',src,inc,ble = False)
+env.app_build('uart_dma',src,inc,ble = False)
