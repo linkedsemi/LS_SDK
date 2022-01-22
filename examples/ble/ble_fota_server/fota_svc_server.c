@@ -188,7 +188,7 @@ static struct fotas_env_tag fotas_env;
 static struct builtin_timer *fotas_rsp_timer = NULL;
 /**************************************************************************************************************************/
 #if FW_ECC_VERIFY
-extern const uint8_t fotas_pub_key[64];
+const uint8_t fotas_pub_key[64];
 bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
 {
     return uECC_verify(fotas_pub_key, digest->data, sizeof(digest->data), signature->data, uECC_secp256r1());
