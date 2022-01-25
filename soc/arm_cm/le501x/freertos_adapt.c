@@ -121,7 +121,7 @@ static int32_t os_sleep_dur_get()
     switch(eSleepStatus)
     {
     case eStandardSleep:
-        dur = OSTICK_HS_STEP_INC(configTICK_RATE_HZ,expected_idle_time);
+        dur = OSTICK_HS_STEP_INC(configTICK_RATE_HZ,expected_idle_time-1);
     break;
     case eNoTasksWaitingTimeout:
         dur = INT_MAX;
