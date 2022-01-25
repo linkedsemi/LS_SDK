@@ -480,7 +480,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
           /* read the received data */
         (* (uint16_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
         hspi->pRxBuffPtr += sizeof(uint16_t);
-        hspi->RxXferCount-= sizeof(uint16_t);;
+        hspi->RxXferCount-= sizeof(uint16_t);
       }
     }
   }
@@ -584,7 +584,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     {
       hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint16_t);
-      hspi->TxXferCount--;
+      hspi->TxXferCount-=sizeof(uint16_t);
     }
     while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
     {
@@ -602,7 +602,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
                {
                    hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                    hspi->pTxBuffPtr += sizeof(uint16_t);
-                   hspi->TxXferCount--;
+                   hspi->TxXferCount -=sizeof(uint16_t);
                }
             }
               /* Check RXNE flag */
@@ -610,7 +610,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
             {
                 *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint16_t);
-                hspi->RxXferCount--;
+                hspi->RxXferCount-=sizeof(uint16_t );
             }
         }
     }
@@ -767,7 +767,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
          hspi->TxXferCount--;
         *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
         hspi->pTxBuffPtr++;
-			}
+	   }
   }
 	
 error :
@@ -944,8 +944,6 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *p
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
         hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
-        hspi->pTxBuffPtr += sizeof(uint16_t);
-        hspi->TxXferCount--;
 			}
 
   }
@@ -955,9 +953,8 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *p
       /* Check TXE flag */
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
+         hspi->TxXferCount--;
         *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
-        hspi->pTxBuffPtr++;
-        hspi->TxXferCount--;
 			}
   }
 error :
@@ -1172,22 +1169,22 @@ static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesTxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  *(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
-  hspi->pTxBuffPtr++;
-  hspi->TxXferCount--;
-
+ hspi->pTxBuffPtr++;
   /* Check the end of the transmission */
-  if (hspi->TxXferCount == 0U)
+  if (hspi->TxXferCount != 0U)
   {
-
+			 hspi->TxXferCount--;
+			*(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+  }
+  else
+	{
     /* Disable TXE interrupt */
     __HAL_SPI_DISABLE_IT(hspi, SPI_IT_TXE);
-
     if (hspi->RxXferCount == 0U)
     {
       SPI_CloseRxTx_ISR(hspi);
     }
-  }
+	}
 }
 
 /**
@@ -1201,7 +1198,7 @@ static void SPI_2linesRxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   /* Receive data in 16 Bit mode */
   *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
   hspi->pRxBuffPtr += sizeof(uint16_t);
-  hspi->RxXferCount--;
+  hspi->RxXferCount-= sizeof(uint16_t);
 
   if (hspi->RxXferCount == 0U)
   {
@@ -1224,23 +1221,22 @@ static void SPI_2linesRxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  /* Transmit data in 16 Bit mode */
-  hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
-  hspi->pTxBuffPtr += sizeof(uint16_t);
-  hspi->TxXferCount--;
-
+  hspi->TxXferCount-=sizeof(uint16_t);	
   /* Enable CRC Transmission */
-  if (hspi->TxXferCount == 0U)
+  if (hspi->TxXferCount != 0U)
   {
-
-    /* Disable TXE interrupt */
-    __HAL_SPI_DISABLE_IT(hspi, SPI_IT_TXE);
-
+		hspi->pTxBuffPtr += sizeof(uint16_t);
+		hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+  }
+	else
+	{
+		/* Disable TXE interrupt */
+	   __HAL_SPI_DISABLE_IT(hspi, SPI_IT_TXE);
     if (hspi->RxXferCount == 0U)
     {
       SPI_CloseRxTx_ISR(hspi);
     }
-  }
+	}
 }
 
 /**
