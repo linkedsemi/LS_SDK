@@ -1,12 +1,13 @@
 #include <stdbool.h>
+#include <string.h>
 #include "lsecc.h"
 #include "lsecc_msp.h"
 #include "common.h"
 #include "field_manipulate.h"
 static const struct ecc_curve_param *ecc_curve;
-static const uint32_t *ecc_private_key;
-static const uint32_t *ecc_public_key[2];
-static uint32_t *ecc_result[2];
+static uint32_t ecc_private_key[8];
+static uint32_t ecc_public_key[2][8];
+static uint8_t *ecc_result[2];
 
 enum ECC_ComMod
 {
@@ -287,12 +288,12 @@ static void calc_fsm_run()
 }
 
 
-static void calc_init(const struct ecc_curve_param *curve,const uint32_t *private_key,const uint32_t *public_key[2],uint32_t *result[2])
+static void calc_init(const struct ecc_curve_param *curve,const uint8_t *private_key,const uint8_t *public_key[2],uint8_t *result[2])
 {
     ecc_curve = curve;
-    ecc_private_key = private_key;
-    ecc_public_key[0] = public_key[0];
-    ecc_public_key[1] = public_key[1];
+    memcpy((uint8_t *)ecc_private_key,private_key,32);
+    memcpy((uint8_t *)ecc_public_key[0],public_key[0],32);
+    memcpy((uint8_t *)ecc_public_key[1],public_key[1],32);
     ecc_result[0] = result[0];
     ecc_result[1] = result[1];
     p_in();
@@ -301,13 +302,20 @@ static void calc_init(const struct ecc_curve_param *curve,const uint32_t *privat
     fsm_step = 0;
 }
 
-static void result2buffer()
+static void copy_from_eccram(uint32_t *src,uint8_t *dst)
 {
-    memcpy32(ecc_result[0],(uint32_t *)&LSECC->ARAM[8],8);
-    memcpy32(ecc_result[1],(uint32_t *)&LSECC->ARAM[16],8);
+    uint32_t buf[8];
+    memcpy32(buf,src,8);
+    memcpy(dst,(uint8_t *)buf,32);
 }
 
-void HAL_LSECC_PointMult(const struct ecc_curve_param *curve,const uint32_t *private_key,const uint32_t *public_key[2],uint32_t *result[2])
+static void result2buffer()
+{
+    copy_from_eccram((uint32_t *)&LSECC->ARAM[8],ecc_result[0]);
+    copy_from_eccram((uint32_t *)&LSECC->ARAM[16],ecc_result[1]);
+}
+
+void HAL_LSECC_PointMult(const struct ecc_curve_param *curve,const uint8_t *private_key,const uint8_t *public_key[2],uint8_t *result[2])
 {
     calc_init(curve,private_key,public_key,result);
     while(ecc_fsm != FSM_DONE)
@@ -318,7 +326,7 @@ void HAL_LSECC_PointMult(const struct ecc_curve_param *curve,const uint32_t *pri
     result2buffer();
 }
 
-void HAL_LSECC_PointMult_IT(const struct ecc_curve_param *curve,const uint32_t *private_key,const uint32_t *public_key[2],uint32_t *result[2])
+void HAL_LSECC_PointMult_IT(const struct ecc_curve_param *curve,const uint8_t *private_key,const uint8_t *public_key[2],uint8_t *result[2])
 {
     HAL_LSECC_MSP_INT_CLRPENDING();
     calc_init(curve,private_key,public_key,result);

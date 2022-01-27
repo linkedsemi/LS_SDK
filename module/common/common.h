@@ -43,4 +43,6 @@ uint8_t count_trailing_zeros(uint32_t x);
 uint8_t count_leading_zeros(uint32_t x);
 
 uint32_t __div64_32(uint64_t *n, uint32_t base);
+
+void memcpy_rev(uint8_t *dest, const uint8_t *src, uint32_t len);
 #endif

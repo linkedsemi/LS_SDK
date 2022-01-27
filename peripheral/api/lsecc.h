@@ -23,9 +23,9 @@ void HAL_LSECC_Init(void);
 
 void HAL_LSECC_DeInit(void);
 
-void HAL_LSECC_PointMult(const struct ecc_curve_param *curve,const uint32_t *private_key,const uint32_t *public_key[2],uint32_t *result[2]);
+void HAL_LSECC_PointMult(const struct ecc_curve_param *curve,const uint8_t *private_key,const uint8_t *public_key[2],uint8_t *result[2]);
 
-void HAL_LSECC_PointMult_IT(const struct ecc_curve_param *curve,const uint32_t *private_key,const uint32_t *public_key[2],uint32_t *result[2]);
+void HAL_LSECC_PointMult_IT(const struct ecc_curve_param *curve,const uint8_t *private_key,const uint8_t *public_key[2],uint8_t *result[2]);
 
 void HAL_LSECC_PointMult_Complete_Callback(void);
 
