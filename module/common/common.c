@@ -73,3 +73,12 @@ uint32_t __attribute__((weak)) __div64_32(uint64_t *n, uint32_t base)  //from li
 	*n = res;
 	return rem;
 }
+
+void memcpy_rev(uint8_t *dest, const uint8_t *src, uint32_t len)
+{
+	src += len - 1;
+	while(len--)
+	{
+		*dest++ = *src--;
+	}
+}
