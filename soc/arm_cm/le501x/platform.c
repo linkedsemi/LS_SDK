@@ -712,20 +712,18 @@ void aos_swint_set()
 }
 
 #include "lsecc.h"
-static uint32_t sec_key[8];
 static void (*ecc_cb)(void *);
 static void *ecc_param;
-static uint32_t *rslt[2];
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)
 {
-    memcpy(sec_key,secret_key,32);
-    rslt[0] = (uint32_t *)result_x;
-    rslt[1] = (uint32_t *)result_y;
+    uint8_t *rslt[2];
+    rslt[0] = result_x;
+    rslt[1] = result_y;
     ecc_cb = cb;
     ecc_param = param;
     HAL_LSECC_Init();
-    const uint32_t *pk[2] = {(const uint32_t *)pub_x,(const uint32_t *)pub_y};
-    HAL_LSECC_PointMult_IT(&secp256r1_param,sec_key,pk,rslt);
+    const uint8_t *pk[2] = {pub_x,pub_y};
+    HAL_LSECC_PointMult_IT(&secp256r1_param,secret_key,pk,rslt);
 }
 
 void HAL_LSECC_PointMult_Complete_Callback()
