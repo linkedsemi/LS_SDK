@@ -6,5 +6,4 @@
 #define SDK_MAX_CONN_NUM 3
 #define SDK_HCLK_MHZ (32)
 #define DEBUG_MODE 0
-
 #endif

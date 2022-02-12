@@ -443,7 +443,7 @@ void prov_succeed_src_addr_ind(uint16_t unicast_address)
     tinyfs_write_through();
 }
 
-void ls_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len)
+void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len)
 {
        uint8_t tmp_scnrsp_data_len=0;
 
@@ -893,7 +893,7 @@ void io_exti_callback(uint8_t pin)
         {
            disable_global_irq(); 
            SYSCFG->BKD[0] = TMALL_GLP_RST_FLAG;
-          ls_sig_mesh_platform_reset();
+          platform_reset(0);
         } 
     }
 }

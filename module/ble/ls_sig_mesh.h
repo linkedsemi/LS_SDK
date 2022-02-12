@@ -116,6 +116,7 @@ enum mesh_evt_type
     MESH_ACTIVE_REGISTER_MODEL,      /*!< To be reported this event type after all requested models were registered, you need to save the returned local index*/
     MESH_ACTIVE_MODEL_PUBLISH,       /*!< To be reported this event type after client model was enable publish function by provisioner, you need to save the returned information of publish*/
     MESH_ACTIVE_MODEL_GROUP_MEMBERS, /*!< To be reported this event type after all requested models were automatically bound AppKey, only for genie mesh*/
+    MESH_ACTIVE_MODEL_PUBLISHED,    /*!< To be reported this event type after the protocol stack confirms that the message was successfully Published*/
     MESH_ACTIVE_MODEL_RSP_SENT,      /*!< To be reported this event type after the protocol stack confirms that the message was successfully sent*/
     MESH_ACTIVE_LPN_START,           /*!< To be reported that this event type requests low power properties (such as timeout, interval, previous_address, RX window factor) after the low-power feature node was registered*/
     MESH_ACTIVE_LPN_OFFER,           /*!< When the low-power node establishes a friendly relationship, all nearby friend-supporting attributes are reported to the application layer and this event type is activated*/
@@ -517,6 +518,7 @@ struct mesh_auto_prov_info
 {
     uint16_t unicast_addr;        /*!< unicast address*/
     uint8_t model_nb;             /*!< Total registered Model*/
+    uint8_t ttl;                  /*!< time to live for publish*/
     uint16_t group_addr;          /*!< Group address for publish and subscription*/
     struct mesh_auto_prov_model_info model_info[MAX_MESH_MODEL_NB];  /*!< Maximum models in a node @ref struct mesh_auto_prov_model_info*/ 
     uint8_t app_key[16];          /*App key*/
@@ -605,6 +607,33 @@ void set_prov_auth_info(struct mesh_prov_auth_info *param);
  * @param Addr  group address
  */
 void model_subscribe(uint8_t const ModelHandle, uint16_t const Addr);
+/**
+ * @brief unsubscribe group address for model
+ * 
+ * @param ModelHandle model local id
+ * @param Addr  group address
+ */
+void model_unsubscribe(uint8_t const ModelHandle, uint16_t const Addr);
+/**
+ * @brief delete all information about Subscription for model
+ * 
+ * @param ModelHandle model local id
+ */
+void model_unsubscribe_all(uint8_t  ModelHandle);
+/**
+ * @brief publish group address and set parameters for model
+ * @param ModelHandle model local id
+ * @param Addr  group address
+ * @param virtual_uuid Virtual address you should set NULL when group address be set 16bits
+ * @param app_key_lid  app_key local index 
+ * @param publish_ttl        time to live for publish message 
+ * @param publish_period     period transmit for publish message
+ * @param publish_retransimit     Number of transmissions of published messages
+ * @param friendship_cred_flag    jush for friendship
+ * 
+ */
+void model_set_publication(uint8_t  ModelHandle, uint16_t Addr, uint8_t *virtual_uuid, uint8_t app_key_lid, uint8_t publish_ttl, uint8_t publish_period, uint8_t publish_retransimit,uint8_t friendship_cred_flag);
+
 /**
  * @brief  Get all subscript address from subscribe_list
  * 
@@ -747,6 +776,12 @@ void lnp_select_friend_handler(uint16_t friend_addr);
  * @param auto_prov_mesh_flag  Enable/Disable Flag
  */
 void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool const auto_prov_mesh_flag);
+/**
+ * @brief update iv_seq by manual for auto provisioning mode
+ * 
+ *  * @param seq_offset  set offset of seqence number by length of message
+ */
+void ls_sig_mesh_auto_prov_update_ivseq_handler(uint8_t seq_offset);
 /**
  * @brief Report unicast_address of provisioner
  * 

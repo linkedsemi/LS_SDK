@@ -200,7 +200,7 @@ void vendor_indication_handler(uint8_t const *info, uint16_t const info_len)
     rsp.opcode = APP_MESH_VENDOR_INDICATION;
     rsp.app_key_lid = mesh_key_lid;
     rsp.ModelHandle = model_env.info[1].model_lid;
-    rsp.dest_addr = mesh_src_addr;
+    rsp.dest_addr = provisioner_unicast_addr;
     rsp.len = info_len;
     rsp.info[0] = vendor_tid;
     memcpy(&(rsp.info[1]), info, info_len);
