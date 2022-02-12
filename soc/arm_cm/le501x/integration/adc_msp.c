@@ -39,6 +39,8 @@ static void adc_msp_init(void *inst,void (*handler)())
 
 void adc_msp_deinit(void)
 {
+    REG_FIELD_WR(RCC->APB2RST, RCC_ADC, 1);
+    REG_FIELD_WR(RCC->APB2RST, RCC_ADC, 0);
     REG_FIELD_WR(RCC->APB2EN, RCC_ADC, 0);
     NVIC_DisableIRQ(ADC_IRQn);
 }
