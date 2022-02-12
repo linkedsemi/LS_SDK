@@ -28,9 +28,11 @@
 #define RECORD_PROVER_APPKEY_LID 3
 #define DEV_NAME_MAX_LEN 0x20
 #define INVALID_MODEL_LID 0xff
+#define INVALID_KEY_LID 0xff
 
 #define PROVER_UNICAST_ADDR 0x0001
 #define NODE_BASE_UNICAST_ADDR  0x0002
+
 uint16_t lid_length = 1;
 extern uint16_t node_unicast_address;
 tinyfs_dir_t ls_sigmesh_provision_dir;
@@ -48,7 +50,7 @@ static uint8_t prover_auth_data[16] = {0xF4,0xC7,0x0B,0xE8,0x10,0xE1,0x3A,0xAE,0
  Network Keys
 */
 #define COMPO_DATA_PAGE0 0
-#define NETKEY_ID0 0
+#define NETKEY_ID0 2
 #define APPKEY_ID0 0
 
 uint8_t netkey[NETKEY_ID0+1][MESH_KEY_LENGTH]={{0x00,0x2b,0x1e,0xdc,0x3d,0x17,0x4f,0x06,0x29,0x80,0x8a,0x8e,0x4f,0xa4,0xa2,0xf7}}; //0xf7a2a44f8e8a8029064f173ddc1e2b00
@@ -56,10 +58,11 @@ uint8_t netkey[NETKEY_ID0+1][MESH_KEY_LENGTH]={{0x00,0x2b,0x1e,0xdc,0x3d,0x17,0x
 uint8_t appkey[APPKEY_ID0+1][MESH_KEY_LENGTH]={{0x98,0x7f,0x87,0x2b,0x79,0x41,0x85,0x24,0x33,0xb5,0x84,0x98,0x50,0xd1,0x16,0x32}};  //0x3216d1509884b533248541792b877f98
 
 
-uint8_t devkey[MESH_KEY_LENGTH]={0x7f,0x61,0xb3,0x31,0x55,0x35,0x98,0x7b,0xcb,0x37,0xd3,0xa2,0xc4,0x12,0xc6,0x37};
+uint8_t devkey[MESH_KEY_LENGTH]={0};
 uint8_t devkey_lid=0;
-uint8_t netkey_lid=0;
-uint8_t appkey_lid=0;
+uint8_t netkey_lid=INVALID_KEY_LID;
+uint8_t appkey_lid=INVALID_KEY_LID;
+uint16_t recode_key_length=1;
 uint8_t health_client_model_lid=0;
 
 struct node_element_id_info
@@ -94,7 +97,7 @@ static void prover_mesh_manager_rx_ind_callback(enum mesh_provisioner_rx_ind_typ
     break;
     case MESH_PROVER_ACTIVE_STATE:
     {
-         at_prover_report_provisiong_status(evt->prover_node_state_info.state,evt->prover_node_state_info.unicast_addr);
+         at_prover_report_provisiong_status(evt->prover_node_state_info.state,evt->prover_node_state_info.status,evt->prover_node_state_info.unicast_addr);
         if (evt->prover_node_state_info.state == PROVISIONING_SUCCEED)
         {
             ls_sig_mesh_prover_config_client_get(CONFIG_CLIENT_GET_TYPE_DFLT_TTL,0); 
@@ -127,6 +130,7 @@ static void prover_mesh_manager_rx_ind_callback(enum mesh_provisioner_rx_ind_typ
     break;
     case MESH_PROVER_CONFC_APP_KEY_STATUS:
         at_prover_report_node_app_key_status(evt->confc_get_app_key_status_info.unicast_addr,evt->confc_get_app_key_status_info.active_status,evt->confc_get_app_key_status_info.net_key_id,evt->confc_get_app_key_status_info.app_key_id);
+        at_prover_report_dev_key(evt->confc_get_app_key_status_info.unicast_addr,&devkey[0]);
     break;
     case MESH_PROVER_CONFC_MODEL_SUBS_STATUS:
         at_prover_report_model_subs_status(evt->confc_model_subs_app_status_info.unicast_addr,evt->confc_model_subs_app_status_info.status,evt->confc_model_subs_app_status_info.element_addr,evt->confc_model_subs_app_status_info.model_id,evt->confc_model_subs_app_status_info.value);
@@ -161,6 +165,7 @@ static void prover_mesh_manager_callback(enum mesh_provisioner_evt_type type, un
     case MESH_PROVER_KEY_DEV_ADD_RSP_INFO:
     { 
        devkey_lid =  evt->prover_node_add_dev_key_rsp_info.dev_key_lid;
+       memcpy(&devkey[0],&evt->prover_node_add_dev_key_rsp_info.dev_key[0],BLE_KEY_LEN);
        ls_sig_mesh_prover_config_set_dev(devkey_lid,netkey_lid,(node_unicast_address)/*dev primary unicast address*/);
     }
     break;
@@ -168,18 +173,36 @@ static void prover_mesh_manager_callback(enum mesh_provisioner_evt_type type, un
     {
        health_client_model_lid =  evt->prover_node_health_model_rsp_info.mdl_lid;
         at_prover_ready_ind();
-        ls_sig_mesh_provisioner_add_net_key(NETKEY_ID0,&netkey[0][0]);  //net_id >2
+
+        tinyfs_read(ls_sigmesh_provision_dir, RECORD_PROVER_NETKEY_LID, &netkey_lid, &recode_key_length);
+        tinyfs_read(ls_sigmesh_provision_dir, RECORD_PROVER_APPKEY_LID, &appkey_lid, &recode_key_length);
+        LOG_I("netkey_lid=%d",netkey_lid);
+        LOG_I("appkey_lid=%d",appkey_lid);
+        if (netkey_lid == INVALID_KEY_LID)
+        {
+          ls_sig_mesh_provisioner_add_net_key(NETKEY_ID0,&netkey[0][0]);  
+        }
     }
     break;
     case MESH_PROVER_KEY_NET_ADD_IND:
     {
         netkey_lid = evt->prover_node_add_net_key_ind_info.net_key_lid;
-        ls_sig_mesh_provisioner_add_app_key(NETKEY_ID0,APPKEY_ID0,&appkey[0][0]);
+        LOG_I("creat_netkey_lid=%d",netkey_lid);
+        tinyfs_write(ls_sigmesh_provision_dir, RECORD_PROVER_NETKEY_LID, &netkey_lid, sizeof(netkey_lid));
+        tinyfs_write_through();
+
+        if (appkey_lid == INVALID_KEY_LID)
+        {
+          ls_sig_mesh_provisioner_add_app_key(NETKEY_ID0,APPKEY_ID0,&appkey[0][0]);
+        }
     }
     break;
      case MESH_PROVER_KEY_APP_ADD_IND:
     {
         appkey_lid = evt->prover_node_add_app_key_ind_info.app_key_lid;
+         LOG_I("creat_appkey_lid=%d",appkey_lid);
+        tinyfs_write(ls_sigmesh_provision_dir, RECORD_PROVER_APPKEY_LID, &appkey_lid, sizeof(appkey_lid));
+        tinyfs_write_through();
     }
     break;
     case MESH_PROVER_SET_DEV_RSP_INFO:
@@ -190,6 +213,11 @@ static void prover_mesh_manager_callback(enum mesh_provisioner_evt_type type, un
     case MESH_PROVER_IDENTIFY_REQ_IND_INFO:
     {
         ls_sig_mesh_identify_cfm(true /*accept*/,netkey_lid/*netkey_lid*/,0x00/*FIPS P-256 ECC*/,0x00/*No OOB Public key uesed*/,0x00/*auth_method*/,0x00/*auth_action*/,0x00/*auth_size*/);
+    }
+    break;
+    case MESH_PROVER_REPORT_IV_SEQ_INFO:
+    {
+        at_prover_report_iv_seq_info(evt->prover_seq_iv_info.iv,evt->prover_seq_iv_info.seq);
     }
     break; 
     default:
@@ -203,7 +231,6 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     {
     case MESH_ACTIVE_ENABLE:
     {
-        ls_sig_mesh_prover_config_reg_model(PROVER_UNICAST_ADDR/*dev primary unicast address*/); 
         TIMER_Set(2, 3000); //clear power up num
     }
     break;
@@ -223,17 +250,6 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     }
     break;
     case MESH_ACTIVE_MODEL_PUBLISH:
-    {
-        for (uint8_t i = 0; i < model_env.nb_model; i++)
-        {
-            if (evt->mesh_publish_info.model_lid == model_env.info[i].model_lid)
-            {
-                 mesh_publish_env[i].model_lid = evt->mesh_publish_info.model_lid;
-                 mesh_publish_env[i].period_ms = evt->mesh_publish_info.period_ms;
-                 mesh_publish_env[i].addr =  evt->mesh_publish_info.addr;
-            }
-        } 
-    }
     break;
     case MESH_ACTIVE_STORAGE_LOAD:
     break;
@@ -322,7 +338,9 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[PROVER_MODEL0_VENDOR_SVR].model_id = VENDOR_USER_SERVER;
 
         ls_sig_mesh_provisioner_init(PROVER_UNICAST_ADDR);
-        ls_sig_mesh_init(&model_env);
+//        ls_sig_mesh_init(&model_env);
+        ls_sig_mesh_prover_config_reg_model(PROVER_UNICAST_ADDR/*dev primary unicast address*/); 
+         ls_sig_mesh_init(&model_env);
     }
     break;
     case ADV_OBJ_CREATED:
@@ -379,7 +397,7 @@ void prover_client_model_tx_message_handler(uint32_t tx_msg, uint16_t dest_addr,
         return;
     }  
      model_tid++;
-     param.mdl_lid = mesh_publish_env[0].model_lid;
+     param.mdl_lid = publish_model_lid;
      param.app_key_lid = model_env.app_key_lid;
      param.dest_addr = dest_addr;
      param.state_1 = tx_msg;

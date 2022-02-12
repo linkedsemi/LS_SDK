@@ -126,6 +126,7 @@ enum mesh_provisioner_evt_type
     MESH_PROVER_HEALTH_MODEL_RSP_INFO,
     MESH_PROVER_SET_DEV_RSP_INFO,
     MESH_PROVER_IDENTIFY_REQ_IND_INFO,
+    MESH_PROVER_REPORT_IV_SEQ_INFO,
     MESH_PROVER_EVT_MAX,
 };
 
@@ -170,11 +171,13 @@ struct prover_active_state_info
    uint8_t state;
    uint16_t status;
    uint16_t unicast_addr;
-}__attribute__((packed));
+};
 
 struct prover_add_dev_key_rsp_info
 {
     uint8_t  dev_key_lid;
+    uint16_t unicast_addr;
+    uint8_t  dev_key[BLE_KEY_LEN];  
 };
 
 struct prover_add_net_key_ind_info
@@ -264,6 +267,12 @@ struct prover_confc_model_pubs_status_ind_info
    uint32_t model_id;
 };
 
+struct prover_report_iv_seq_info
+{
+    uint32_t iv;
+    uint32_t seq;
+};
+
 union ls_sig_mesh_provisioner_evt_u 
 {
   struct prover_add_dev_key_rsp_info  prover_node_add_dev_key_rsp_info;
@@ -271,6 +280,7 @@ union ls_sig_mesh_provisioner_evt_u
   struct prover_add_net_key_ind_info prover_node_add_net_key_ind_info;
   struct prover_add_app_key_ind_info prover_node_add_app_key_ind_info;
   struct prover_identify_req_ind_info prover_identify_req_ind_info;
+  struct prover_report_iv_seq_info prover_seq_iv_info;
 };
 
 union ls_sig_mesh_provisioner_rx_info_u 
@@ -304,7 +314,14 @@ void ls_sig_mesh_add_uuid_unicast_addr(const uint16_t unicast_addr, const uint8_
  * 
  * @param unicast_addr provisioner unicast address
  */
-void ls_sig_mesh_provisioner_init(uint16_t const unicast_addr);
+void ls_sig_mesh_provisioner_init(const uint16_t unicast_addr);
+/**
+ * @brief 
+ * 
+ * @param unicast_addr 
+ * @param dev_key 
+ */
+void ls_sig_mesh_provisioner_add_dev_key(const uint16_t unicast_addr, const uint8_t* dev_key);
 /**
  * @brief 
  * 
@@ -317,34 +334,26 @@ void ls_sig_mesh_provisioner_add_net_key(const uint16_t netkey_id, const uint8_t
  * 
  * @param netkey_id 
  */
-void ls_sig_mesh_provisioner_use_new_net_key(const uint8_t netkey_id);
+void ls_sig_mesh_provisioner_use_new_net_key(const uint16_t netkey_id);
 /**
  * @brief 
  * 
  * @param netkey_id 
  * @param net_key 
  */
-void ls_sig_mesh_provisioner_update_net_key(const uint8_t netkey_id, const uint8_t* net_key);
+void ls_sig_mesh_provisioner_update_net_key(const uint16_t netkey_id, const uint8_t* net_key);
 /**
  * @brief 
  * 
  * @param netkey_id 
  */
-void ls_sig_mesh_provisioner_revoke_old_net_key(const uint8_t netkey_id);
+void ls_sig_mesh_provisioner_revoke_old_net_key(const uint16_t netkey_id);
 /**
  * @brief 
  * 
  * @param netkey_id 
  */
-void ls_sig_mesh_provisioner_delete_net_key(const uint8_t netkey_id);
-/**
- * @brief 
- * 
- * @param netkey_id 
- * @param appkey_id 
- * @param app_key 
- */
-void ls_sig_mesh_provisioner_add_app_key(const uint8_t netkey_id, const uint8_t appkey_id, const uint8_t* app_key);
+void ls_sig_mesh_provisioner_delete_net_key(const uint16_t netkey_id);
 /**
  * @brief 
  * 
@@ -352,14 +361,22 @@ void ls_sig_mesh_provisioner_add_app_key(const uint8_t netkey_id, const uint8_t 
  * @param appkey_id 
  * @param app_key 
  */
-void ls_sig_mesh_provisioner_update_app_key(const uint8_t netkey_id, const uint8_t appkey_id, const uint8_t* app_key);
+void ls_sig_mesh_provisioner_add_app_key(const uint16_t netkey_id, const uint16_t appkey_id, const uint8_t* app_key);
+/**
+ * @brief 
+ * 
+ * @param netkey_id 
+ * @param appkey_id 
+ * @param app_key 
+ */
+void ls_sig_mesh_provisioner_update_app_key(const uint16_t netkey_id, const uint16_t appkey_id, const uint8_t* app_key);
 /**
  * @brief 
  * 
  * @param netkey_id 
  * @param appkey_id 
  */
-void ls_sig_mesh_provisioner_delete_app_key(const uint8_t netkey_id, const uint8_t appkey_id);
+void ls_sig_mesh_provisioner_delete_app_key(const uint16_t netkey_id, const uint16_t appkey_id);
 /**
  * @brief 
  * 
@@ -545,6 +562,18 @@ void ls_sig_mesh_prover_health_client_act_fault(uint16_t address, uint8_t appkey
  * 
  */
 void ls_sig_mesh_prover_health_client_reg_model(void);
+/**
+ * @brief 
+ * 
+ * @param prover_iv 
+ * @param prover_seq 
+ */
+void ls_sig_mesh_set_prover_iv_seq(const uint32_t prover_iv, const uint32_t prover_seq);
+/**
+ * @brief 
+ * 
+ */
+void ls_sig_mesh_get_prover_iv_seq(void);
 
 /** @} */
 
