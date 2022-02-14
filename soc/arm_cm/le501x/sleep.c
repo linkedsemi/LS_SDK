@@ -111,7 +111,7 @@ XIP_BANNED uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn);
 
 XIP_BANNED void after_wfi()
 {
-    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn)||__NVIC_GetPendingIRQ(EXTI_IRQn));
+    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn)||__NVIC_GetPendingIRQ(EXTI_IRQn)||__NVIC_GetPendingIRQ(RTC_IRQn));
     wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     normal_sleep_set();
@@ -283,7 +283,7 @@ XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup
 
 void deep_sleep()
 {
-    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn|1<<EXTI_IRQn);
+    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn|1<<EXTI_IRQn|1 << RTC_IRQn);
     SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
     systick_stop();
     lvd33_disable();
@@ -397,7 +397,10 @@ void LPWKUP_Handler(void)
     }
     if (wkup_stat & RTC_WKUP)
     {
-        rtc_wkup_callback();
+        if (__NVIC_GetPendingIRQ(RTC_IRQn) == 0)
+        {
+            rtc_wkup_callback();
+        }
     }
 }
 
