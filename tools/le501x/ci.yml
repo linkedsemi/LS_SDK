@@ -201,6 +201,18 @@ le501x_ls_mesh_build:
   script:
     - cd examples/mesh/ls_mesh ; scons
 
+le501x_tmall_mesh_gatt_ls_ota_build:
+  stage: build
+  script:
+    - cd examples/mesh/genie_mesh/tmall_mesh_gatt_ls_ota ; scons
+
+le501x_tmall_mesh_gatt_ls_ota_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/mesh/genie_mesh/tmall_mesh_gatt_ls_ota/le501x/uvision5/ ; C:/Keil_v5/UV4/UV4.exe -b tmall_mesh_gatt_ls_ota.uvprojx -o UVBuild/build.txt -j0
+    
 le501x_ls_mesh_keil_build:
   stage: build
   rules:
