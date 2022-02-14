@@ -43,6 +43,8 @@ uint8_t vendor_tid = 0;
 #define RECORD_KEY1 1
 #define RECORD_KEY2 2
 
+#define SIG_MESH_WITH_OTA 		1
+
 tinyfs_dir_t mesh_dir;
 struct mesh_model_info model_env;
 static uint8_t gatt_mesh_model_indx=TMALL_GATT_MESH_MODEL_INDEX_INVALID;
@@ -53,15 +55,16 @@ SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
 SIGMESH_NodeInfo_TypeDef Node_Beacon_State = 0;
 
 static uint8_t ali_pid[TRIPLE_PID_LEN] = {0};
-uint32_t ali_pid_u32 = 12449;
-uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x28,0xfa,0x7a,0x3a,0xfe,0xd7};
-uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xe3,0x89,0x92,0x38,0xfa,0xbe,0x3c,0xef,0x10,0x12,0x8d,0x18,0xb1,0x47,0xb4,0xe9};
+uint32_t ali_pid_u32 = 9416171;//8493052;
+uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x50,0x3d,0xeb,0x2f,0xcc,0xe3};//{0xfc,0x42,0x65,0xef,0x96,0x71};
+uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xd7,0x59,0x10,0xa9,0xe4,0x38,0x26,0x87,0x1f,0xa8,0xc4,0x0c,0x08,0xa7,0xdf,0xd6};//{0x27,0x4a,0x2a,0x37,0x3e,0x0d,0xc5,0x23,0xb2,0x01,0x10,0x28,0x12,0xb3,0x08,0x7c};
+
 static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0};
 
 uint8_t rsp_data_info[40] = {0};
 uint8_t tmall_ModelHandle = 0;
 
-static uint16_t provisioner_unicast_addr;
+static uint16_t mesh_src_addr;
 void create_adv_obj(void);
 
 static struct gatt_svc_env tmall_aiots_svc_env;
@@ -337,9 +340,9 @@ void disable_tx_unprov_beacon(void)
     stop_tx_unprov_beacon();
 }
 
-void report_provisioner_unicast_address_ind(uint16_t unicast_address)
+void prov_succeed_src_addr_ind(uint16_t unicast_address)
 {
-    provisioner_unicast_addr = unicast_address;
+    mesh_src_addr= unicast_address;
     tinyfs_write(mesh_dir, RECORD_KEY2, (uint8_t *)&unicast_address, sizeof(unicast_address));
     tinyfs_write_through();
 }
@@ -523,11 +526,11 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         Node_Get_Proved_State = evt->st_proved.proved_state;
         if (Node_Get_Proved_State == PROVISIONED_OK)
         {
-            uint16_t length = sizeof(provisioner_unicast_addr);
-            LOG_I("src_addr=%x",provisioner_unicast_addr);
+            uint16_t length = sizeof(mesh_src_addr);
+            LOG_I("src_addr=%x",mesh_src_addr);
             LOG_I("The node is provisioned");
             tmall_light_set_lightness(0xffff);
-            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&provisioner_unicast_addr, &length);
+            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&mesh_src_addr, &length);
         }
         else
         {
@@ -643,6 +646,64 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     }
 }
 
+#if(SIG_MESH_WITH_OTA==1)
+#if FW_ECC_VERIFY
+extern const uint8_t fotas_pub_key[64];
+bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
+{
+    return uECC_verify(fotas_pub_key, digest->data, sizeof(digest->data), signature->data, uECC_secp256r1());
+}
+#else
+bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
+{
+    return true;
+}
+#endif
+
+static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt)
+{
+    switch(type)
+    {
+    case FOTAS_START_REQ_EVT:
+    {
+        //ota_settings_write(SINGLE_FOREGROUND); 
+        ota_settings_write(DOUBLE_FOREGROUND); 
+        enum fota_start_cfm_status status;
+        if(fw_signature_check(evt->fotas_start_req.digest, evt->fotas_start_req.signature))
+        {
+            status = FOTA_REQ_ACCEPTED;
+        }else
+        {
+            status = FOTA_REQ_REJECTED;
+        }
+
+         LOG_I("type=0x%x,status=0x%x",type,status);
+        prf_fotas_start_confirm(status);
+    }break;
+    case FOTAS_FINISH_EVT:
+        if(evt->fotas_finish.integrity_checking_result)
+        {
+            if(evt->fotas_finish.new_image->base != get_app_image_base())
+            {
+                ota_copy_info_set(evt->fotas_finish.new_image);
+            }
+            else
+            {
+                ota_settings_erase();
+            }
+            platform_reset(RESET_OTA_SUCCEED);
+        }else
+        {
+            platform_reset(RESET_OTA_FAILED);
+        }
+    break;
+    default:
+        LS_ASSERT(0);
+    break;
+    }
+}
+#endif
+
 
 static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 {
@@ -659,21 +720,23 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 
     }
     break;
-
     case STACK_READY:
     {
         uint8_t addr[6];
         bool type;
         dev_manager_get_identity_bdaddr(addr, &type);
-        dev_manager_add_service((struct svc_decl *)&tmall_aiots_server_svc); 
+#if (SIG_MESH_WITH_OTA == 1)         
+        dev_manager_prf_fota_server_add(NO_SEC);
+#else
+        dev_manager_add_service((struct svc_decl *)&tmall_aiots_server_svc);  
+#endif            
     }
-    break;
-
+    break;   
     case SERVICE_ADDED:
     {
         gatt_manager_svc_register(evt->service_added.start_hdl, TMALL_AIOTS_ATT_NUM, &tmall_aiots_svc_env);
-        
-        struct ls_sig_mesh_cfg feature = {
+         
+         struct ls_sig_mesh_cfg feature = {
             .MeshFeatures = EN_RELAY_NODE | EN_MSG_API | EN_PB_GATT | EN_PROXY_NODE,
             .MeshCompanyID = ALI_COMPANY_ID,
             .MeshProID = 0,
@@ -686,26 +749,28 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_prf_ls_sig_mesh_add(NO_SEC, &feature);
     }
     break;
-    case PROFILE_ADDED:
-    {
-        
-        prf_ls_sig_mesh_callback_init(mesh_manager_callback);
-
-        model_env.nb_model = 5;
-        model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
-        model_env.info[0].element_id = 0;
-        model_env.info[1].model_id = VENDOR_TMALL_SERVER;
-        model_env.info[1].element_id = 0;
-        model_env.info[2].model_id = LIGHTNESS_SERVER;
-        model_env.info[2].element_id = 0;
-        model_env.info[3].model_id = LIGHTS_CTL_SERVER;
-        model_env.info[3].element_id = 0;
-        model_env.info[4].model_id = LIGHTS_HSL_SERVER;
-        model_env.info[4].element_id = 0;
-        ls_sig_mesh_init(&model_env);
-        
-    }
-    break;
+     case PROFILE_ADDED:
+     {
+#if (SIG_MESH_WITH_OTA == 1)         
+         if (evt->profile_added.id == PRF_FOTA_SERVER)
+         {
+            prf_fota_server_callback_init(prf_fota_server_callback);
+            dev_manager_add_service((struct svc_decl *)&tmall_aiots_server_svc);
+            break;  
+         }
+#endif         
+         if (evt->profile_added.id == PRF_MESH)
+         {
+             prf_ls_sig_mesh_callback_init(mesh_manager_callback);
+             model_env.nb_model = 2;
+             model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
+             model_env.info[0].element_id = 0;
+             model_env.info[1].model_id = VENDOR_TMALL_SERVER;
+             model_env.info[1].element_id = 0;
+             ls_sig_mesh_init(&model_env);
+             break;
+         }
+     }
     default:
         break;
     }

@@ -15,6 +15,7 @@
 #include "sig_mesh_ctl.h"
 #include "sig_mesh_vendor_event.h"
 #include "io_config.h"
+#include "builtin_timer.h"
 
 #define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
@@ -26,9 +27,11 @@
 #define RECORD_KEY2 2
 #define NODE_UNICAST_ADDR 0x03  /*!< unicast_address >= 0x0002*/
 #define GROUP_ADDR 0xC000  /*!< group_address >= 0xC000*/
+#define PUBLISH_TTL 11  
 #define PROV_SUCCESS_LED  PA01 
 #define LED_ON  1
 #define LED_OFF 0
+#define AUTO_SIG_MESH_LP_MODE 0
 
 tinyfs_dir_t ls_sigmesh_dir;
 struct mesh_model_info model_env;
@@ -44,15 +47,40 @@ static uint8_t auth_data[16] = {0xF4,0xC7,0x0B,0xE8,0x10,0xE1,0x3A,0xAE,0xF8,0x3
 uint8_t net_key[16] = {0x4D,0xC8,0x86,0xC8,0x0A,0x53,0xEF,0x80,0x5B,0x5C,0x30,0x59,0xF6,0xE3,0xA7,0xAD};
 uint8_t app_key[16] = {0x8E,0x40,0x71,0xA5,0x3F,0x7A,0xEA,0xF0,0x81,0xB9,0xCF,0x8B,0x83,0x05,0x12,0x52};
 
-char ble_device_name[DEV_NAME_MAX_LEN] = "ls_sig_mesh_provee_alexa";
+char ble_device_name[DEV_NAME_MAX_LEN] = "ls_sig_mesh_provee";
 uint8_t rsp_data_info[40] = {0};
 struct mesh_publish_info_ind mesh_publish_env[MAX_MESH_MODEL_NB];
 static uint8_t model_tid = 0;
 static uint8_t vendor_model_tid = 0;
+static uint8_t seqnum_offset=0;
 
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
+struct vendor_model_publish_message tx_msg_info;
 void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx, uint16_t model_cfg_idx);
+#if (AUTO_SIG_MESH_LP_MODE == 1)
+#define TIMER_100ms	  100
+static bool glp_tx_enable=false;
+struct builtin_timer *user_timer_delay_rsp = NULL;
+void timer_delay_rsp_callback(void *param);
+void timer_delay_rsp_callback(void *param)
+{
+    if(glp_tx_enable==true)
+    {
+        mesh_vendor_model_publish_message_handler(&tx_msg_info);
+        builtin_timer_start(user_timer_delay_rsp, TIMER_100ms, NULL);
+        glp_tx_enable = false;
+    }
+    else
+    {
+       app_status_set(false);
+    }
+}
+void builtin_timer_delay_rsp_Init(void)
+{
+	user_timer_delay_rsp = builtin_timer_create(timer_delay_rsp_callback);
+}
+#endif
 
 void auto_check_unbind(void)
 {
@@ -121,14 +149,20 @@ void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx, uin
 
 void app_vendor_model_tx_message_handler(uint8_t *data, uint8_t len)
 {
-    struct vendor_model_publish_message tx_msg_info;
     vendor_model_tid++;
     tx_msg_info.ModelHandle = model_env.info[MODEL2_VENDOR_MODEL_CLI].model_lid;
     tx_msg_info.TxHandle = vendor_model_tid;
     tx_msg_info.MsgOpcode = APP_LS_SIG_MESH_VENDOR_SET;
     tx_msg_info.MsgLength = len;
+    seqnum_offset = (len>>3) + (((len%8)>0)?1:0);
     memcpy(&tx_msg_info.msg[0], data, tx_msg_info.MsgLength);
+    #if (AUTO_SIG_MESH_LP_MODE == 1) 
+     app_status_set(true);
+     glp_tx_enable=true;
+     builtin_timer_start(user_timer_delay_rsp, TIMER_100ms, NULL);
+    #else
     mesh_vendor_model_publish_message_handler(&tx_msg_info);
+    #endif 
 }
 
 static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt_u *evt)
@@ -137,6 +171,13 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     {
     case MESH_ACTIVE_ENABLE:
     {
+#if (AUTO_SIG_MESH_LP_MODE == 1)        
+        struct start_glp_info param;
+        param.RxDelyMs = 60;//60ms
+        param.SleepIntvlMs = 86400;//1200ms
+        start_glp_handler(&param);
+        builtin_timer_delay_rsp_Init();
+#endif 
         TIMER_Set(2, 3000); //clear power up num
     }
     break;
@@ -205,7 +246,9 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
             uint16_t length = sizeof(mesh_src_addr);
             LOG_I("The node is provisioned");
             tinyfs_read(ls_sigmesh_dir, RECORD_KEY2, (uint8_t *)&mesh_src_addr, &length);
+            #if (AUTO_SIG_MESH_LP_MODE ==0)  
             io_write_pin(PROV_SUCCESS_LED,LED_ON);
+            #endif  
         }
         else
         {
@@ -247,7 +290,11 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         else if(evt->prov_rslt_sate.state == MESH_PROV_SUCCEED)
         {
             LOG_I("prov succeed");
+           #if (AUTO_SIG_MESH_LP_MODE == 1)
+            app_status_set(false);
+           #else
             io_write_pin(PROV_SUCCESS_LED,LED_ON);
+           #endif 
         }
        else if(evt->prov_rslt_sate.state == MESH_PROV_FAILED)
         {
@@ -268,6 +315,11 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
                 vendor_event_accept_info(&evt->rx_msg.info[0],evt->rx_msg.rx_info_len);
             }
          } 
+    }
+    break;
+    case MESH_ACTIVE_MODEL_PUBLISHED:
+    {
+         ls_sig_mesh_auto_prov_update_ivseq_handler(seqnum_offset);
     }
     break;
     case MESH_REPORT_TIMER_STATE:
@@ -304,6 +356,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
 			memcpy((uint8_t *)&init_param.unicast_addr,&dev_uuid[0],2); 
             init_param.unicast_addr = NODE_UNICAST_ADDR; //Recommendation unicast_addr >= 0x0002
             init_param.group_addr = GROUP_ADDR;//+group_para_handle();   //Recommendation group_addr >= 0xC000LOG_I()
+            init_param.ttl = PUBLISH_TTL;
             init_param.model_info[MODEL0_GENERIC_ONOFF_SVC].model_id = model_env.info[MODEL0_GENERIC_ONOFF_SVC].model_id;
             init_param.model_info[MODEL0_GENERIC_ONOFF_SVC].publish_flag = false;
             init_param.model_info[MODEL0_GENERIC_ONOFF_SVC].subs_flag = true;
@@ -446,8 +499,10 @@ int main()
 {
     sys_init_app();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
+    #if (AUTO_SIG_MESH_LP_MODE == 0)
     io_cfg_output(PROV_SUCCESS_LED);
     io_write_pin(PROV_SUCCESS_LED,LED_OFF);
+    #endif
     ble_init();
     auto_check_unbind();
     dev_manager_init(dev_manager_callback);

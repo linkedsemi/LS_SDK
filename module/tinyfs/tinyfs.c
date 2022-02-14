@@ -1010,8 +1010,9 @@ static bool garbage_collect_try(uint16_t size)
 {
     if(tinyfs_env.gc_section != INVALID_SECTION)
     {
-        if( get_next_section(tinyfs_env.tail_section) == get_prev_section(tinyfs_env.gc_section) 
-            && tinyfs_env.tail_available_offset + size + tinyfs_list[tinyfs_env.gc_section].size > TINYFS_SECTION_SIZE)
+        uint16_t tail_next = get_next_section(tinyfs_env.tail_section);
+        if( tail_next == tinyfs_env.gc_section || (tail_next == get_prev_section(tinyfs_env.gc_section) 
+            && tinyfs_env.tail_available_offset + size + tinyfs_list[tinyfs_env.gc_section].size > TINYFS_SECTION_SIZE))
         {
             section_garbage_collection(tinyfs_env.gc_section);
             tinyfs_env.gc_section = get_next_section(tinyfs_env.gc_section);

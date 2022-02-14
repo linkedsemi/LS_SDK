@@ -19,10 +19,11 @@ void at_prover_report_dev_uuid(uint8_t *param,int8_t rssi);
 /**
  * @brief 
  * 
- * @param status
- * @param node_unicast_addr
+ * @param state 
+ * @param status 
+ * @param node_unicast_address 
  */
-void at_prover_report_provisiong_status(uint8_t status,uint16_t node_unicast_address);
+void at_prover_report_provisiong_status(uint8_t state, uint16_t status,uint16_t node_unicast_address);
 
 /**
  * @brief 
@@ -60,6 +61,13 @@ void at_prover_report_dev_default_ttl(uint16_t unicast_addr,uint8_t default_ttl)
  * @param app_key_id
  */
 void at_prover_report_node_app_key_status(uint16_t unicast_addr,uint8_t act_status,uint16_t net_key_id,uint8_t app_key_id);
+/**
+ * @brief 
+ * 
+ * @param unicast_addr 
+ * @param devkey 
+ */
+void at_prover_report_dev_key(uint16_t unicast_addr,uint8_t *devkey);
 /**
  * @brief Construct a new at prover report model subs status object
  * 
@@ -105,4 +113,11 @@ void at_prover_report_model_pub_status(uint16_t unicast_addr,uint8_t model_app_s
  * @param dev_key_lid 
  */
 void at_prover_report_node_info(uint16_t unicast_addr,uint16_t net_key_lid,uint16_t dev_key_lid);
+/**
+ * @brief 
+ * 
+ * @param prim_iv 
+ * @param prim_seq 
+ */
+void at_prover_report_iv_seq_info(uint32_t prover_iv,uint32_t prover_seq);
 #endif // _AT_SIG_MESH_PROVER_CMD_IND_H_

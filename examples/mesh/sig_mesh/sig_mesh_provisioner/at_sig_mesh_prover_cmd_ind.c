@@ -42,21 +42,27 @@ void at_prover_report_dev_uuid(uint8_t *param,int8_t rssi)
     uart_write((uint8_t *)ind_msg,ind_len);
 }
 
-void at_prover_report_provisiong_status(uint8_t status,uint16_t node_unicast_address)
+void at_prover_report_provisiong_status(uint8_t state, uint16_t status,uint16_t node_unicast_address)
 {
     uint8_t ind_len=0;
     char ind_msg[100]={0};
-    uint8_t node_address[sizeof(uint16_t)*2+1]={0};
+    uint8_t at_node_address[sizeof(uint16_t)*2+1]={0};
+    uint8_t at_status[sizeof(uint16_t)*2+1]={0};
 
-     hex_arr_to_str(node_address,(uint8_t *)&node_unicast_address,sizeof(uint16_t));
-    if(status == PROVISIONING_SUCCEED)
+
+     hex_arr_to_str(at_node_address,(uint8_t *)&node_unicast_address,sizeof(uint16_t));
+    if(state == PROVISIONING_SUCCEED)
     {
-       ind_len = sprintf(ind_msg,"\r\n+Provisioning_Succeed-Unicast_addr:%s\r\n",node_address);
+       ind_len = sprintf(ind_msg,"\r\n+Provisioning_Succeed-Unicast_addr:%s\r\n",at_node_address);
     }
     else
     {
-       ind_len = sprintf(ind_msg,"\r\n+DEV_Provisioning_Fail:%s\r\n",node_address);
+       ind_len = sprintf(ind_msg,"\r\n+DEV_Provisioning_Fail-Unicast_addr:%s\r\n",at_node_address);
     }
+    uart_write((uint8_t *)ind_msg,ind_len);
+
+    hex_arr_to_str(at_status,(uint8_t *)&status,sizeof(uint16_t));
+    ind_len = sprintf(ind_msg,"\r\n+DEV_Provisioning_status:%s\r\n",at_status);
     uart_write((uint8_t *)ind_msg,ind_len);
 }
 
@@ -161,7 +167,7 @@ void at_prover_report_node_app_key_status(uint16_t unicast_addr,uint8_t active_s
     uint8_t at_active_status[sizeof(uint8_t)*2+1]={0};
     uint8_t at_net_key_id[sizeof(uint16_t)*2+1]={0};
     uint8_t at_app_key_id[sizeof(uint16_t)*2+1]={0};
-    char ready_info[32] = "Mesh Node Configuration Complete";
+   
 
      hex_arr_to_str(at_unicast_addr,(uint8_t *)&unicast_addr,sizeof(uint16_t));
      ind_len = sprintf(ind_msg,"\r\n+Unicast_address:%s\r\n",at_unicast_addr);
@@ -178,8 +184,24 @@ void at_prover_report_node_app_key_status(uint16_t unicast_addr,uint8_t active_s
      hex_arr_to_str(at_app_key_id,(uint8_t *)&app_key_id,sizeof(uint16_t));
      ind_len = sprintf(ind_msg,"+App_key_id:%s\r\n",at_app_key_id);
      uart_write((uint8_t *)ind_msg,ind_len);
+}
+
+void at_prover_report_dev_key(uint16_t unicast_addr,uint8_t *devkey)
+{
+    uint8_t ind_len=0;
+    char ind_msg[100]={0};
+    uint8_t at_unicast_addr[sizeof(uint16_t)*2+1]={0};
+    uint8_t at_dev_key[BLE_KEY_LEN*2+1]={0};
+    char ready_info[33] = "+Mesh Node Configuration Complete";
+     hex_arr_to_str(at_unicast_addr,(uint8_t *)&unicast_addr,sizeof(uint16_t));
+     ind_len = sprintf(ind_msg,"\r\n+Unicast_address:%s\r\n",at_unicast_addr);
+     uart_write((uint8_t *)ind_msg,ind_len);
      
-     memset(ind_msg,0,100);
+    hex_arr_to_str(at_dev_key,devkey,BLE_KEY_LEN);
+    ind_len = sprintf(ind_msg,"\r\n+DEV KEY:%s\r\n",at_dev_key);
+    uart_write((uint8_t *)ind_msg,ind_len);
+
+    memset((uint8_t *)ind_msg,0,100*sizeof(char));
     ind_len = sprintf((char *)ind_msg,"\r\n%s\r\n",ready_info);
     uart_write((uint8_t *)ind_msg,ind_len);
 }
@@ -326,5 +348,22 @@ void at_prover_report_node_info(uint16_t unicast_addr,uint16_t net_key_lid,uint1
 
     hex_arr_to_str(at_dev_key_lid,(uint8_t *)&dev_key_lid,sizeof(uint16_t));
     ind_len = sprintf(ind_msg,"\r\n+dev_key_lid:%s\r\n",at_dev_key_lid);
+    uart_write((uint8_t *)ind_msg,ind_len);
+}
+
+
+void at_prover_report_iv_seq_info(uint32_t prover_iv,uint32_t prover_seq)
+{
+    uint8_t ind_len=0;
+    char ind_msg[100]={0};
+    uint8_t at_prover_prim_iv[sizeof(uint32_t)*2+1]={0};
+    uint8_t at_prover_prim_seq[sizeof(uint32_t)*2+1]={0};
+
+    hex_arr_to_str(at_prover_prim_iv,(uint8_t *)&prover_iv,sizeof(uint32_t));
+    ind_len = sprintf(ind_msg,"\r\n+Prover_iv:%s\r\n",at_prover_prim_iv);
+    uart_write((uint8_t *)ind_msg,ind_len);
+
+    hex_arr_to_str(at_prover_prim_seq,(uint8_t *)&prover_seq,sizeof(uint32_t));
+    ind_len = sprintf(ind_msg,"\r\n+Prover_seq:%s\r\n",at_prover_prim_seq);
     uart_write((uint8_t *)ind_msg,ind_len);
 }

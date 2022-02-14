@@ -33,6 +33,15 @@ static void at_set_model_publi(uint8_t *p_cmd_parse);
 static void at_config_dev(uint8_t *p_cmd_parse);
 
 static void at_set_rest_node(uint8_t *p_cmd_parse);
+
+static void at_add_net_key(uint8_t *p_cmd_parse);
+
+static void at_add_app_key(uint8_t *p_cmd_parse);
+
+static void at_get_prover_ivseq(uint8_t *p_cmd_parse);
+
+static void at_set_prover_ivseq(uint8_t *p_cmd_parse);
+
 #if 0
 static void at_set_model_publi(uint8_t *p_cmd_parse);
 
@@ -111,7 +120,11 @@ static const at_cmd_attr_t at_cmd_attr_table[] =
     {"SET_MDL_PUBLI",              13, at_set_model_publi},
     {"SET_MDL_PUBLI",              13, at_set_model_publi},
     {"SET_RST_NODE",               12, at_set_rest_node},
-    {"SET_CONFIG_DEV",             14, at_config_dev}
+    {"SET_CONFIG_DEV",             14, at_config_dev},
+    {"ADD_NETKEY",                 10, at_add_net_key},
+    {"ADD_APPKEY",                 10, at_add_app_key},
+    {"GET_PROVER_IVSEQ",           16, at_get_prover_ivseq},
+    {"SET_PROVER_IVSEQ",           16, at_set_prover_ivseq}
 #if 0  
     {"SET_MDL_PUBLI",              13, at_set_model_publi},
     {"CONF_CLI_SET",               12, at_config_client_set},
@@ -421,9 +434,66 @@ static void at_config_dev(uint8_t *p_cmd_parse)
        offset += 2*sizeof(uint16_t)+DIVISYM_LEN;
        str_to_hex_arr((uint8_t *)&devkey_lid, p_cmd_parse+offset, sizeof(uint16_t));
        offset += 2*sizeof(uint16_t)+DIVISYM_LEN;
+       node_unicast_address = node_primary_addr;
       
       ls_sig_mesh_prover_config_set_dev(devkey_lid,netkey_lid,node_primary_addr); /**< dev_key_lid/net_key_lid / primary_addr*/
     }
+}
+
+
+static void at_add_net_key(uint8_t *p_cmd_parse)
+{
+    uint8_t offset=0;
+    uint16_t netkey_id=0;
+    uint8_t netkey[UUID_MESH_DEV_LEN]={0};
+    if ((*p_cmd_parse++) ==  '=')
+     {
+        str_to_hex_arr((uint8_t *)&netkey_id, p_cmd_parse+offset, sizeof(uint16_t));
+        offset = 2*sizeof(uint16_t)+DIVISYM_LEN;  
+        str_to_hex_arr(netkey, p_cmd_parse+offset, UUID_MESH_DEV_LEN);
+
+        ls_sig_mesh_provisioner_add_net_key(netkey_id,netkey);  //net_id >2
+     }
+}
+
+static void at_add_app_key(uint8_t *p_cmd_parse)
+{
+    uint8_t offset=0;
+    uint16_t netkey_id=0;
+    uint16_t appkey_id=0;
+    uint8_t appkey[UUID_MESH_DEV_LEN]={0};
+    
+    if ((*p_cmd_parse++) ==  '=')
+     {
+        str_to_hex_arr((uint8_t *)&netkey_id, p_cmd_parse+offset, sizeof(uint16_t));
+        offset = 2*sizeof(uint16_t)+DIVISYM_LEN; 
+        str_to_hex_arr((uint8_t *)&appkey_id, p_cmd_parse+offset, sizeof(uint16_t));
+        offset += 2*sizeof(uint16_t)+DIVISYM_LEN;   
+        str_to_hex_arr(appkey, p_cmd_parse+offset, UUID_MESH_DEV_LEN);
+
+         ls_sig_mesh_provisioner_add_app_key(netkey_id,appkey_id,appkey);
+     }
+}
+
+static void at_get_prover_ivseq(uint8_t *p_cmd_parse)
+{
+    ls_sig_mesh_get_prover_iv_seq();
+}
+
+static void at_set_prover_ivseq(uint8_t *p_cmd_parse)
+{
+    uint8_t offset=0;
+    uint32_t prover_iv=0;
+    uint32_t prover_seq=0;
+    
+    if ((*p_cmd_parse++) ==  '=')
+     {
+        str_to_hex_arr((uint8_t *)&prover_iv, p_cmd_parse+offset, sizeof(uint32_t));
+        offset = 2*sizeof(uint32_t)+DIVISYM_LEN; 
+        str_to_hex_arr((uint8_t *)&prover_seq, p_cmd_parse+offset, sizeof(uint32_t));  
+
+         ls_sig_mesh_set_prover_iv_seq(prover_iv,prover_seq);
+     }
 }
 
 #if 0
