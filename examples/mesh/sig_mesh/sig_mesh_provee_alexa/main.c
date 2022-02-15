@@ -14,7 +14,6 @@
 #include "le501x.h"
 #include "sig_mesh_ctl.h"
 #include "sig_light_cfg.h"
-#include "sig_mesh_vendor_event.h"
 
 #define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
@@ -416,7 +415,6 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         LOG_HEX(addr,6);
         dev_manager_prf_ls_sig_mesh_add(NO_SEC, &feature);
         ls_button_timer_init();
-//        vendor_event_init();
     }
     break;
     case PROFILE_ADDED:
