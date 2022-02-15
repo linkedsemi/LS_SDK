@@ -289,7 +289,7 @@ le501x_adc_blocking_sampling_keil_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adc/adc_blocking_sampling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_blocking_samplings.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/adc/adc_blocking_sampling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_blocking_sampling.uvprojx -o UVBuild/build.txt -j0
 
 le501x_adc_multi_channel_build:
   stage: build
