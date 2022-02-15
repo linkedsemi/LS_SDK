@@ -6,8 +6,7 @@ env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [    
     'main.c',
     'sig_mesh_ctl.c',
-    'sig_light_cfg.c',
-    'sig_mesh_vendor_event.c'
+    'sig_light_cfg.c'
 ]
 inc = [
     '.'
