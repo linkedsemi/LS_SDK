@@ -7,7 +7,7 @@
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
             "executable": "examples/ble/ble_uart_server/build/le501x/ble_uart_server.elf",
-            "name": "LE501X Debug BLE_SINGLE_ROLE",
+            "name": "LE501X Debug BLE_UART_SERVER",
             "device": "LE501X",
             "interface": "swd",
             "preLaunchCommands":[
@@ -21,7 +21,7 @@
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
             "executable": "examples/ble/ble_uart_server/build/le501x/ble_uart_server.elf",
-            "name": "LE501X Attach BLE_SINGLE_ROLE",
+            "name": "LE501X Attach BLE_UART_SERVER",
             "device": "LE501X",
             "interface": "swd",
             "preAttachCommands":[
