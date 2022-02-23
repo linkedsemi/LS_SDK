@@ -19,8 +19,21 @@ def add_include(dir,path):
     return inc_list
 
 def image_build(name,src,inc,ble=False,mesh=False,rtos = None,with_startup = True,objprefix = ''):
-    src_files = env.variant_dir_add_source('build/$IC/','./',src)
-    env.add_include(Dir('.').path,inc)
+    src_files = []
+    for i in src:
+        if '$SDK_ROOT/' in i:
+            env.VariantDir('build/$IC/','$SDK_ROOT/',duplicate = 0)
+            src_files += [File(env.subst(os.path.join('build/$IC/',i.replace('$SDK_ROOT/',''))))]
+        else:
+            env.VariantDir('build/$IC/'+name,'./',duplicate = 0)
+            src_files += [File(env.subst(os.path.join('build/$IC/'+name,i)))]
+    inc_list = []
+    for i in inc:
+        if '$SDK_ROOT/' in i:
+            inc_list += [os.path.relpath(env.subst(i),Dir('#').abspath)]
+        else:
+            inc_list += [os.path.relpath(env.subst(os.path.join(Dir('.').path,i)),Dir('#').abspath)]
+    env.Append(CPPPATH = inc_list)
     env.Append(LINKFLAGS = ' $GC_OPTION ')
     return env.plf_build(name,src_files,rtos,with_startup,ble,mesh,objprefix)
 
