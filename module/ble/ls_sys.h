@@ -7,5 +7,6 @@
  */
 void func_post(void (*func)(void *),void *param);
 
+void func_post_rtos(void (*func)(void *),void *param);
 #endif
 
