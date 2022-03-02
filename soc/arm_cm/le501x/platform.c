@@ -476,7 +476,7 @@ void platform_reset(uint32_t error)
     __disable_irq();
     struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
     reset_retain_ptr->reset_reason = error;
-    switch_to_hse();
+    switch_to_xo16m();
     __NVIC_SystemReset();
 }
 
@@ -551,11 +551,6 @@ XIP_BANNED void switch_to_rc32k()
 XIP_BANNED void switch_to_xo16m()
 {
     MODIFY_REG(RCC->CFG, RCC_HCLK_SCAL_MASK | RCC_CKCFG_MASK | RCC_SYSCLK_SW_MASK, (uint32_t)1<<RCC_CKCFG_POS | (uint32_t)1<<RCC_SYSCLK_SW_POS);
-}
-
-XIP_BANNED void switch_to_hse(void)
-{
-    MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, (uint32_t)1 <<RCC_SYSCLK_SW_POS | (uint32_t)1<<RCC_CKCFG_POS | (uint32_t)0 << RCC_HCLK_SCAL_POS);
 }
 
 #if (SDK_HCLK_MHZ==16)
