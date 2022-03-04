@@ -7,6 +7,8 @@
 #include "le501x.h"
 #include "sleep.h"
 #include "ls_dbg.h"
+#include "ls_sys.h"
+#include "cpu.h"
 #define BLE_TASK_STACK_SIZE 200
 #define TIMER_TASK_STACK_SIZE 100
 #define IDLE_TASK_STACK_SIZE 100
@@ -46,14 +48,19 @@ void check_and_sleep()
     }
 }
 
+static void ble_stack_task_notify_give_from_isr()
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR((void *)&ble_task_buf,&xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
 void ble_stack_isr()
 {
     uint32_t irq_stat = ble_isr();
     if(irq_stat != 0x40)
     {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        vTaskNotifyGiveFromISR((void *)&ble_task_buf,&xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        ble_stack_task_notify_give_from_isr();
     }
 }
 
@@ -165,4 +172,16 @@ void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
     *ppxTimerTaskTCBBuffer = &timer_task_buf;
     *ppxTimerTaskStackBuffer = timer_task_stack;
     *pulTimerTaskStackSize = TIMER_TASK_STACK_SIZE;
+}
+
+void func_post_rtos(void (*func)(void *),void *param)
+{
+    func_post(func,param);
+    if(in_interrupt())
+    {
+        ble_stack_task_notify_give_from_isr();
+    }else
+    {
+        xTaskNotifyGive((void *)&ble_task_buf);
+    }
 }
