@@ -174,7 +174,7 @@ void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
     *pulTimerTaskStackSize = TIMER_TASK_STACK_SIZE;
 }
 
-void func_post_rtos(void (*func)(void *),void *param)
+void rtos_ble_task_func_post(void (*func)(void *),void *param)
 {
     func_post(func,param);
     if(in_interrupt())
