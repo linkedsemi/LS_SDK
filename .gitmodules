@@ -1,3 +1,6 @@
 [submodule "stack"]
 	path = stack
 	url = http://10.10.20.8:8000/sw/sdk_stack.git
+[submodule "soc/arm_cm/le501x/tk"]
+	path = soc/arm_cm/le501x/tk
+	url = http://10.10.20.8:8000/sw/le5030_tk.git
