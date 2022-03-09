@@ -46,6 +46,7 @@ static void timer_insert(struct sw_timer_env *timer)
 
 void sw_timer_update()
 {
+    timer_irq_mask();
     while(1)
     {
         struct cdll_hdr *hdr = cdll_first(&sw_timer_list);
@@ -104,7 +105,6 @@ bool sw_timer_active(struct sw_timer_env *timer)
 
 LL_EVT_ISR void sw_timer_isr()
 {
-    timer_irq_mask();
     sw_timer_update();
 }
 
