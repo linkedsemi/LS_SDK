@@ -408,7 +408,7 @@ void pll_gain_24g(uint16_t tx_chn)
     pll_gain_cal_val = rf_pll_gain_cal_24g(tx_chn_dis, tx_chn_frac);
     pll_int_vtxd_ext_24g = pll_gain_cal_val; 
 
-    LOG_I("gain calib val: 0x%x", pll_int_vtxd_ext_24g);
+    // LOG_I("gain calib val: 0x%x", pll_int_vtxd_ext_24g);
 
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);  
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT,pll_int_vtxd_ext_24g);

@@ -47,18 +47,114 @@ struct prop_24g_tx_rx_cntl_env
     // bool finished;
 };
 
-// Use this function in interrupt instead of memcpy!!!
+/**
+ ****************************************************************************************
+ * \brief Copy memory from source to destination while the code runs on RAM. 
+ *        Use this function in interrupt instead of memcpy.
+ *
+ * \param[in]     src                     Pointer of the source buffer.
+ * \param[inout]  dst                     Pointer of the destination buffer.
+ * \param[in]     length                  Length of data to copy in units of byte.
+ *
+ ****************************************************************************************
+ */
 void memcpy_ram(void *dst, const void *src, uint32_t length);
-
+/**
+ ****************************************************************************************
+ * \brief 2.4G initialization.
+ *
+ ****************************************************************************************
+ */
 void RF_24g_Init(void);
-// void RF_24g_Start(void);
-// Only rx can be stopped!!!
+/**
+ ****************************************************************************************
+ * \brief Stop 2.4G activity. Actually only RX need to be stopped by user. The function 
+ *        has nothing to do with TX which will go to end automatically when all the data
+ *        have been sent. 
+ *        The implementation relies on flag-checking modified in certain interrupt, so don't 
+ *        call this function in irq_handler or call-back!
+ *
+ ****************************************************************************************
+ */
 void RF_24g_Stop(void);
+/**
+ ****************************************************************************************
+ * \brief Set the RF channel used to send and receive 2.4G data.
+ *
+ * \param[in]     channel                     Channel number.
+ *
+ ****************************************************************************************
+ */
 void RF_24g_SetChannel(uint16_t channel);
+/**
+ ****************************************************************************************
+ * \brief Set the PHY used to send and receive 2.4G data.
+ *
+ * \param[in]     phy                         PHY. Refer to ::prop_24g_phy.
+ *
+ ****************************************************************************************
+ */
 void RF_24g_SetPhy(uint8_t phy);
+/**
+ ****************************************************************************************
+ * \brief Get the RF channel configuration.
+ *
+ * \return                                     Channel number.
+ *
+ ****************************************************************************************
+ */
 uint16_t RF_24g_GetChannel(void);
+/**
+ ****************************************************************************************
+ * \brief Get RSSI.
+ *
+ * \return                                     RSSI value.
+ *
+ ****************************************************************************************
+ */
 int8_t RF_24g_GetRssi(void);
+/**
+ ****************************************************************************************
+ * \brief Set TX power.
+ *
+ * \param[in]     tx_pwr_config                TX power value. Refer to ::prop_24g_tx_power_config
+ *
+ ****************************************************************************************
+ */
 void RF_24g_SetPower(enum prop_24g_tx_power_config tx_pwr_config);
+/**
+ ****************************************************************************************
+ * \brief 2.4G packets send function.
+ *
+ * \param[in]     txBuf                        Pointer to buffer contains data to send.
+ * \param[in]     txLen                        Length of data to send in units of byte.
+ * \param[in]     Tx_cmpt_cb                   TX complete callback that will be called in interrupt.
+ * \param[in]     param                        TX complete callback parameter.
+ * \return                                     Status of TX process. Refer to ::prop_24g_status.
+ *
+ ****************************************************************************************
+ */
 enum prop_24g_status RF_24g_Tx(uint8_t *txBuf, uint8_t txLen, void (*Tx_cmpt_cb)(void *), void *param);
+/**
+ ****************************************************************************************
+ * \brief 2.4G packets receive function.
+ *
+ * \param[in]     rxBuf                        Pointer to buffer contains data to receive.
+ * \param[in]     rxLen                        Pointer to the length of data received.
+ * \param[in]     Rx_cmpt_cb                   RX complete callback that will be called in interrupt.
+ * \param[in]     param                        RX complete callback parameter.
+ * \return                                     Status of RX process. Refer to ::prop_24g_status.
+ *
+ ****************************************************************************************
+ */
 enum prop_24g_status RF_24g_Rx(uint8_t *rxBuf, uint8_t *rxLen, void (*Rx_cmpt_cb)(void *), void *param);
+/**
+ ****************************************************************************************
+ * \brief Get 2.4G state.
+ *
+ * \return                                     2.4G state. Refer to ::prop_24g_state.
+ *
+ ****************************************************************************************
+ */
+uint8_t get_cur_prop_24g_state(void);
 #endif

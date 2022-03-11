@@ -420,27 +420,8 @@ void sys_init_none()
 
 void sys_init_24g(void)
 {
-    analog_init();
-    spi_flash_drv_var_init(true,false);
-    // module_init();
-    io_init();
-    rco_freq_counting_init();
-    LOG_INIT();
-    LOG_I("sys init");
-    // INIT_BUILTIN_TIMER_ENV();
-    HAL_PIS_Init();
-    srand(get_trng_value());
-    calc_acc_init();
-    cpu_sleep_recover_init();
-    // uint32_t base_offset = flash_data_storage_base_offset();
-    // tinyfs_init(base_offset);
-    // tinyfs_print_dir_tree();
-    mac_init();
+    sys_init_none();
     modem_rf_init_24g();
-    irq_init();
-    systick_start();
-    rco_freq_counting_config();
-    rco_freq_counting_start();
 }
 
 void ll_stack_var_ptr_init(void);
