@@ -1,9 +1,14 @@
 #include <string.h>
 #include "cpu.h"
 #include "platform.h"
+#include "le501x.h"
+#include "sleep.h"
+#include "sw_timer.h"
+#include "sys_stat.h"
 #include "io_config.h"
 #include "ls_dbg.h"
 #include "lsuart.h"
+#include "ls_24g_common.h"
 #include "ls_24g.h"
 #include "app_user_24g.h"
 #include "log.h"
@@ -18,6 +23,10 @@
 #define UART_LEN_LEN 1
 #define UART_24G_BUF_SIZE (UART_SYNC_BYTE_LEN + UART_LEN_LEN + VALID_TX_LEN_MAX)
 
+#define USER_TIMER_PERIOD_MS 200
+#define IO_FILTER_TIMER_PERIOD_MS 30
+#define USER_TEST_IO PA07
+
 enum uart_rx_status
 {
     UART_IDLE,
@@ -27,20 +36,25 @@ enum uart_rx_status
     UART_RECEIVING,
 };
 static uint8_t uart_state = UART_IDLE;
-static bool uart_tx_busy = false;
+static volatile bool uart_tx_busy = false;
 static uint8_t uart_rx_buf[UART_24G_BUF_SIZE];
 static uint8_t uart_tx_buf[UART_24G_BUF_SIZE];
 static uint8_t rf_rx_length;
+static volatile bool rf_tx_cplt_flag = true;
 static UART_HandleTypeDef UART_Config; 
+static struct sw_timer_env user_timer;
+static struct sw_timer_env io_filter_timer;
 
 static void app_user_24g_rx(void);
 static void ls_uart_recv_restart(void);
+static bool timer_cb(void *param);
 
 _ISR static void app_user_24g_tx_cb(void *param)
 {
     // LOG_I("24g tx completed");
     ls_uart_recv_restart();
     app_user_24g_rx();
+    rf_tx_cplt_flag = true;
 }
 _ISR static void app_user_24g_rx_cb(void *param)
 {
@@ -65,6 +79,11 @@ static void ls_uart_init(void)
     UART_Config.Init.StopBits = UART_STOPBITS1;
     UART_Config.Init.WordLength = UART_BYTESIZE8;
     HAL_UART_Init(&UART_Config);
+}
+static void ls_uart_deinit(void)
+{
+    uart1_io_deinit();
+    HAL_UART_DeInit(&UART_Config);
 }
 static void ls_uart_recv_restart(void)
 {
@@ -109,6 +128,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         len = uart_rx_buf[UART_SYNC_BYTE_LEN];
         RF_24g_Tx(&uart_rx_buf[UART_SYNC_BYTE_LEN + UART_LEN_LEN], len, app_user_24g_tx_cb, NULL); 
         restart = false;
+        rf_tx_cplt_flag = false;
         break;
     default:
         break;
@@ -123,23 +143,118 @@ static void app_user_24g_rx(void)
 {
     RF_24g_Rx(uart_tx_buf, &rf_rx_length, app_user_24g_rx_cb, NULL);
 }
-
-void app_user_24g_init(void)
+static void app_user_24g_peri_init(void)
 {
+    io_pull_write(USER_TEST_IO, IO_PULL_UP);
+    io_cfg_input(USER_TEST_IO);
+    io_exti_config(USER_TEST_IO,INT_EDGE_FALLING);
+    io_exti_enable(USER_TEST_IO,true);
+
+    io_cfg_output(PA00);
     ls_uart_init();
     ls_uart_recv_restart();
+}
+
+static void app_user_24g_rf_init(void)
+{
     RF_24g_SetChannel(RF_CHANNEL_DEFAULT);
     RF_24g_SetPhy(RF_PHY_DEFAULT);
     app_user_24g_rx();
+}
+
+static void app_user_24g_peri_deinit(void)
+{
+    io_pull_write(USER_TEST_IO, IO_PULL_DOWN);
+    ls_uart_deinit();
+}
+
+void io_exti_callback(uint8_t pin) 
+{
+    switch (pin)
+    {
+    case USER_TEST_IO:
+        io_exti_enable(USER_TEST_IO,false);
+        NVIC_DisableIRQ(EXTI_IRQn);
+        sw_timer_start(&io_filter_timer);
+        break;
+    default:
+        break;
+    }
+}
+
+static void app_user_sw_timer_init(void)
+{
+    sw_timer_callback_set(&user_timer,timer_cb,&user_timer);
+    sw_timer_period_set(&user_timer,MS_2_PERIOD(USER_TIMER_PERIOD_MS));
+    sw_timer_start(&user_timer);
+
+    sw_timer_callback_set(&io_filter_timer,timer_cb,&io_filter_timer);
+    sw_timer_period_set(&io_filter_timer,MS_2_PERIOD(IO_FILTER_TIMER_PERIOD_MS));
+    // sw_timer_start(&io_filter_timer);
+}
+static bool timer_cb(void *param)
+{
+    bool timer_continue = true;
+    if(param == (void *)&io_filter_timer)
+    {
+        static uint16_t gpio_filter_high_cnt = 0;
+        static uint16_t gpio_filter_low_cnt = 0;
+        if (1 == io_read_pin(USER_TEST_IO))
+        {
+            gpio_filter_low_cnt = 0;
+            if(3 == ++gpio_filter_high_cnt)
+            {
+                if (rf_tx_cplt_flag && !uart_tx_busy && PROP_24G_STATE_IDLE == get_cur_prop_24g_state())
+                {
+                    app_status_set(true); // app prevent sleep entrance
+                    app_user_24g_peri_init();
+                    app_user_24g_rf_init();
+                }
+                // sw_timer_stop(&io_filter_timer);
+                timer_continue = false;
+                io_pull_write(USER_TEST_IO, IO_PULL_UP);
+                io_exti_config(USER_TEST_IO,INT_EDGE_FALLING);
+                io_exti_enable(USER_TEST_IO,true);
+                NVIC_EnableIRQ(EXTI_IRQn);
+                gpio_filter_high_cnt = 0;
+            }
+        }
+        else
+        {
+            gpio_filter_high_cnt = 0;
+            if (3 == ++gpio_filter_low_cnt)
+            {
+                // sw_timer_stop(&io_filter_timer);
+                app_status_set(false); // app permit sleep entrance
+                app_user_24g_peri_deinit();
+                // RF_24g_Stop();
+                timer_continue = false;
+                io_pull_write(USER_TEST_IO, IO_PULL_DOWN);
+                io_exti_config(USER_TEST_IO,INT_EDGE_RISING);
+                io_exti_enable(USER_TEST_IO,true);
+                NVIC_EnableIRQ(EXTI_IRQn);
+                gpio_filter_low_cnt = 0;
+            }
+        }
+    }
+    else if (param == (void*)&user_timer)
+    {
+        io_toggle_pin(PA00);
+    }
+    
+    return timer_continue;
 }
 
 int main()
 {
     sys_init_24g();
     RF_24g_Init();
-    app_user_24g_init();
+
+    app_user_24g_rf_init();
+    app_user_24g_peri_init();
+    app_user_sw_timer_init();
     while (1)
     {
-        
+        ls_24g_sleep_wakeup();
     }
 }

@@ -3,4 +3,6 @@
 
 #define SDK_HCLK_MHZ   (64)
 
+#define DEBUG_MODE 0
+
 #endif

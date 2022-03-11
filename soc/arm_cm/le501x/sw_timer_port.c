@@ -4,6 +4,7 @@
 #include "reg_rcc.h"
 #include "sleep.h"
 #include "sdk_config.h"
+
 #define SLEEP_MINIMUM_HS_CYCLES 10
 #define CNTL (*(volatile uint32_t *)0x50000000)
 #define INT_MASK (*(volatile uint32_t *)0x50000018)
@@ -72,18 +73,19 @@ void timer_isr_func_set(void (*isr)())
 {
     timer_isr = isr;
 }
-
+__attribute((weak)) void ls_24g_restore_in_wkup(void){}
 static void WKUP_Handler_For_SW_Timer()
 {
     ble_hclk_set();
     clr_ble_wkup_req();
     CNTL = 0x100;
     INT_MASK = 0x2;
+    ls_24g_restore_in_wkup();
     ble_irq_clr_and_enable();
     ble_wkup_status_set(false);
     BLE_WKUP_IRQ_DISABLE();
 }
-
+__attribute((weak)) XIP_BANNED void PROP_24g_Handler(uint32_t int_stat_24g){}
 static void Handler_For_SW_Timer()
 {
     static uint32_t error = 0;
@@ -121,6 +123,7 @@ static void Handler_For_SW_Timer()
         wkup_cnt = 624 - CNT_SAMP;
         timer_isr();
     }
+    PROP_24g_Handler(int_stat);
 }
 
 void mac_init_for_sw_timer()

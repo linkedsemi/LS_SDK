@@ -3,6 +3,7 @@ env = Environment(ENV = os.environ)
 env['SDK_ROOT'] = Dir('../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [    
+    'ls_24g_common.c',
     'app_user_24g.c',
 ]
 inc = [
