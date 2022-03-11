@@ -26,5 +26,7 @@ void rf_set_power(uint8_t tx_power);
 void tempsensor_ldo_init(void);
 
 void tempsensor_ldo_deinit(void);
+
+void rf_reg_config(uint8_t,uint8_t,uint16_t);
 #endif
 

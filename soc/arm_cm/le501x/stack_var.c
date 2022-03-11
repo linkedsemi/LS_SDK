@@ -4,7 +4,7 @@
 #include "platform.h"
 #include "cpu.h"
 #include "log.h"
-
+#include "modem_rf_le501x.h"
 #define ENV_BUF_SIZE 2048
 #if CONFIG_AOS
 #define DB_BUF_SIZE 0
@@ -31,6 +31,7 @@ __attribute((weak)) void (*stack_reset_hook_fn)(void);
 __attribute((weak)) uint64_t (*lpcycles_to_hus_fn)(uint32_t);
 __attribute((weak)) uint32_t (*us_to_lpcycles_fn)(uint32_t);
 __attribute((weak)) uint32_t (*lsi_freq_update_and_hs_to_lpcycles_fn)(int32_t);
+__attribute((weak)) void (*rf_reg_config_fn)(uint8_t,uint8_t,uint16_t);
 __attribute((weak)) bool lsi_used;
 
 __attribute((weak)) uint8_t main_task;
@@ -149,6 +150,7 @@ void stack_var_ptr_init()
     lpcycles_to_hus_fn = lpcycles_to_hus;
     us_to_lpcycles_fn = us_to_lpcycles;
     lsi_freq_update_and_hs_to_lpcycles_fn = lsi_freq_update_and_hs_to_lpcycles;
+    rf_reg_config_fn = rf_reg_config;
     #if SDK_LSI_USED
     lsi_used = true;
     #else
@@ -245,6 +247,7 @@ void ll_stack_var_ptr_init()
     lpcycles_to_hus_fn = lpcycles_to_hus;
     us_to_lpcycles_fn = us_to_lpcycles;
     lsi_freq_update_and_hs_to_lpcycles_fn = lsi_freq_update_and_hs_to_lpcycles;
+    rf_reg_config_fn = rf_reg_config;
     #if SDK_LSI_USED
     lsi_used = true;
     #else
