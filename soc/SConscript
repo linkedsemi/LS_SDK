@@ -25,8 +25,8 @@ def image_build(name,src,inc,ble=False,mesh=False,rtos = None,with_startup = Tru
             env.VariantDir('build/$IC/','$SDK_ROOT/',duplicate = 0)
             src_files += [File(env.subst(os.path.join('build/$IC/',i.replace('$SDK_ROOT/',''))))]
         else:
-            env.VariantDir('build/$IC/'+name,'./',duplicate = 0)
-            src_files += [File(env.subst(os.path.join('build/$IC/'+name,i)))]
+            env.VariantDir('build/$IC/src','./',duplicate = 0)
+            src_files += [File(env.subst(os.path.join('build/$IC/src',i)))]
     inc_list = []
     for i in inc:
         if '$SDK_ROOT/' in i:
