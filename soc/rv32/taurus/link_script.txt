@@ -1,0 +1,64 @@
+MEMORY
+{
+    FLASH (rx) : ORIGIN = 0x800000, LENGTH = 0x80000
+    RAM (rwx) : ORIGIN = 0x40c000, LENGTH = 0x3000
+}
+ENTRY(Reset_Handler)
+SECTIONS
+{
+	.text_ram :
+	{
+        *(.text.Reset_Handler)
+        *(.text.SystemInit)
+        *(.text.qspi_flash_io_init)
+        *(.text.pll_enable)
+        *(.text.exception_entry)        
+		KEEP(*(.init))
+		KEEP(*(.fini))
+		*(.xip_banned)
+        *(.text.cpu_recover_asm)
+		. = ALIGN(4);
+	} >RAM
+	.data :
+	{
+        *(.sdata*)
+		*(.data*)
+		*(vtable)
+		. = ALIGN(4);
+	}>RAM
+    .text :
+    {
+		LONG(0x5A5A3C3C)
+
+		*crtbegin.o(.ctors)
+		*crtbegin?.o(.ctors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+		*(SORT(.ctors.*))
+		*(.ctors)
+
+		*crtbegin.o(.dtors)
+		*crtbegin?.o(.dtors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+		*(SORT(.dtors.*))
+		*(.dtors)
+
+		*(.eh_frame*)
+		*(.text* .*rodata*)
+		. = ALIGN(4);
+	}>FLASH
+
+
+	.bss (NOLOAD):
+	{
+		__bss_start__ = .;
+        *(.sbss*)
+		*(.bss*)
+		*(SECTION_RTT)
+		__bss_end__ = ALIGN(4);
+        PROVIDE(_end = .);
+		PROVIDE(end = .);
+	}>RAM
+
+	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+	PROVIDE(__global_pointer$ = __bss_start__ + (4K / 2) );	
+}
