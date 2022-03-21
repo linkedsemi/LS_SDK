@@ -68,7 +68,7 @@ static bool lsTK_Init(void)
     tkHandle.Init.MultiOn = TK_MULTION_DISABLE;     // Disable multichannel detection
     tkHandle.Init.Debounce = 3;                     // Set the anti-jitter value to 3
     tkHandle.Init.ChannelEN = 0x3FFF;               // Open all channels
-    tkHandle.Init.GbSen = 0xA0;                     // Set global sensitivity to 0xda
+    tkHandle.Init.GbSen = 0xA8;                     // Set global sensitivity to 0xda
     tkHandle.Init.LP = TK_LP_DISABLE;               // DISENABLE automatic low-power scan mode
     tkHandle.Init.IComGS = 0x28;                    // Set group scan compensation current to 0x28
     tkHandle.Init.CdcFswDiv = 0x07;                 // Set the CDC module scanning frequency to 0x07
@@ -76,7 +76,7 @@ static bool lsTK_Init(void)
     tkHandle.Init.KeyDebounceCount = 1;             // Set the number of jitters to 1
     tkHandle.Init.LpDelay = 4;                      // Set the time for automatic low-power scanning to 4*1S
     tkHandle.Init.ScanPeriod = 1;                   // Set the scan period
-    tkHandle.Init.GsMask = 0x3FFF;                  // ENABLE low-power scanning for all channels
+    tkHandle.Init.GsMask = 0x00;                  // ENABLE low-power scanning for all channels
     tkHandle.Init.LSenseGS = 0x68;                  // Set group scan sensitivity to 0x68
 
     if (HAL_TK_Init(&tkHandle) != HAL_OK)
