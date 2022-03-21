@@ -71,7 +71,7 @@ static bool lsTK_Init(void)
     tkHandle.Init.MultiOn = TK_MULTION_DISABLE;     // Disable multichannel detection
     tkHandle.Init.Debounce = 3;                     // Set the anti-jitter value to 3
     tkHandle.Init.ChannelEN = 0x3FFF;               // Open all channels
-    tkHandle.Init.GbSen = 0xA0;                     // Set global sensitivity to 0xda
+    tkHandle.Init.GbSen = 0xA8;                     // Set global sensitivity to 0xda
     tkHandle.Init.LP = TK_LP_DISABLE;               // DISABLE automatic low-power scan mode
     tkHandle.Init.IComGS = 0x28;                    // Set group scan compensation current to 0x28
     tkHandle.Init.CdcFswDiv = 0x07;                 // Set the CDC module scanning frequency to 0x07
