@@ -736,7 +736,7 @@ typedef struct
 
 /** @brief  Disable the specified TIM interrupt.
   */
-#define __HAL_TIM_DISABLE_IT(__HANDLE__, __INTERRUPT__)   ((__HANDLE__)->Instance->IDR &= ~(__INTERRUPT__))
+#define __HAL_TIM_DISABLE_IT(__HANDLE__, __INTERRUPT__)   ((__HANDLE__)->Instance->IDR |= (__INTERRUPT__))
 
 /** @brief  Check whether the specified TIM interrupt flag is set or not.
   */
