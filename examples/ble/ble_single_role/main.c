@@ -617,7 +617,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         LOG_I("disconnected! delete con_idx = %d", con_idx);       
         if (CONNECTION_IS_SERVER(con_idx))
         {
-#if SLAVE_SERVER_ROLE == 1               
+#if SLAVE_SERVER_ROLE == 1
+            ls_uart_server_init();
             disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_SLAVE);
             con_idx_server = CON_IDX_INVALID_VAL;        
             uart_server_mtu = UART_SERVER_MTU_DFT;
@@ -626,7 +627,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         }      
         else if (CONNECTION_IS_CLIENT(con_idx))
         {
-#if MASTER_CLIENT_ROLE == 1            
+#if MASTER_CLIENT_ROLE == 1
+            ls_uart_client_init();
             disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_MASTER);
             con_idx_client = CON_IDX_INVALID_VAL;        
             uart_client_mtu = UART_SERVER_MTU_DFT;
