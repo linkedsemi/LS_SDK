@@ -23,6 +23,8 @@
 #endif
 #endif
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
+#define WRTIE_STATUS_REGISTER_0_OPCODE 0x01
+#define WRITE_STATUS_REGISTER_1_OPCODE 0x31
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
 #define WRITE_ENABLE_OPCODE 0x06
@@ -74,6 +76,10 @@ struct flash_read_reg_param
 void spi_flash_write_enable(void);
 
 void do_spi_flash_write_status_reg_func(void * param);
+
+void do_spi_flash_write_status_reg_0_func(void * param);
+
+void do_spi_flash_write_status_reg_1_func(void * param);
 
 void do_spi_flash_erase_func(void *param);
 

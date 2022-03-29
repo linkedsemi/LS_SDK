@@ -62,6 +62,21 @@ bool spi_flash_write_in_process(void);
  */
 void spi_flash_write_status_register(uint16_t status);
 
+/** \brief Write Status Register 0
+ *  \param[in] status The value to write to Status Register 0
+ */
+void spi_flash_write_status_register_0(uint8_t status_0);
+
+/** \brief Write Status Register 1
+ *  \param[in] status The value to write to Status Register 1
+ */
+void spi_flash_write_status_register_1(uint8_t status_1);
+
+/** \brief Dual Page Program 
+ *  \param[in] offset Offset to FLASH_BASE_ADDR
+ *  \param[in] data The pointer of the data to program into Flash
+ *  \param[in] length Data length in bytes, must be less than or equal to FLASH_PAGE_SIZE
+ */
 void spi_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length);
 
 /** \brief Quad Page Program 
@@ -91,8 +106,18 @@ void spi_flash_sector_erase(uint32_t offset);
 /** \brief Chip Erase */
 void spi_flash_chip_erase(void);
 
+/** \brief Dual IO Read if dual_mode is set, else Quad IO Read
+ *  \param[in] offset Offset to FLASH_BASE_ADDR
+ *  \param[out] data The pointer of the data buffer
+ *  \param[in] length Data length in bytes
+ */
 void spi_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length);
 
+/** \brief Dual IO Read
+ *  \param[in] offset Offset to FLASH_BASE_ADDR
+ *  \param[out] data The pointer of the data buffer
+ *  \param[in] length Data length in bytes
+ */
 void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length);
 
 /** \brief Quad IO Read

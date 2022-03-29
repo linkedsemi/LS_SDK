@@ -136,6 +136,16 @@ XIP_BANNED void spi_flash_write_status_register(uint16_t status)
     flash_writing_critical(do_spi_flash_write_status_reg_func,&status);
 }
 
+XIP_BANNED void spi_flash_write_status_register_0(uint8_t status_0)
+{
+    flash_writing_critical(do_spi_flash_write_status_reg_0_func,&status_0);
+}
+
+XIP_BANNED void spi_flash_write_status_register_1(uint8_t status_1)
+{
+    flash_writing_critical(do_spi_flash_write_status_reg_1_func,&status_1);
+}
+
 void spi_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length)
 {
     if(spi_flash_dual_mode_get())
@@ -235,6 +245,17 @@ void spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16
     spi_flash_read_security_area_operation(idx, addr,data,length);
 }
 
+#ifdef QE_EN_1_BYTE_CMD
+XIP_BANNED void spi_flash_qe_status_read_and_set()
+{
+    uint8_t status_1;
+    spi_flash_read_status_register_1(&status_1);
+    if((status_1&0x02) == 0)
+    {
+        spi_flash_write_status_register_1(status_1|0x02);
+    }
+}
+#else
 XIP_BANNED void spi_flash_qe_status_read_and_set()
 {
     uint8_t status_reg[2];
@@ -245,6 +266,7 @@ XIP_BANNED void spi_flash_qe_status_read_and_set()
         spi_flash_write_status_register(status_reg[1]<<8|status_reg[0]|0x200);
     }
 }
+#endif
 
 XIP_BANNED bool spi_flash_writing_busy()
 {

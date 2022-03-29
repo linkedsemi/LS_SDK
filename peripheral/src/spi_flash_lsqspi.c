@@ -85,6 +85,16 @@ XIP_BANNED void do_spi_flash_write_status_reg_func(void * param)
     lsqspi_stig_write_register(WRITE_STATUS_REGISTER_OPCODE,param, sizeof(uint16_t));
 }
 
+XIP_BANNED void do_spi_flash_write_status_reg_0_func(void *param)
+{
+    lsqspi_stig_write_register(WRTIE_STATUS_REGISTER_0_OPCODE,param,sizeof(uint8_t));
+}
+
+XIP_BANNED void do_spi_flash_write_status_reg_1_func(void *param)
+{
+    lsqspi_stig_write_register(WRITE_STATUS_REGISTER_1_OPCODE,param,sizeof(uint8_t));
+}
+
 XIP_BANNED void do_spi_flash_prog_func(void *param)
 {
     lsqspi_stig_write_data( param);
