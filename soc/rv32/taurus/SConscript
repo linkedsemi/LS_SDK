@@ -7,7 +7,7 @@ env['ARCH'] = 'rv32emc'
 def plf_postaction(target):
     env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     target_path = str(target[0]).replace('.elf','')
-    app_hex = env.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+    app_hex = env.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex -j .text $SOURCES $TARGET'))
 
 
 

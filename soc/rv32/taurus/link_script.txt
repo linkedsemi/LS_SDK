@@ -17,6 +17,7 @@ SECTIONS
 		KEEP(*(.fini))
 		*(.xip_banned)
         *(.text.cpu_recover_asm)
+		*save-restore.o(.text)
 		. = ALIGN(4);
 	} >RAM
 	.data :
