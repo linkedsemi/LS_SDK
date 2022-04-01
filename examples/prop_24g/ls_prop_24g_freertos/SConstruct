@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'ls_24g_common_freertos.c',
+    'app_user_24g.c',
+]
+inc = [
+    '.'
+]
+env.app_build('ls_prop_24g_freertos',src,inc, rtos = 'freertos', ble = False)
+env.Append(LIBS = [File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/prop_24g_lib.o'))])
