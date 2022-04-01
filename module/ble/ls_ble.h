@@ -424,7 +424,7 @@ enum gap_evt_type
     REQUEST_PASSKEY,                                /*!< Request passkey event*/
     NUMERIC_COMPARE,                                /*!< Numeric compare event*/
     REQUEST_LEGACY_OOB,                             /*!< Request legacy OOB event*/
-    REQUEST_SC_OOB,                                 /*!< Request security connection event*/
+    REQUEST_SC_OOB,                                 /*!< Request security connection OOB event*/
     GET_DEV_INFO_DEV_NAME,                          /*!< Get device name of device information*/
     GET_DEV_INFO_APPEARANCE,                        /*!< Get appearance Icon of device information*/
     GET_DEV_INFO_SLV_PRE_PARAM,                     /*!< Get slave preferred parameters of device information*/
@@ -607,6 +607,14 @@ struct gap_numeric_compare
 };
 
 /**
+  * @brief Secure Connection OOB Exchange Event structure
+  */
+struct gap_sc_oob_exchange
+{
+    struct gap_sc_oob *sc_oob;             /**< Pointer to SC OOB value @ref gap_sc_oob */
+};
+
+/**
   * @brief Get device name.
   */
 struct gap_dev_info_dev_name
@@ -654,6 +662,7 @@ union gap_evt_u
     struct gap_encrypt_done encrypt_done;                      /*!< Encryption done event*/
     struct gap_display_passkey display_passkey;                /*!< Display passkey event*/
     struct gap_numeric_compare numeric_compare;                /*!< Numeric comparison event*/
+    struct gap_sc_oob_exchange sc_oob_exchange;                /*!< Secure Connection OOB Exchange event*/
     struct gap_dev_info_dev_name get_dev_name;                 /*!< Get device name*/
     struct gap_dev_info_appearance get_appearance;             /*!< Get Get appearance*/
     struct gap_dev_info_slave_pref_param slv_pref_param;       /*!< Get slave preferred parameters*/
