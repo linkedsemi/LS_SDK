@@ -146,8 +146,16 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         ])
         rtos_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
             'arm_cm/le501x/compiler/$COMPILER/port.c',
-            'arm_cm/le501x/freertos_adapt.c',
+            # 'arm_cm/le501x/freertos_adapt.c',
         ])
+        if ble:
+            rtos_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+                'arm_cm/le501x/freertos_adapt_ble.c',
+            ])
+        else:
+            rtos_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+                'arm_cm/le501x/freertos_adapt_mcu.c',
+            ])
         self.add_include('$SDK_ROOT/',['rtos/freertos/include'])
     if mesh:
         self.Append(LIBS = [File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
