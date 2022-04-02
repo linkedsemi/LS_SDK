@@ -447,7 +447,7 @@ static void rf_reg_retention_24g(void)
 
 int8_t rf_rssi_convert_24g(uint8_t rssi_reg)
 {
-    LOG_I("rssi_reg: %d", rssi_reg);
+    // LOG_I("rssi_reg: %d", rssi_reg);
     int8_t rssi_dbm;
     uint8_t agc_state;
     agc_state = REG_FIELD_RD(RF->REG6C,RF_AGC_STATE);
