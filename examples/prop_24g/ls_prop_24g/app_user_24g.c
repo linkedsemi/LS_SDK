@@ -39,6 +39,7 @@ static uint8_t uart_state = UART_IDLE;
 static volatile bool uart_tx_busy = false;
 static uint8_t uart_rx_buf[UART_24G_BUF_SIZE];
 static uint8_t uart_tx_buf[UART_24G_BUF_SIZE];
+static uint8_t rf_rx_buf[UART_24G_BUF_SIZE];
 static uint8_t rf_rx_length;
 static volatile bool rf_tx_cplt_flag = true;
 static UART_HandleTypeDef UART_Config; 
@@ -61,12 +62,22 @@ _ISR static void app_user_24g_rx_cb(void *param)
     // LOG_I("24g rx completed, length=%d", rf_rx_length);
     if (!uart_tx_busy && rf_rx_length > 0)
     {
+        memcpy_ram((void*)&uart_tx_buf[0], (void*)&rf_rx_buf[0], rf_rx_length);
         uart_tx_busy = true;
         HAL_UART_Transmit_IT(&UART_Config, &uart_tx_buf[0], rf_rx_length);
         rf_rx_length = 0;
         // LOG_I("rssi: %d", RF_24g_GetRssi());
     }
 }
+
+// uint32_t get_access_addr(void)
+// {
+//     return 0x8e89bed6;
+// }
+// uint8_t get_rx_format(void)
+// {
+//     return PROP_24G_LEGACY_ADV_FORMAT;
+// }
 
 static void ls_uart_init(void)
 {
@@ -92,9 +103,9 @@ static void ls_uart_recv_restart(void)
 }
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    LOG_I("uart tx cplt");
+    // LOG_I("uart tx cplt");
     uart_tx_busy = false; 
-    app_user_24g_rx();
+    // app_user_24g_rx();
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -141,7 +152,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 static void app_user_24g_rx(void)
 {
-    RF_24g_Rx(uart_tx_buf, &rf_rx_length, app_user_24g_rx_cb, NULL);
+    RF_24g_Rx(rf_rx_buf, &rf_rx_length, app_user_24g_rx_cb, NULL);
 }
 static void app_user_24g_peri_init(void)
 {
