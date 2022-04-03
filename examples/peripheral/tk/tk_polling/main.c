@@ -40,7 +40,7 @@
 /******************************************************************************
  Local Variable Definition
  ******************************************************************************/
-static volatile uint8_t RxBUFF[3] = {0};
+static volatile uint8_t RxBUFF[256] = {0};
 static TK_HandleTypeDef tkHandle;
 static uint8_t BUf0_ctl_io[] = {PB12, PC01, PC00, PA06, PA07, PA09, PA08, PA15};
 static uint8_t BUf1_ctl_io[] = {PB02, PB04, PB10, PB11, PB13, PA04};
@@ -68,7 +68,7 @@ static bool lsTK_Init(void)
     tkHandle.Init.MultiOn = TK_MULTION_DISABLE;     // Disable multichannel detection
     tkHandle.Init.Debounce = 3;                     // Set the anti-jitter value to 3
     tkHandle.Init.ChannelEN = 0x3FFF;               // Open all channels
-    tkHandle.Init.GbSen = 0xA8;                     // Set global sensitivity to 0xda
+    tkHandle.Init.GbSen = 0xA0;                     // Set global sensitivity to 0xda
     tkHandle.Init.LP = TK_LP_DISABLE;               // DISENABLE automatic low-power scan mode
     tkHandle.Init.IComGS = 0x28;                    // Set group scan compensation current to 0x28
     tkHandle.Init.CdcFswDiv = 0x07;                 // Set the CDC module scanning frequency to 0x07
