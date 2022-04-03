@@ -40,7 +40,7 @@ static TK_HandleTypeDef tkHandle;
 /******************************************************************************
  Local Variable Definition
  ******************************************************************************/
-static volatile uint8_t RxBUFF[3] = {0};
+static volatile uint8_t RxBUFF[256] = {0};
 static volatile uint8_t IRQ_flag = 0;
 static uint8_t BUf0_ctl_io[] = {PB12, PC01, PC00, PA06, PA07, PA09, PA08, PA15};
 static uint8_t BUf1_ctl_io[] = {PB02, PB04, PB10, PB11, PB13, PA04};
@@ -70,7 +70,7 @@ static bool lsTK_Init(void)
     tkHandle.Init.MultiOn = TK_MULTION_DISABLE;     // Disable multichannel detection
     tkHandle.Init.Debounce = 3;                     // Set the anti-jitter value to 3
     tkHandle.Init.ChannelEN = 0x3FFF;               // Open all channels
-    tkHandle.Init.GbSen = 0xA8;                     // Set global sensitivity to 0xda
+    tkHandle.Init.GbSen = 0xA0;                     // Set global sensitivity to 0xda
     tkHandle.Init.LP = TK_LP_ENABLE;                // ENABLE automatic low-power scan mode
     tkHandle.Init.IComGS = 0x10;                    // Set group scan compensation current to 0x28
     tkHandle.Init.CdcFswDiv = 0x07;                 // Set the CDC module scanning frequency to 0x07
@@ -98,6 +98,11 @@ static bool lsTK_Init(void)
  */
 static void Init_GPIO(void)
 {
+    /*WKUP key io initial*/
+    io_cfg_input(PB15);
+    io_pull_write(PB15, IO_PULL_UP);
+    io_exti_config(PB15, INT_EDGE_FALLING);
+    io_exti_enable(PB15, true);
     /*LED io initial*/
     for (uint8_t i = 0; i < 8; i++)
     {
@@ -199,7 +204,7 @@ void io_exti_callback(uint8_t pin)
 {
     switch (pin)
     {
-    case PA00:
+    case TK_WKUP:
         IRQ_flag = 1;
         break;
     default:

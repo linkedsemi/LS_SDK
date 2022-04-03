@@ -34,22 +34,22 @@ extern "C"
  *  @defgroup TK_channel_mode TK channel mode.
  */
 #define TK_MULTION_DISABLE 0x00U /*!< Disable TK channel mode.   */
-#define TK_MULTION_ENABLE 0x10   /*!< Enable TK channel mode.   */
+#define TK_MULTION_ENABLE 0x10U   /*!< Enable TK channel mode.   */
 /**
  *  @defgroup TK_ScanEN_mode TK ScanEN mode.
  */
 #define TK_SCANEN_DISABLE 0x00U /*!< Disable TK ScanEN mode.   */
-#define TK_SCANEN_ENABLE 0x01   /*!< Enable TK ScanEN mode.   */
+#define TK_SCANEN_ENABLE 0x01U   /*!< Enable TK ScanEN mode.   */
 /**
  *  @defgroup TK_Low_power_scan_mode TK cLow power scan mode. 
  */
 #define TK_LP_DISABLE 0x00U /*!< Disable TK cLow power scan mode.   */
-#define TK_LP_ENABLE 0x40   /*!< Enable TK cLow power scan mode.   */
+#define TK_LP_ENABLE 0x40U   /*!< Enable TK cLow power scan mode.   */
 /**
  *  @defgroup TK_sleep_mode TK sleep mode.
  */
 #define TK_PD_DISABLE 0x00U /*!< Disable TK sleep mode.   */
-#define TK_PD_ENABLE 0x80   /*!< Enable TK sleep mode.   */
+#define TK_PD_ENABLE 0x80U   /*!< Enable TK sleep mode.   */
 /**
  *  @defgroup TK_Low_power_scan_preiod  TK Low power scan preiod.
  */
@@ -229,6 +229,7 @@ extern "C"
 #define LSR12 0XEC
 #define LSR13 0XED
 #define LSGR  0XEE
+#define TK_WKUP  PA00
   /******************************************************************************
  External Variable Definition
  ******************************************************************************/
