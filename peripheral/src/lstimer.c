@@ -2126,6 +2126,162 @@ void TIM_OC4_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
   TIMx->CCER = tmpccer;
 }
 
+/**
+  * @brief  Slave Timer configuration function
+  * @param  htim TIM handle
+  * @param  sSlaveConfig Slave timer configuration
+  * @retval None
+  */
+static HAL_StatusTypeDef TIM_SlaveTimer_SetConfig(TIM_HandleTypeDef *htim, TIM_SlaveConfigTypeDef *sSlaveConfig)
+{
+  uint32_t tmpsmcr;
+  uint32_t tmpccmr1;
+  uint32_t tmpccer;
+
+  /* Get the TIMx SMCR register value */
+  tmpsmcr = htim->Instance->SMCR;
+
+  /* Reset the Trigger Selection Bits */
+  tmpsmcr &= ~TIMER_SMCR_TS;
+  /* Set the Input Trigger source */
+  tmpsmcr |= sSlaveConfig->InputTrigger;
+
+  /* Reset the slave mode Bits */
+  tmpsmcr &= ~TIMER_SMCR_SMS;
+  /* Set the slave mode */
+  tmpsmcr |= sSlaveConfig->SlaveMode;
+
+  /* Write to TIMx SMCR */
+  htim->Instance->SMCR = tmpsmcr;
+
+  /* Configure the trigger prescaler, filter, and polarity */
+  switch (sSlaveConfig->InputTrigger)
+  {
+    case TIM_TS_ETRF:
+    {
+      /* Check the parameters */
+      LS_ASSERT(IS_TIM_CLOCKSOURCE_ETRMODE1_INSTANCE(htim->Instance));
+      LS_ASSERT(IS_TIM_TRIGGERPRESCALER(sSlaveConfig->TriggerPrescaler));
+      LS_ASSERT(IS_TIM_TRIGGERPOLARITY(sSlaveConfig->TriggerPolarity));
+      LS_ASSERT(IS_TIM_TRIGGERFILTER(sSlaveConfig->TriggerFilter));
+      /* Configure the ETR Trigger source */
+      TIM_ETR_SetConfig(htim->Instance,
+                        sSlaveConfig->TriggerPrescaler,
+                        sSlaveConfig->TriggerPolarity,
+                        sSlaveConfig->TriggerFilter);
+      break;
+    }
+
+    case TIM_TS_TI1F_ED:
+    {
+      /* Check the parameters */
+      LS_ASSERT(IS_TIM_CC1_INSTANCE(htim->Instance));
+      LS_ASSERT(IS_TIM_TRIGGERFILTER(sSlaveConfig->TriggerFilter));
+
+      if(sSlaveConfig->SlaveMode == TIM_SLAVEMODE_GATED)
+      {
+        return HAL_INVALIAD_PARAM;
+      }
+
+      /* Disable the Channel 1: Reset the CC1E Bit */
+      tmpccer = htim->Instance->CCER;
+      htim->Instance->CCER &= ~TIMER_CCER_CC1E;
+      tmpccmr1 = htim->Instance->CCMR1;
+
+      /* Set the filter */
+      tmpccmr1 &= ~TIMER_CCMR1_IC1F;
+      tmpccmr1 |= ((sSlaveConfig->TriggerFilter) << 4U);
+
+      /* Write to TIMx CCMR1 and CCER registers */
+      htim->Instance->CCMR1 = tmpccmr1;
+      htim->Instance->CCER = tmpccer;
+      break;
+    }
+
+    case TIM_TS_TI1FP1:
+    {
+      /* Check the parameters */
+      LS_ASSERT(IS_TIM_CC1_INSTANCE(htim->Instance));
+      LS_ASSERT(IS_TIM_TRIGGERPOLARITY(sSlaveConfig->TriggerPolarity));
+      LS_ASSERT(IS_TIM_TRIGGERFILTER(sSlaveConfig->TriggerFilter));
+
+      /* Configure TI1 Filter and Polarity */
+      TIM_TI1_ConfigInputStage(htim->Instance,
+                               sSlaveConfig->TriggerPolarity,
+                               sSlaveConfig->TriggerFilter);
+      break;
+    }
+
+    case TIM_TS_TI2FP2:
+    {
+      /* Check the parameters */
+      LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+      LS_ASSERT(IS_TIM_TRIGGERPOLARITY(sSlaveConfig->TriggerPolarity));
+      LS_ASSERT(IS_TIM_TRIGGERFILTER(sSlaveConfig->TriggerFilter));
+
+      /* Configure TI2 Filter and Polarity */
+      TIM_TI2_ConfigInputStage(htim->Instance,
+                               sSlaveConfig->TriggerPolarity,
+                               sSlaveConfig->TriggerFilter);
+      break;
+    }
+
+    case TIM_TS_ITR0:
+    case TIM_TS_ITR1:
+    case TIM_TS_ITR2:
+    case TIM_TS_ITR3:
+    {
+      /* Check the parameter */
+      LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+      break;
+    }
+
+    default:
+      break;
+  }
+  return HAL_OK;
+}
+
+/**
+  * @brief  Configures the TIM in Slave mode
+  * @param  htim TIM handle.
+  * @param  sSlaveConfig pointer to a TIM_SlaveConfigTypeDef structure that
+  *         contains the selected trigger (internal trigger input, filtered
+  *         timer input or external trigger input) and the Slave mode
+  *         (Disable, Reset, Gated, Trigger, External clock mode 1).
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, TIM_SlaveConfigTypeDef *sSlaveConfig)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_SLAVE_INSTANCE(htim->Instance));
+  LS_ASSERT(IS_TIM_SLAVE_MODE(sSlaveConfig->SlaveMode));
+  LS_ASSERT(IS_TIM_TRIGGER_SELECTION(sSlaveConfig->InputTrigger));
+
+  __HAL_LOCK(htim);
+
+  htim->State = HAL_TIM_STATE_BUSY;
+
+  if (TIM_SlaveTimer_SetConfig(htim, sSlaveConfig) != HAL_OK)
+  {
+    htim->State = HAL_TIM_STATE_READY;
+    __HAL_UNLOCK(htim);
+    return HAL_INVALIAD_PARAM;
+  }
+
+  /* Disable Trigger Interrupt */
+  __HAL_TIM_DISABLE_IT(htim, TIM_IT_TRIGGER);
+
+  /* Disable Trigger DMA request */
+  // __HAL_TIM_DISABLE_DMA(htim, TIM_DMA_TRIGGER);
+
+  htim->State = HAL_TIM_STATE_READY;
+
+  __HAL_UNLOCK(htim);
+
+  return HAL_OK;
+}
+
 static void TIM_TI1_SetConfig(reg_timer_t *TIMx, uint32_t TIM_ICPolarity, uint32_t TIM_ICSelection,
                        uint32_t TIM_ICFilter)
 {
