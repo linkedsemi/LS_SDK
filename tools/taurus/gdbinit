@@ -1,0 +1,9 @@
+set output-radix 16
+sreset -c 0x2
+load
+load stack/build/taurus/fw.elf
+add-symbol-file stack/build/taurus/fw.elf
+set mem inaccessible-by-default off
+mem 0x780000 0xffffff ro
+set $pc=0x40c000
+si
