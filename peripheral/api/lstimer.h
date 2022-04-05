@@ -153,6 +153,23 @@ typedef struct
 } TIM_ClearInputConfigTypeDef;
 
 /**
+  * @brief  TIM Slave configuration Structure definition
+  */
+typedef struct
+{
+  uint32_t  SlaveMode;         /*!< Slave mode selection
+                                    This parameter can be a value of @ref TIM_Slave_Mode */
+  uint32_t  InputTrigger;      /*!< Input Trigger source
+                                    This parameter can be a value of @ref TIM_Trigger_Selection */
+  uint32_t  TriggerPolarity;   /*!< Input Trigger polarity
+                                    This parameter can be a value of @ref TIM_Trigger_Polarity */
+  uint32_t  TriggerPrescaler;  /*!< Input trigger prescaler
+                                    This parameter can be a value of @ref TIM_Trigger_Prescaler */
+  uint32_t  TriggerFilter;     /*!< Input trigger filter
+                                    This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF  */
+} TIM_SlaveConfigTypeDef;
+
+/**
   * @brief  TIM Break input(s) and Dead time configuration Structure definition
   * @note   2 break inputs can be configured (BKIN and BKIN2) with configurable
   *        filter and polarity.
@@ -625,13 +642,13 @@ typedef struct
   * @{
   */
 #define TIM_TS_ITR0          0x00000000U                /*!< Internal Trigger 0 (ITR0)              */
-#define TIM_TS_ITR1          0x00000001U                /*!< Internal Trigger 1 (ITR1)              */
-#define TIM_TS_ITR2          0x00000002U                /*!< Internal Trigger 2 (ITR2)              */
-#define TIM_TS_ITR3          0x00000003U                /*!< Internal Trigger 3 (ITR3)              */
-#define TIM_TS_TI1F_ED       0x00000004U                /*!< TI1 Edge Detector (TI1F_ED)            */
-#define TIM_TS_TI1FP1        0x00000005U                /*!< Filtered Timer Input 1 (TI1FP1)        */
-#define TIM_TS_TI2FP2        0x00000006U                /*!< Filtered Timer Input 2 (TI2FP2)        */
-#define TIM_TS_ETRF          0x00000007U                /*!< Filtered External Trigger input (ETRF) */
+#define TIM_TS_ITR1          TIMER_SMCR_TS_0                /*!< Internal Trigger 1 (ITR1)              */
+#define TIM_TS_ITR2          TIMER_SMCR_TS_1                /*!< Internal Trigger 2 (ITR2)              */
+#define TIM_TS_ITR3          (TIMER_SMCR_TS_0 | TIMER_SMCR_TS_1)                /*!< Internal Trigger 3 (ITR3)              */
+#define TIM_TS_TI1F_ED       TIMER_SMCR_TS_2                /*!< TI1 Edge Detector (TI1F_ED)            */
+#define TIM_TS_TI1FP1        (TIMER_SMCR_TS_0 | TIMER_SMCR_TS_2)                /*!< Filtered Timer Input 1 (TI1FP1)        */
+#define TIM_TS_TI2FP2        (TIMER_SMCR_TS_1 | TIMER_SMCR_TS_2)                /*!< Filtered Timer Input 2 (TI2FP2)        */
+#define TIM_TS_ETRF          (TIMER_SMCR_TS_0 | TIMER_SMCR_TS_1 | TIMER_SMCR_TS_2)                /*!< Filtered External Trigger input (ETRF) */
 #define TIM_TS_NONE          0x0000FFFFU                /*!< No trigger selected                    */
 /**
   * @}
@@ -1464,6 +1481,17 @@ void HAL_TIM_TriggerHalfCpltCallback(TIM_HandleTypeDef *htim);
   * @retval None
   */
 void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim);
+
+/**
+  * @brief  Configures the TIM in Slave mode
+  * @param  htim TIM handle.
+  * @param  sSlaveConfig pointer to a TIM_SlaveConfigTypeDef structure that
+  *         contains the selected trigger (internal trigger input, filtered
+  *         timer input or external trigger input) and the Slave mode
+  *         (Disable, Reset, Gated, Trigger, External clock mode 1).
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, TIM_SlaveConfigTypeDef *sSlaveConfig);
 #endif /* LSTIMER_H_ */
 
 /*****************************END OF FILE****************************/
