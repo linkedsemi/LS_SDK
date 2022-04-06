@@ -152,6 +152,7 @@ int main(void)
                 io_set_pin(BUf0_ctl_io[i]);
             }
         }
+        DELAY_US(5000);
     }
 }
 /**
