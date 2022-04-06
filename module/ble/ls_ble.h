@@ -1321,13 +1321,12 @@ void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_sv
  ****************************************************************************************
  * \brief Set service/profile permission.
  *
- * \param[in]  con_idx                 Connection index.
  * \param[in]  handle                  Start handle of the service/profile.
  * \param[in]  perm                    Permission value to set. Refer to ::sec_lvl_type
  *
  ****************************************************************************************
  */
-void gatt_manager_server_set_svc_permission(uint8_t con_idx, uint16_t handle, uint16_t perm);
+void gatt_manager_server_set_svc_permission(uint16_t handle, uint16_t perm);
 /**
  ****************************************************************************************
  * \brief Send reply to read request from GATT client.
