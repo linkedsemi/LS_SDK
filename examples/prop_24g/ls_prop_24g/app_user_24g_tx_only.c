@@ -15,7 +15,7 @@
 
 #define _ISR // The macro means the function will be called in interrupt.
 
-#define RF_CHANNEL_DEFAULT 2380
+#define RF_CHANNEL_DEFAULT 2402
 #define RF_PHY_DEFAULT PROP_24G_PHY_1MBPS
 
 #define UART_SYNC_BYTE  0xA5
@@ -37,7 +37,7 @@ enum uart_rx_status
 };
 static uint8_t uart_state = UART_IDLE;
 static volatile bool uart_tx_busy = false;
-static uint8_t uart_rx_buf[UART_24G_BUF_SIZE];
+static uint8_t uart_rx_buf[UART_24G_BUF_SIZE] = {0x02, 0x01, 0x06, 0x07, 0x08, 'L', 'S', '_', '2', '4', 'G'};
 static uint8_t uart_tx_buf[UART_24G_BUF_SIZE];
 static uint8_t rf_rx_length;
 static volatile bool rf_tx_cplt_flag = true;
@@ -49,12 +49,14 @@ static void app_user_24g_rx(void);
 static void ls_uart_recv_restart(void);
 static bool timer_cb(void *param);
 
+uint8_t get_tx_format(void){return PROP_24G_LEGACY_ADV_FORMAT;}
+
 _ISR static void app_user_24g_tx_cb(void *param)
 {
     // LOG_I("24g tx completed");
     // ls_uart_recv_restart();
     // app_user_24g_rx();
-    RF_24g_Tx(&uart_rx_buf[0], 1, app_user_24g_tx_cb, NULL); 
+    RF_24g_Tx(&uart_rx_buf[0], 11, app_user_24g_tx_cb, NULL); 
     rf_tx_cplt_flag = true;
 }
 _ISR static void app_user_24g_rx_cb(void *param)
@@ -161,7 +163,7 @@ static void app_user_24g_rf_init(void)
     RF_24g_SetChannel(RF_CHANNEL_DEFAULT);
     RF_24g_SetPhy(RF_PHY_DEFAULT);
     // app_user_24g_rx();
-    RF_24g_Tx(&uart_rx_buf[0], 1, app_user_24g_tx_cb, NULL); 
+    RF_24g_Tx(&uart_rx_buf[0], 11, app_user_24g_tx_cb, NULL); 
 }
 
 static void app_user_24g_peri_deinit(void)
