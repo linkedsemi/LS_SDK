@@ -37,7 +37,7 @@ enum prop_24g_phy
     PROP_24G_PHY_1MBPS = 0,
     PROP_24G_PHY_2MBPS
 };
-enum prop_24g_rx_format
+enum prop_24g_tx_rx_format
 {
     PROP_24G_EXT_ADV_FORMAT = 0,
     PROP_24G_LEGACY_ADV_FORMAT
