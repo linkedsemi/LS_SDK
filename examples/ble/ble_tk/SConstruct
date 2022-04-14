@@ -10,4 +10,4 @@ inc = [
 ]
 env.app_build('ble_tk', src, inc)
 env.Append(
-    LIBS=[File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/lible5030_tk.o'))])
+    LIBS=[File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/lible5030_tk.a'))])
