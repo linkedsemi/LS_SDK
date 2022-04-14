@@ -935,6 +935,16 @@ void dev_manager_stack_init(struct ble_stack_cfg *cfg);
 void dev_manager_get_identity_bdaddr(uint8_t *addr,bool *random);
 /**
  ****************************************************************************************
+ * \brief Add service with specified start handle.
+ * 
+ * \param[in]   svc                 Pointer to service to added.
+   \param[in]   start_handle        Start handle of the service to add.
+ *
+ ****************************************************************************************
+ */
+void dev_manager_add_service_with_start_handle(struct svc_decl *svc, uint16_t start_handle);
+/**
+ ****************************************************************************************
  * \brief Add service.
  * 
  * \param[in]   svc                 Pointer to service to added.
