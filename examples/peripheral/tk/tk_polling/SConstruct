@@ -10,4 +10,4 @@ inc = [
 ]
 env.app_build('tk_polling', src, inc, ble=False)
 env.Append(
-    LIBS=[File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/lible5030_tk.o'))])
+    LIBS=[File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/lible5030_tk.a'))])
