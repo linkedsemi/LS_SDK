@@ -270,7 +270,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
     break;
     case SERVER_WRITE_REQ:
         LOG_I("write req");
-        if (evt->server_read_req.svc == &ls_uart_server_svc_env)
+        if (evt->server_write_req.svc == &ls_uart_server_svc_env)
         {
             ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
         }
