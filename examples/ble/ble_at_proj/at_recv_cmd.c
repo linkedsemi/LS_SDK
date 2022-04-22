@@ -47,10 +47,11 @@ void at_cmd_recv_cb(void *arg)
         at_recv_cmd_handler((at_recv_cmd_t *)msg->param);
         break;
     case AT_RECV_TRANSPARENT_DATA:
+    {
         builtin_timer_stop(uart_server_timer_inst);
+        uint32_t cpu_stat = enter_critical();
         if (get_con_status(ls_at_ctl_env.transparent_conidx))
         {
-            uint32_t cpu_stat = enter_critical();
             if (gap_manager_get_role(ls_at_ctl_env.transparent_conidx) == LS_BLE_ROLE_SLAVE) //slave send
             {
                 ble_slave_send_data(ls_at_ctl_env.transparent_conidx, ls_at_env.at_recv_buffer, ls_at_env.at_recv_index);
@@ -59,18 +60,18 @@ void at_cmd_recv_cb(void *arg)
             {
                 ble_master_send_data(ls_at_ctl_env.transparent_conidx, ls_at_env.at_recv_buffer, ls_at_env.at_recv_index);
             }
-            ls_at_env.at_recv_index = 0;
-            ls_at_env.data_sending = 0;
-            exit_critical(cpu_stat);
-            if (ls_at_ctl_env.one_slot_send_start && ls_at_ctl_env.one_slot_send_len == 0)
-            {
-                ls_at_ctl_env.one_slot_send_start = false;
-                ls_at_ctl_env.one_slot_send_len = 0;
-                uint8_t at_rsp[] = "\r\nSEND OK\r\n";
-                uart_write(at_rsp,sizeof(at_rsp));
-            }
         }
-        break;
+        ls_at_env.at_recv_index = 0;
+        ls_at_env.data_sending = 0;
+        exit_critical(cpu_stat);
+        if (ls_at_ctl_env.one_slot_send_start && ls_at_ctl_env.one_slot_send_len == 0)
+        {
+            ls_at_ctl_env.one_slot_send_start = false;
+            ls_at_ctl_env.one_slot_send_len = 0;
+            uint8_t at_rsp[] = "\r\nSEND OK\r\n";
+            uart_write(at_rsp,sizeof(at_rsp));
+        }
+    }break;
     case AT_TRANSPARENT_START_TIMER:
         builtin_timer_start(uart_server_timer_inst, 50, NULL);
         break;
@@ -231,7 +232,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 static void ls_uart_init(void)
 {
     uart1_io_init(PB00, PB01);
-    io_pull_write(PB01, IO_PULL_UP);
+	io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Server_Config.Init.MSBEN = 0;
