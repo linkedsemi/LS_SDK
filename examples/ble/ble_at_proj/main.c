@@ -145,11 +145,11 @@ static uint8_t init_status = INIT_IDLE;
 static uint8_t scan_status = SCAN_IDLE;
 static bool update_adv_intv_flag = false;
 
-static void ls_uart_server_init(void);
+static void ls_uart_server_init(uint8_t idx);
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx);
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value);
 
-static void ls_uart_client_init(void);
+static void ls_uart_client_init(uint8_t idx);
 void start_scan(uint16_t scan_duration);
 
 static void ls_uart_client_service_dis(uint8_t con_idx);
@@ -210,22 +210,40 @@ uint16_t ble_get_mtu(uint8_t con_idx)
     return ble_mtu_array[con_idx];
 }
 
-static void ls_uart_server_init(void)
+static void ls_uart_server_init(uint8_t idx)
 {
-    for (uint8_t i = 0; i < UART_SERVER_MASTER_NUM; i++)
+    if(idx < UART_SERVER_MASTER_NUM)
     {
-        con_idx_array[i] = CON_IDX_INVALID_VAL;
-        uart_server_ntf_done_array[i] = true;
+        con_idx_array[idx] = CON_IDX_INVALID_VAL;
+        uart_server_ntf_done_array[idx] = true;
+    }
+    else
+    {
+        for (uint8_t i = 0; i < UART_SERVER_MASTER_NUM; i++)
+        {
+            con_idx_array[i] = CON_IDX_INVALID_VAL;
+            uart_server_ntf_done_array[i] = true;
+        }
     }
 }
-static void ls_uart_client_init(void)
+static void ls_uart_client_init(uint8_t idx)
 {
-    for (uint8_t i = 0; i < UART_CLIENT_NUM; i++)
+    if(idx < UART_CLIENT_NUM)
     {
-        con_idx_client_array[i] = CON_IDX_INVALID_VAL;
-        uart_client_wr_cmd_done_array[i] = true;
-        uart_client_svc_attribute_handle[i] = 0x1;
-        uart_client_svc_end_handle[i] = 0xffff;
+        con_idx_client_array[idx] = CON_IDX_INVALID_VAL;
+        uart_client_wr_cmd_done_array[idx] = true;
+        uart_client_svc_attribute_handle[idx] = 0x1;
+        uart_client_svc_end_handle[idx] = 0xffff;
+    }
+    else
+    {
+        for (uint8_t i = 0; i < UART_CLIENT_NUM; i++)
+        {
+            con_idx_client_array[i] = CON_IDX_INVALID_VAL;
+            uart_client_wr_cmd_done_array[i] = true;
+            uart_client_svc_attribute_handle[i] = 0x1;
+            uart_client_svc_end_handle[i] = 0xffff;
+        }
     }
 }
 
@@ -332,7 +350,7 @@ void dev_disconnected_fun(uint8_t con_idx,uint8_t reason)
     {
         uart_server_connected_num--;
 
-        con_idx_array[search_idx] = CON_IDX_INVALID_VAL;
+        ls_uart_server_init(search_idx);
         if (uart_server_connected_num < UART_SERVER_MASTER_NUM)
         {
             at_start_adv();
@@ -341,13 +359,14 @@ void dev_disconnected_fun(uint8_t con_idx,uint8_t reason)
     else if ((search_idx = search_client_conidx(con_idx)) != 0xff)
     {
         uart_client_connected_num--;
-        con_idx_client_array[search_idx] = CON_IDX_INVALID_VAL;
+        ls_uart_client_init(search_idx);
     }
     else
     {
         LS_ASSERT(0);
     }
 
+    trans_mode_exit();
     if(ls_at_ctl_env.one_slot_send_start && ls_at_ctl_env.one_slot_send_len > 0)
     {
         if(get_con_status(ls_at_ctl_env.transparent_conidx)==false)
@@ -432,7 +451,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     {
         array_idx = search_client_conidx(con_idx);
     }
-    LS_ASSERT(array_idx != 0xff);
+    // LS_ASSERT(array_idx != 0xff);
     //LOG_I("con_idx = %d", con_idx);
     switch (type)
     {
@@ -708,8 +727,8 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         LOG_HEX(addr, sizeof(addr));
 
         dev_manager_add_service(&ls_uart_server_svc);
-        ls_uart_server_init();
-        ls_uart_client_init();
+        ls_uart_server_init(0xff);
+        ls_uart_client_init(0xff);
     }
     break;
     case SERVICE_ADDED:
