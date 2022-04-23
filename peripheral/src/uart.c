@@ -403,7 +403,10 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
         if ((isrflags & UART_IT_TC) != 0)
         {
             huart->UARTX->ICR = UART_IT_TC;
-            UART_EndTransmit_IT_DMA(huart);
+            if(REG_FIELD_RD(huart->UARTX->SR,UART_SR_BUSY) == 0)
+            {
+                UART_EndTransmit_IT_DMA(huart);
+            }
         }
     }else
     {
@@ -415,7 +418,10 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
         if ((isrflags & UART_IT_TC) != 0)
         {
             huart->UARTX->ICR = UART_IT_TC;
-            UART_EndTransmit_IT(huart);
+            if(REG_FIELD_RD(huart->UARTX->SR,UART_SR_BUSY) == 0)
+            {
+                UART_EndTransmit_IT(huart);
+            }
         }
     }
     /* UART in mode Receive ------------------------------------------------*/
