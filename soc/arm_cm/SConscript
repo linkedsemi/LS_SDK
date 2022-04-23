@@ -15,7 +15,7 @@ else:
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
     env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '
-    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
+    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,--print-memory-usage -Wl,-Map=${TARGET.base}.map -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 SConscript(dirs=env['IC'],exports = ['env'])
