@@ -590,10 +590,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         if ((search_idx = search_conidx(con_idx)) != 0xff)
         {
             uart_server_connected_num--;
-            ls_uart_server_init(search_idx);
             disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_SLAVE);
-            con_idx_array[search_idx] = CON_IDX_INVALID_VAL;        
-            uart_server_mtu_array[search_idx] = UART_SERVER_MTU_DFT;
+            ls_uart_server_init(search_idx);
             if (uart_server_connected_num == UART_SERVER_MASTER_NUM - 1)
             {
                 start_adv();
@@ -602,10 +600,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         else if ((search_idx = search_client_conidx(con_idx)) != 0xff)
         {
             uart_client_connected_num--;
-            ls_uart_client_init(search_idx);
             disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_MASTER);
-            con_idx_client_array[search_idx] = CON_IDX_INVALID_VAL;        
-            uart_client_mtu_array[search_idx] = UART_SERVER_MTU_DFT;
+            ls_uart_client_init(search_idx);
             if (uart_client_connected_num < UART_CLIENT_NUM )
             {
                 start_scan();
