@@ -16,12 +16,12 @@
 #define LDO_START_STAGE_ANCHOR (3)
 #define AFC_CAL_STAGE_ANCHOR (29)
 #define GAIN_CAL_STAGE_ANCHOR (84)
-#define PLL_LOCK_STAGE_ANCHOR (80)
+#define PLL_LOCK_STAGE_ANCHOR (9)
 #define PA_EN_ANCHOR (PLL_LOCK_STAGE_ANCHOR - 9)
 
-static uint16_t package_id=0;
+static uint16_t package_id;
 static uint8_t user_rf_power=INVALID_POWER_VALUE;
-
+static uint8_t gain_threshold[2];
 uint8_t   pll_int_vtxd_ext;
 struct {
     uint8_t ldo_tx_trim:3,
@@ -263,7 +263,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PA_VB_SEL,0)  //  0-rf_ctl      1-cs_ctl
                | FIELD_BUILD(RF_PA_VB_TARGET,0xf) 
                | FIELD_BUILD(RF_LDO_START_CNT,LDO_START_STAGE_ANCHOR)
-               | FIELD_BUILD(RF_PA_STEP_SET,2);
+               | FIELD_BUILD(RF_PA_STEP_SET,11);
     RF->REG54 = FIELD_BUILD(RF_AFC_MIN_CNT,AFC_CAL_STAGE_ANCHOR)
                 | FIELD_BUILD(RF_AFC_MAX_CNT,AFC_CAL_STAGE_ANCHOR+1)
                 | FIELD_BUILD(RF_GAIN_MAX_CNT,GAIN_CAL_STAGE_ANCHOR)
@@ -275,8 +275,8 @@ static void rf_reg_init()
     RF->REG5C = FIELD_BUILD(RF_EN_PA_STG1_CNT,PA_EN_ANCHOR) 
                | FIELD_BUILD(RF_EN_PA_STG2_CNT,PA_EN_ANCHOR)
                | FIELD_BUILD(RF_PLL_LOCK_CNT,PLL_LOCK_STAGE_ANCHOR)
-               | FIELD_BUILD(RF_EN_RX_CNT,0x2);
-    RF->REG60 = FIELD_BUILD(RF_EN_AGC_CNT,6)|
+               | FIELD_BUILD(RF_EN_RX_CNT,0);
+    RF->REG60 = FIELD_BUILD(RF_EN_AGC_CNT,0)|
                 FIELD_BUILD(RF_TX_START_CNT,0)|
                 FIELD_BUILD(RF_TX_WAIT_CNT,0)|
                 FIELD_BUILD(RF_RX_START_CNT,0);
@@ -292,13 +292,19 @@ static void rf_reg_init()
     switch (package_id)
     {
     case 0x1603:
-        REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 8);
+        REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 18);
+		gain_threshold[0] = 0x22;
+		gain_threshold[1] = 0x1e;
     break;
     case 0x3202:
-        REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 16);//LP 16  HP 9
+        REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 11);//LP 16  HP 9
+		gain_threshold[0] = 0x20;
+		gain_threshold[1] = 0x1e;
     break;
     case 0x4803:
         REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 12);
+		gain_threshold[0] = 0x20;
+		gain_threshold[1] = 0x1e;
     break;
     default:
     break;
@@ -424,10 +430,10 @@ void rf_reg_config(uint8_t idx,uint8_t format,uint16_t rate)
     switch(rate)
     {
     case 0:
-        REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,0x20);
+        REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,gain_threshold[0]);
     break;
     case 1:
-        REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,0x1E);
+        REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,gain_threshold[1]);
     break;
     default:
 
