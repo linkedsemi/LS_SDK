@@ -87,11 +87,5 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
 void UART_Transmit_IT_DMA(UART_HandleTypeDef *huart)
 {
     huart->UARTX->IDR = UART_IT_TXS;
-    huart->UARTX->IER = UART_IT_TC;
-}
-
-void UART_EndTransmit_IT_DMA(UART_HandleTypeDef *huart)
-{
-    huart->UARTX->IDR = UART_IT_TC;
     HAL_UART_DMA_TxCpltCallback(huart);
 }
