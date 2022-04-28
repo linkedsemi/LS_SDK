@@ -12,11 +12,12 @@ SECTIONS
     }>RAM AT>FLASH
 
     __data_lma__ = __vector_lma__ + SIZEOF(.vector);
-    
-    .data :
+
+    __data_start__ = DEFINED(__mesh_stack_bss_end__)? __mesh_stack_bss_end__ : DEFINED(__stack_bss_end__)? __stack_bss_end__ : 0xc0;
+
+    .data __data_start__ :
     {
         . = ALIGN(4);
-        __data_start__ = .;
         *(.data*)
         *(.xip_banned)
 		*(vtable)
@@ -116,13 +117,11 @@ SECTIONS
     .stack_dummy (NOLOAD):
     {
         *(.stack*)
+        __StackTop = .;
     } > RAM
 
     /* Set stack top to end of RAM, and stack limit move down by
      * size of stack_dummy section */
-    PROVIDE(__stack_data_start__ = ORIGIN(RAM) + LENGTH(RAM));
-    PROVIDE(__mesh_stack_data_start__ = __stack_data_start__);
-    __StackTop = __mesh_stack_data_start__;
     __StackLimit = __StackTop - SIZEOF(.stack_dummy);
     PROVIDE(__stack = __StackTop);
     

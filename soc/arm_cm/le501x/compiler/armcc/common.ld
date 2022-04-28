@@ -6,17 +6,17 @@
 #define RAM_SIZE 0xc000
 #define RAM_END (RAM_BASE + RAM_SIZE)
 #define RESET_RETAIN_VALID_START_ADDR 0x6EA8
-#define RESET_RETAIN_VALID_ENMD_ADDR 0xB800
-
+#define RESET_RETAIN_VALID_END_ADDR 0xB800
+#define MESH_STACK_BSS_END 0x828
+#define BLE_STACK_BSS_END 0x744
 LR_FLASH FLASH_BASE_USER FLASH_SIZE{
     VECTOR_CODE RAM_BASE{
         *(RESET, +First)
     }
-    
-    RAM_DATA_CODE +0 RAM_SIZE{
+	
+    RAM_DATA_CODE defined(__mesh_stack_bss_end__)?MESH_STACK_BSS_END:defined(__stack_bss_end__)?BLE_STACK_BSS_END:ImageLimit(VECTOR_CODE){
         *(+RW)
         *(.xip_banned)
-		*(:gdef:__aeabi_memcpy)
     }
     
     FLASH_CODE FLASH_BASE_USER+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE) ALIGN 0x4{
@@ -39,7 +39,7 @@ LR_FLASH FLASH_BASE_USER FLASH_SIZE{
     {
         
     }
-    ScatterAssert(ImageLimit(RESET_RETAIN_DATA)<=RESET_RETAIN_VALID_ENMD_ADDR)
+    ScatterAssert(ImageLimit(RESET_RETAIN_DATA)<=RESET_RETAIN_VALID_END_ADDR)
     RW_IRAM6 0x0000A000 UNINIT 0x2000 { 
         *(DMAC1)
         *(DMARAM)
