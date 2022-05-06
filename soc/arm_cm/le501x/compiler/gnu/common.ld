@@ -96,6 +96,7 @@ SECTIONS
         __end__ = .;
         PROVIDE(end = .);
         *(.heap*)
+        __HeapLimit = .;
     } > RAM
     reset_retain_addr = MAX(__HeapLimit , 0x6AE8);
     .reset_retain reset_retain_addr (NOLOAD):
