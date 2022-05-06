@@ -22,11 +22,9 @@ def plf_postaction(self,target):
 def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
     start_src = []
     if with_startup:
-        start_src = self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
-            'arm_cm/le501x/compiler/$COMPILER/startup.S',
-        ])
+        start_src = ['$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/startup.S']
     sdk_src = []
-    sdk_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
         'arm_cm/svcall.c',
         'arm_cm/systick.c',
         'arm_cm/swint_handler.c',
@@ -59,8 +57,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/le501x/sleep.c',
         'arm_cm/le501x/sys_stat.c',
         'arm_cm/le501x/sw_timer_port.c',
-    ])
-    sdk_src += self.variant_dir_add_source('build/$IC/peripheral/','$SDK_ROOT/peripheral/',[
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/peripheral/',x),[
         'src/flash_svcall.c',
         'src/adc_dma.c',
         'src/calc_div.c',
@@ -86,8 +84,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'src/uart_dma.c',
         'src/uart.c',
         'src/lsecc.c',
-    ])
-    sdk_src += self.variant_dir_add_source('build/$IC/module/','$SDK_ROOT/module/',[
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',
         'common/circular_doubly_linked_list.c',
         #'common/linked_async_framework.c',
@@ -109,10 +107,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         #'adpcm/adpcm.c',
         #'micro-ecc/uECC.c',
         'ble/ble_common_api.c',
-    ])
-    self.add_include('$SDK_ROOT/',[
-        '.',
-        'peripheral/inc',
+    ]))
+    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),['peripheral/inc',
         'peripheral/api',
         'module/common',
         #'module/calendar',
@@ -131,10 +127,10 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'soc/arm_cm/cmsis',
         'soc/arm_cm/le501x',
         'soc/arm_cm/le501x/integration',
-    ])
+    ]))
     rtos_src = []
     if not rtos is None:
-        rtos_src = self.variant_dir_add_source('build/$IC/rtos/','$SDK_ROOT/rtos/freertos/',[
+        rtos_src = list(map(lambda x:os.path.join('$SDK_ROOT/rtos/freertos/',x),[
             'croutine.c',
             'event_groups.c',
             'list.c',
@@ -143,20 +139,16 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
             'tasks.c',
             'timers.c',
             'heap_4.c',
-        ])
-        rtos_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
-            'arm_cm/le501x/compiler/$COMPILER/port.c',
-            # 'arm_cm/le501x/freertos_adapt.c',
-        ])
+        ]))
         if ble:
-            rtos_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
-                'arm_cm/le501x/freertos_adapt_ble.c',
-            ])
+            rtos_adapt = 'arm_cm/le501x/freertos_adapt_ble.c'
         else:
-            rtos_src += self.variant_dir_add_source('build/$IC/soc/','$SDK_ROOT/soc/',[
-                'arm_cm/le501x/freertos_adapt_mcu.c',
-            ])
-        self.add_include('$SDK_ROOT/',['rtos/freertos/include'])
+            rtos_adapt = 'arm_cm/le501x/freertos_adapt_mcu.c'
+        rtos_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+            'arm_cm/le501x/compiler/$COMPILER/port.c',
+            rtos_adapt,
+        ]))
+        inc_list += ['$SDK_ROOT/rtos/freertos/include']
     if mesh:
         self.Append(LIBS = [File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
         self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
@@ -174,7 +166,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         if self.get('LINKSCRIPT') is None:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mcu.ld"))
     self.Append(LIBPATH = [self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/")])
-    target =  self.Program('build/le501x/'+name,sdk_src + start_src + app_src + rtos_src,OBJPREFIX = objprefix)
+    self.Append(CPPPATH = self.inc_dirs(inc_list))
+    target = self.Program('build/le501x/'+name,self.variant_dir_source(sdk_src + start_src + app_src + rtos_src),OBJPREFIX = objprefix)
     self.Depends(target,[self['LINKSCRIPT'],self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/common.ld")])
     return target
 
