@@ -472,5 +472,12 @@ void modem_rf_init_24g(void)
 
 void modem_rf_set_rx_phy(uint8_t phy)
 {
-    REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, phy);  
+    if (phy != PROP_24G_PHY_2MBPS)
+    {
+        REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, PROP_24G_PHY_1MBPS);
+    }
+    else
+    {
+        REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, PROP_24G_PHY_2MBPS);
+    }
 }
