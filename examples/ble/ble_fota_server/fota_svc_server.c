@@ -64,7 +64,7 @@ struct fotas_env_tag
     uint16_t start_hdl;
     uint16_t current_sector;
     uint16_t cccd_config;
-    uint8_t sector_buf[FOTAS_SECTOR_SIZE/FOTAS_PAGE_SIZE][FOTAS_PAGE_SIZE];
+    // uint8_t sector_buf[FOTAS_SECTOR_SIZE/FOTAS_PAGE_SIZE][FOTAS_PAGE_SIZE];
     uint8_t ack[FOTAS_ACK_BUF_LENGTH_MAX];
     uint8_t conidx;
 };
@@ -273,15 +273,6 @@ static bool fw_digest_check(void)
     LOG_HEX(fotas_env.digest.data,TC_SHA256_DIGEST_SIZE);
     return memcmp(digest,fotas_env.digest.data,TC_SHA256_DIGEST_SIZE) ? false : true;
 }
-static void program_last_sector_to_flash(void)
-{
-    uint8_t i;
-    for(i = 0; i< FOTAS_SECTOR_SIZE/FOTAS_PAGE_SIZE ; ++i)
-    {
-        spi_flash_quad_page_program(fotas_env.new_image.base - FLASH_BASE_ADDR + fotas_env.current_sector * FOTAS_SECTOR_SIZE +
-            i*FOTAS_PAGE_SIZE, fotas_env.sector_buf[i], FOTAS_PAGE_SIZE);
-    }
-}
 static void foats_read_cfm_send(uint8_t con_idx, uint16_t handle, uint8_t status, uint8_t *data, uint16_t length)
 {
     gatt_manager_server_read_req_reply(con_idx, handle, status, data, length);
@@ -374,10 +365,6 @@ static uint8_t ctrl_pkt_dispatch(const uint8_t *data,uint16_t length,uint8_t con
     break;
     case FOTAS_NEW_SECTOR_CMD:
     {
-        if(ctrl->u.new_sector.sector_idx)
-        {
-            program_last_sector_to_flash();
-        }
         fotas_env.current_sector = ctrl->u.new_sector.sector_idx;
         memset(fotas_env.ack,0,FOTAS_ACK_BUF_LENGTH_MAX);
         //LOG_I("new sector,%d,%d",fotas_env.current_sector,fotas_env.start_hdl);
@@ -385,12 +372,6 @@ static uint8_t ctrl_pkt_dispatch(const uint8_t *data,uint16_t length,uint8_t con
     break;
     case FOTAS_INTEGRITY_CHECK_REQ:
     {
-        uint16_t last_sector_size = fotas_env.new_image.size % FOTAS_SECTOR_SIZE;
-        if(last_sector_size)
-        {
-            memset((uint8_t *)fotas_env.sector_buf + last_sector_size, 0xff, FOTAS_SECTOR_SIZE - last_sector_size);
-        }
-        program_last_sector_to_flash();
         fotas_env.finish_ind->integrity_checking_result = fw_digest_check();
         uint8_t digest_check_status = fotas_env.finish_ind->integrity_checking_result ? 0 : 0x80;
         fotas_integrity_check_rsp_ind_send(conidx, digest_check_status);
@@ -435,8 +416,36 @@ void ls_ota_server_write_req_ind(struct gatt_server_write_req *wr_req, uint8_t c
         {
             len = fotas_env.segment_data_max_length;
         }
-        LOG_I("segment:%d,dst %x,%d",ptr->segment_id,(uint8_t *)fotas_env.sector_buf + ptr->segment_id*fotas_env.segment_data_max_length,length);
-        memcpy((uint8_t *)fotas_env.sector_buf + ptr->segment_id*fotas_env.segment_data_max_length, ptr->data, len);
+        uint8_t *data_ptr = ptr->data;
+        uint32_t start_addr = fotas_env.new_image.base - FLASH_BASE_ADDR + fotas_env.current_sector * FOTAS_SECTOR_SIZE + ptr->segment_id * fotas_env.segment_data_max_length;
+        LOG_I("segment:%d,start_addr %x,%d",ptr->segment_id,start_addr,length);
+        uint32_t end_addr = start_addr + len;
+        uint32_t page_aligned_addr = (start_addr + FOTAS_PAGE_SIZE) & ~(FOTAS_PAGE_SIZE - 1);
+        uint16_t pro_len;
+        if (end_addr > page_aligned_addr)
+        {
+            pro_len = page_aligned_addr - start_addr;
+            spi_flash_quad_page_program(start_addr, data_ptr, pro_len);
+            start_addr += pro_len;
+            data_ptr += pro_len;
+            len -= pro_len;
+            while (len >= FOTAS_PAGE_SIZE)
+            {
+                spi_flash_quad_page_program(start_addr, data_ptr, FOTAS_PAGE_SIZE);
+                start_addr += FOTAS_PAGE_SIZE;
+                data_ptr += FOTAS_PAGE_SIZE;
+                len -= FOTAS_PAGE_SIZE;
+            }
+            if (len > 0)
+            {
+                spi_flash_quad_page_program(start_addr, data_ptr, len);
+            }
+        }
+        else
+        {
+            spi_flash_quad_page_program(start_addr, data_ptr, len);
+        }
+        
         fotas_env.ack[ptr->segment_id/8] |= 1<< ptr->segment_id % 8;
         LOG_I("ack[%d] = 0x%x",ptr->segment_id/8,fotas_env.ack[ptr->segment_id/8]);
     }
