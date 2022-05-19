@@ -303,6 +303,18 @@ le501x_adc_analog_wdg_keil_build:
   script:
     - cd examples/peripheral/adc/adc_analog_wdg/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_analog_wdg.uvprojx -o UVBuild/build.txt -j0
 
+le501x_adc_amic_sampling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adc/adc_amic_sampling && scons
+
+le501x_adc_amic_sampling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adc/adc_amic_sampling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_amic_sampling.uvprojx -o UVBuild/build.txt -j0
+
 le501x_adc_blocking_sampling_build:
   stage: build
   script:

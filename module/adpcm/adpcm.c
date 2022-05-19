@@ -13,6 +13,8 @@ static const uint16_t StepSizeTable[89]={7,8,9,10,11,12,13,14,16,17,
                             15289,16818,18500,20350,22385,24623,27086,29794,32767};
 /* Table of index changes */
 static const int8_t IndexTable[16]={0xff,0xff,0xff,0xff,2,4,6,8,0xff,0xff,0xff,0xff,2,4,6,8};
+/* Intel ADPCM step variation table */
+// static const int8_t IndexTable[16]={-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
 
 /* Global ADPCM values for google TV remoter */
 google_tv_audio_adpcm gAudioAdpcmVal; 
@@ -215,7 +217,7 @@ void Adpcm_FrameDecode(int16_t *PCMBuffer, const void *EncodeBuffer, int32_t Len
 	const uint8_t *pCode;
 	
 	HighBits = 0;
-	pCode = EncodeBuffer;
+	pCode = (uint8_t *)EncodeBuffer;
 	for (i=0; i<Len; i++) {
 		if (HighBits) {
 			Code = *pCode >> 4;

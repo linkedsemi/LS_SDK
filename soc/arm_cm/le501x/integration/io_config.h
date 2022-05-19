@@ -10,9 +10,17 @@
 /** \addtogroup GPIO
  *  @{
  */
- 
+
+/**@brief IO output drive capability type */
+typedef enum
+{
+    IO_OUTPUT_QUARTER_DRIVER = 0, //1/4 output drive capability, range is 0~1
+    IO_OUTPUT_HALF_DRIVER = 2,    //1/2 output drive capability
+    IO_OUTPUT_MAX_DRIVER = 3,     //MAX output drive capability
+}io_drive_type_t;
+
 /**@brief IO pull type */
-typedef enum 
+typedef enum
 {
     IO_PULL_DISABLE,
     IO_PULL_UP,
@@ -193,6 +201,23 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull);
   * @retval GPIO pullup and pulldown state This parameter can be a value of @ref io_pull_type_t    
   */
 io_pull_type_t io_pull_read(uint8_t pin);
+
+/**
+  * @brief set GPIO drive capability
+  * @param  pin  Specific GPIO pin
+  * @param drive Configure the GPIO drive capability, This parameter can be a value of @ref io_drive_type_t
+  */
+void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive);
+
+/**
+  * @brief read GPIO drive capability
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO drive capability, This parameter can be a value of @ref io_drive_type_t
+  *              0/1 means 1/4 output drive capability
+  *              2 means 1/2 output drive capability
+  *              3 means MAX output drive capability
+  */
+io_drive_type_t io_drive_capacity_read(uint8_t pin);
 
 /**
   * @brief GPIO external interrupt enable 
