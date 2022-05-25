@@ -3,7 +3,7 @@
 #if (ROM_CODE==1 || BOOT_RAM==1 || defined(FLASH_PROG_ALGO))
     .section .text.arm_cm_delay_asm,"x"
 #else
-    .section .xip_banned,"x"
+    .section .xip_banned,"ax"
 #endif
     .thumb
     .thumb_func

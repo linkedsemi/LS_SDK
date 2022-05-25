@@ -2,6 +2,7 @@ import os
 import sys
 Import('env')
 env['CPU'] = 'cortex-m0'
+env['LLVM_CFG'] = 'armv6m_soft_nofp_nosys.cfg'
 
 def plf_postaction(self,target):
     if 'progen' in self['TOOLS']:
