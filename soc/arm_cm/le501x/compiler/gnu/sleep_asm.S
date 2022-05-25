@@ -1,7 +1,7 @@
     .syntax unified
     .arch armv6-m
     
-    .section .xip_banned,"x"
+    .section .xip_banned,"ax"
     .thumb
     .thumb_func
     .globl cpu_sleep_asm
@@ -18,7 +18,7 @@ cpu_sleep_asm:
     WFI
     .size	cpu_sleep_asm, . - cpu_sleep_asm
 
-    .section .xip_banned,"x"
+    .section .xip_banned,"ax"
     .thumb
     .thumb_func
     .globl cpu_recover_asm
