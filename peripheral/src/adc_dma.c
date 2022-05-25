@@ -38,7 +38,7 @@ static void ADC_DMA_Callback(void *hdma,uint32_t param)
     }
     
     /* Conversion complete callback */
-    hadc->Env.DMA.Callback();
+    hadc->Env.DMA.Callback(hadc);
   }
   else
   {
@@ -47,7 +47,7 @@ static void ADC_DMA_Callback(void *hdma,uint32_t param)
   }
 }
 
-HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)())
+HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length, void (*Callback)(ADC_HandleTypeDef* hadc))
 {
     HAL_StatusTypeDef tmp_hal_status = HAL_OK;
      

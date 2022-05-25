@@ -956,6 +956,21 @@ io_pull_type_t io_pull_read(uint8_t pin)
     return pull;
 }
 
+void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    MODIFY_REG(gpiox->OD, GPIO_OD0_MASK << 2*x->num, drive << 2*x->num);
+}
+
+io_drive_type_t io_drive_capacity_read(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    io_drive_type_t drive = (io_drive_type_t)((gpiox->OD >> 2 * x->num ) & GPIO_OD0_MASK);
+    return drive;
+}
+
 void io_exti_config(uint8_t pin,exti_edge_t edge)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;

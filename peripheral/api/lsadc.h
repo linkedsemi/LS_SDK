@@ -115,7 +115,7 @@ typedef struct
                                    This parameter can be set to ENABLE or DISABLE */
     uint32_t HighThreshold;  /*!< Configures the ADC analog watchdog High threshold value.
                                    This parameter must be a number between Min_Data = 0x000 and Max_Data = 0xFFF. */
-    uint32_t LowThreshold;   /*!< Configures the ADC analog watchdog High threshold value.
+    uint32_t LowThreshold;   /*!< Configures the ADC analog watchdog Low threshold value.
                                    This parameter must be a number between Min_Data = 0x000 and Max_Data = 0xFFF. */
     uint32_t WatchdogNumber; /*!< Reserved for future use, can be set to 0 */
 } ADC_AnalogWDGConfTypeDef;
@@ -162,9 +162,10 @@ typedef struct
 /**
   * @brief  ADC DMA Environment 
   */
+ struct __ADC_HandleTypeDef;
  struct AdcDMAEnv
 {
-    void                          (*Callback)();
+    void                          (*Callback)(struct __ADC_HandleTypeDef *);
     uint8_t                       DMA_Channel;
 };
 
@@ -851,7 +852,7 @@ HAL_StatusTypeDef HAL_ADCEx_InjectedStop_IT(ADC_HandleTypeDef* hadc);
   * @param  Length: The length of data to be transferred from ADC peripheral to memory.
   * @retval HAL status.
   */
- HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)());
+ HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length, void (*Callback)(ADC_HandleTypeDef* hadc));
 
  /**
   * @brief  Stop ADC conversion of regular group (and injected group in 
