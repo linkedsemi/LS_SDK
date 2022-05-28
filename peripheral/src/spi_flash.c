@@ -147,6 +147,17 @@ void spi_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length)
     }
 }
 
+void spi_flash_multi_io_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+{
+    if(spi_flash_dual_mode_get())
+    {
+        spi_flash_dual_page_program(offset,data,length);
+    }else
+    {
+        spi_flash_quad_page_program(offset,data,length);
+    }
+}
+
 void spi_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 {
     spi_flash_program_operation(offset,data,length,QUAD_WIRE);

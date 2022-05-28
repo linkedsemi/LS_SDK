@@ -62,6 +62,8 @@ bool spi_flash_write_in_process(void);
  */
 void spi_flash_write_status_register(uint16_t status);
 
+void spi_flash_multi_io_page_program(uint32_t offset,uint8_t *data,uint16_t length);
+
 void spi_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length);
 
 /** \brief Quad Page Program 
