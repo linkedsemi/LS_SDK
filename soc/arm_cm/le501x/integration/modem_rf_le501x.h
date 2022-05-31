@@ -3,6 +3,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+enum rf_tx_pwr
+{
+    TX_N8DBM = -2,
+    TX_N4DBM = -1,
+    TX_0DBM = 0,
+    TX_3DBM,
+    TX_5DBM,
+    TX_7DBM,
+    TX_12DBM_PAHP,
+};
+
 uint8_t rf_txpwr_dbm_get(uint8_t txpwr_idx, uint8_t modulation);
 
 void rf_reset(void);
@@ -21,7 +32,7 @@ void modem_rf_reinit(void);
 
 void modem_rf_init(void);
 
-void rf_set_power(uint8_t tx_power);
+void rf_set_power(enum rf_tx_pwr tx_power);
 
 void tempsensor_ldo_init(void);
 

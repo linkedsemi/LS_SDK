@@ -592,7 +592,7 @@ static void at_tx_power_handler(uint8_t *p_cmd_parse)
             break;
         case '=':
             ls_at_buff_env.default_info.rfpower = atoi((const char *)p_cmd_parse);
-            if(ls_at_buff_env.default_info.rfpower > 16)
+            if(ls_at_buff_env.default_info.rfpower > TX_12DBM_PAHP)
                 msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nERR\r\n",ls_at_buff_env.default_info.rfpower);
             else
             {

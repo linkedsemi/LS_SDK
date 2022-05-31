@@ -5,13 +5,11 @@
 #include "reg_mdm2.h"
 #include "reg_syscfg.h"
 #include "spi_flash.h"
-#define RF_GAIN_TBL_SIZE           (8)
+#include "ls_dbg.h"
 #define RF_PWR_TBL_SIZE            (8)
 
-#define PLL_GAIN_CAL_FRQ_DIS0  20
 #define FLASH_SECURITY_AREA_INDEX_1 1
 #define SECURITY_AREA_PACKAGEID_OFFSET 0x24
-#define INVALID_POWER_VALUE 0xff 
 
 #define LDO_START_STAGE_ANCHOR (3)
 #define AFC_CAL_STAGE_ANCHOR (29)
@@ -20,9 +18,8 @@
 #define PA_EN_ANCHOR (PLL_LOCK_STAGE_ANCHOR - 9)
 
 static uint16_t package_id;
-static uint8_t user_rf_power=INVALID_POWER_VALUE;
+static enum rf_tx_pwr user_rf_power;
 static uint8_t gain_threshold[2];
-uint8_t   pll_int_vtxd_ext;
 struct {
     uint8_t ldo_tx_trim:3,
             ldo_rx_trim:3;
@@ -240,16 +237,16 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_AGC_TEST_S,0)
                | FIELD_BUILD(RF_PA_MN_TUNE,0)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_TH,0x20)
-               | FIELD_BUILD(RF_PLL_VTXD_EXT,pll_int_vtxd_ext)
+               | FIELD_BUILD(RF_PLL_VTXD_EXT,0)
                | FIELD_BUILD(RF_PLL_VTXD_EXT_EN,0)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_EN,0)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_DC,1);
     RF->REG30 = FIELD_BUILD(RF_RSV,0x44)
-               | FIELD_BUILD(RF_LDO_PA_TRIM,6)
+               | FIELD_BUILD(RF_LDO_PA_TRIM,1)
                | FIELD_BUILD(RF_EN_LMT_OUTI_EXT,1)
                | FIELD_BUILD(RF_EN_LMT_OUTQ_EXT,1)
                | FIELD_BUILD(RF_PAHP_SEL,0)
-               | FIELD_BUILD(RF_LDO_PAHP_TRIM,0)
+               | FIELD_BUILD(RF_LDO_PAHP_TRIM,0xf)
                | FIELD_BUILD(RF_EN_AT,0)
                | FIELD_BUILD(RF_PAHP_ADJ,0xf);
     RF->REG50 = FIELD_BUILD(RF_ANA_TEST_EN,0)
@@ -285,8 +282,8 @@ static void rf_reg_init()
     RF->REG70 = FIELD_BUILD(RF_RX2MBW_FORCE_EN,0)
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR1,0x19)
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR0,0xc)
-               | FIELD_BUILD(RF_INT_VTXD_EXT2,pll_int_vtxd_ext)
-               | FIELD_BUILD(RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
+               | FIELD_BUILD(RF_INT_VTXD_EXT2,0)
+               | FIELD_BUILD(RF_INT_VTXD_EXT1,0);
 
 
     switch (package_id)
@@ -370,36 +367,54 @@ static void rf_reg_retention()
     rf_ret.ldo_rx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_RX_TRIM);
 }
 
-void rf_set_power(uint8_t tx_power)
+static void tx_pwr_config()
 {
-    user_rf_power = tx_power;
-    if(tx_power == 0x10)
+    if(user_rf_power == TX_12DBM_PAHP)
     {
-        REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,1);
-        REG_FIELD_WR(RF->REG30,RF_LDO_PAHP_TRIM,0xf);
-        REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x3); //0x0f
-        REG_FIELD_WR(RF->REG2C,RF_PA_MN_TUNE,0xa);
         REG_FIELD_WR(RF->REG00,RF_EN_PAHP,1);
-    }
-    else if(tx_power < 0x10)
+        REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,1);
+    }else
     {
         REG_FIELD_WR(RF->REG00,RF_EN_PAHP,0);
         REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,0);
-        REG_FIELD_WR(RF->REG30,RF_LDO_PAHP_TRIM,0);
-        REG_FIELD_WR(RF->REG2C,RF_PA_MN_TUNE,3);
-        REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,(((15-tx_power)<=3)?3:(((15-tx_power)<=8)?5:10))); //0x0f
-        REG_FIELD_WR(RF->REG50,RF_PA_VB_TARGET,tx_power);
+        switch(user_rf_power)
+        {
+        case TX_N8DBM:
+            REG_FIELD_WR(RF->REG08,RF_PA_TANK_Q_ADJ,7);
+        break;
+        case TX_N4DBM:
+            REG_FIELD_WR(RF->REG08,RF_PA_TANK_Q_ADJ,3);
+        break;
+        case TX_0DBM:
+            REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,1);
+        break;
+        case TX_3DBM:
+            REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,2);
+        break;
+        case TX_5DBM:
+            REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,4);
+        break;
+        case TX_7DBM:
+            REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,7);
+        break;
+        default:
+            LS_ASSERT(0);
+        break;
+        }
     }
+}
+
+void rf_set_power(enum rf_tx_pwr tx_power)
+{
+    user_rf_power = tx_power;
+    tx_pwr_config();
 }
 
 void modem_rf_reinit()
 {
     rf_reg_init();
     modem_reg_init();
-    if (user_rf_power !=INVALID_POWER_VALUE)
-    {
-       rf_set_power(user_rf_power);
-    }
+    tx_pwr_config();
 }
 
 void modem_rf_init()
