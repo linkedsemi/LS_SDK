@@ -1,10 +1,3 @@
-/**
-  ******************************************************************************
-  * @file    hal_lsadc.h
-  * @author  AE Team
-  * @brief   Header file of ADC HAL module.
-  ******************************************************************************
-  */
 #ifndef _LSADC_H_
 #define _LSADC_H_
 #include <stdbool.h>
@@ -54,9 +47,9 @@ typedef struct
                                                 This parameter must be a number between Min_Data = 1 and Max_Data = 8. */
     uint32_t TrigType;                     /*!< Selects the external event used to trigger the conversion start of regular group. */
 
-    uint32_t Vref;                         /*!< Select ADC reference voltage, please refer to the type @ref enum ADC_Vref_TypeDef*/
+    uint32_t Vref;                         /*!< Select ADC reference voltage, please refer to the type ADC_Vref_TypeDef*/
 
-    uint32_t AdcDriveType;                 /*!< Select ADC Driving mode, please refer to the type @ref  enum ADC_Drv_TypeDef*/
+    uint32_t AdcDriveType;                 /*!< Select ADC Driving mode, please refer to the type ADC_Drv_TypeDef*/
 
     uint32_t AdcCkDiv;                     /*!< ADC division coefficient ranges from 1 to 128 */
 } ADC_InitTypeDef;
@@ -68,9 +61,9 @@ typedef struct
 typedef struct 
 {
   uint32_t InjectedChannel;                       /*!< Selection of ADC channel to configure
-                                                       This parameter can be a value of @ref ADC_channels */
+                                                       This parameter can be a value of ADC_channels */
   uint32_t InjectedRank;                          /*!< Rank in the injected group sequencer
-                                                       This parameter must be a value of @ref ADCEx_injected_rank*/
+                                                       This parameter must be a value of ADCEx_injected_rank*/
   uint32_t InjectedSamplingTime;                  /*!< Sampling time value to be set for the selected channel. */
 
   uint32_t InjectedOffset;                        /*!< Defines the offset to be subtracted from the raw converted data (for channels set on injected group only).
@@ -107,10 +100,10 @@ typedef struct
 typedef struct
 {
     uint32_t WatchdogMode;   /*!< Configures the ADC analog watchdog mode: single/all channels, regular/injected group.
-                                   This parameter can be a value of @ref ADC_analog_watchdog_mode. */
+                                   This parameter can be a value of ADC_analog_watchdog_mode. */
     uint32_t Channel;        /*!< Selects which ADC channel to monitor by analog watchdog.
                                    This parameter has an effect only if watchdog mode is configured on single channel (parameter WatchdogMode)
-                                   This parameter can be a value of @ref ADC_channels. */
+                                   This parameter can be a value of ADC_channels. */
     FunctionalState ITMode;  /*!< Specifies whether the analog watchdog is configured in interrupt or polling mode.
                                    This parameter can be set to ENABLE or DISABLE */
     uint32_t HighThreshold;  /*!< Configures the ADC analog watchdog High threshold value.
@@ -120,41 +113,39 @@ typedef struct
     uint32_t WatchdogNumber; /*!< Reserved for future use, can be set to 0 */
 } ADC_AnalogWDGConfTypeDef;
 
-
- /** @defgroup HAL ADC states definition
-  * @{
-  */
+ /**
+ *  @defgroup ADC_states_definition ADC states definition
+ */
 #define HAL_ADC_STATE_RESET 0x00000000U         /*!< ADC not yet initialized or disabled */
 #define HAL_ADC_STATE_READY 0x00000001U         /*!< ADC peripheral ready for use */
 #define HAL_ADC_STATE_BUSY_INTERNAL 0x00000002U /*!< ADC is busy to internal process  */
 #define HAL_ADC_STATE_TIMEOUT 0x00000004U       /*!< TimeOut occurrence */
 
- /** @defgroup States of ADC errors
-  * @{
-  */
+/**
+ *  @defgroup ADC_errors ADC errors
+ */
 #define HAL_ADC_STATE_ERROR_INTERNAL 0x00000010U /*!< Internal error occurrence */
 #define HAL_ADC_STATE_ERROR_CONFIG 0x00000020U   /*!< Configuration error occurrence */
 #define HAL_ADC_STATE_ERROR_DMA 0x00000040U      /*!< DMA error occurrence */
 
- /** @defgroup States of ADC group regular
-  * @{
-  */
+/**
+ *  @defgroup States_of_ADC_group_regular States of ADC group regular
+ */
 #define HAL_ADC_STATE_REG_BUSY 0x00000100U  /*!< A conversion on group regular is ongoing or can occur  */
 #define HAL_ADC_STATE_REG_EOC 0x00000200U   /*!< Conversion data available on group regular */
 #define HAL_ADC_STATE_REG_OVR 0x00000400U   /*!< Not available on  device: Overrun occurrence */
 #define HAL_ADC_STATE_REG_EOSMP 0x00000800U /*!< Not available on  device: End Of Sampling flag raised  */
 
-
-/** @defgroup States of ADC group injected
-  * @{
-  */
+/**
+ *  @defgroup States_of_ADC_group_injected States of ADC group injected
+ */
 #define HAL_ADC_STATE_INJ_BUSY 0x00001000U  /*!< A conversion on group injected is ongoing or can occur  */
 #define HAL_ADC_STATE_INJ_EOC 0x00002000U   /*!< Conversion data available on group injected */
 #define HAL_ADC_STATE_INJ_JQOVF 0x00004000U /*!< Not available on  device: Injected queue overflow occurrence */
 
-/** @defgroup States of ADC analog watchdogs
-  * @{
-  */
+/**
+ *  @defgroup States_of_ADC_analog_watchdogs States of ADC analog watchdogs
+ */ 
 #define HAL_ADC_STATE_AWD1 0x00010000U      /*!< Out-of-window occurrence of analog watchdog 1 */
 #define HAL_ADC_STATE_AWD2 0x00020000U      /*!< Not available on  device: Out-of-window occurrence of analog watchdog 2 */
 #define HAL_ADC_STATE_AWD3 0x00040000U      /*!< Not available on  device: Out-of-window occurrence of analog watchdog 3 */
@@ -228,9 +219,9 @@ typedef enum
 
 /* Exported constants --------------------------------------------------------*/
 
-/** @defgroup ADC_Error_Code ADC Error Code
-  * @{
-  */
+/** 
+ *  @defgroup ADC_Error_Code ADC Error Code
+*/
 #define HAL_ADC_ERROR_NONE 0x00U     /*!< No error                                              */
 #define HAL_ADC_ERROR_INTERNAL 0x01U /*!< ADC IP internal error: if problem of clocking, enable/disable, erroneous state                       */
 #define HAL_ADC_ERROR_OVR 0x02U      /*!< Overrun error                                         */
@@ -238,37 +229,31 @@ typedef enum
 #define HAL_ADC_ERROR_INVALID_CALLBACK (0x10U) /*!< Invalid Callback error */
 
 
-/** @defgroup ADC_Data_align ADC data alignment
-  * @{
-  */
+/** 
+ *  @defgroup ADC_Data_align ADC data alignment
+*/
 #define ADC_DATAALIGN_RIGHT 0x00000000U
 #define ADC_DATAALIGN_LEFT ((uint32_t)ADC_ALIGN_MASK)
-/**
-  * @}
-  */
 
-/** @defgroup ADC_Scan_mode ADC scan mode
-  * @{
-  */
+
+/**
+ *  @defgroup ADC_Scan_mode ADC scan mode
+*/
 #define ADC_SCAN_DISABLE 0x00000000U
 #define ADC_SCAN_ENABLE ((uint32_t)ADC_SCAN_MASK)
-/**
-  * @}
-  */
 
-/** @defgroup ADC_External_trigger_edge_Regular ADC external trigger enable 
-  * @{
-  */
+
+/** 
+ * @defgroup ADC_External_trigger_edge_Regular ADC external trigger enable 
+*/
 #define ADC_PIS_TRIG                       0x00000000U
 #define ADC_REGULAR_SOFTWARE_TRIGT         ADC_RTRIG_MASK
 #define ADC_INJECTED_SOFTWARE_TRIGT        ADC_JTRIG_MASK 
-/**
-  * @}
-  */
 
-/** @defgroup ADC Clock Division
-  * @{
-  */               
+
+/** 
+ *  @defgroup ADC_Clock_Division ADC Clock Division
+*/               
 #define ADC_CLOCK_DIV2          0x00000001U                 
 #define ADC_CLOCK_DIV4          0x00000002U                 
 #define ADC_CLOCK_DIV8          0x00000003U                 
@@ -277,9 +262,9 @@ typedef enum
 #define ADC_CLOCK_DIV64         0x00000006U                 
 #define ADC_CLOCK_DIV128        0x00000007U  
 
-/** @defgroup ADC_sampling_times ADC sampling times
-  * @{
-  */
+/** 
+ * @defgroup ADC_sampling_times ADC sampling times
+*/
 #define ADC_SAMPLETIME_1CYCLE   0x00000000U                 /*!< Sampling time 1 ADC clock cycle */
 #define ADC_SAMPLETIME_2CYCLES  0x00000001U                 /*!< Sampling time 2 ADC clock cycles */
 #define ADC_SAMPLETIME_4CYCLES  0x00000002U                 /*!< Sampling time 4 ADC clock cycles */
@@ -294,9 +279,6 @@ typedef enum
     ADC_VREF_EXPOWER,       /*!< External power */
     ADC_VREF_INSIDE,        /*!< inside power */
  };
-/**
-  * @}
-  */
 
 /** 
   * @brief  ADC conversion cycles
@@ -324,9 +306,9 @@ typedef enum
 #define ADC_CHANNEL_VREFINT         0x0000000BU  /* ADC internal channel (no connection on device pin) */
 
 
-/** @defgroup ADC_regular_rank ADC rank into regular group
-  * @{
-  */
+/** 
+ * @defgroup ADC_regular_rank ADC rank into regular group
+*/
 #define ADC_REGULAR_RANK_1                 0x00000001U
 #define ADC_REGULAR_RANK_2                 0x00000002U
 #define ADC_REGULAR_RANK_3                 0x00000003U
@@ -339,22 +321,18 @@ typedef enum
 #define ADC_REGULAR_RANK_10                0x0000000AU
 #define ADC_REGULAR_RANK_11                0x0000000BU
 #define ADC_REGULAR_RANK_12                0x0000000CU
-/**
-  * @}
-  */
-/** @defgroup ADCEx_injected_rank ADCEx rank into injected group
-  * @{
-  */
+
+/** 
+ * @defgroup ADCEx_injected_rank ADCEx rank into injected group
+*/
 #define ADC_INJECTED_RANK_1                           0x00000001U
 #define ADC_INJECTED_RANK_2                           0x00000002U
 #define ADC_INJECTED_RANK_3                           0x00000003U
 #define ADC_INJECTED_RANK_4                           0x00000004U
-/**
-  * @}
-  */
-/** @defgroup ADC_analog_watchdog_mode ADC analog watchdog mode
-  * @{
-  */
+
+/** 
+ * @defgroup ADC_analog_watchdog_mode ADC analog watchdog mode
+*/
 #define ADC_ANALOGWATCHDOG_NONE                             0x00000000U
 #define ADC_ANALOGWATCHDOG_SINGLE_REG           ((uint32_t)(ADC_AWDSGL_MASK | ADC_RAWDEN_MASK))
 #define ADC_ANALOGWATCHDOG_SINGLE_INJEC         ((uint32_t)(ADC_AWDSGL_MASK | ADC_JAWDEN_MASK))
@@ -362,25 +340,21 @@ typedef enum
 #define ADC_ANALOGWATCHDOG_ALL_REG              ((uint32_t)ADC_RAWDEN_MASK)
 #define ADC_ANALOGWATCHDOG_ALL_INJEC            ((uint32_t)ADC_JAWDEN_MASK)
 #define ADC_ANALOGWATCHDOG_ALL_REGINJEC         ((uint32_t)(ADC_RAWDEN_MASK | ADC_JAWDEN_MASK))
-/**
-  * @}
-  */
 
-/** @defgroup ADC_interrupts_definition ADC interrupts definition
-  * @{
-  */
+
+/** 
+ * @defgroup ADC_interrupts_definition ADC interrupts definition
+*/
 #define ADC_IT_EOC   ADC_REOCIE_MASK       /*!< ADC End of Regular Conversion interrupt source */
 #define ADC_IT_EOS   ADC_REOSIE_MASK       /*!< ADC regular end of sequence conversions interrupt source */
 #define ADC_IT_JEOC  ADC_JEOCIE_MASK       /*!< ADC End of Injected Conversion interrupt source */
 #define ADC_IT_JEOS  ADC_JEOSIE_MASK       /*!< ADC Injected end of sequence conversions interrupt source */
 #define ADC_IT_AWD   ADC_AWDIE_MASK        /*!< ADC Analog watchdog interrupt source */
-/**
-  * @}
-  */
 
-/** @defgroup ADC_flags_definition ADC flags definition
-  * @{
-  */
+
+/** 
+ * @defgroup ADC_flags_definition ADC flags definition
+*/
 #define ADC_FLAG_STRT   ADC_RSTRTC_MASK   /*!< ADC Regular group start flag */
 #define ADC_FLAG_JSTRT  ADC_JSTRTC_MASK   /*!< ADC Injected group start flag */
 #define ADC_FLAG_EOC    ADC_REOC_MASK     /*!< ADC End of Regular conversion flag */
@@ -390,13 +364,10 @@ typedef enum
 #define ADC_FLAG_AWD    ADC_AWD_MASK      /*!< ADC Analog watchdog flag */
 
 /** 
-  * @brief  ADC_Event_type ADC Event type
+  * @brief ADC Event type
   */
 #define ADC_AWD_EVENT ((uint32_t)ADC_FLAG_AWD) /*!< ADC Analog watchdog event */
 #define ADC_AWD1_EVENT ADC_AWD_EVENT /*!< ADC Analog watchdog 1 event: Alternate naming for compatibility with other devices having several analog watchdogs */
-/**
-  * @}
-  */
 
 
 /* Combination of all post-conversion flags bits: EOC/EOS, JEOC/JEOS, OVR, AWDx */
@@ -508,15 +479,14 @@ typedef enum
         (__HANDLE__)->MspDeInitCallback = NULL;    \
     } while (0)
 
-/**
-  * @}
-  */
 
 /* Private macro ------------------------------------------------------------*/
 
-/** @defgroup ADC_Private_Macros ADC Private Macros
-  * @{
-  */
+/** 
+ * @defgroup ADC_Private_Macros ADC Private Macros
+*/
+
+
 /* Macro reserved for internal HAL driver usage, not intended to be used in   */
 /* code of final user.                                                        */
 
@@ -617,7 +587,6 @@ typedef enum
   * @brief Set the selected injected channel rank
   * @param _CHANNELNB_: Channel number.
   * @param _RANKNB_: Rank number.
-  * @param _JSQR_JL_: Sequence length.
   * @retval None
   */
 #define ADC_JSQR_RK_JL(_CHANNELNB_, _RANKNB_)                       \
@@ -650,9 +619,7 @@ typedef enum
 #define IS_VREF_SWITCH(VREF)    (((VREF) == ADC_VREF_VCC)     || \
                                 ((VREF) == ADC_VREF_EXPOWER)  || \
                                 ((VREF) == ADC_VREF_INSIDE)  )
-/**
-  * @}
-  */
+
 /**  
   * @brief ADC_range_verification ADC range verification For a unique ADC resolution: 12 bits
   */
@@ -667,9 +634,8 @@ typedef enum
   * @brief ADC_regular_discontinuous_mode_number_verification ADC regular discontinuous mode number verification
   */
 #define IS_ADC_REGULAR_DISCONT_NUMBER(NUMBER) (((NUMBER) >= 1U) && ((NUMBER) <= 8U))
-/**
-  * @}
-  */
+
+
 #define IS_ADC_CHANNEL(CHANNEL) (((CHANNEL) == ADC_CHANNEL_0)           || \
                                  ((CHANNEL) == ADC_CHANNEL_1)           || \
                                  ((CHANNEL) == ADC_CHANNEL_2)           || \
@@ -735,9 +701,6 @@ typedef enum
 HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc);
 HAL_StatusTypeDef HAL_ADC_DeInit(ADC_HandleTypeDef *hadc);
 
-/**
-  * @}
-  */
 
 /* Exported functions --------------------------------------------------------*/
 /**
@@ -850,6 +813,7 @@ HAL_StatusTypeDef HAL_ADCEx_InjectedStop_IT(ADC_HandleTypeDef* hadc);
   * @param  hadc: ADC handle
   * @param  pData: The destination Buffer address.
   * @param  Length: The length of data to be transferred from ADC peripheral to memory.
+  * @param  Callback: function pointer.
   * @retval HAL status.
   */
  HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length, void (*Callback)(ADC_HandleTypeDef* hadc));
@@ -887,28 +851,24 @@ uint32_t HAL_ADCEx_InjectedGetValue(ADC_HandleTypeDef* hadc, uint32_t InjectedRa
 /**
   * @brief  Handles ADC interrupt request  
   * @param  hadc: ADC handle
-  * @retval None
   */
 void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc);
 
 /**
   * @brief  Conversion complete callback in non blocking mode 
   * @param  hadc: ADC handle
-  * @retval None
   */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);
 
 /**
   * @brief  Analog watchdog callback in non blocking mode. 
   * @param  hadc: ADC handle
-  * @retval None
   */
 void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc);
 
 /**
   * @brief  ADC error callback in non blocking mode
   * @param  hadc: ADC handle
-  * @retval None
   */
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc);
 
@@ -948,13 +908,14 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 /**
   * @brief  Injected conversion complete callback in non blocking mode 
   * @param  hadc: ADC handle
-  * @retval None
   */
 void  HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc);
-/**
-  * @}
-  */
 
 
+/** @}*/
 
-#endif //(_LSADC_H_)
+
+/** @}*/
+
+
+#endif /* (_LSADC_H_) */

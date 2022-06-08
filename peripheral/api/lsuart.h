@@ -265,7 +265,6 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
   * @brief  This function handles UARTx interrupt request.
   * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
   *                the configuration information for the specified UART module.
-  * @retval None
   */
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart);
 
@@ -275,7 +274,6 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart);
            the HAL_UART_TxCpltCallback could be implemented in the user file     
   * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
   *                the configuration information for the specified UART module.
-  * @retval None
   */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 
@@ -285,7 +283,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
            the HAL_UART_RxCpltCallback could be implemented in the user file
   * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
   *                the configuration information for the specified UART module.
-  * @retval None
   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
@@ -295,7 +292,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
            the HAL_UART_DMA_TxCpltCallback could be implemented in the user file
   * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
   *                the configuration information for the specified UART module.
-  * @retval None
   */
 void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart);
 
@@ -305,7 +301,6 @@ void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart);
            the HAL_UART_DMA_RxCpltCallback could be implemented in the user file
   * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
   *                the configuration information for the specified UART module.
-  * @retval None
   */
 void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart);
 

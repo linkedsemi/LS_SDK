@@ -1,0 +1,38 @@
+PROJECT_NAME           = LS_SDK_API
+
+INPUT                  = peripheral/api/spi_flash.h \
+                         peripheral/api/lsadc.h \
+                         peripheral/api/lsecc.h \
+                         peripheral/api/lsdmac.h \
+                         peripheral/api/lscrypt.h \
+                         peripheral/api/lsssi.h \
+                         peripheral/api/lspdm.h \
+                         peripheral/api/lsrtc.h \
+                         peripheral/api/lsuart.h \
+                         peripheral/api/lsspi.h \
+                         peripheral/api/lsi2c.h \
+                         peripheral/api/lstrng.h \
+                         peripheral/api/lsiwdg.h \
+                         peripheral/api/lstimer.h \
+                         peripheral/api/lspis.h \
+                         module/ble/ls_ble.h \
+                         module/ble/ls_mesh.h \
+                         module/ble/ls_sig_mesh.h \
+                         module/ble/ls_sig_mesh_provisioner.h \
+                         module/ble/prf/prf_hid.h \
+
+GENERATE_XML           = YES
+
+XML_OUTPUT             = _build/doxyxml
+
+GENERATE_HTML          = YES
+
+HTML_OUTPUT            = _build/doxyhtml
+
+GENERATE_LATEX         = NO
+
+WARN_IF_UNDOCUMENTED   = NO
+
+OPTIMIZE_OUTPUT_FOR_C  = YES
+
+WARN_AS_ERROR          = FAIL_ON_WARNINGS
