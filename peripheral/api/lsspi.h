@@ -115,9 +115,6 @@ typedef struct __SPI_HandleTypeDef
   uint32_t                   ErrorCode;      /*!< SPI Error code                           */
 
 } SPI_HandleTypeDef;
-/**
-  * @}
-  */
 
 /** @defgroup SPI_Error_Code SPI Error Code
   * @{

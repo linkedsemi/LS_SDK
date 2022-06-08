@@ -8,3 +8,9 @@ stages:
     - if: $CI_COMMIT_BRANCH =~ /^release\/v*/
 
 include: 'tools/le501x/ci.yml'
+
+doxygen:
+  stage: build
+  script:
+    - mkdir _build
+    - doxygen tools/Doxyfile

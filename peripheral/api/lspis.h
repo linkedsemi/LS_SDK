@@ -53,7 +53,7 @@ HAL_StatusTypeDef HAL_PIS_DeInit(void);
  */
 HAL_StatusTypeDef HAL_PIS_Config(uint8_t channel,enum pis_src src,enum pis_dst dst,enum pis_sync_mode sync,enum pis_edge_sel edge);
 
-/** \brief LSPIS Channel Output Enable\Disable
+/** \brief LSPIS Channel Output Enable/Disable
  *  \param channel 
  *  \param enable
  *  \return status 
