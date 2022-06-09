@@ -292,8 +292,8 @@ enum friend_node_min_queue_size_log
   */
 struct report_dev_provisioned_state_info
 {
-    uint8_t proved_state;                     /*!< @ref enum mesh_provisioned_state*/  
-    uint8_t proving_success_state;            /*!< @ref enum mesh_provisioning_result */
+    uint8_t proved_state;                     /*!<  enum mesh_provisioned_state*/  
+    uint8_t proving_success_state;            /*!<  enum mesh_provisioning_result */
 };
 
 /**
@@ -403,8 +403,8 @@ struct start_glp_info
   */
 struct start_lpn_info
 {
-    uint8_t rx_window_factor;        /*!< @ref enum lpn_rx_window_factor*/
-    uint8_t min_queue_size_log;      /*!< @ref enum enum friend_node_min_queue_size_log*/
+    uint8_t rx_window_factor;        /*!<  enum lpn_rx_window_factor*/
+    uint8_t min_queue_size_log;      /*!<  enum enum friend_node_min_queue_size_log*/
     uint8_t rx_delay_ms;             /*!< rx delay at least 10ms*/
     uint16_t previous_addr;          
     uint32_t poll_timeout_100ms;     /*!< poll timeout at least 1s*/ 
@@ -417,7 +417,7 @@ struct start_lpn_info
 {
     uint16_t friend_addr;             /*!< friend node unicast address*/
     uint8_t  friend_rx_window;        /*!< friend node rx window*/
-    uint8_t  friend_queue_size;       /*!< friend queue size,@ref enum friend_node_min_queue_size_log*/
+    uint8_t  friend_queue_size;       /*!< friend queue size, enum friend_node_min_queue_size_log*/
     uint8_t  friend_subs_list_size;   /*!< friend subscription list size*/
     int8_t   friend_rssi;             /*!< friend node rssi*/
 };
@@ -450,7 +450,7 @@ struct model_rx_info
 struct model_state_upd
 {
     uint8_t elmt_idx;                /*!< Element index*/
-    uint16_t state_id;               /*!< State identifier, @ref num mesh_state_idx*/
+    uint16_t state_id;               /*!< State identifier,  num mesh_state_idx*/
     uint32_t state;                  /*!<  New state value or targeted state value depending on transition time*/
     uint32_t trans_time_ms;          /*!<  Transition time in milliseconds*/
 };
@@ -459,7 +459,7 @@ struct model_state_upd
   */
 struct report_mesh_prov_result_info
 {
-    uint8_t state;                   /*!< Provisioning  state ,@ref enum mesh_provisioning_result*/
+    uint8_t state;                   /*!< Provisioning  state , enum mesh_provisioning_result*/
     uint16_t status;                 /*!< Provisioning failed reason*/
 };
 /**
@@ -468,7 +468,7 @@ struct report_mesh_prov_result_info
 struct report_mesh_timer_state_info
 {
     uint8_t timer_id;               /*!< mesh timer index*/
-    uint8_t status;                 /*!< mesh timer status, @ref enum mesh_timer_state*/
+    uint8_t status;                 /*!< mesh timer status,  enum mesh_timer_state*/
 };
 /**
   * @brief Registered Model inforation structure for model
@@ -489,7 +489,7 @@ struct mesh_model_info
 {
     uint8_t nb_model;                                /*!< Total registered Model*/
     uint8_t app_key_lid;                             /*!< App key loacal index*/
-    struct model_id_info info[MAX_MESH_MODEL_NB];    /*!< Maximum models in a node @ref struct model_id_info*/ 
+    struct model_id_info info[MAX_MESH_MODEL_NB];    /*!< Maximum models in a node  struct model_id_info*/ 
 };
 
 /**
@@ -520,7 +520,7 @@ struct mesh_auto_prov_info
     uint8_t model_nb;             /*!< Total registered Model*/
     uint8_t ttl;                  /*!< time to live for publish*/
     uint16_t group_addr;          /*!< Group address for publish and subscription*/
-    struct mesh_auto_prov_model_info model_info[MAX_MESH_MODEL_NB];  /*!< Maximum models in a node @ref struct mesh_auto_prov_model_info*/ 
+    struct mesh_auto_prov_model_info model_info[MAX_MESH_MODEL_NB];  /*!< Maximum models in a node  struct mesh_auto_prov_model_info*/ 
     uint8_t app_key[16];          /*App key*/
     uint8_t net_key[16];          /*Net key*/
 }__attribute__((packed));
@@ -529,26 +529,26 @@ struct mesh_auto_prov_info
   * @brief Sig Mesh event union definition.
   */
 union ls_sig_mesh_evt_u {
-    struct report_dev_provisioned_state_info st_proved;            /*!< Device state information, @ref struct report_dev_provisioned_state_info*/
-    struct report_mesh_attention_info update_attention;            /*!< Attention state,@ref struct report_mesh_attention_info*/
-    struct report_mesh_prov_result_info prov_rslt_sate;            /*!< Report provisioning state, @ref struct report_mesh_prov_result_info*/
-    struct model_rx_info rx_msg;                                   /*!< Receive message structure from other nodes, @ref struct model_rx_info*/
-    struct update_state_info update_state_param;                   /*!< Report updated state struct, @ref struct update_state_info*/
-    struct report_mesh_timer_state_info mesh_timer_state;          /*!< Report mesh timer state, @ref struct report_mesh_timer_state_info*/
-    struct adv_report_evt adv_report;                              /*!< Report adv information, @ref struct adv_report_evt*/
-    struct model_state_upd mdl_state_upd_ind;                      /*!< State update indication structure for SIG Model, @ref struct model_state_upd*/
-    struct mesh_model_info sig_mdl_info;                           /*!< Registered Model all informations structure for node, @ref struct mesh_model_info*/
-    struct mesh_publish_info_ind mesh_publish_info;                /*!< Report new publication parameters for a model, @ref struct mesh_publish_info_ind*/
-    struct mesh_auto_prov_info mesh_auto_prov_param;               /*!< Auto provisioning information for node, @ref struct mesh_auto_prov_info*/
-    struct lpn_offer_info lpn_offer_info;                          /*!< Report friend node parameter structure - for lower power node, @ref struct lpn_offer_info*/
-    struct lpn_status_info lpn_status_info;                        /*!< Report friendship status structure - for lower power node, @ref struct lpn_status_info*/
+    struct report_dev_provisioned_state_info st_proved;            /*!< Device state information,  struct report_dev_provisioned_state_info*/
+    struct report_mesh_attention_info update_attention;            /*!< Attention state, struct report_mesh_attention_info*/
+    struct report_mesh_prov_result_info prov_rslt_sate;            /*!< Report provisioning state,  struct report_mesh_prov_result_info*/
+    struct model_rx_info rx_msg;                                   /*!< Receive message structure from other nodes,  struct model_rx_info*/
+    struct update_state_info update_state_param;                   /*!< Report updated state struct,  struct update_state_info*/
+    struct report_mesh_timer_state_info mesh_timer_state;          /*!< Report mesh timer state,  struct report_mesh_timer_state_info*/
+    struct adv_report_evt adv_report;                              /*!< Report adv information,  struct adv_report_evt*/
+    struct model_state_upd mdl_state_upd_ind;                      /*!< State update indication structure for SIG Model,  struct model_state_upd*/
+    struct mesh_model_info sig_mdl_info;                           /*!< Registered Model all informations structure for node,  struct mesh_model_info*/
+    struct mesh_publish_info_ind mesh_publish_info;                /*!< Report new publication parameters for a model,  struct mesh_publish_info_ind*/
+    struct mesh_auto_prov_info mesh_auto_prov_param;               /*!< Auto provisioning information for node,  struct mesh_auto_prov_info*/
+    struct lpn_offer_info lpn_offer_info;                          /*!< Report friend node parameter structure - for lower power node,  struct lpn_offer_info*/
+    struct lpn_status_info lpn_status_info;                        /*!< Report friendship status structure - for lower power node,  struct lpn_status_info*/
 };
 /**
   * @brief Sig Mesh initial parameter.
   */
 struct ls_sig_mesh_cfg
 {
-    uint32_t MeshFeatures;            /*!< Features supported by nodes,@ref enum mesh_feature*/
+    uint32_t MeshFeatures;            /*!< Features supported by nodes, enum mesh_feature*/
     uint16_t MeshCompanyID;           /*!< CompanyID supported by SIG */
     uint16_t MeshProID;               /*!< Production ID */
     uint16_t MeshProVerID;            /*!< Production Version ID */
@@ -579,25 +579,25 @@ void prf_ls_sig_mesh_callback_init(void (*evt_cb)(enum mesh_evt_type, union ls_s
  * @brief Add Sig mesh profile to dev manager 
  * 
  * @param sec_lvl  No security
- * @param cfg      Node Suported Feature, @ref struct ls_sig_mesh_cfg
+ * @param cfg      Node Suported Feature, struct ls_sig_mesh_cfg
  */
 void dev_manager_prf_ls_sig_mesh_add(uint8_t sec_lvl, struct ls_sig_mesh_cfg *cfg);
 /**
  * @brief Initialization of Sig mesh.
  * 
- * @param param  Register Model informatin ,@ref struct mesh_model_info
+ * @param param  Register Model informatin, struct mesh_model_info
  */
 void ls_sig_mesh_init(struct mesh_model_info *param);
 /**
  * @brief Set the prov parameter
  * 
- * @param param @ref struct mesh_prov_info 
+ * @param param struct mesh_prov_info 
  */
 void set_prov_param(struct mesh_prov_info *param);
 /**
  * @brief Set the prov auth parameter
  * 
- * @param param @ref struct mesh_prov_auth_info 
+ * @param param struct mesh_prov_auth_info 
  */
 void set_prov_auth_info(struct mesh_prov_auth_info *param);
 /**
@@ -658,25 +658,25 @@ uint16_t  ls_sig_mesh_get_primary_address(void);
 /**
  * @brief User send  message to other nodes by Vendor Client Model
  * 
- * @param param ,@ref struct model_send_info
+ * @param param  struct model_send_info
  */
 void model_send_info_handler(struct model_send_info *param);
 /**
  * @brief Set state to other nodes by Sig Client Model
  * 
- * @param param,@ref struct model_cli_set_state_info
+ * @param param struct model_cli_set_state_info
  */
 void mesh_model_client_set_state_handler(struct model_cli_set_state_info *param);
 /**
  * @brief Publish message to other nodes by by Sig Client Model
  * 
- * @param param ,@ref struct model_cli_trans_info
+ * @param param  struct model_cli_trans_info
  */
 void mesh_standard_model_publish_message_handler(struct model_cli_trans_info *param);
 /**
  * @brief Publish message to other nodes by by Vendor Client Model,but Cann't set dest address
  * 
- * @param msg, @ref struct vendor_model_publish_message
+ * @param msg  struct vendor_model_publish_message
  */
 void mesh_vendor_model_publish_message_handler(struct vendor_model_publish_message *msg);
 /**
@@ -705,7 +705,7 @@ void stop_tx_unprov_beacon(void);
 /**
  * @brief Device start unprov beacon
  * 
- * @param param @ref 
+ * @param param struct bcn_start_unprov_param
  */
 void start_tx_unprov_beacon(struct bcn_start_unprov_param *param);
 /**
@@ -734,7 +734,7 @@ void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
 /**
  * @brief Enable lower power for genie mesh
  * 
- * @param param @ref struct start_glp_info
+ * @param param struct start_glp_info
  */
 void start_glp_handler(struct start_glp_info *param);
 /**
@@ -772,7 +772,7 @@ void lnp_select_friend_handler(uint16_t friend_addr);
 /**
  * @brief Enable Auto Provisioning process
  * 
- * @param param @ref struct mesh_auto_prov_info
+ * @param param struct mesh_auto_prov_info
  * @param auto_prov_mesh_flag  Enable/Disable Flag
  */
 void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool const auto_prov_mesh_flag);

@@ -346,7 +346,6 @@ void RF_24g_SetPower(enum prop_24g_tx_power_config tx_pwr_config)
 static uint16_t rf_pll_gain_cal_24g(uint8_t tx_di_s, uint32_t tx_frac)
 {
     uint8_t pll_gain_cal_val            =0;
-	int32_t cnt_timeout                 =0;
 
     REG_FIELD_WR(RF->REG10, RF_PLL_RTX_SEL, 1);  
     REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 1);  //Integer mode
@@ -360,10 +359,7 @@ static uint16_t rf_pll_gain_cal_24g(uint8_t tx_di_s, uint32_t tx_frac)
     REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// AFC CAL disable
 	REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 1);// AFC CAL enable
 
-    cnt_timeout=500;
-    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE))) 
-        || (cnt_timeout>0))
-        {cnt_timeout--;}
+    while(!REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE)); 
 
     // gain cal 
     REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
@@ -371,10 +367,7 @@ static uint16_t rf_pll_gain_cal_24g(uint8_t tx_di_s, uint32_t tx_frac)
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0); 
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,1);  
 
-    cnt_timeout=500;
-    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE)))
-        || (cnt_timeout>0))
-        {cnt_timeout--;}
+    while(!REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE));
 
     pll_gain_cal_val =REG_FIELD_RD(RF->REG38, RF_PLL_DAC_ADJ_TEST);
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,1); 
@@ -447,7 +440,7 @@ static void rf_reg_retention_24g(void)
 
 int8_t rf_rssi_convert_24g(uint8_t rssi_reg)
 {
-    LOG_I("rssi_reg: %d", rssi_reg);
+    // LOG_I("rssi_reg: %d", rssi_reg);
     int8_t rssi_dbm;
     uint8_t agc_state;
     agc_state = REG_FIELD_RD(RF->REG6C,RF_AGC_STATE);
@@ -474,10 +467,17 @@ void modem_rf_init_24g(void)
     RCC->APB1EN |= 1<<RCC_RF_POS | 1<<RCC_MDM2_POS;
     rf_reg_retention_24g();
     modem_rf_reinit_24g();
-    pll_gain_24g(2400);
+    // pll_gain_24g(2400);
 }
 
 void modem_rf_set_rx_phy(uint8_t phy)
 {
-    REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, phy);  
+    if (phy != PROP_24G_PHY_2MBPS)
+    {
+        REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, PROP_24G_PHY_1MBPS);
+    }
+    else
+    {
+        REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, PROP_24G_PHY_2MBPS);
+    }
 }

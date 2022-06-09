@@ -35,7 +35,14 @@ enum prop_24g_tx_power_config
 enum prop_24g_phy
 {
     PROP_24G_PHY_1MBPS = 0,
-    PROP_24G_PHY_2MBPS
+    PROP_24G_PHY_2MBPS,
+    PROP_24G_PHY_125KBPS,
+    PROP_24G_PHY_500KBPS,
+};
+enum prop_24g_tx_rx_format
+{
+    PROP_24G_EXT_ADV_FORMAT = 0,
+    PROP_24G_LEGACY_ADV_FORMAT
 };
 
 struct prop_24g_tx_rx_cntl_env

@@ -72,6 +72,8 @@ void spi_flash_write_status_register_0(uint8_t status_0);
  */
 void spi_flash_write_status_register_1(uint8_t status_1);
 
+void spi_flash_multi_io_page_program(uint32_t offset,uint8_t *data,uint16_t length);
+
 /** \brief Dual Page Program 
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  *  \param[in] data The pointer of the data to program into Flash

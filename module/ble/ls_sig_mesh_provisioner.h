@@ -4,6 +4,10 @@
 #include "ls_ble.h"
 #include "ls_sig_mesh.h"
 
+/** \addtogroup SIG_MESH_PROVISIONER
+ *  @{
+ */
+
 #define CONNECT_IDX_INVALID 0xff
 /*provisioner infomation*/
 #define MESH_KEY_LENGTH (16)
@@ -388,7 +392,7 @@ void ls_sig_mesh_provisioner_scan(uint16_t timeout);
  * 
  * @param conidx 
  * @param dev_uuid
- * @param unicast_address  
+ * @param unicast_addr 
  * @param attention_dur_s 
  */
 void ls_sig_mesh_provisioner_invite(const uint8_t conidx, const uint8_t *dev_uuid, const uint16_t unicast_addr, const uint8_t attention_dur_s);
@@ -408,7 +412,6 @@ void app_mesh_prover_set_prov_auth_info(struct mesh_prov_auth_info *param);
  * 
  * @param accept 
  * @param netkey_lid 
- * @param unicast_addr 
  * @param algo 
  * @param pub_key 
  * @param auth_method 

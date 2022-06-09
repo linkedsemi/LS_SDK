@@ -144,4 +144,10 @@ void app_hid_send_keyboard_report(uint8_t report_idx, uint8_t *report_data,uint8
  *   \param[in] peer_id Peer device instance
  */
 void hid_ntf_cfg_init(uint16_t ntf_cfg,uint8_t con_idx,uint8_t peer_id);
+
+/** @}*/
+
+
+/** @}*/
+
 #endif

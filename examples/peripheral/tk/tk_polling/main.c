@@ -40,7 +40,7 @@
 /******************************************************************************
  Local Variable Definition
  ******************************************************************************/
-static volatile uint8_t RxBUFF[3] = {0};
+static volatile uint8_t RxBUFF[256] = {0};
 static TK_HandleTypeDef tkHandle;
 static uint8_t BUf0_ctl_io[] = {PB12, PC01, PC00, PA06, PA07, PA09, PA08, PA15};
 static uint8_t BUf1_ctl_io[] = {PB02, PB04, PB10, PB11, PB13, PA04};
@@ -76,7 +76,7 @@ static bool lsTK_Init(void)
     tkHandle.Init.KeyDebounceCount = 1;             // Set the number of jitters to 1
     tkHandle.Init.LpDelay = 4;                      // Set the time for automatic low-power scanning to 4*1S
     tkHandle.Init.ScanPeriod = 1;                   // Set the scan period
-    tkHandle.Init.GsMask = 0x3FFF;                  // ENABLE low-power scanning for all channels
+    tkHandle.Init.GsMask = 0x00;                  // ENABLE low-power scanning for all channels
     tkHandle.Init.LSenseGS = 0x68;                  // Set group scan sensitivity to 0x68
 
     if (HAL_TK_Init(&tkHandle) != HAL_OK)
@@ -152,6 +152,7 @@ int main(void)
                 io_set_pin(BUf0_ctl_io[i]);
             }
         }
+        DELAY_US(5000);
     }
 }
 /**

@@ -40,7 +40,7 @@ static TK_HandleTypeDef tkHandle;
 /******************************************************************************
  Local Variable Definition
  ******************************************************************************/
-static volatile uint8_t RxBUFF[3] = {0};
+static volatile uint8_t RxBUFF[256] = {0};
 static volatile uint8_t IRQ_flag = 0, ISR_Flag = 0, M = 0;
 static volatile uint16_t PD_Flag = 0;
 static uint8_t BUf0_ctl_io[] = {PB12, PC01, PC00, PA06, PA07, PA09, PA08, PA15};
@@ -236,7 +236,7 @@ void io_exti_callback(uint8_t pin)
 {
     switch (pin)
     {
-    case PA00:
+    case TK_WKUP:
         /*To detect the touch of the key, set the interrupt flag IRQ_flag to 1*/
         IRQ_flag = 1;
         break;

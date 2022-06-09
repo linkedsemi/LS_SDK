@@ -170,7 +170,7 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     }
     *bufptr = '\n'; bufptr ++;
     *bufptr = '\0';
-    printf(log_format_buff);
+    printf("%s",log_format_buff);
 }
 
 

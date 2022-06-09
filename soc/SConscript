@@ -10,42 +10,30 @@ if env.get('IC') is None:
 env['BASE_ARCH'] = plf[env['IC']]
 env['CPPDEFINES'] = [env['IC'].upper()]
 
-def variant_dir_add_source(variant_dir,src_dir,src_list):
-    env.VariantDir(variant_dir,src_dir,duplicate = 0)
-    return File(env.subst(list(map(lambda x:os.path.join(variant_dir,x),src_list))))
+def variant_dir_source(self,srcs):
+    def variant_dir_map(x):
+        relpath = os.path.relpath(self.subst(x),Dir('#').abspath)
+        variant_src = os.path.join('build/$IC/',relpath.replace('..','__'))
+        self.VariantDir(os.path.dirname(variant_src),os.path.normpath(os.path.dirname(relpath)),duplicate = 0)
+        return self.subst(variant_src)
+    return [variant_dir_map(x) for x in srcs]
 
-def add_include(dir,path):
-    inc_list = list(map(lambda x:os.path.relpath(env.subst(os.path.join(dir,x)),Dir('#').abspath),path))
-    env.Append(CPPPATH = inc_list)
-    return inc_list
+def inc_dirs(self,dirs):
+    return [os.path.relpath(self.subst(x),Dir('#').abspath) for x in dirs]
 
-def image_build(name,src,inc,ble=False,mesh=False,rtos = None,with_startup = True,objprefix = ''):
-    src_files = []
-    for i in src:
-        if '$SDK_ROOT/' in i:
-            env.VariantDir('build/$IC/','$SDK_ROOT/',duplicate = 0)
-            src_files += [File(env.subst(os.path.join('build/$IC/',i.replace('$SDK_ROOT/',''))))]
-        else:
-            env.VariantDir('build/$IC/'+name,'./',duplicate = 0)
-            src_files += [File(env.subst(os.path.join('build/$IC/'+name,i)))]
-    inc_list = []
-    for i in inc:
-        if '$SDK_ROOT/' in i:
-            inc_list += [os.path.relpath(env.subst(i),Dir('#').abspath)]
-        else:
-            inc_list += [os.path.relpath(env.subst(os.path.join(Dir('.').path,i)),Dir('#').abspath)]
-    env.Append(CPPPATH = inc_list)
-    env.Append(LINKFLAGS = ' $GC_OPTION ')
-    return env.plf_build(name,src_files,rtos,with_startup,ble,mesh,objprefix)
+def image_build(self,name,src,inc,ble=False,mesh=False,rtos = None,with_startup = True,objprefix = ''):
+    self.Append(CPPPATH = self.inc_dirs(inc))
+    self.Append(LINKFLAGS = ' $GC_OPTION ')
+    return self.plf_build(name,src,rtos,with_startup,ble,mesh,objprefix)
 
-def app_build(app_name,src,inc,ble = True,mesh = False,rtos = None):
-    target = image_build(app_name,src,inc,ble,mesh,rtos)
-    env.plf_postaction(target)
+def app_build(self,app_name,src,inc,ble = True,mesh = False,rtos = None):
+    target = self.image_build(app_name,src,inc,ble,mesh,rtos)
+    self.plf_postaction(target)
 
-env.variant_dir_add_source = variant_dir_add_source
-env.add_include = add_include
-env.image_build = image_build
-env.app_build = app_build
+env.AddMethod(image_build)
+env.AddMethod(app_build)
+env.AddMethod(variant_dir_source)
+env.AddMethod(inc_dirs)
 
 SConscript(dirs = env['BASE_ARCH'], exports = ['env'])
 flags = env.ParseFlags(ARGUMENTS.get('flags'))

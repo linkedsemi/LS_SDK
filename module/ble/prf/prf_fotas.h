@@ -6,6 +6,7 @@
 enum fotas_evt_type
 {
     FOTAS_START_REQ_EVT,
+    FOTAS_PROGRESS_EVT,
     FOTAS_FINISH_EVT,
 };
 
@@ -35,6 +36,14 @@ struct fotas_start_req_evt
 {
     struct fota_signature *signature;
     struct fw_digest *digest;
+    struct fota_image_info *new_image;
+    uint16_t segment_data_max_length;
+};
+
+struct fotas_progress_evt
+{
+    uint16_t current_sector;
+    uint8_t current_segment;
 };
 
 struct fotas_finish_evt

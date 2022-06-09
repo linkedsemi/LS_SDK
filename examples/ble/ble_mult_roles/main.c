@@ -170,7 +170,7 @@ static uint8_t scan_obj_hdl = 0xff;
 static uint8_t init_obj_hdl = 0xff;
 static uint8_t init_status = INIT_IDLE; 
 
-static void ls_uart_server_init(void);
+static void ls_uart_server_init(uint8_t idx);
 static void ls_uart_server_timer_cb(void *param);
 static void ls_uart_init(void);
 static void ls_uart_server_client_uart_tx(void);
@@ -179,7 +179,7 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
 static void ls_uart_server_send_notification(void);
 static void start_adv(void);
 
-static void ls_uart_client_init(void);
+static void ls_uart_client_init(uint8_t idx);
 static void start_scan(void);
 
 static void ls_uart_client_service_dis(uint8_t con_idx);
@@ -214,29 +214,54 @@ static uint8_t search_client_conidx(uint8_t con_idx)
     }
     return index;
 }
-static void ls_uart_server_init(void)
+static void ls_uart_server_init(uint8_t idx)
 {
-    uart_server_timer_inst = builtin_timer_create(ls_uart_server_timer_cb);
-    builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
-    for (uint8_t i = 0; i < UART_SERVER_MASTER_NUM; i++)
+    if (idx < UART_SERVER_MASTER_NUM)
     {
-        con_idx_array[i] = CON_IDX_INVALID_VAL;
-        uart_server_ntf_done_array[i] = true;
-        uart_server_mtu_array[i] = UART_SERVER_MTU_DFT;
-        uart_server_recv_data_length_array[i] = 0;
-    }    
+        con_idx_array[idx] = CON_IDX_INVALID_VAL;
+        uart_server_ntf_done_array[idx] = true;
+        uart_server_mtu_array[idx] = UART_SERVER_MTU_DFT;
+        uart_server_recv_data_length_array[idx] = 0;
+    }
+    else
+    {
+        if (NULL == uart_server_timer_inst)
+        {
+            uart_server_timer_inst = builtin_timer_create(ls_uart_server_timer_cb);
+            builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
+        }
+        for (uint8_t i = 0; i < UART_SERVER_MASTER_NUM; i++)
+        {
+            con_idx_array[i] = CON_IDX_INVALID_VAL;
+            uart_server_ntf_done_array[i] = true;
+            uart_server_mtu_array[i] = UART_SERVER_MTU_DFT;
+            uart_server_recv_data_length_array[i] = 0;
+        }  
+    }
 }
-static void ls_uart_client_init(void)
+static void ls_uart_client_init(uint8_t idx)
 {
-    for (uint8_t i = 0; i < UART_CLIENT_NUM; i++)
+    if (idx < UART_CLIENT_NUM)
     {
-        con_idx_client_array[i] = CON_IDX_INVALID_VAL;
-        uart_client_wr_cmd_done_array[i] = true;
-        uart_client_mtu_array[i] = UART_SERVER_MTU_DFT;
-        uart_client_recv_data_length_array[i] = 0;
-        uart_client_svc_attribute_handle[i] = 0x1;
-        uart_client_svc_end_handle[i] = 0xffff;  
-    } 
+        con_idx_client_array[idx] = CON_IDX_INVALID_VAL;
+        uart_client_wr_cmd_done_array[idx] = true;
+        uart_client_mtu_array[idx] = UART_SERVER_MTU_DFT;
+        uart_client_recv_data_length_array[idx] = 0;
+        uart_client_svc_attribute_handle[idx] = 0x1;
+        uart_client_svc_end_handle[idx] = 0xffff; 
+    }
+    else
+    {
+        for (uint8_t i = 0; i < UART_CLIENT_NUM; i++)
+        {
+            con_idx_client_array[i] = CON_IDX_INVALID_VAL;
+            uart_client_wr_cmd_done_array[i] = true;
+            uart_client_mtu_array[i] = UART_SERVER_MTU_DFT;
+            uart_client_recv_data_length_array[i] = 0;
+            uart_client_svc_attribute_handle[i] = 0x1;
+            uart_client_svc_end_handle[i] = 0xffff;  
+        } 
+    }
 }
 static void ls_uart_server_timer_cb(void *param)
 {
@@ -566,8 +591,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         {
             uart_server_connected_num--;
             disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_SLAVE);
-            con_idx_array[search_idx] = CON_IDX_INVALID_VAL;        
-            uart_server_mtu_array[search_idx] = UART_SERVER_MTU_DFT;
+            ls_uart_server_init(search_idx);
             if (uart_server_connected_num == UART_SERVER_MASTER_NUM - 1)
             {
                 start_adv();
@@ -577,8 +601,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         {
             uart_client_connected_num--;
             disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_MASTER);
-            con_idx_client_array[search_idx] = CON_IDX_INVALID_VAL;        
-            uart_client_mtu_array[search_idx] = UART_SERVER_MTU_DFT;
+            ls_uart_client_init(search_idx);
             if (uart_client_connected_num < UART_CLIENT_NUM )
             {
                 start_scan();
@@ -835,8 +858,8 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
         ls_uart_init(); 
         HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[0], UART_SYNC_BYTE_LEN);
-        ls_uart_server_init();
-        ls_uart_client_init();      
+        ls_uart_server_init(0xff);
+        ls_uart_client_init(0xff);      
     }
     break;
     case SERVICE_ADDED:

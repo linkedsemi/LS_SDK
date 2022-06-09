@@ -9,13 +9,21 @@ if tool == 'progen':
         'iar':'iar'
     }
     env['COMPILER'] = ide_toolchain[env['IDE']]
+elif tool == 'arm-llvm':
+    env['COMPILER'] = 'gnu'
+    env['CCFLAGS'] = ' --config $LLVM_CFG -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -faapcs-bitfield-width -fomit-frame-pointer -fno-common -Wall '
+    env['CFLAGS'] = ' -std=c11 '
+    env['CXXFLAGS'] = ' -fno-exceptions '
+    env['ASFLAGS'] = ' -c ${CCFLAGS} '
+    env['LINKFLAGS'] = ' --config $LLVM_CFG -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map '
+    env['GC_OPTION'] = ' -Wl,--gc-sections '
 else:
     env['COMPILER'] = 'gnu'
     env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
-    env['ASFLAGS'] = ' -c ${CCFLAGS} '
-    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
+    env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '
+    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,--print-memory-usage -Wl,-Map=${TARGET.base}.map -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 SConscript(dirs=env['IC'],exports = ['env'])

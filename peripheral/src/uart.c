@@ -44,7 +44,7 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
     {
         return HAL_INVALIAD_PARAM;
     }
-
+    while(REG_FIELD_RD(huart->UARTX->SR,UART_SR_BUSY) != 0);
     /* Check the parameters */
     //  assert_param(IS_UART_INSTANCE(huart->UARTX));
     HAL_UART_MSP_DeInit(huart);
@@ -308,7 +308,9 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
             if (huart->Tx_Env.Interrupt.XferCount == 0U)
             {
                 huart->UARTX->IDR = UART_IT_TXS;
-                huart->UARTX->IER = UART_IT_TC;
+                /* Tx process is ended, restore huart->gState to Ready */
+                huart->gState = HAL_UART_STATE_READY;
+                HAL_UART_TxCpltCallback(huart);
             }
             else
             {
@@ -324,17 +326,6 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
             }
         }
     }
-}
-
-static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
-{
-    /* Disable the UART Transmit Complete Interrupt */
-        huart->UARTX->IDR = UART_IT_TC ;
-        /* Tx process is ended, restore huart->gState to Ready */
-        huart->gState = HAL_UART_STATE_READY;
-        HAL_UART_TxCpltCallback(huart);
-
-    
 }
 
 static void UART_Receive_IT(UART_HandleTypeDef *huart)
@@ -367,8 +358,6 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
     }
 }
 
-__attribute__((weak)) void UART_EndTransmit_IT_DMA(UART_HandleTypeDef *huart){}
-
 __attribute__((weak)) void UART_Transmit_IT_DMA(UART_HandleTypeDef *huart){}
 
 __attribute__((weak)) void HAL_UART_BaudRateDetectCpltCallback(UART_HandleTypeDef *huart,uint8_t detect_byte){}
@@ -400,22 +389,12 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
             huart->UARTX->ICR = UART_IT_TXS;
             UART_Transmit_IT_DMA(huart);
         }
-        if ((isrflags & UART_IT_TC) != 0)
-        {
-            huart->UARTX->ICR = UART_IT_TC;
-            UART_EndTransmit_IT_DMA(huart);
-        }
     }else
     {
         if (( isrflags& UART_IT_TXS) != 0) 
         {
             huart->UARTX->ICR = UART_IT_TXS;
             UART_Transmit_IT(huart);
-        }
-        if ((isrflags & UART_IT_TC) != 0)
-        {
-            huart->UARTX->ICR = UART_IT_TC;
-            UART_EndTransmit_IT(huart);
         }
     }
     /* UART in mode Receive ------------------------------------------------*/
@@ -455,9 +434,3 @@ HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uin
     huart->UARTX->IER = UART_IT_RXRD;
     return HAL_OK;
 }
-
-
-
-
-
-

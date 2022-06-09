@@ -12,11 +12,12 @@ SECTIONS
     }>RAM AT>FLASH
 
     __data_lma__ = __vector_lma__ + SIZEOF(.vector);
-    
-    .data :
+
+    __data_start__ = DEFINED(__mesh_stack_bss_end__)? __mesh_stack_bss_end__ : DEFINED(__stack_bss_end__)? __stack_bss_end__ : 0xc0;
+
+    .data __data_start__ :
     {
         . = ALIGN(4);
-        __data_start__ = .;
         *(.data*)
         *(.xip_banned)
 		*(vtable)
@@ -94,7 +95,7 @@ SECTIONS
     {
         __end__ = .;
         PROVIDE(end = .);
-        *(.heap*)
+        KEEP(*(.heap*))
     } > RAM
     reset_retain_addr = MAX(__HeapLimit , 0x6AE8);
     .reset_retain reset_retain_addr (NOLOAD):
@@ -109,21 +110,17 @@ SECTIONS
     {
         *(DMAC1)
         *(DMARAM)
-    }
+    } > RAM
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
      * values to stack symbols later */
     .stack_dummy (NOLOAD):
     {
-        *(.stack*)
+        KEEP(*(.stack*))
     } > RAM
 
     /* Set stack top to end of RAM, and stack limit move down by
      * size of stack_dummy section */
-    PROVIDE(__stack_data_start__ = ORIGIN(RAM) + LENGTH(RAM));
-    PROVIDE(__mesh_stack_data_start__ = __stack_data_start__);
-    __StackTop = __mesh_stack_data_start__;
-    __StackLimit = __StackTop - SIZEOF(.stack_dummy);
     PROVIDE(__stack = __StackTop);
     
     /* Check if data + heap + stack exceeds RAM limit */
