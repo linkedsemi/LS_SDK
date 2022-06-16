@@ -17,6 +17,7 @@
 #include "systick.h"
 #include "reg_lsgpio.h"
 #include "sys_stat.h"
+#include "lsiwdg.h"
 
 const uint16_t wkup_delay_us = 1500;
 static uint32_t CPU_PSP;
@@ -75,6 +76,26 @@ XIP_BANNED static void sleep_mode_set()
 }
 #endif
 
+XIP_BANNED void iwdg_check()
+{
+    if(REG_FIELD_RD(RCC->AHBEN, RCC_IWDT)==0)
+    {
+        return;
+    }
+    if(REG_FIELD_RD(LSIWDG->IWDG_CON,IWDG_EN)==0)
+    {
+        return;
+    }
+    if(LSIWDG->IWDG_RIS)
+    {
+        while(1);
+    }
+    if(LSIWDG->IWDG_VALUE<100)
+    {
+        while(1);
+    }
+}
+
 XIP_BANNED void before_wfi()
 {
     sleep_mode_set();
@@ -82,6 +103,7 @@ XIP_BANNED void before_wfi()
     ble_hclk_clr();
     switch_to_xo16m();
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
+    iwdg_check();
 }
 
 XIP_BANNED static void wait_dpll_lock()
@@ -115,14 +137,11 @@ XIP_BANNED void after_wfi()
     wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     normal_sleep_set();
-    if(wkup_stat & WDT_WKUP)
-    {
-        while(1);
-    }
     dcdc_on();
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     wait_dpll_lock();
     clk_switch();
+    iwdg_check();
 }
 
 void clr_ble_wkup_req()
