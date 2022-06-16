@@ -29,6 +29,7 @@
 #include "lstimer.h"
 #include "reg_lptim.h"
 #include "sw_timer.h"
+#include "lsecc.h"
 #define XTAL_STB_VAL 20
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
@@ -687,23 +688,14 @@ void aos_swint_set()
     __NVIC_SetPendingIRQ(CACHE_IRQn);
 }
 
-#include "lsecc.h"
-static void (*ecc_cb)(void *);
-static void *ecc_param;
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)
 {
     uint8_t *rslt[2];
     rslt[0] = result_x;
     rslt[1] = result_y;
-    ecc_cb = cb;
-    ecc_param = param;
     HAL_LSECC_Init();
     const uint8_t *pk[2] = {pub_x,pub_y};
-    HAL_LSECC_PointMult_IT(&secp256r1_param,secret_key,pk,rslt);
-}
-
-void HAL_LSECC_PointMult_Complete_Callback()
-{
+    HAL_LSECC_PointMult(&secp256r1_param,secret_key,pk,rslt);
     HAL_LSECC_DeInit();
-    ecc_cb(ecc_param);
+    cb(param);
 }
