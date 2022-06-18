@@ -28,9 +28,9 @@
 #define ADV_REPORT_CACHE_SIZE 2
 #define SW_TIMER_BUF_NUM 5
 
-#define TX_RAMPUP_TIME (0x52)
-#define TX_RAMPDOWN_TIME (20)
-#define RX_RAMPUP_TIME (0x52)
+#define TX_RAMPUP_TIME (110)
+#define TX_RAMPDOWN_TIME (1)
+#define RX_RAMPUP_TIME (110)
 #define RX_PATH_DELAY_1M_PHY (28)
 #define RX_PATH_DELAY_2M_PHY (15)
 #define TX_PATH_DELAY_1M_PHY (2)

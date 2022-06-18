@@ -98,6 +98,7 @@ void mac_srst()
 void idle_process()
 {
     uint32_t cpu_stat = enter_critical();
+    /*
     uint32_t sleep_dur = mac_sleep();
     if(sleep_dur)
     {
@@ -113,6 +114,7 @@ void idle_process()
     {
 
     }
+    */
     exit_critical(cpu_stat);
 }
 
@@ -190,6 +192,7 @@ static void flash_swint_enable()
 
 static void module_init()
 {
+    SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MAC_DBG_EN, 0x1F);
     V33_RG->CLKG_SRST = V33_RG_CLKG_SET_MAC_SLP_MASK | V33_RG_SRST_SET_MAC_SLP_N_MASK;
     REG_FIELD_WR(V33_RG->MISC_CTRL0,V33_RG_MAC_SLP_INTR_EN,1);
     LOG_INIT();
