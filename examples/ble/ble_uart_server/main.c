@@ -101,7 +101,6 @@ static bool uart_server_tx_busy;
 static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
 static struct builtin_timer *uart_server_timer_inst = NULL;
-static bool update_adv_intv_flag = false;
 static uint16_t cccd_config = 0;
 
 static uint8_t adv_obj_hdl;
@@ -131,7 +130,7 @@ bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signatur
 }
 #endif
 
-static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt,uint8_t con_idx)
+static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt)
 {
     switch(type)
     {
@@ -178,15 +177,6 @@ static void ls_uart_server_init(void)
     builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
 }
 
-static void ls_uart_server_update_adv_interval(uint8_t input_intv)
-{
-    LOG_I("input_char: %d",input_intv);
-    uint32_t new_intv = (input_intv - '0')*160;
-    dev_manager_update_adv_interval(adv_obj_hdl, new_intv, new_intv);
-    dev_manager_stop_adv(adv_obj_hdl);
-    update_adv_intv_flag = true;
-}
-
 static void ls_uart_server_timer_cb(void *param)
 {
     if(connect_id != 0xff)
@@ -195,11 +185,6 @@ static void ls_uart_server_timer_cb(void *param)
         // LOG_I("uart timer out, length=%d", uart_server_rx_index);
         ls_uart_server_send_notification();
         exit_critical(cpu_stat);
-    }
-    uint8_t input_char = (uint8_t)SEGGER_RTT_GetKey();
-    if(connect_id == 0xff && input_char != 0xff && input_char > '0' && input_char <= '9')
-    {
-        ls_uart_server_update_adv_interval(input_char);
     }
     if(uart_server_timer_inst)
     {
@@ -316,28 +301,35 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
 
 static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,uint8_t con_idx)
 {
-    switch (type)
+    if (connect_id != 0xff)
     {
-    case SERVER_READ_REQ:
-        LOG_I("read req");
-        ls_uart_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
-    break;
-    case SERVER_WRITE_REQ:
-        LOG_I("write req");
-        ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
-    break;
-    case SERVER_NOTIFICATION_DONE:
-        uart_server_ntf_done = true;
-        LOG_I("ntf done");
-    break;
-    case MTU_CHANGED_INDICATION:
-        uart_server_mtu = evt->mtu_changed_ind.mtu;
-        LOG_I("mtu: %d", uart_server_mtu);
-        ls_uart_server_data_length_update(con_idx);
-    break;
-    default:
-        LOG_I("Event not handled!");
+        switch (type)
+        {
+        case SERVER_READ_REQ:
+            LOG_I("read req");
+            ls_uart_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
         break;
+        case SERVER_WRITE_REQ:
+            LOG_I("write req");
+            ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
+        break;
+        case SERVER_NOTIFICATION_DONE:
+            uart_server_ntf_done = true;
+            LOG_I("ntf done");
+        break;
+        case MTU_CHANGED_INDICATION:
+            uart_server_mtu = evt->mtu_changed_ind.mtu;
+            LOG_I("mtu: %d", uart_server_mtu);
+            ls_uart_server_data_length_update(con_idx);
+        break;
+        default:
+            LOG_I("Event not handled!");
+            break;
+        }
+    }
+    else
+    {
+        LOG_I("receive gatt msg when disconnected!");
     }
 }
 
@@ -447,15 +439,11 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         adv_obj_hdl = evt->obj_created.handle;
         start_adv();
     break;
-    case ADV_STOPPED:
-        if (update_adv_intv_flag)
-        {
-            update_adv_intv_flag = false;
-            start_adv();
-        }    
+    case ADV_STARTED:
+        LOG_I("adv started");
     break;
-    case SCAN_STOPPED:
-    
+    case ADV_STOPPED:
+        LOG_I("adv stopped");
     break;
     default:
 

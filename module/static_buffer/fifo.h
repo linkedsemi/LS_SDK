@@ -18,7 +18,7 @@ struct fifo_env{
 
 #define INIT_FIFO(name) sw_fifo_init(&name,_##name##_fifo_array,ARRAY_LEN(_##name##_fifo_array),sizeof(_##name##_fifo_array[0]))
 
-void sw_fifo_init(struct fifo_env *ptr,void *buf,uint16_t length);
+void sw_fifo_init(struct fifo_env *ptr,void *buf,uint16_t length, uint16_t item_size);
 
 bool sw_fifo_full(struct fifo_env *ptr);
 
