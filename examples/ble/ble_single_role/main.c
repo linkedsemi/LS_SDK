@@ -829,6 +829,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         start_adv();
         LOG_I("adv start");
     break;
+    case ADV_STARTED:
+        LOG_I("adv started");
+    break;
     case ADV_STOPPED:
         LOG_I("adv stopped");
     break;
@@ -839,6 +842,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         scan_obj_hdl = evt->obj_created.handle;
         create_init_obj();
+    break;
+    case SCAN_STARTED:
+        LOG_I("scan started");
     break;
     case SCAN_STOPPED:
         LOG_I("scan stopped, next_connect_addr=%d", next_connect_addr);
@@ -882,6 +888,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         init_obj_hdl = evt->obj_created.handle;
         start_scan();
+    break;
+    case INIT_STARTED:
+        LOG_I("init started");
     break;
     case INIT_STOPPED:
         init_status = INIT_IDLE;

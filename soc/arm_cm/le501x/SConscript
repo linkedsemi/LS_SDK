@@ -99,7 +99,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'debug/$BASE_ARCH/$COMPILER/ls_dbg_asm.S',
         'debug/RTT/SEGGER_RTT.c',
         'static_buffer/linked_buffer.c',
-        #'static_buffer/fifo.c',
+        'static_buffer/fifo.c',
         'tinyfs/tinyfs_nvm.c',
         'tinyfs/tinyfs_write_cache.c',
         'tinyfs/tinyfs.c',

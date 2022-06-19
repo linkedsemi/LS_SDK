@@ -223,8 +223,12 @@ enum dev_evt_type
     ADV_OBJ_CREATED,                                /*!< Adv object created event*/ 
     SCAN_OBJ_CREATED,                               /*!< Scan object created event*/ 
     INIT_OBJ_CREATED,                               /*!< Initiate object created event*/ 
-    ADV_STOPPED,                                    /*!< Adv stopped event*/ 
+    ADV_STARTED,                                    /*!< Adv started event*/ 
+    ADV_STOPPED,                                    /*!< Adv stopped event*/
+    ADV_UPDATED,                                    /*!< Adv data updated event*/
+    SCAN_STARTED,                                   /*!< Scan started event*/ 
     SCAN_STOPPED,                                   /*!< Scan stopped event*/ 
+    INIT_STARTED,                                   /*!< Initiate started event*/ 
     INIT_STOPPED,                                   /*!< Initiate stopped event*/ 
     OBJ_DELETED,                                    /*!< Object deleted event*/ 
     ADV_REPORT,                                     /*!< Receive adv report event*/ 
@@ -267,7 +271,21 @@ struct obj_created_evt
     uint8_t status;                                 /*!< Status of object create action*/ 
 };
 /**
-  * @brief Object created event.
+  * @brief Object started event.
+  */
+struct started_evt
+{
+    uint8_t handle;                                 /*!< Handle of the started event*/ 
+};
+/**
+  * @brief ADV updated event.
+  */
+struct adv_updated_evt
+{
+    uint8_t handle;                                 /*!< Handle of the updated adv event*/ 
+};
+/**
+  * @brief Object stopped event.
   */
 struct stopped_evt
 {
@@ -324,6 +342,8 @@ union dev_evt_u
     struct profile_added_evt profile_added;         /*!< Profile added event*/ 
     struct service_added_evt service_added;         /*!< Service added event*/ 
     struct obj_created_evt obj_created;             /*!< Object created event*/ 
+    struct started_evt started;                     /*!< Started event*/ 
+    struct adv_updated_evt adv_updated;             /*!< Adv updated event*/ 
     struct stopped_evt stopped;                     /*!< Stopped event*/ 
     struct obj_deleted_evt deleted;                 /*!< Object deleted event*/ 
     struct adv_report_evt adv_report;               /*!< Adv report event*/ 
