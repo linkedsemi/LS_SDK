@@ -1,6 +1,7 @@
 #ifndef BUILTIN_TIMER_H_
 #define BUILTIN_TIMER_H_
 #include <stdint.h>
+#include <stdbool.h>
 #include "linked_buffer.h"
 #include "co_list.h"
 
@@ -28,6 +29,8 @@ void builtin_timer_delete(void *timer);
 void builtin_timer_stop(void *timer);
 
 void builtin_timer_start(void *timer,uint32_t timeout,void *param);
+
+bool builtin_timer_active(void *timer);
 
 #endif
 
