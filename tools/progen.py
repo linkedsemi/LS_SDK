@@ -3,6 +3,7 @@ import SCons.Builder
 import xml.etree.ElementTree
 import os
 import shutil
+import copy
 from project_generator.project import ProjectTemplate
 from project_generator.project import Project
 from project_generator.settings import ProjectSettings
@@ -48,10 +49,22 @@ def progen(target,source,env):
         et = xml.etree.ElementTree.parse(file)
         user_action1 = et.getroot().find('Targets').find('Target').find('TargetOption').find('TargetCommonOption').find('AfterMake').find('UserProg1Name')
         root_relpath = os.path.relpath(env['SDK_ROOT'].abspath,os.path.join(os.path.join(env['IC'],env['IDE'])))
+        info_sbl_xml = os.path.join(env['SDK_ROOT'].abspath,'tools/le501x/hex_target.xml')
+        info_sbl_et = xml.etree.ElementTree.parse(info_sbl_xml)
+        et.getroot().find('Targets').append(info_sbl_et.getroot())
         if env.get('STACK_HEX') is None:
             stack_path = ''
         else:
             stack_path = os.path.relpath(env['STACK_HEX'].srcnode().abspath,env['SDK_ROOT'].abspath)
+            stack_hex_et = copy.deepcopy(info_sbl_et)
+            outdir = stack_hex_et.getroot().find('TargetOption').find('TargetCommonOption').find('OutputDirectory')
+            listdir = stack_hex_et.getroot().find('TargetOption').find('TargetCommonOption').find('ListingPath')
+            listdir.text = outdir.text = os.path.relpath(os.path.dirname(env['STACK_HEX'].srcnode().abspath),os.path.join(env['IC'],env['IDE'])) + '\\'
+            stack_file_name = os.path.basename(env['STACK_HEX'].srcnode().abspath)
+            target_name = stack_hex_et.getroot().find('TargetName')
+            output_name = stack_hex_et.getroot().find('TargetOption').find('TargetCommonOption').find('OutputName')
+            target_name.text = output_name.text = stack_file_name
+            et.getroot().find('Targets').append(stack_hex_et.getroot())
         user_action1.text = "{} @L {} {} {}".format(root_relpath +'\\tools\\'+env['IC']+'\\after_build.bat',root_relpath,env['APP_IMAGE_BASE'],stack_path)
         et.write(file,xml_declaration=True,short_empty_elements=False)
         shutil.copy(env['SDK_ROOT'].abspath+'/tools/prog/LinkedSemi/LE501X.jlinkscript',os.path.join(os.path.join(env['IC'],env['IDE']),"JLinkSettings.jlinkscript"))
