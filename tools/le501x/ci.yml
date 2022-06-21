@@ -3,6 +3,18 @@ le501x_boot_ram_build:
   script:
     - cd bootloader/boot_ram/le501x && scons
 
+le501x_ble_advertiser_build:
+  stage: build
+  script:
+    - cd examples/ble/ble_advertiser && scons
+
+le501x_ble_advertiser_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_advertiser/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ble_advertiser.uvprojx -o UVBuild/build.txt -j0
+
 le501x_ble_ancs_build:
   stage: build
   script:
