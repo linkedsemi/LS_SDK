@@ -10,6 +10,7 @@ def le501x_keil_proj_gen(path):
     process.wait()
     os.chdir(root_path)
 
+le501x_keil_proj_gen('examples/ble/ble_advertiser')
 le501x_keil_proj_gen('examples/ble/ble_ancs')
 le501x_keil_proj_gen('examples/ble/ble_at_proj')
 le501x_keil_proj_gen('examples/ble/ble_dis')
