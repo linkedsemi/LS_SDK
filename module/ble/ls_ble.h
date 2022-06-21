@@ -98,12 +98,17 @@ enum sec_lvl_type
 /**
   * @brief Legacy adv properities.
   */
-struct legacy_adv_prop
+struct adv_prop
 {
-    uint8_t connectable:1,                         /*!< Connectable property*/ 
+    uint16_t connectable:1,                        /*!< Connectable property*/ 
             scannable:1,                           /*!< Scannable property*/ 
             directed:1,                            /*!< Directed property*/ 
-            high_duty_cycle:1;                     /*!< High duty cycle property*/ 
+            high_duty_cycle:1,                     /*!< High duty cycle property*/ 
+            reserved:1,                            /*!< Reserved*/
+            anonymous:1,                           /*!< Anonymous property*/
+            tx_power:1,                            /*!< TX power property*/
+            periodic_tx_power:1,                   /*!< Periodic TX power property*/
+            scan_req_ntf:1;                        /*!< Scan request indicate property*/
 };
 /**
   * @brief ADV discovery mode.
@@ -122,14 +127,14 @@ enum adv_disc_mode
 struct legacy_adv_obj_param                        
 {
     struct dev_addr *peer_addr;                    /*!< Peer address. Only valid for directed adv*/ 
+    struct adv_prop prop;                          /*!< adv properities*/
     uint16_t adv_intv_min;                         /*!< Minimum adv interval, in units of 625us*/ 
     uint16_t adv_intv_max;                         /*!< Maximum adv interval, in units of 625us*/ 
     enum gap_own_addr_type own_addr_type;          /*!< Own address type*/ 
     enum gap_peer_addr_type peer_addr_type;        /*!< Peer address type*/ 
     uint8_t filter_policy;                         /*!< Adv filter policy*/ 
     uint8_t ch_map;                                /*!< Adv channel map. bit0: channel 37 enabled. bit1: channel 38 enabled. bit2: channel 39 enabled. */ 
-    enum adv_disc_mode disc_mode;                  /*!< Adv discovery mode*/ 
-    struct legacy_adv_prop prop;                   /*!< Legacy adv properities*/ 
+    enum adv_disc_mode disc_mode;                  /*!< Adv discovery mode*/
 };
 /**
   * @brief PHY type.
@@ -232,6 +237,7 @@ enum dev_evt_type
     INIT_STOPPED,                                   /*!< Initiate stopped event*/ 
     OBJ_DELETED,                                    /*!< Object deleted event*/ 
     ADV_REPORT,                                     /*!< Receive adv report event*/ 
+    SCAN_REQ_IND,                                   /*!< Indicate reception of scan request event*/ 
 };
 /**
   * @brief Profile IDs.
@@ -335,6 +341,15 @@ struct adv_report_evt
     struct adv_report_info info;                    /*!< Adv report information*/ 
 };
 /**
+  * @brief Scan request indicate event.
+  */
+struct scan_req_ind_evt
+{
+    uint8_t obj_hdl;                                /*!<Handle of the adv activity*/
+    uint8_t adv_addr_type;                          /*!< Transmitter device address type*/ 
+    struct dev_addr *adv_addr;                      /*!<Transmitter device address*/
+};
+/**
   * @brief Device event union.
   */
 union dev_evt_u
@@ -347,6 +362,7 @@ union dev_evt_u
     struct stopped_evt stopped;                     /*!< Stopped event*/ 
     struct obj_deleted_evt deleted;                 /*!< Object deleted event*/ 
     struct adv_report_evt adv_report;               /*!< Adv report event*/ 
+    struct scan_req_ind_evt scan_req_ind;           /*!< Scan request indicate event*/ 
 };
 /**
   * @brief BLE Stack configuration.
@@ -1280,10 +1296,11 @@ void gap_manager_get_identity_addr(uint8_t peer_id,struct ble_addr *addr);
  * 
  * \param[in]  con_idx           Connection ID number.
  * \param[in]  p_param           Pointer to parameter to update.
+ * \return Whether the connection parameter is valid
  * 
  ****************************************************************************************
  */
-void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
+uint8_t gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
 /**
  ****************************************************************************************
  * \brief Update packet size in air for specified connection. 
