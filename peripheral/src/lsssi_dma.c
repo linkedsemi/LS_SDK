@@ -60,24 +60,6 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         inc = DMA_INC_WORD;
     }
     struct DMA_Channel_Config prim;
-    if(TX_Data)
-    {
-        prim.src_data_end_ptr = tx_data_end_ptr;
-        prim.dst_data_end_ptr = (uint32_t)&hssi->REG->DR;
-        prim.ctrl_data.cycle_ctrl = DMA_Cycle_Basic,
-        prim.ctrl_data.next_useburst = 0;
-        prim.ctrl_data.n_minus_1 = Count - 1;
-        prim.ctrl_data.R_power = 0;
-        prim.ctrl_data.src_prot_ctrl = 0;
-        prim.ctrl_data.dst_prot_ctrl = 0;
-        prim.ctrl_data.src_size = data_size;
-        prim.ctrl_data.src_inc = inc;
-        prim.ctrl_data.dst_size = data_size;
-        prim.ctrl_data.dst_inc = DMA_INC_NONE;
-        prim.dummy = (uint32_t)SSI_Transmit_DMA_Callback;
-        HAL_DMA_Channel_Config_Set(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,false,&prim);
-        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,HAL_SSI_TX_DMA_Handshake_Get(hssi),(uint32_t)hssi);
-    }
     if(RX_Data)
     {
         prim.src_data_end_ptr = (uint32_t)&hssi->REG->DR;
@@ -97,6 +79,24 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Rx_Env.DMA.DMA_Channel,HAL_SSI_RX_DMA_Handshake_Get(hssi),(uint32_t)hssi);
     }
     hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
+    if(TX_Data)
+    {
+        prim.src_data_end_ptr = tx_data_end_ptr;
+        prim.dst_data_end_ptr = (uint32_t)&hssi->REG->DR;
+        prim.ctrl_data.cycle_ctrl = DMA_Cycle_Basic,
+        prim.ctrl_data.next_useburst = 0;
+        prim.ctrl_data.n_minus_1 = Count - 1;
+        prim.ctrl_data.R_power = 0;
+        prim.ctrl_data.src_prot_ctrl = 0;
+        prim.ctrl_data.dst_prot_ctrl = 0;
+        prim.ctrl_data.src_size = data_size;
+        prim.ctrl_data.src_inc = inc;
+        prim.ctrl_data.dst_size = data_size;
+        prim.ctrl_data.dst_inc = DMA_INC_NONE;
+        prim.dummy = (uint32_t)SSI_Transmit_DMA_Callback;
+        HAL_DMA_Channel_Config_Set(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,false,&prim);
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,HAL_SSI_TX_DMA_Handshake_Get(hssi),(uint32_t)hssi);
+    }
 }
 
 HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
