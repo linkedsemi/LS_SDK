@@ -212,15 +212,10 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->gState = HAL_UART_STATE_BUSY_TX;
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_TL_0);
-    /* Enable the UART Transmit data register empty Interrupt */
-        huart->UARTX->ICR = UART_IT_TC| UART_IT_TXS;
-        huart->UARTX->IER = UART_IT_TXS;
+        huart->UARTX->ICR = UART_IT_TXS;
         huart->Tx_Env.Interrupt.XferCount--; 
         huart->UARTX->TBR = (*huart->Tx_Env.Interrupt.pBuffPtr++ & (uint8_t)0xFF);
-        if(huart->Tx_Env.Interrupt.XferCount == 0)
-        {
-            huart->UARTX->IER = UART_IT_TC;
-        }
+        huart->UARTX->IER = UART_IT_TXS;
         return HAL_OK;
     }
     else
