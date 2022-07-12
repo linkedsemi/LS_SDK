@@ -18,6 +18,7 @@
 #include "cpu.h"
 #include "io_config.h"
 #include "reg_base_addr.h"
+#include "ota_settings.h"
 #define TRIM_4202_BUF_SIZE (12)
 
 static void swd_pull_down()
@@ -254,14 +255,6 @@ void trim_val_load()
     }
 }
 
-static bool need_foreground_ota(void)
-{
-    uint32_t ota_status;
-    ota_status = READ_REG(SYSCFG->BKD[7]);
-    uint32_t ota_settings = ota_settings_read();
-    return ota_status == 0x5A5A3C3C || (ota_settings == SINGLE_FOREGROUND);   
-}
-
 static void boot_app(uint32_t base)
 {
     uint32_t *msp = (void *)base;
@@ -271,19 +264,18 @@ static void boot_app(uint32_t base)
     (*reset_handler)();
 }
 
-static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
+static void fw_copy(uint32_t src,uint32_t dst,uint32_t size)
 {
     static uint8_t fw_buf[FLASH_PAGE_SIZE];
     uint16_t i;
-    for(i=0;i<CEILING(ptr->size, FLASH_PAGE_SIZE);++i)
+    for(i=0;i<CEILING(size, FLASH_PAGE_SIZE);++i)
     {
         if ((i % (FLASH_SECTOR_SIZE/FLASH_PAGE_SIZE)) == 0)
         {
-            spi_flash_sector_erase(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE);
+            spi_flash_sector_erase(dst - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE);
         }
-        
-        spi_flash_quad_io_read(ptr->base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
-        spi_flash_quad_page_program(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
+        spi_flash_quad_io_read(src - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
+        spi_flash_quad_page_program(dst - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
     }
 }
 
@@ -299,6 +291,7 @@ void boot_ram_start(uint32_t exec_addr)
     SYSCFG->PMU_PWR = 0;
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
+    spi_flash_dual_mode_set(false);
     spi_flash_xip_start();
     lscache_cache_enable(0);
     io_init();
@@ -308,17 +301,21 @@ void boot_ram_start(uint32_t exec_addr)
     lvd33_enable();
     DELAY_US(200);
     LVD33_Handler();
-    uint32_t image_base;
-    image_base = get_app_image_base();
-    struct fota_image_info image;
-    if(ota_copy_info_get(&image))
+    uint32_t image_base = get_app_image_base();
+    struct fota_copy_info info;
+    if(ota_copy_info_get(&info))
     {
-        fw_copy(&image,image_base);
-        ota_settings_erase();
+        fw_copy(info.fw_copy_src_addr,info.fw_copy_dst_addr,info.fw_copy_size);
+        ota_copy_done_set();
     }
-    if(need_foreground_ota())
+    uint32_t boot_addr;
+    if(ota_boot_addr_get(&boot_addr))
     {
-        image_base = get_fota_image_base();
+        image_base = boot_addr;
+    }
+    if(ota_settings_erase_req_get())
+    {
+        ota_settings_erase();
     }
     boot_app(image_base);
 }

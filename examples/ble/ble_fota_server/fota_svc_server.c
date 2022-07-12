@@ -7,9 +7,15 @@
 #include "ls_ble.h"
 #include "reg_base_addr.h"
 #include "tinycrypt/sha256.h"
+#include "ota_settings.h"
+#include "inflash_settings.h"
 #include "spi_flash.h"
 #include "fota_svc_server.h"
 #include "log.h"
+
+#define FOTA_STATUS_MASK 0x1
+#define FOTA_REBOOT_MASK 0x2
+#define FOTA_SETTINGS_ERASE_MASK 0x4
 
 #define FOTA_RESET_TIMEOUT 1000 // 1 second
 #define FOTA_SVC_DATA_MAX_LEN (USER_MAX_MTU - 3)
@@ -29,6 +35,7 @@ enum fotas_ctrl_type
     FOTAS_NEW_SECTOR_CMD,
     FOTAS_INTEGRITY_CHECK_REQ,
     FOTAS_INTEGRITY_CHECK_RSP,
+    FOTAS_FINISH_CMD,
 };
 
 enum fotas_cfm_status
@@ -108,6 +115,15 @@ struct fota_integrity_check_rsp
     uint8_t status;
 }__attribute__((packed));
 
+struct fota_finish_cmd
+{
+    uint32_t status:8,
+            fw_copy_size:24;
+    uint32_t fw_copy_src_addr;
+    uint32_t fw_copy_dst_addr;
+    uint32_t boot_addr;
+}__attribute__((packed));
+
 struct fota_ctrl
 {
     enum fotas_ctrl_type type;
@@ -119,6 +135,7 @@ struct fota_ctrl
         struct fota_new_sector_cmd new_sector;
         struct fota_integrity_check_req integrity_check_req;
         struct fota_integrity_check_rsp integrity_check_rsp;
+        struct fota_finish_cmd finish;
     }__attribute__((packed)) u;
 }__attribute__((packed));
 
@@ -183,9 +200,7 @@ static const struct svc_decl ls_ota_server_svc =
     .uuid_len = UUID_LEN_16BIT,
 };
 static struct gatt_svc_env ls_ota_svc_env;
-
 static struct fotas_env_tag fotas_env;
-static struct builtin_timer *fotas_rsp_timer = NULL;
 /**************************************************************************************************************************/
 #if FW_ECC_VERIFY
 const uint8_t fotas_pub_key[64];
@@ -224,24 +239,6 @@ static void fotas_flash_cleanup(void)
         {
             break;
         }
-    }
-}
-static void fotas_timer_cb(void *param)
-{
-    if(fotas_env.finish_ind->integrity_checking_result)
-    {
-        if(fotas_env.new_image.base != get_app_image_base())
-        {
-            ota_copy_info_set(&fotas_env.new_image);
-        }
-        else
-        {
-            ota_settings_erase();
-        }
-        platform_reset(RESET_OTA_SUCCEED);
-    }else
-    {
-        platform_reset(RESET_OTA_FAILED);
     }
 }
 static bool fw_digest_check(void)
@@ -338,7 +335,6 @@ static uint8_t ctrl_pkt_dispatch(const uint8_t *data,uint16_t length,uint8_t con
         if(fota_state_get()==FOTAS_IDLE)
         {
             fota_state_set(FOTAS_BUSY);
-            ota_settings_write(DOUBLE_BACKGROUND); 
             fotas_env.conidx = conidx;
             fotas_env.new_image.base = ctrl->u.start_req.new_image_base;
             fotas_env.new_image.size = ctrl->u.start_req.new_image_size;
@@ -353,10 +349,6 @@ static uint8_t ctrl_pkt_dispatch(const uint8_t *data,uint16_t length,uint8_t con
                 status = FOTA_REQ_REJECTED;
             }
             fotas_send_start_rsp(conidx, status);
-            if (fotas_rsp_timer == NULL)
-            {
-                fotas_rsp_timer = builtin_timer_create(fotas_timer_cb);
-            }
         }
         else
         {
@@ -375,9 +367,31 @@ static uint8_t ctrl_pkt_dispatch(const uint8_t *data,uint16_t length,uint8_t con
         fotas_env.finish_ind->integrity_checking_result = fw_digest_check();
         uint8_t digest_check_status = fotas_env.finish_ind->integrity_checking_result ? 0 : 0x80;
         fotas_integrity_check_rsp_ind_send(conidx, digest_check_status);
-        if (fotas_rsp_timer != NULL)
+    }
+    break;
+    case FOTAS_FINISH_CMD:
+    {
+        if (ctrl->u.finish.status & FOTA_STATUS_MASK && ctrl->u.finish.status & FOTA_REBOOT_MASK)
         {
-            builtin_timer_start(fotas_rsp_timer, FOTA_RESET_TIMEOUT, NULL);
+            struct fota_copy_info copy_info =
+            {
+                .fw_copy_src_addr = ctrl->u.finish.fw_copy_src_addr,
+                .fw_copy_dst_addr = ctrl->u.finish.fw_copy_dst_addr,
+                .fw_copy_size = ctrl->u.finish.fw_copy_size,
+            };
+            if (ctrl->u.finish.boot_addr)
+            {
+                ota_boot_addr_set(ctrl->u.finish.boot_addr);
+            }
+            if (ctrl->u.finish.status & FOTA_SETTINGS_ERASE_MASK)
+            {
+                ota_settings_erase_req_set();
+            }
+            if(ctrl->u.finish.fw_copy_size)
+            {
+                ota_copy_info_set(&copy_info);
+            }
+            platform_reset(RESET_OTA_SUCCEED);
         }
         fota_state_set(FOTAS_IDLE);
     }
@@ -425,25 +439,25 @@ void ls_ota_server_write_req_ind(struct gatt_server_write_req *wr_req, uint8_t c
         if (end_addr > page_aligned_addr)
         {
             pro_len = page_aligned_addr - start_addr;
-            spi_flash_quad_page_program(start_addr, data_ptr, pro_len);
+            spi_flash_multi_io_page_program(start_addr, data_ptr, pro_len);
             start_addr += pro_len;
             data_ptr += pro_len;
             len -= pro_len;
             while (len >= FOTAS_PAGE_SIZE)
             {
-                spi_flash_quad_page_program(start_addr, data_ptr, FOTAS_PAGE_SIZE);
+                spi_flash_multi_io_page_program(start_addr, data_ptr, FOTAS_PAGE_SIZE);
                 start_addr += FOTAS_PAGE_SIZE;
                 data_ptr += FOTAS_PAGE_SIZE;
                 len -= FOTAS_PAGE_SIZE;
             }
             if (len > 0)
             {
-                spi_flash_quad_page_program(start_addr, data_ptr, len);
+                spi_flash_multi_io_page_program(start_addr, data_ptr, len);
             }
         }
         else
         {
-            spi_flash_quad_page_program(start_addr, data_ptr, len);
+            spi_flash_multi_io_page_program(start_addr, data_ptr, len);
         }
         
         fotas_env.ack[ptr->segment_id/8] |= 1<< ptr->segment_id % 8;

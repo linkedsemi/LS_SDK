@@ -46,16 +46,29 @@ struct fotas_progress_evt
     uint8_t current_segment;
 };
 
+struct fota_copy_info
+{
+    uint32_t fw_copy_src_addr;
+    uint32_t fw_copy_dst_addr;
+    uint32_t fw_copy_size;
+};
+
+#define FOTA_STATUS_MASK 0x1
+#define FOTA_REBOOT_MASK 0x2
+#define FOTA_SETTINGS_ERASE_MASK 0x4
+
 struct fotas_finish_evt
 {
-    struct fota_image_info *new_image;
-    bool integrity_checking_result;
+    struct fota_copy_info copy;
+    uint32_t boot_addr;
+    uint8_t status;
 };
 
 union fotas_evt_u
 {
     struct fotas_start_req_evt fotas_start_req;
     struct fotas_finish_evt fotas_finish;
+    struct fotas_progress_evt fotas_progress;
 };
 
 

@@ -583,79 +583,14 @@ XIP_BANNED void clk_switch()
 
 #endif
 
-uint32_t get_ota_info_offset()
+uint32_t get_ota_settings_offset()
 {
-    uint8_t jedec_id[3];
-    spi_flash_read_id(jedec_id);
-    uint8_t capacity_id = jedec_id[2];
-    uint32_t flash_size = 1<<capacity_id;
-    return flash_size - FLASH_PAGE_SIZE;
-}
-
-void ota_settings_erase(void)
-{
-    SYSCFG->BKD[7] = 0;
-    spi_flash_sector_erase(get_ota_info_offset());
-}
-
-void ota_settings_write(uint32_t ota_settings_type)
-{
-    LS_ASSERT(ota_settings_type < OTA_SETTINGS_TYPE_MAX); 
-    spi_flash_quad_page_program(get_ota_info_offset(),(uint8_t *)&ota_settings_type,sizeof(ota_settings_type));
-}
-
-uint32_t ota_settings_read(void)
-{
-    uint32_t ota_settings;
-    spi_flash_quad_io_read(get_ota_info_offset(),(uint8_t *)&ota_settings,sizeof(ota_settings));
-    return ota_settings;
-}
-
-// only for foreground OTA
-void request_ota_reboot()
-{
-    SYSCFG->BKD[7] = 0x5A5A3C3C;
-    platform_reset(RESET_OTA_REQ);
-}
-
-uint32_t get_ota_status_offset()
-{
-    return get_ota_info_offset() + 0x10;    
-}
-
-bool ota_copy_info_get(struct fota_image_info *ptr)
-{
-    struct fota_image_info ota_image_info_array[2];
-    spi_flash_quad_io_read(get_ota_status_offset(), (uint8_t *)&ota_image_info_array[0], sizeof(ota_image_info_array));
-    ptr->base = ota_image_info_array[0].base;
-    ptr->size = ota_image_info_array[0].size;
-    if(ota_image_info_array[0].base == ~ota_image_info_array[1].base && ota_image_info_array[0].size == ~ota_image_info_array[1].size)
-    {
-        return true;
-    }else
-    {
-        return false;
-    }
-}
-
-void ota_copy_info_set(struct fota_image_info *ptr)
-{
-    struct fota_image_info ota_image_info_array[2];
-    ota_image_info_array[0].base = ptr->base;
-    ota_image_info_array[0].size = ptr->size;
-    ota_image_info_array[1].base = ~ptr->base;
-    ota_image_info_array[1].size = ~ptr->size;
-    spi_flash_quad_page_program(get_ota_status_offset(), (uint8_t *)&ota_image_info_array[0], sizeof(ota_image_info_array));
+    return spi_flash_total_size_get() - FLASH_PAGE_SIZE;
 }
 
 uint32_t get_app_image_base()
 {
     return config_word_get(APP_IMAGE_BASE_OFFSET);
-}
-
-uint32_t get_fota_image_base()
-{
-    return config_word_get(FOTA_IMAGE_BASE_OFFSET);
 }
 
 __attribute__((weak)) uint32_t __aeabi_uidiv(uint32_t r0,uint32_t r1)
