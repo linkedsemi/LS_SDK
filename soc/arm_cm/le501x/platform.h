@@ -11,14 +11,6 @@
 
 #define LSI_CNT_CYCLES (100)
 
-enum OTA_settings_type
-{
-    SINGLE_FOREGROUND = 0,
-    DOUBLE_FOREGROUND = 1,
-    DOUBLE_BACKGROUND = 2,
-    OTA_SETTINGS_TYPE_MAX = DOUBLE_BACKGROUND + 1,
-};
-
 struct reset_retain_struct
 {
     uint32_t reset_reason;
@@ -78,8 +70,6 @@ uint64_t idiv_acc(uint32_t,uint32_t,bool);
 
 void arm_cm_delay_asm(uint32_t);
 
-void request_ota_reboot(void);
-
 void power_up_hardware_modules(void);
 
 void remove_hw_isolation(void);
@@ -91,19 +81,7 @@ void arm_cm_set_int_isr(int8_t type,void (*isr)());
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/5)
 
-void ota_settings_erase(void);
-
-void ota_settings_write(uint32_t ota_settings_type);
-
-uint32_t ota_settings_read(void);
-
-bool ota_copy_info_get(struct fota_image_info *ptr);
-
-void ota_copy_info_set(struct fota_image_info *ptr);
-
 uint32_t get_app_image_base(void);
-
-uint32_t get_fota_image_base(void);
 
 void LVD33_Handler(void);
 

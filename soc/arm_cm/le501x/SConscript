@@ -108,6 +108,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         #'adpcm/adpcm.c',
         #'micro-ecc/uECC.c',
         'ble/ble_common_api.c',
+        'settings/inflash_settings.c',
+        'settings/ota_settings.c',
     ]))
     inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),['peripheral/inc',
         'peripheral/api',
@@ -123,6 +125,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         #'module/adpcm',
         'module/ble',
         'module/ble/prf',
+        'module/settings',
         'soc',
         'soc/arm_cm',
         'soc/arm_cm/cmsis',

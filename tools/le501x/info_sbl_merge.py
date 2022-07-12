@@ -17,13 +17,11 @@ sbl_code_start = 0x18000300
 sbl_code_length = len(sbl_data)
 assert(0x18002000 >= sbl_code_start + sbl_code_length)
 data_storage_base = 0x1807C000
-data_storage_size = 0x3000
 app_image_base = int(app_base)
-fota_image_base = 0x18070000
 crc_rslt = zlib.crc32(sbl_data)
 crc_bytes = struct.pack("I",crc_rslt)
 sbl_data = sbl_data + crc_bytes
-info_head = struct.pack('IIHHIIIIIIIII',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length,app_image_base,fota_image_base,data_storage_base)
+info_head = struct.pack('IIHHIIIIIIIII',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length,app_image_base,0xffffffff,data_storage_base)
 
 mac_addr_base = flash_base + 0x30
 mac_addr = bytes([0xff,0xff,0xff,0xff,0xff,0xff]) # ff:ff:ff:ff:ff:ff is not a valid address

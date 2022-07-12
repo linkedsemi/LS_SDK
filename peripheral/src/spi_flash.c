@@ -11,7 +11,7 @@ bool flash_dual_mode_only;
 
 void spi_flash_dual_mode_set(bool dual)
 {
-    flash_dual_mode_only= true;
+    flash_dual_mode_only= dual;
 }
 
 XIP_BANNED bool spi_flash_dual_mode_get()
@@ -265,6 +265,14 @@ XIP_BANNED bool spi_flash_writing_busy()
 XIP_BANNED bool spi_flash_xip_status_get()
 {
     return flash_stat.xip;
+}
+
+uint32_t spi_flash_total_size_get(void)
+{
+    uint8_t jedec_id[3];
+    spi_flash_read_id(jedec_id);
+    uint8_t capacity_id = jedec_id[2];
+    return 1<<capacity_id;
 }
 
 #endif
