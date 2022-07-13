@@ -1,6 +1,7 @@
 #ifndef PRF_BASS_H_
 #define PRF_BASS_H_
 #include <stdint.h>
+#include <stdbool.h>
 
 ///Maximal number of BAS that can be added in the DB
 #define BASS_NB_BAS_INSTANCES_MAX         (2)
@@ -27,5 +28,7 @@ void prf_bass_server_callback_init(void (*evt_cb)(enum bass_evt_type, union bass
 void dev_manager_prf_bass_server_add(uint8_t sec_lvl,struct bas_db_cfg*cfg,uint16_t len);
 
 void bas_batt_lvl_update(uint8_t ins_idx, uint8_t batt_lvl);
+
+void bas_batt_enable(uint8_t con_idx, bool enable, uint8_t old_bat_lvl);
 
 #endif
