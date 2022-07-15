@@ -577,7 +577,7 @@ static void Touch_LED(void)
  * 
  * @param null
  */
-static void Touch_Updata()
+static void Touch_Updata(void *param)
 {
     Touch_LED();
     HAL_TK_Get_Reg(SIGLR0, (uint8_t *)RxBUFF, 1);
