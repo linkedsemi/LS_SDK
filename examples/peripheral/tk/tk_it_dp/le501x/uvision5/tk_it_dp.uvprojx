@@ -1298,6 +1298,11 @@
 				<Group>
 					<GroupName>libs</GroupName>
 					<Files>
+						<File>
+							<FileType>4</FileType>
+							<FileName>lible5030_tk.a</FileName>
+							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\bin\lible5030_tk.a</FilePath>
+						</File>
 					</Files>
 				</Group>
 				<Group>
