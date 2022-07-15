@@ -290,7 +290,7 @@ void at_load_info_from_flash(void)
             ls_at_buff_env.default_info.advint = 0;
         }
     }
-    rf_set_power(ls_at_buff_env.default_info.rfpower);
+    rf_set_power((enum rf_tx_pwr)ls_at_buff_env.default_info.rfpower);
 }
 
 void at_store_info_to_flash(void)
