@@ -597,7 +597,7 @@ static void at_tx_power_handler(uint8_t *p_cmd_parse)
             else
             {
                 LOG_I("power:%d",ls_at_buff_env.default_info.rfpower);
-                rf_set_power(ls_at_buff_env.default_info.rfpower);
+                rf_set_power((enum rf_tx_pwr)ls_at_buff_env.default_info.rfpower);
                 msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nOK\r\n",ls_at_buff_env.default_info.rfpower);
             }
             uart_write(msg_rsp,msg_len);
