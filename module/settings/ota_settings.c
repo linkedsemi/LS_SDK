@@ -84,7 +84,7 @@ bool ota_copy_info_get(struct fota_copy_info *ptr)
 void ota_copy_info_set(struct fota_copy_info *ptr)
 {
     struct setting_info info = get_ota_copy_info();
-    return settings_set(&info,(void *)ptr);
+    settings_set(&info,(void *)ptr);
 }
 
 void ota_copy_done_set(void)
