@@ -144,7 +144,7 @@ XIP_BANNED void after_wfi()
     iwdg_check();
 }
 
-void clr_ble_wkup_req()
+static void clr_ble_wkup_req()
 {
     RCC->BLECFG &= ~RCC_BLE_WKUP_RST_MASK;
 }
@@ -240,7 +240,7 @@ void ble_wkup_status_set(bool status)
     waiting_ble_wkup_irq = status;
 }
 
-void ble_hclk_set()
+static void ble_hclk_set()
 {
     REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 1);
 }
@@ -257,6 +257,8 @@ static void ble_radio_en_sync()
 //    LS_ASSERT(__NVIC_GetPendingIRQ(BLE_WKUP_IRQn)==0);
     __NVIC_ClearPendingIRQ(BLE_WKUP_IRQn);
     __NVIC_EnableIRQ(BLE_WKUP_IRQn);
+    ble_hclk_set();
+    clr_ble_wkup_req();
 }
 
 static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
@@ -439,4 +441,14 @@ XIP_BANNED void restore_psp()
 {
     __set_PSP(CPU_PSP);
     __set_CONTROL(CPU_CONTROL);
+}
+
+void ble_reg_restore(void);
+void BLE_WKUP_Handler()
+{
+    ble_reg_restore();
+    modem_rf_reinit();
+    ble_irq_clr_and_enable();
+    ble_wkup_status_set(false);
+    BLE_WKUP_IRQ_DISABLE();
 }
