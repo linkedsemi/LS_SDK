@@ -88,12 +88,12 @@ int main(void)
 	{
 		if(ssi_txrx_flag == 1)
 		{
+			ssi_txrx_flag = 0;
 			if(HAL_SSI_TransmitReceive_IT(&SsiHandle, (uint8_t*)ssi_tx_buf, (uint8_t *)ssi_rx_buf, 4) != HAL_OK)
             {
                 /* Transfer error in transmission process */
                 Error_Handler();
             }
-			ssi_txrx_flag = 0;
 		}
 		DELAY_US(10000);
 	}

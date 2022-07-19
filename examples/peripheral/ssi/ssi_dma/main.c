@@ -97,12 +97,12 @@ int main(void)
 	{
 		if(ssi_txrx_flag == 1)
 		{
+			ssi_txrx_flag = 0;
 			if(HAL_SSI_TransmitReceive_DMA(&SsiHandle, ssi_dma_tx_buf,ssi_dma_rx_buf, 4)!= HAL_OK)
             {
                 /* Transfer error in transmission process */
                 Error_Handler();
             }
-			ssi_txrx_flag = 0;
 		}
 		DELAY_US(10000);
 	}
