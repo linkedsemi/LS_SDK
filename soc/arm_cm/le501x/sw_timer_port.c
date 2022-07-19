@@ -76,8 +76,6 @@ void timer_isr_func_set(void (*isr)())
 __attribute((weak)) void ls_24g_restore_in_wkup(void){}
 static void WKUP_Handler_For_SW_Timer()
 {
-    ble_hclk_set();
-    clr_ble_wkup_req();
     CNTL = 0x100;
     INT_MASK = 0x2;
     ls_24g_restore_in_wkup();

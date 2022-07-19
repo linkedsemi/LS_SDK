@@ -271,8 +271,6 @@ static volatile uint32_t int_stat = 0;
 __attribute((weak)) void ls_24g_restore_in_wkup(void){}
 static void WKUP_Handler_For_mcu(void)
 {
-    ble_hclk_set();
-    clr_ble_wkup_req();
     while(*(volatile uint32_t*)LS_24G_VERSION_ADDR == 0);
     CNTL = 0x100;
     // INT_MASK = 0x2;
