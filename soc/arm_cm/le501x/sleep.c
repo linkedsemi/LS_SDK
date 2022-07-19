@@ -443,7 +443,8 @@ XIP_BANNED void restore_psp()
     __set_CONTROL(CPU_CONTROL);
 }
 
-void ble_reg_restore(void);
+__attribute__((weak)) void ble_reg_restore(){}
+
 void BLE_WKUP_Handler()
 {
     ble_reg_restore();
