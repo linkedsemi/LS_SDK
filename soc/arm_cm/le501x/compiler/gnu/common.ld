@@ -106,11 +106,6 @@ SECTIONS
         reset_retain_end = .;
     } > RAM
     ASSERT(reset_retain_end <= 0xb800, "Error end address for reset retain")
-    .dmaram 0xa000 (NOLOAD):
-    {
-        *(DMAC1)
-        *(DMARAM)
-    } > RAM
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
      * values to stack symbols later */
@@ -125,5 +120,15 @@ SECTIONS
     
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
-    
+    .dmaram dmaram_start :
+    {
+        *(DMARAM)
+    }
+    dmaram_start = ALIGN((dmacs_start - SIZEOF(.dmaram))%4 ? (dmacs_start - SIZEOF(.dmaram) - 4):(dmacs_start - SIZEOF(.dmaram)),4);
+    .dmacs dmacs_start :
+    {
+        *(DMAC1)
+    }
+    dmacs_start = ORIGIN(RAM)+LENGTH(RAM) - SIZEOF(.dmacs);
+
 }
