@@ -120,12 +120,12 @@ SECTIONS
     
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
-    .dmaram dmaram_start :
+    .dmaram dmaram_start (NOLOAD):
     {
         *(DMARAM)
     }
     dmaram_start = ALIGN((dmacs_start - SIZEOF(.dmaram))%4 ? (dmacs_start - SIZEOF(.dmaram) - 4):(dmacs_start - SIZEOF(.dmaram)),4);
-    .dmacs dmacs_start :
+    .dmacs dmacs_start (NOLOAD):
     {
         *(DMAC1)
     }
