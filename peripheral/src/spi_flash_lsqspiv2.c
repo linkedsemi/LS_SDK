@@ -323,7 +323,7 @@ void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length)
     spi_flash_read_loop(&cfg,DUAL_IO_READ_OPCODE,offset,length);
 }
 
-void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
+ROM_SYMBOL void spi_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 39;
@@ -346,7 +346,7 @@ void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
     cfg.dat_ctrl.reserved2 = 0;
     cfg.dat_ctrl.dat_bytes = 0;
     cfg.data = data;
-    spi_flash_read_loop(&cfg,FAST_READ_OPCODE,offset,length);
+    spi_flash_read_loop(&cfg,opcode,offset,length);
 }
 
 XIP_BANNED void spi_flash_deep_power_down()
