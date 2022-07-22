@@ -275,4 +275,14 @@ uint32_t spi_flash_total_size_get(void)
     return 1<<capacity_id;
 }
 
+ROM_SYMBOL void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
+{
+    spi_flash_read_24bit_addr_8bit_dummy(offset,data,length,FAST_READ_OPCODE);
+}
+
+ROM_SYMBOL void spi_flash_read_sfdp(uint32_t offset,uint8_t *data, uint16_t length)
+{
+    spi_flash_read_24bit_addr_8bit_dummy(offset,data,length,READ_SFDP_OPCODE);
+}
+
 #endif

@@ -140,11 +140,11 @@ void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
     spi_flash_read_operation(&param);
 }
 
-void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
+void spi_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
-    param.start.opcode = FAST_READ_OPCODE;
+    param.start.opcode = opcode;
     param.start.addr = offset;
     param.start.dummy_bytes = 0;
     param.start.dummy_bytes_en = 1;
