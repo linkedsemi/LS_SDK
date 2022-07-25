@@ -1,5 +1,6 @@
 #ifndef LSSSI_H_
 #define LSSSI_H_
+#include <stdbool.h>
 #include "reg_ssi_type.h"
 #include "reg_base_addr.h"
 #include "HAL_def.h"
@@ -73,14 +74,14 @@ enum Control_Frame_Size{
 
 /// Clock Phase enumeration
 enum Clock_Phase{
-	Inactive_Low = 0,
-	Inactive_High
+	SCLK_Toggle_In_Middle = 0,
+	SCLK_Toggle_At_Start
 };
 
 /// Clock Polarity enumeration
 enum Clock_Polarity{
-	SCLK_Toggle_In_Middle = 0,
-	SCLK_Toggle_At_Start
+	Inactive_Low = 0,
+	Inactive_High
 };
 
 /// Frame Format enumeration
@@ -111,7 +112,8 @@ struct ssi_ctrl{
             cpol:1,           /**< ::Clock_Polarity */
             reserved1:4,
             control_frame_size:4, /**< ::Control_Frame_Size */
-            data_frame_size:5;    /**< ::Data_Frame_Size */
+            data_frame_size:5,    /**< ::Data_Frame_Size */
+			reserved2;
 };
 
 /// SSI Initialization Parameters Typedef
@@ -127,6 +129,7 @@ typedef struct __SSI_HandleTypeDef
 {
     reg_ssi_t *REG;              /**< Register Base Pointer */
     SSI_InitTypeDef Init;       /**< Initialization Parameters */
+	volatile uint32_t *DR_REG;  /**< Used Data Register */
     void *DMAC_Instance;        /**< DMA Controller Handle Pointer */
     union{
         struct SSI_DMA_Env DMA;     /**< DMA Env */
@@ -145,6 +148,17 @@ HAL_StatusTypeDef HAL_SSI_Init(SSI_HandleTypeDef *hssi);
  */
 HAL_StatusTypeDef HAL_SSI_Deinit(SSI_HandleTypeDef *hssi);
 
+
+HAL_StatusTypeDef HAL_SSI_Use_Reversed_Data_Reg(SSI_HandleTypeDef *hssi,bool reversed_data_reg);
+
+/** \brief SSI Transmit (Polling Mode)
+ *  \param[in] hssi Handle of SSI
+ *  \param[in] Data Buffer pointer for TX
+ *  \param[in] Count Number of data frame in units of ::Data_Frame_Size
+ *  \return Status
+ */
+HAL_StatusTypeDef HAL_SSI_Transmit(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count);
+
 /** \brief SSI Transmit (Interrupt Mode)
  *  \param[in] hssi Handle of SSI
  *  \param[in] Data Buffer pointer for TX
@@ -158,6 +172,14 @@ HAL_StatusTypeDef HAL_SSI_Transmit_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_
  *  \param hssi Handle of SSI
  */
 void HAL_SSI_TxCpltCallback(SSI_HandleTypeDef *hssi);
+
+/** \brief SSI Receive (Polling Mode)
+ *  \param[in] hssi Handle of SSI
+ *  \param[out] Data Buffer pointer for RX
+ *  \param[in] Count Number of data frame in units of ::Data_Frame_Size
+ *  \return Status
+ */
+HAL_StatusTypeDef HAL_SSI_Receive(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count);
 
 /** \brief SSI Receive (Interrupt Mode)
  *  \param[in] hssi Handle of SSI
@@ -173,6 +195,16 @@ HAL_StatusTypeDef HAL_SSI_Receive_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t
  */
 void HAL_SSI_RxCpltCallback(SSI_HandleTypeDef *hssi);
 
+
+/** \brief SSI TransmitReceive (Polling Mode)
+ *  \param[in] hssi Handle of SSI
+ *  \param[in] TX_Data Buffer pointer for TX
+ *  \param[out] RX_Data Buffer pointer for RX
+ *  \param[in] Count Number of data frame in units of ::Data_Frame_Size
+ *  \return Status
+ */
+HAL_StatusTypeDef HAL_SSI_TransmitReceive(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count);
+
 /** \brief SSI TransmitReceive (Interrupt Mode)
  *  \param[in] hssi Handle of SSI
  *  \param[in] TX_Data Buffer pointer for TX
@@ -187,6 +219,32 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_IT(SSI_HandleTypeDef *hssi,void *TX_Da
  *  \param hssi Handle of SSI
  */
 void HAL_SSI_TxRxCpltCallback(SSI_HandleTypeDef *hssi);
+
+/** \brief SSI TransmitReceive HalfDuplex (Polling Mode)
+ *  \param[in] hssi Handle of SSI
+ *  \param[in] TX_Data Buffer pointer for TX
+ *  \param[in] TX_Count Number of TX data frame in units of ::Data_Frame_Size
+ *  \param[out] RX_Data Buffer pointer for RX
+ *  \param[in] RX_Count Number of RX data frame in units of ::Data_Frame_Size
+ *  \return Status
+ */
+HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count);
+
+/** \brief SSI TransmitReceive HalfDuplex (Interrupt Mode)
+ *  \param[in] hssi Handle of SSI
+ *  \param[in] TX_Data Buffer pointer for TX
+ *  \param[in] TX_Count Number of TX data frame in units of ::Data_Frame_Size
+ *  \param[out] RX_Data Buffer pointer for RX
+ *  \param[in] RX_Count Number of RX data frame in units of ::Data_Frame_Size
+ *  \return Status
+ */
+HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_IT(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count);
+
+/** Callback function that will be invoked in the interrupt context when SSI TXRX HalfDuplex (Interrupt Mode) is complete
+ *  Overwrite this function to get notification of completion of SSI TXRX HalfDuplex.
+ *  \param hssi Handle of SSI
+ */
+void HAL_SSI_TxRxHalfDuplexCpltCallback(SSI_HandleTypeDef *hssi);
 
 /** \brief SSI Transmit (DMA Mode)
  *  \param[in] hssi Handle of SSI
@@ -216,7 +274,7 @@ HAL_StatusTypeDef HAL_SSI_Receive_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_
  */
 void HAL_SSI_RxDMACpltCallback(SSI_HandleTypeDef *hssi);
 
-/** \brief SSI TransmitReceive (Interrupt Mode)
+/** \brief SSI TransmitReceive (DMA Mode)
  *  \param[in] hssi Handle of SSI
  *  \param[in] TX_Data Buffer pointer for TX
  *  \param[out] RX_Data Buffer pointer for RX
@@ -230,6 +288,22 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_D
  *  \param hssi Handle of SSI
  */
 void HAL_SSI_TxRxDMACpltCallback(SSI_HandleTypeDef *hssi);
+
+/** \brief SSI TransmitReceive HalfDuplex (DMA Mode)
+ *  \param[in] hssi Handle of SSI
+ *  \param[in] TX_Data Buffer pointer for TX
+ *  \param[in] TX_Count Number of TX data frame in units of ::Data_Frame_Size
+ *  \param[out] RX_Data Buffer pointer for RX
+ *  \param[in] RX_Count Number of RX data frame in units of ::Data_Frame_Size
+ *  \return Status
+ */
+HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_DMA(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count);
+
+/** Callback function that will be invoked in the interrupt context when SSI TXRX HalfDuplex (DMA Mode) is complete
+ *  Overwrite this function to get notification of completion of SSI TXRX HalfDuplex.
+ *  \param hssi Handle of SSI
+ */
+void HAL_SSI_TxRxHalfDuplexDMACpltCallback(SSI_HandleTypeDef *hssi);
 
 void HAL_SSI_IRQHandler(SSI_HandleTypeDef *hssi);
 
