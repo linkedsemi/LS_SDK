@@ -67,6 +67,7 @@ static void Input_Capture_Config(void)
     HAL_TIM_IC_ConfigChannel(&TIM_Capture_Handle, &TIM_ICInitStructure, TIM_CHANNEL_1);
 
 #if (INPUT_CAPTURE_MODE == COMMON_INPUT_CAPTURE)
+    io_cfg_output(PA01); //Debug IO Config
     HAL_TIM_Base_Start_IT(&TIM_Capture_Handle);  
     HAL_TIM_IC_Start_IT(&TIM_Capture_Handle,TIM_CHANNEL_1);
 #else

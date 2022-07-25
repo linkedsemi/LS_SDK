@@ -35,6 +35,7 @@
 #define DUAL_IO_READ_OPCODE 0xbb
 #define QUAD_IO_READ_OPCODE 0xeb
 #define FAST_READ_OPCODE 0x0b
+#define READ_SFDP_OPCODE 0x5a
 #define DEEP_POWER_DOWN_OPCODE 0xb9
 #define RELEASE_FROM_DEEP_POWER_DOWN_OPCODE 0xab
 #define READ_IDENTIFICATION_OPCODE 0x9f
@@ -112,6 +113,8 @@ void do_spi_flash_program_security_area(uint8_t idx, uint16_t addr, uint8_t * da
 void do_spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 
 void do_spi_flash_read_reg(void *param);
+
+void spi_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode);
 
 #endif
 
