@@ -10,6 +10,7 @@ HAL_StatusTypeDef HAL_SSI_Init(SSI_HandleTypeDef *hssi)
     HAL_SSI_MSP_Busy_Set(hssi);
     hssi->REG->BAUDR = hssi->Init.clk_div;
     hssi->REG->RXSAMPLE_DLY = hssi->Init.rxsample_dly;
+    hssi->DR_REG = &hssi->REG->DR;
     return HAL_OK;
 }
 
@@ -41,10 +42,15 @@ static void ssi_config_it(SSI_HandleTypeDef *hssi,bool tx,bool rx)
     hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
 }
 
-HAL_StatusTypeDef HAL_SSI_Transmit_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+static void tx_var_init(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
     hssi->Tx_Env.Interrupt.Data = Data;
     hssi->Tx_Env.Interrupt.Count = Count;
+}
+
+HAL_StatusTypeDef HAL_SSI_Transmit_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+{
+    tx_var_init(hssi,Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
     ssi_config_it(hssi,true,false); 
     return HAL_OK;
@@ -52,14 +58,19 @@ HAL_StatusTypeDef HAL_SSI_Transmit_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_
 
 __attribute__((weak)) void HAL_SSI_TxCpltCallback(SSI_HandleTypeDef *hssi){}
 
-HAL_StatusTypeDef HAL_SSI_Receive_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+static void rx_var_init(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
     hssi->Rx_Env.Interrupt.Data = Data;
     hssi->Rx_Env.Interrupt.Count = Count;
+}
+
+HAL_StatusTypeDef HAL_SSI_Receive_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+{
+    rx_var_init(hssi,Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
     hssi->REG->CTRLR1 = Count - 1;
     ssi_config_it(hssi,false,true);
-    hssi->REG->DR = 0;
+    hssi->DR_REG[0] = 0;
     return HAL_OK;
 }
 
@@ -67,52 +78,68 @@ __attribute__((weak)) void HAL_SSI_RxCpltCallback(SSI_HandleTypeDef *hssi){}
 
 HAL_StatusTypeDef HAL_SSI_TransmitReceive_IT(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
-    hssi->Tx_Env.Interrupt.Data = TX_Data;
-    hssi->Rx_Env.Interrupt.Data = RX_Data;
-    hssi->Tx_Env.Interrupt.Count = Count;
-    hssi->Rx_Env.Interrupt.Count = Count;
+    tx_var_init(hssi,TX_Data,Count);
+    rx_var_init(hssi,RX_Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
     ssi_config_it(hssi,true,true);
     return HAL_OK;
 }
 
-void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_callback)(SSI_HandleTypeDef *hssi))
+static void ssi_disable(SSI_HandleTypeDef *hssi)
 {
+    while(REG_FIELD_RD(hssi->REG->SR,SSI_BUSY) == SSI_Busy);
     hssi->REG->SSIENR = SSI_Disabled;
     hssi->REG->SER = 0;
-    if(REG_FIELD_RD(hssi->REG->CTRLR0,SSI_TMOD) == Receive_Only)
+}
+
+void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_halfduplex_callback)(SSI_HandleTypeDef *hssi))
+{
+    ssi_disable(hssi);
+    switch(REG_FIELD_RD(hssi->REG->CTRLR0,SSI_TMOD))
     {
+    case Receive_Only:
         rx_callback(hssi);
-    }else if(REG_FIELD_RD(hssi->REG->CTRLR0,SSI_TMOD) == Transmit_and_Receive)
-    {
+    break;
+    case Transmit_and_Receive:
         txrx_callback(hssi);
+    break;
+    case EEPROM_Read:
+        txrx_halfduplex_callback(hssi);
+    break;
     }
 }
 
 __attribute__((weak)) void HAL_SSI_TxRxCpltCallback(SSI_HandleTypeDef *hssi){}
 
-static void ssi_rx_full_isr(SSI_HandleTypeDef *hssi)
+__attribute__((weak)) void HAL_SSI_TxRxHalfDuplexCpltCallback(SSI_HandleTypeDef *hssi){}
+
+static void ssi_data_rx(SSI_HandleTypeDef *hssi)
 {
-    do
+    while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE))
     {
         if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
         {
-            *(uint8_t *)hssi->Rx_Env.Interrupt.Data = (uint8_t)hssi->REG->DR;
+            *(uint8_t *)hssi->Rx_Env.Interrupt.Data = (uint8_t)hssi->DR_REG[0];
             hssi->Rx_Env.Interrupt.Data += 1;
         }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
         {
-            *(uint16_t *)hssi->Rx_Env.Interrupt.Data = (uint16_t)hssi->REG->DR;
+            *(uint16_t *)hssi->Rx_Env.Interrupt.Data = (uint16_t)hssi->DR_REG[0];
             hssi->Rx_Env.Interrupt.Data += 2;
         }else
         {
-            *(uint32_t *)hssi->Rx_Env.Interrupt.Data = (uint32_t)hssi->REG->DR;
+            *(uint32_t *)hssi->Rx_Env.Interrupt.Data = (uint32_t)hssi->DR_REG[0];
             hssi->Rx_Env.Interrupt.Data += 4;
         }
         --hssi->Rx_Env.Interrupt.Count;
-    }while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE));
+    }
+}
+
+static void ssi_rx_full_isr(SSI_HandleTypeDef *hssi)
+{
+    ssi_data_rx(hssi);
     if(hssi->Rx_Env.Interrupt.Count == 0)
     {
-        ssi_rx_done(hssi,HAL_SSI_RxCpltCallback,HAL_SSI_TxRxCpltCallback);
+        ssi_rx_done(hssi,HAL_SSI_RxCpltCallback,HAL_SSI_TxRxCpltCallback,HAL_SSI_TxRxHalfDuplexCpltCallback);
     }
 }
 
@@ -121,10 +148,29 @@ void ssi_tx_done(SSI_HandleTypeDef *hssi,void (*tx_callback)(SSI_HandleTypeDef *
     REG_FIELD_WR(hssi->REG->IMR,SSI_TXEIM,0);
     if(REG_FIELD_RD(hssi->REG->CTRLR0,SSI_TMOD) == Transmit_Only)
     {
-        while(REG_FIELD_RD(hssi->REG->SR,SSI_BUSY) == SSI_Busy);
-        hssi->REG->SSIENR = SSI_Disabled;
-        hssi->REG->SER = 0;
+        ssi_disable(hssi);
         tx_callback(hssi);
+    }
+}
+
+static void ssi_data_tx(SSI_HandleTypeDef *hssi)
+{
+    while(REG_FIELD_RD(hssi->REG->SR,SSI_TFNF)&&hssi->Tx_Env.Interrupt.Count)
+    {
+        if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
+        {
+            hssi->DR_REG[0] = *(uint8_t *)hssi->Tx_Env.Interrupt.Data;
+            hssi->Tx_Env.Interrupt.Data += 1;
+        }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
+        {
+            hssi->DR_REG[0] = *(uint16_t *)hssi->Tx_Env.Interrupt.Data;
+            hssi->Tx_Env.Interrupt.Data += 2;
+        }else
+        {
+            hssi->DR_REG[0] = *(uint32_t *)hssi->Tx_Env.Interrupt.Data;
+            hssi->Tx_Env.Interrupt.Data += 4;
+        }
+        --hssi->Tx_Env.Interrupt.Count;
     }
 }
 
@@ -132,22 +178,7 @@ static void ssi_tx_empty_isr(SSI_HandleTypeDef *hssi)
 {
     if(hssi->Tx_Env.Interrupt.Count)
     {
-        do{
-            if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
-            {
-                hssi->REG->DR = *(uint8_t *)hssi->Tx_Env.Interrupt.Data;
-                hssi->Tx_Env.Interrupt.Data += 1;
-            }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
-            {
-                hssi->REG->DR = *(uint16_t *)hssi->Tx_Env.Interrupt.Data;
-                hssi->Tx_Env.Interrupt.Data += 2;
-            }else
-            {
-                hssi->REG->DR = *(uint32_t *)hssi->Tx_Env.Interrupt.Data;
-                hssi->Tx_Env.Interrupt.Data += 4;
-            }
-            --hssi->Tx_Env.Interrupt.Count;
-        }while(REG_FIELD_RD(hssi->REG->SR,SSI_TFNF)&&hssi->Tx_Env.Interrupt.Count);
+        ssi_data_tx(hssi);
     }else{
         if(hssi->REG->TXFLR)
         {
@@ -157,6 +188,79 @@ static void ssi_tx_empty_isr(SSI_HandleTypeDef *hssi)
             ssi_tx_done(hssi,HAL_SSI_TxCpltCallback);
         }
     }
+}
+
+HAL_StatusTypeDef HAL_SSI_Transmit(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+{
+    tx_var_init(hssi,Data,Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
+    ssi_config_it(hssi,false,false);
+    while(hssi->Tx_Env.Interrupt.Count)
+    {
+        ssi_data_tx(hssi);
+    }
+    ssi_disable(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Receive(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+{
+    rx_var_init(hssi,Data,Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
+    hssi->REG->CTRLR1 = Count - 1;
+    ssi_config_it(hssi,false,false);
+    hssi->DR_REG[0] = 0;
+    while(hssi->Rx_Env.Interrupt.Count)
+    {
+        ssi_data_rx(hssi);
+    }
+    ssi_disable(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_TransmitReceive(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count)
+{
+    tx_var_init(hssi,TX_Data,Count);
+    rx_var_init(hssi,RX_Data,Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
+    ssi_config_it(hssi,false,false);
+    while(hssi->Rx_Env.Interrupt.Count)
+    {
+        ssi_data_tx(hssi);
+        while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE)==0);
+        ssi_data_rx(hssi);
+    }
+    ssi_disable(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count)
+{
+    tx_var_init(hssi,TX_Data,TX_Count);
+    rx_var_init(hssi,RX_Data,RX_Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
+    hssi->REG->CTRLR1 = RX_Count - 1;
+    ssi_config_it(hssi,false,false);
+    while(hssi->Tx_Env.Interrupt.Count)
+    {
+        ssi_data_tx(hssi);
+    }
+    while(hssi->Rx_Env.Interrupt.Count)
+    {
+        ssi_data_rx(hssi);
+    }
+    ssi_disable(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_IT(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count)
+{
+    tx_var_init(hssi,TX_Data,TX_Count);
+    rx_var_init(hssi,RX_Data,RX_Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
+    hssi->REG->CTRLR1 = RX_Count - 1;
+    ssi_config_it(hssi,true,true);
+    return HAL_OK;
 }
 
 __attribute__((weak)) void ssi_tx_empty_dma_isr(SSI_HandleTypeDef *hssi){}
@@ -205,4 +309,10 @@ void HAL_SSI_IRQHandler(SSI_HandleTypeDef *hssi)
             }
         }    
     }
+}
+
+HAL_StatusTypeDef HAL_SSI_Use_Reversed_Data_Reg(SSI_HandleTypeDef *hssi,bool reversed_data_reg)
+{
+    hssi->DR_REG = reversed_data_reg? &hssi->REG->DR_REVERSED : &hssi->REG->DR;
+    return HAL_OK;
 }

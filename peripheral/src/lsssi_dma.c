@@ -6,11 +6,13 @@
 
 void ssi_ctrlr0_set(SSI_HandleTypeDef *hssi,uint8_t frame_format,uint8_t mode);
 void ssi_tx_done(SSI_HandleTypeDef *hssi,void (*tx_callback)(SSI_HandleTypeDef *hssi));
-void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_callback)(SSI_HandleTypeDef *hssi));
+void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_halfduplex_callback)(SSI_HandleTypeDef *hssi));
 
 __attribute__((weak)) void HAL_SSI_TxDMACpltCallback(SSI_HandleTypeDef *hssi){}
 __attribute__((weak)) void HAL_SSI_RxDMACpltCallback(SSI_HandleTypeDef *hssi){}
 __attribute__((weak)) void HAL_SSI_TxRxDMACpltCallback(SSI_HandleTypeDef *hssi){}
+__attribute__((weak)) void HAL_SSI_TxRxHalfDuplexDMACpltCallback(SSI_HandleTypeDef *hssi){}
+
 
 void ssi_tx_empty_dma_isr(SSI_HandleTypeDef *hssi)
 {
@@ -27,10 +29,10 @@ static void SSI_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_chan
 static void SSI_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
 {
     SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
-    ssi_rx_done(hssi,HAL_SSI_RxDMACpltCallback,HAL_SSI_TxRxDMACpltCallback);
+    ssi_rx_done(hssi,HAL_SSI_RxDMACpltCallback,HAL_SSI_TxRxDMACpltCallback,HAL_SSI_TxRxHalfDuplexDMACpltCallback);
 }
 
-static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count)
+static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t TX_Count,uint16_t RX_Count)
 {
     hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|
         FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
@@ -42,20 +44,20 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
     uint8_t inc;
     if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
     {
-        tx_data_end_ptr += Count - 1;
-        rx_data_end_ptr += Count - 1;
+        tx_data_end_ptr += TX_Count - 1;
+        rx_data_end_ptr += RX_Count - 1;
         data_size = DMA_SIZE_BYTE;
         inc = DMA_INC_BYTE;
     }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
     {
-        tx_data_end_ptr += (Count - 1) * 2;
-        rx_data_end_ptr += (Count - 1) * 2;
+        tx_data_end_ptr += (TX_Count - 1) * 2;
+        rx_data_end_ptr += (RX_Count - 1) * 2;
         data_size = DMA_SIZE_HALFWORD;
         inc = DMA_INC_HALFWORD;
     }else
     {
-        tx_data_end_ptr += (Count - 1)* 4;
-        rx_data_end_ptr += (Count - 1)* 4;
+        tx_data_end_ptr += (TX_Count - 1)* 4;
+        rx_data_end_ptr += (RX_Count - 1)* 4;
         data_size = DMA_SIZE_WORD;
         inc = DMA_INC_WORD;
     }
@@ -66,7 +68,7 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         prim.dst_data_end_ptr = rx_data_end_ptr;
         prim.ctrl_data.cycle_ctrl = DMA_Cycle_Basic;
         prim.ctrl_data.next_useburst = 0;
-        prim.ctrl_data.n_minus_1 = Count - 1;
+        prim.ctrl_data.n_minus_1 = RX_Count - 1;
         prim.ctrl_data.R_power = 0;
         prim.ctrl_data.src_prot_ctrl = 0;
         prim.ctrl_data.dst_prot_ctrl = 0;
@@ -85,7 +87,7 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         prim.dst_data_end_ptr = (uint32_t)&hssi->REG->DR;
         prim.ctrl_data.cycle_ctrl = DMA_Cycle_Basic,
         prim.ctrl_data.next_useburst = 0;
-        prim.ctrl_data.n_minus_1 = Count - 1;
+        prim.ctrl_data.n_minus_1 = TX_Count - 1;
         prim.ctrl_data.R_power = 0;
         prim.ctrl_data.src_prot_ctrl = 0;
         prim.ctrl_data.dst_prot_ctrl = 0;
@@ -104,7 +106,7 @@ HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
     hssi->REG->DMACR = SSI_TDMAE_MASK;
     hssi->REG->DMATDLR = 2;
-    ssi_dma_config(hssi,Data,NULL,Count);
+    ssi_dma_config(hssi,Data,NULL,Count,Count);
     return HAL_OK;
 }
 
@@ -114,7 +116,7 @@ HAL_StatusTypeDef HAL_SSI_Receive_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_
     hssi->REG->CTRLR1 = Count - 1;
     hssi->REG->DMACR = SSI_RDMAE_MASK;
     hssi->REG->DMARDLR = 1;
-    ssi_dma_config(hssi,NULL,Data,Count);
+    ssi_dma_config(hssi,NULL,Data,Count,Count);
     hssi->REG->DR = 0;
     return HAL_OK;
 }
@@ -125,7 +127,17 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_D
     hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
     hssi->REG->DMATDLR = 2;
     hssi->REG->DMARDLR = 1;
-    ssi_dma_config(hssi,TX_Data,RX_Data,Count);
+    ssi_dma_config(hssi,TX_Data,RX_Data,Count,Count);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_DMA(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count)
+{
+    ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
+    hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
+    hssi->REG->DMATDLR = 2;
+    hssi->REG->DMARDLR = 1;
+    ssi_dma_config(hssi,TX_Data,RX_Data,TX_Count,RX_Count);
     return HAL_OK;
 }
 
