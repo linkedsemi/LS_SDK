@@ -263,6 +263,8 @@ static void ble_radio_en_sync()
 
 static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
 {
+    __disable_irq();
+    systick_stop();
     NVIC->ICER[0] = 0xffffffff;
     lvl2_lvl3_io_retention(LSGPIOA);
     lvl2_lvl3_io_retention(LSGPIOB);
