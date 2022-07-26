@@ -111,6 +111,13 @@ void spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length);
  */
 void spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length);
 
+/** \brief Read SFDP
+ *  \param[in] offset Offset
+ *  \param[out] data The pointer of the data buffer
+ *  \param[in] length Data length in bytes
+ */
+void spi_flash_read_sfdp(uint32_t offset,uint8_t *data, uint16_t length);
+
 /** \brief Deep Power Down */
 void spi_flash_deep_power_down(void);
 

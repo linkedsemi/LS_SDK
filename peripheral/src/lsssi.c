@@ -29,6 +29,11 @@ void ssi_ctrlr0_set(SSI_HandleTypeDef *hssi,uint8_t frame_format,uint8_t mode)
     hssi->REG->CTRLR0 = ctrlr0;
 }
 
+static inline void ssi_ser_cfg(SSI_HandleTypeDef *hssi)
+{
+    hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
+}
+
 static void ssi_config_it(SSI_HandleTypeDef *hssi,bool tx,bool rx)
 {
     hssi->REG->DMACR = 0;
@@ -39,7 +44,6 @@ static void ssi_config_it(SSI_HandleTypeDef *hssi,bool tx,bool rx)
         FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
         FIELD_BUILD(SSI_TXEIM,tx);
     hssi->REG->SSIENR = SSI_Enabled;
-    hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
 }
 
 static void tx_var_init(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
@@ -53,6 +57,7 @@ HAL_StatusTypeDef HAL_SSI_Transmit_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_
     tx_var_init(hssi,Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
     ssi_config_it(hssi,true,false); 
+    ssi_ser_cfg(hssi);
     return HAL_OK;
 }
 
@@ -70,6 +75,7 @@ HAL_StatusTypeDef HAL_SSI_Receive_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t
     ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
     hssi->REG->CTRLR1 = Count - 1;
     ssi_config_it(hssi,false,true);
+    ssi_ser_cfg(hssi);
     hssi->DR_REG[0] = 0;
     return HAL_OK;
 }
@@ -82,6 +88,7 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_IT(SSI_HandleTypeDef *hssi,void *TX_Da
     rx_var_init(hssi,RX_Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
     ssi_config_it(hssi,true,true);
+    ssi_ser_cfg(hssi);
     return HAL_OK;
 }
 
@@ -195,6 +202,8 @@ HAL_StatusTypeDef HAL_SSI_Transmit(SSI_HandleTypeDef *hssi,void *Data,uint16_t C
     tx_var_init(hssi,Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
     ssi_config_it(hssi,false,false);
+    ssi_data_tx(hssi);
+    ssi_ser_cfg(hssi);
     while(hssi->Tx_Env.Interrupt.Count)
     {
         ssi_data_tx(hssi);
@@ -209,6 +218,7 @@ HAL_StatusTypeDef HAL_SSI_Receive(SSI_HandleTypeDef *hssi,void *Data,uint16_t Co
     ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
     hssi->REG->CTRLR1 = Count - 1;
     ssi_config_it(hssi,false,false);
+    ssi_ser_cfg(hssi);
     hssi->DR_REG[0] = 0;
     while(hssi->Rx_Env.Interrupt.Count)
     {
@@ -224,11 +234,13 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive(SSI_HandleTypeDef *hssi,void *TX_Data,
     rx_var_init(hssi,RX_Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
     ssi_config_it(hssi,false,false);
+    ssi_data_tx(hssi);
+    ssi_ser_cfg(hssi);
     while(hssi->Rx_Env.Interrupt.Count)
     {
-        ssi_data_tx(hssi);
         while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE)==0);
         ssi_data_rx(hssi);
+        ssi_data_tx(hssi);
     }
     ssi_disable(hssi);
     return HAL_OK;
@@ -241,6 +253,8 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex(SSI_HandleTypeDef *hssi,voi
     ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
     hssi->REG->CTRLR1 = RX_Count - 1;
     ssi_config_it(hssi,false,false);
+    ssi_data_tx(hssi);
+    ssi_ser_cfg(hssi);
     while(hssi->Tx_Env.Interrupt.Count)
     {
         ssi_data_tx(hssi);
@@ -260,6 +274,7 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_IT(SSI_HandleTypeDef *hssi,
     ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
     hssi->REG->CTRLR1 = RX_Count - 1;
     ssi_config_it(hssi,true,true);
+    ssi_ser_cfg(hssi);
     return HAL_OK;
 }
 
