@@ -4,50 +4,50 @@
 
 ### 1、构建系统（SCons）
 
-1.1 <a name="v110_1_1"></a>支持引用上级目录源文件 
+1.1 <a name="v110_1_1"></a>支持引用上级目录源文件  
 
 ### 2、外设驱动
 
-2.1 <a name="v110_2_1"></a>增加Flash SFDP读取接口 
-2.2 <a name="v110_2_2"></a>增加SSI阻塞收发接口和半双工接口
-2.3 <a name="v110_2_3"></a>SSI DMA发送BUG修复
-2.4 <a name="v110_2_4"></a>Uart it tx最后一个byte概率性丢失bug修复
+2.1 <a name="v110_2_1"></a>增加Flash SFDP读取接口  
+2.2 <a name="v110_2_2"></a>增加SSI阻塞收发接口和半双工接口  
+2.3 <a name="v110_2_3"></a>SSI DMA发送BUG修复  
+2.4 <a name="v110_2_4"></a>Uart it tx最后一个byte概率性丢失bug修复     
 
 ### 3、BLE
 
-3.1 <a name="v110_3_1"></a>射频参数优化，发射功率一致性优化
-3.2 <a name="v110_3_2"></a>增加安全连接OOB事件
-3.3 <a name="v110_3_3"></a>FOTA支持协议栈更新，FOTA RAM消耗优化
+3.1 <a name="v110_3_1"></a>射频参数优化，发射功率一致性优化  
+3.2 <a name="v110_3_2"></a>增加安全连接OOB事件  
+3.3 <a name="v110_3_3"></a>FOTA支持协议栈更新，FOTA RAM消耗优化  
 3.4 <a name="v110_3_4"></a>多连接BUG修复（多路并行批量数据传输，其中一路断连接会影响另一路数据传输）
-3.5 <a name="v110_3_5"></a>增加SCAN REQ IND事件
-3.6 <a name="v110_3_6"></a>增加ADV STARTED和UPDATED事件
-3.7 <a name="v110_3_7"></a>set_svc_permission API更新，删除无效参数
-3.8 <a name="v110_3_8"></a>增加dev_manager_add_service_with_start_handle API
-3.9 <a name="v110_3_9"></a>llcp过程slave latency优化
-3.10 <a name="v110_3_10"></a>active scan bug修复
-3.11 <a name="v110_3_11"></a>增加builtin_timer_active API
-3.12 <a name="v110_3_12"></a>增加bass profile enable api
-3.13 <a name="v110_3_13"></a>修改ecc为polling模式（支持应用使用ecc）
-3.14 <a name="v110_3_14"></a>ble_multi_roles/uart_server_multi_link等demo新增disconnect时清相关全局变量处理
+3.5 <a name="v110_3_5"></a>增加SCAN REQ IND事件  
+3.6 <a name="v110_3_6"></a>增加ADV STARTED和UPDATED事件  
+3.7 <a name="v110_3_7"></a>set_svc_permission API更新，删除无效参数  
+3.8 <a name="v110_3_8"></a>增加dev_manager_add_service_with_start_handle API  
+3.9 <a name="v110_3_9"></a>llcp过程slave latency优化  
+3.10 <a name="v110_3_10"></a>active scan bug修复  
+3.11 <a name="v110_3_11"></a>增加builtin_timer_active API  
+3.12 <a name="v110_3_12"></a>增加bass profile enable api  
+3.13 <a name="v110_3_13"></a>修改ecc为polling模式（支持应用使用ecc）  
+3.14 <a name="v110_3_14"></a>ble_multi_roles/uart_server_multi_link等demo新增disconnect时清相关全局变量处理  
 
 ### 4、Demos
 
-4.1 <a name="v110_4_1"></a>增加AMIC示例
-4.2 <a name="v110_4_2"></a>Keil info_sbl和stack烧录支持
-4.3 <a name="v110_4_3"></a>增加LE5030触控BLE示例和外设示例
-4.4 <a name="v110_4_4"></a>输入捕获示例中调试IO不翻转bug修复
+4.1 <a name="v110_4_1"></a>增加AMIC示例  
+4.2 <a name="v110_4_2"></a>Keil info_sbl和stack烧录支持  
+4.3 <a name="v110_4_3"></a>增加LE5030触控BLE示例和外设示例  
+4.4 <a name="v110_4_4"></a>输入捕获示例中调试IO不翻转bug修复  
 
 ### 5、LE5010
 
-5.1 <a name="v110_5_1"></a>1M Flash 烧录算法支持
+5.1 <a name="v110_5_1"></a>1M Flash 烧录算法支持  
 5.2 <a name="v110_5_2"></a>进入LP2 LP3函数BUG修复（新增stop systick & global irq disable）
 
 ### 6、prop 2.4G
 
-6.1 <a name="v110_6_1"></a>优化2.4g tx prog delay
-6.2 <a name="v110_6_2"></a>支持FreeRTOS
-6.3 <a name="v110_6_3"></a>支持LP0
-6.4 <a name="v110_6_4"></a>支持在sw_timer cb里调用RF_Stop接口
+6.1 <a name="v110_6_1"></a>优化2.4g tx prog delay  
+6.2 <a name="v110_6_2"></a>支持FreeRTOS  
+6.3 <a name="v110_6_3"></a>支持LP0  
+6.4 <a name="v110_6_4"></a>支持在sw_timer cb里调用RF_Stop接口  
 6.5 <a name="v110_6_5"></a>支持legacy adv的收发
 
 
