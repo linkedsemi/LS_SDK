@@ -11,126 +11,136 @@
 2. <a name="v110_2"></a>增加Flash SFDP读取接口 
 3. <a name="v110_3"></a>增加SSI阻塞收发接口和半双工接口
 4. <a name="v110_4"></a>SSI DMA发送BUG修复
+5. <a name="v110_5"></a>Uart it tx最后一个byte概率性丢失bug修复
 
 ### BLE
 
-5. <a name="v110_5"></a>射频参数优化，发射功率一致性优化
-6. <a name="v110_6"></a>增加安全连接OOB事件
-7. <a name="v110_7"></a>FOTA支持协议栈更新，FOTA RAM消耗优化
-8. <a name="v110_8"></a>多链接情况断连BUG修复
-9. <a name="v110_9"></a>增加SCAN REQ IND事件
-10. <a name="v110_10"></a>增加ADV STARTED和UPDATED事件
-11. <a name="v110_11"></a>set_svc_permission API更新
-12. <a name="v110_12"></a>增加dev_manager_add_service_with_start_handle API
-13. <a name="v110_13"></a>llcp过程slave latency优化
-14. <a name="v110_14"></a>active scan bug修复
-15. <a name="v110_15"></a>增加builtin_timer_active API
+6. <a name="v110_6"></a>射频参数优化，发射功率一致性优化
+7. <a name="v110_7"></a>增加安全连接OOB事件
+8. <a name="v110_8"></a>FOTA支持协议栈更新，FOTA RAM消耗优化
+9. <a name="v110_9"></a>多连接BUG修复（多路并行批量数据传输，其中一路断连接会影响另一路数据传输）
+10. <a name="v110_10"></a>增加SCAN REQ IND事件
+11. <a name="v110_11"></a>增加ADV STARTED和UPDATED事件
+12. <a name="v110_12"></a>set_svc_permission API更新，删除无效参数
+13. <a name="v110_13"></a>增加dev_manager_add_service_with_start_handle API
+14. <a name="v110_14"></a>llcp过程slave latency优化
+15. <a name="v110_15"></a>active scan bug修复
+16. <a name="v110_16"></a>增加builtin_timer_active API
+17. <a name="v110_17"></a>增加bass profile enable api
+18. <a name="v110_18"></a>修改ecc为polling模式（支持应用使用ecc）
+19. <a name="v110_19"></a>ble_multi_roles/uart_server_multi_link等demo新增disconnect时清相关全局变量处理
 
 ### Demos
 
-16. <a name="v110_16"></a>增加AMIC示例
-17. <a name="v110_17"></a>Keil info_sbl和stack烧录支持
-18. <a name="v110_18"></a>增加LE5030触控BLE示例和外设示例
+20. <a name="v110_20"></a>增加AMIC示例
+21. <a name="v110_21"></a>Keil info_sbl和stack烧录支持
+22. <a name="v110_22"></a>增加LE5030触控BLE示例和外设示例
 
 ### LE5010
 
-19. <a name="v110_19"></a>1M Flash 烧录算法支持
-20. <a name="v110_20"></a>进入LP2 LP3函数BUG修复
+23. <a name="v110_23"></a>1M Flash 烧录算法支持
+24. <a name="v110_24"></a>进入LP2 LP3函数BUG修复（新增stop systick & global irq disable）
 
+### prop 2.4G
 
+25. <a name="v110_25"></a>优化2.4g tx prog delay
+26. <a name="v110_26"></a>支持FreeRTOS
+27. <a name="v110_27"></a>支持LP0
+28. <a name="v110_28"></a>支持在sw_timer cb里调用RF_Stop接口
+29. <a name="v110_29"></a>支持legacy adv的收发
 
 
 
 ## 变更版本
 
-| Commit Hash                    |                        |
-| -----------------------------  | ------------------------------ | 
-| ccf6b9d06cc12defc218970d384fa82b4959fd2f  |  |
-| b76c6d6fe95f65b889eada0f2f8ce1ebf7bb3446  |  |
-| 36e43b84f87f6ed6cbe5e8b9035c7b2fc9ae4f72  |  |
-| 449369a529d8f3db81dbb8692f5792ab5cb451d0  |  |
-| 5dc723500d9091726b4977425101f6ebb8680156  |  |
-| 7d94c46edcab67afb53efa74e37fc455f144a09e  |  |
-| 07e8a6b7893c2469cc5df6907cf22c38422005e2  |  |
-| ed735bd33dc86358f5aa368521bb4735e3e72ce3  |  |
-| e757f6ae9987606129f9591523f2bff0f7dc5e5e  |  |
-| 9234f9c36b4b3835649dd328d72d99f37c28edfa  |  |
-| f6830b7b4c761e4df29c40145f5a676dd815c351  |  | 
-| 6e74b02de60f8c3f954602513028760737f00c62  |  | 
-| 696ad72f2661ca88c6bebae28ddaaeedd364057c  |  | 
-| 728cd3ffe26851eca28c50b30f080f255df8bb51  |  | 
-| aa197779f74d73995c3e93a3758e2b1e406f39fd  |  | 
-| af74d3b5cdcf626031481d4a2f726e3e1f795b57  |  | 
-| d8504a0a670f4fb61efcf65458c86eab102579e8  |  | 
-| e76e8bf8214c0cd847bfc12af9e6205825291ed8  |  | 
-| ac6dddbeb59235e205b18da71a5628713f7c60b1  |  | 
-| 5257fe5f9684a4f9e26cd18bab31a44c5b9dc481  |  | 
-| 970e83e632b1d384beb99400c9d7f5033dd2d6d0  |  | 
-| 1f5024c5c070813a5780699b99ca5c0d545458d3  |  | 
-| f4f38d2cd354fb9b5fcdaf679b432eb9d642c620  |  | 
-| 0bebdac1bbdabd6ea86c696681097aeabcf14bec  |  | 
-| 22b041b846c1295bc9981e845cd882d695f2820f  |  | 
-| 1eedf09e4916940d11e10ac4a20813d37661c6bd  |  | 
-| a9d5e594d2309108950a182fe280bc4946bf6be7  |  | 
-| 152699e4c1811615027ed4b59766f110021528be  |  | 
-| ce25890b2b1cbd779bd363ff603814915df84462  |  | 
-| 8137d97458712a9bb5e93394e38706302682d254  |  | 
-| 20656610fb15cdbc37e6f958e2aeece968fb58d9  |  | 
-| ff5d4a641350bd27e331dd51b0be851e0deb2525  |  | 
-| 1c7386623f15ef92e5b03101de1351d729037f46  |  | 
-| 21c7202d3d0dcc1ef635f976b5c0f9795e48653e  |  | 
-| a2e1205bd33aa19ef75b43db95925d8454e47b72  |  | 
-| 8bf4fefa33c02ec68559fc1c0f649ece94f1e8f9  |  | 
-| 0d2d942ae08936005c057994ec0eaa4697359dd4  |  | 
-| fa30912f067ae00718890661ced5f8e4fd1f1b8e  |  | 
-| 67d784332952e37f25350a172e1877ecfa38f158  |  | 
-| 23778ea917f42551b4fcaa50ebaf46be06cc855c  |  | 
-| 99cb52349ff8d451a41a64c4dc5e8e839c091ff5  |  | 
-| 51b444ba925f675511e415553b850a0a4d068109  |  | 
-| b9ac05b0bd91e63d9854bcc7d94a3b0a7132b2db  |  | 
-| 91693e8efd2f44cab0aa0c0949b20ed637b87a3b  | [1](#v110_1) | 
-| cbff5bd4497b528fcbdeefffd34994475195bbc4  |  | 
-| 13b80710fe0da8c5350180442b39f53a6d8b3e2f  |  | 
-| 81503a752c26b43d3f1ba1dd80920f0813267664  |  | 
-| 5af6193742d3fe52d9f3676d8060a25fa4db332d  |  | 
-| f7b4d749e8ab09628cb26145b606ad1f1fe04855  |  | 
-| c82eb30c4a0137835554ce4063f4c74abf5efb44  |  | 
-| ad4c9830884d968e3c281e56c295a1c29ffc55f0  |  | 
-| 2eaebfecb6a6e1b720d81d49cda8336b974d96eb  |  | 
-| c12d811a4916e9609dd6e7dfc79148de21fb82ae  |   |
-| b6d7e95751631d7fa3bc950082f2db14a87f846a  |   |
-| 9f95fe0befc7235244d0da59cd2474d2ed31c99b  |   |
-| d53c07bd7857bbd23c22402bcd6a3a31ece43176  |   |
-| 8318469a5a76575573d3b67012af4f9050adff72  |   |
-| 1026ca5e90d7f23d6f0a5ddda00fb6a64cdf34f8  |   |
-| 5589080a2536c8b7281f3c0f0efaa0e8f7f3617e  |   |
-| 26adfd45bcd7594655c7f3fcccdb377aacca8fcd  |   |
-| 1bbebd9c63719901c9925b7754ebafe7f61ed874  |   |
-| 9f31905a2dcc649c1246f666b40b51988dd70ec4  |   |
-| c8b224ebefe3d2339f9fd42629714516207d7dd9  |   |
-| 84a9c3fee8fc7be187deb345ddcd5996cc0cb12a  |   |
-| 0745dad1c547adc902e3bbb815998a690795c283  |   |
-| 7365e245e985e34d54b3eaa200e6cea4a557e265  |   |
-| 116f125d09d65ffa228d0896c8a34c6929866d0e  |   |
-| ee161c3864c6e9a458eeda593101c455dcba7d60  |   |
-| 5d0a4c6c5869e54491bdbabc4681613fc05f73a0  |   |
-| ba6663a6014051fb09652e7272482a110826eb7b  |   |
-| 6a3ca3915674df846f659bbd53f63309abb6307a  |   |
-| b345a64f3f653846a4093263dc52038e14bab6b6  |   |
-| 9e5fd241ff28f570916429c5933deae4b9ebe717  |   |
-| 3b375f5b296eaccd5dd27537117f16ab1ddd1d1f  |   |
-| 167800c9428559f56f7044b918d4f21d4b95d676  |   |
-| 20c8e62519878d7120cf12661b74c8d0c0b97ebc  |   |
-| 32bfc9ba9589ad34bd3239e25e183b3d6c1b1bff  |   |
-| ac82321656ee2fa1b75397a2edbab4d98a38659c  | [5](#v110_5)  |
-| b5d3963d4e804de10bab4c3e9bac1b1747b159ea  |   |
-| fb8ca67c7692e1f1d03ea7d308974a0b89e593bd  | [20](#v110_20)  |
-| c17ce1499e1be72f241b9b88bd93d5aac588428e  |   |
-| b573576eec89763e490c2c910d2dea1332d8ded4  |   |
-| bd9a4993cc2356a9f68060bd78ef01eb57848f6b  |   |
-| 30ff6f2758d90f82995a0b718979860639065f9f  |   |
-| 690a3512338e18a58517f628e9c6dedd1331fb18  |   |
-| 067815c0d8a0156a84d842c2c35ae017cf64ba5d  |   |
+| Commit Hash                              |                |
+| ---------------------------------------- | -------------- |
+| ccf6b9d06cc12defc218970d384fa82b4959fd2f |                |
+| b76c6d6fe95f65b889eada0f2f8ce1ebf7bb3446 | [3](#v110_3)   |
+| 36e43b84f87f6ed6cbe5e8b9035c7b2fc9ae4f72 |                |
+| 449369a529d8f3db81dbb8692f5792ab5cb451d0 | [24](#v110_24) |
+| 5dc723500d9091726b4977425101f6ebb8680156 | [2](#v110_2)   |
+| 7d94c46edcab67afb53efa74e37fc455f144a09e |                |
+| 07e8a6b7893c2469cc5df6907cf22c38422005e2 |                |
+| ed735bd33dc86358f5aa368521bb4735e3e72ce3 |                |
+| e757f6ae9987606129f9591523f2bff0f7dc5e5e |                |
+| 9234f9c36b4b3835649dd328d72d99f37c28edfa |                |
+| f6830b7b4c761e4df29c40145f5a676dd815c351 |                |
+| 6e74b02de60f8c3f954602513028760737f00c62 |                |
+| 696ad72f2661ca88c6bebae28ddaaeedd364057c |                |
+| 728cd3ffe26851eca28c50b30f080f255df8bb51 |                |
+| aa197779f74d73995c3e93a3758e2b1e406f39fd | [17](#v110_17) |
+| af74d3b5cdcf626031481d4a2f726e3e1f795b57 | [8](#v110_8)   |
+| d8504a0a670f4fb61efcf65458c86eab102579e8 | [5](#v110_5)   |
+| e76e8bf8214c0cd847bfc12af9e6205825291ed8 | [4](#v110_4)   |
+| ac6dddbeb59235e205b18da71a5628713f7c60b1 | [18](#v110_18) |
+| 5257fe5f9684a4f9e26cd18bab31a44c5b9dc481 |                |
+| 970e83e632b1d384beb99400c9d7f5033dd2d6d0 |                |
+| 1f5024c5c070813a5780699b99ca5c0d545458d3 | [9](#v110_9)   |
+| f4f38d2cd354fb9b5fcdaf679b432eb9d642c620 | [21](#v110_21) |
+| 0bebdac1bbdabd6ea86c696681097aeabcf14bec |                |
+| 22b041b846c1295bc9981e845cd882d695f2820f | [16](#v110_16) |
+| 1eedf09e4916940d11e10ac4a20813d37661c6bd | [11](#v110_11) |
+| a9d5e594d2309108950a182fe280bc4946bf6be7 |                |
+| 152699e4c1811615027ed4b59766f110021528be |                |
+| ce25890b2b1cbd779bd363ff603814915df84462 |                |
+| 8137d97458712a9bb5e93394e38706302682d254 | [15](#v110_15) |
+| 20656610fb15cdbc37e6f958e2aeece968fb58d9 |                |
+| ff5d4a641350bd27e331dd51b0be851e0deb2525 |                |
+| 1c7386623f15ef92e5b03101de1351d729037f46 | [28](#v110_28) |
+| 21c7202d3d0dcc1ef635f976b5c0f9795e48653e | [20](#v110_20) |
+| a2e1205bd33aa19ef75b43db95925d8454e47b72 |                |
+| 8bf4fefa33c02ec68559fc1c0f649ece94f1e8f9 | [14](#v110_14) |
+| 0d2d942ae08936005c057994ec0eaa4697359dd4 |                |
+| fa30912f067ae00718890661ced5f8e4fd1f1b8e |                |
+| 67d784332952e37f25350a172e1877ecfa38f158 | [8](#v110_8)   |
+| 23778ea917f42551b4fcaa50ebaf46be06cc855c | [23](#v110_23) |
+| 99cb52349ff8d451a41a64c4dc5e8e839c091ff5 |                |
+| 51b444ba925f675511e415553b850a0a4d068109 | [25](#v110_25) |
+| b9ac05b0bd91e63d9854bcc7d94a3b0a7132b2db |                |
+| 91693e8efd2f44cab0aa0c0949b20ed637b87a3b | [1](#v110_1)   |
+| cbff5bd4497b528fcbdeefffd34994475195bbc4 |                |
+| 13b80710fe0da8c5350180442b39f53a6d8b3e2f |                |
+| 81503a752c26b43d3f1ba1dd80920f0813267664 |                |
+| 5af6193742d3fe52d9f3676d8060a25fa4db332d | [5](#v110_5)   |
+| f7b4d749e8ab09628cb26145b606ad1f1fe04855 | [5](#v110_5)   |
+| c82eb30c4a0137835554ce4063f4c74abf5efb44 |                |
+| ad4c9830884d968e3c281e56c295a1c29ffc55f0 | [19](#v110_19) |
+| 2eaebfecb6a6e1b720d81d49cda8336b974d96eb |                |
+| c12d811a4916e9609dd6e7dfc79148de21fb82ae |                |
+| b6d7e95751631d7fa3bc950082f2db14a87f846a |                |
+| 9f95fe0befc7235244d0da59cd2474d2ed31c99b |                |
+| d53c07bd7857bbd23c22402bcd6a3a31ece43176 |                |
+| 8318469a5a76575573d3b67012af4f9050adff72 |                |
+| 1026ca5e90d7f23d6f0a5ddda00fb6a64cdf34f8 | [13](#v110_13) |
+| 5589080a2536c8b7281f3c0f0efaa0e8f7f3617e |                |
+| 26adfd45bcd7594655c7f3fcccdb377aacca8fcd | [25](#v110_25) |
+| 1bbebd9c63719901c9925b7754ebafe7f61ed874 |                |
+| 9f31905a2dcc649c1246f666b40b51988dd70ec4 | [29](#v110_29) |
+| c8b224ebefe3d2339f9fd42629714516207d7dd9 | [12](#v110_12) |
+| 84a9c3fee8fc7be187deb345ddcd5996cc0cb12a |                |
+| 0745dad1c547adc902e3bbb815998a690795c283 |                |
+| 7365e245e985e34d54b3eaa200e6cea4a557e265 |                |
+| 116f125d09d65ffa228d0896c8a34c6929866d0e |                |
+| ee161c3864c6e9a458eeda593101c455dcba7d60 |                |
+| 5d0a4c6c5869e54491bdbabc4681613fc05f73a0 | [7](#v110_7)   |
+| ba6663a6014051fb09652e7272482a110826eb7b | [26](#v110_26) |
+| 6a3ca3915674df846f659bbd53f63309abb6307a | [10](#v110_10) |
+| b345a64f3f653846a4093263dc52038e14bab6b6 |                |
+| 9e5fd241ff28f570916429c5933deae4b9ebe717 |                |
+| 3b375f5b296eaccd5dd27537117f16ab1ddd1d1f |                |
+| 167800c9428559f56f7044b918d4f21d4b95d676 |                |
+| 20c8e62519878d7120cf12661b74c8d0c0b97ebc |                |
+| 32bfc9ba9589ad34bd3239e25e183b3d6c1b1bff | [27](#v110_27) |
+| ac82321656ee2fa1b75397a2edbab4d98a38659c | [6](#v110_6)   |
+| b5d3963d4e804de10bab4c3e9bac1b1747b159ea |                |
+| fb8ca67c7692e1f1d03ea7d308974a0b89e593bd | [22](#v110_22) |
+| c17ce1499e1be72f241b9b88bd93d5aac588428e |                |
+| b573576eec89763e490c2c910d2dea1332d8ded4 |                |
+| bd9a4993cc2356a9f68060bd78ef01eb57848f6b |                |
+| 30ff6f2758d90f82995a0b718979860639065f9f |                |
+| 690a3512338e18a58517f628e9c6dedd1331fb18 |                |
+| 067815c0d8a0156a84d842c2c35ae017cf64ba5d |                |
 
 # v1.0.0 发布公告
 
@@ -173,14 +183,14 @@
 - SigMesh 节点支持Amazon的Alexa的灯控场景
 - SigMesh 无主机模式下，自动入网的节点上电初始化时，可配置消息的TTL值，以及Sequence Offset
 - SigMesh 有主机模式 Provisioner
-    * 添加获取主机端消息的iv ，seq数值，节点的dev_key.
-    * 添加主机解绑节点功能
-    * 解决主机入网设备有概率性失败的问题
-    * 解决主机重新上电，概率性有节点不受控的问题
-    * 增加主机的相关的AT指令
+  * 添加获取主机端消息的iv ，seq数值，节点的dev_key.
+  * 添加主机解绑节点功能
+  * 解决主机入网设备有概率性失败的问题
+  * 解决主机重新上电，概率性有节点不受控的问题
+  * 增加主机的相关的AT指令
 - tmall genie mesh
-   * 添加支持天猫精灵的GLP模式，设备在LP2模式下有IO中断后才进入待入网模式，被精灵入网以后才进入GLP模式
-   * 支持凌思微APP OTA升级Tmall genie Mesh
+  * 添加支持天猫精灵的GLP模式，设备在LP2模式下有IO中断后才进入待入网模式，被精灵入网以后才进入GLP模式
+  * 支持凌思微APP OTA升级Tmall genie Mesh
 
 ### 其他
 
