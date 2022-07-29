@@ -689,12 +689,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             connect_pattern_send_prepare(con_idx); 
 
 #if (PAIR_ENCRYPT_ENABLE == 1)
-        uint8_t peer_id_cont = gap_manager_get_bonding_peer_id(con_idx);
-        LOG_I("CONNECT Peer_id = %d", peer_id_cont);
-        if(peer_id_cont==0xff)
-        {
-            gap_manager_slave_security_req(con_idx, AUTH_SEC_CON);
-        }
+        gap_manager_slave_security_req(con_idx, AUTH_SEC_CON);
 #endif //PAIR_ENCRYPT_ENABLE
 
         }
@@ -723,7 +718,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         struct pair_feature feat_param={
             .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
             .oob = BLE_GAP_OOB_ENABLE,
-            .auth = AUTH_SEC_CON,
+            .auth = AUTH_SEC_CON | AUTH_BOND,
             .key_size = 16,
             .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
             .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
