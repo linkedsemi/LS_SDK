@@ -42,7 +42,7 @@
 5.1 <a name="v110_5_1"></a>1M Flash 烧录算法支持  
 5.2 <a name="v110_5_2"></a>进入LP2 LP3函数BUG修复（新增stop systick & global irq disable）
 
-### 6、prop 2.4G
+### 6、Prop 2.4G
 
 6.1 <a name="v110_6_1"></a>优化2.4g tx prog delay  
 6.2 <a name="v110_6_2"></a>支持FreeRTOS  
