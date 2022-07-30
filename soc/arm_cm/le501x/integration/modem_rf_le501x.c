@@ -6,6 +6,8 @@
 #include "reg_syscfg.h"
 #include "spi_flash.h"
 #include "ls_dbg.h"
+#include "sdk_config.h"
+
 #define RF_PWR_TBL_SIZE            (8)
 
 #define FLASH_SECURITY_AREA_INDEX_1 1
@@ -428,8 +430,49 @@ void modem_rf_init()
     modem_rf_reinit();
 }
 
+#if (CHIP_TEMP_SENSOR)
+static const uint16_t mdm_adc_temp_sensor(void)
+{	
+   uint16_t chip_temp_value=0; 
+   pll_cal_testreg_init();
+
+   MODIFY_REG(RF->REG00, (RF_EN_LDO_IF_MASK | RF_EN_LDO_TX_MASK | RF_EN_LDO_PAHP_MASK | RF_EN_LDO_PLL_MASK | RF_EN_LDO_VCO_MASK | RF_EN_LDO_PA_MASK | RF_EN_LDO_RX_MASK | RF_EN_LDO_PAHP_BYPS_MASK) ,(1<<RF_EN_LDO_IF_POS) | (1<<RF_EN_LDO_TX_POS));
+   REG_FIELD_WR(RF->REG18,RF_ADC_MUX_SEL,0x03); 
+   REG_FIELD_WR(RF->REG18,RF_ADC_VREF_ADJ,1); 
+   REG_FIELD_WR(RF->REG00,RF_EN_ADC,1); 
+   REG_FIELD_WR(RF->REG18,RF_EN_ADC_CNT_MODE,1); 
+   REG_FIELD_WR(RF->REG00,RF_EN_ADC_DIG,1); 
+   REG_FIELD_WR(RF->REG64,RF_ADC_MDM_EN,0); 
+   REG_FIELD_WR(RF->REG18,RF_ADC_START,0); 
+   REG_FIELD_WR(RF->REG18,RF_ADC_START,1); 
+ 
+   while((!(REG_FIELD_RD(RF->REG34,RF_ADC_DATA_RDY))));
+   chip_temp_value = REG_FIELD_RD(RF->REG34,RF_ADC_DATA);
+    
+   pll_cal_testreg_deinit();
+   return chip_temp_value;
+}
+#endif
+
 void rf_reg_config(uint8_t idx,uint8_t format,uint16_t rate)
 {
+
+#if (CHIP_TEMP_SENSOR)
+   if (package_id == 0x3202)
+   {
+       if((mdm_adc_temp_sensor()<260))  //-30°C to -10°C sample value less than 260 
+       {
+          REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 9);
+          gain_threshold[0] = 0x21;  
+       }
+       else
+       {
+          REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 21);
+          gain_threshold[0] = 0x21; 
+       }
+   }
+#endif
+
     switch(format)
     {
     case 2:case 4:case 5:case 6:case 28:case 30:
