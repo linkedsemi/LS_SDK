@@ -69,10 +69,10 @@
 6.3 <a name="v110_6_3"></a>支持LP0  
 6.4 <a name="v110_6_4"></a>支持在sw_timer cb里调用RF_Stop接口  
 6.5 <a name="v110_6_5"></a>支持legacy adv的收发  
-6.6 <a name="v110_6_6"></a>修复2.4g例程uart/rf共用buffer导致数据出错bug
-6.7 <a name="v110_6_7"></a>删除2.4g每次tx前都默认做pll gain calib的多余行为
-6.8 <a name="v110_6_8"></a>删除2.4g pll gain calib流程中无效空等行为
-6.9 <a name="v110_6_9"></a>删除2.4g rx abort flag(不需要中断flag同步，改为阻塞式等待)
+6.6 <a name="v110_6_6"></a>修复2.4g例程uart/rf共用buffer导致数据出错bug  
+6.7 <a name="v110_6_7"></a>删除2.4g每次tx前都默认做pll gain calib的多余行为  
+6.8 <a name="v110_6_8"></a>删除2.4g pll gain calib流程中无效空等行为  
+6.9 <a name="v110_6_9"></a>删除2.4g rx abort flag(不需要中断flag同步，改为阻塞式等待)  
 
 ### 7、Modules
 
