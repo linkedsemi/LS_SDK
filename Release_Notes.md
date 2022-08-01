@@ -5,7 +5,7 @@
 - FOTA协议调整，协议栈OTA支持，固件端、APP端与老版本不兼容
 - LE5030触控芯片支持
 
-## 更新
+## 更新内容
 
 ### 1、构建系统（SCons）
 
@@ -22,10 +22,10 @@
 2.2 <a name="v110_2_2"></a>增加SSI阻塞收发接口和半双工接口  
 2.3 <a name="v110_2_3"></a>SSI DMA发送BUG修复  
 2.4 <a name="v110_2_4"></a>Uart it tx最后一个byte概率性丢失bug修复     
-2.5 <a name="v110_2_5"></a>__HAL_TIM_DISABLE_IT() API bug修复
-2.6 <a name="v110_2_6"></a>IWDG LP0 BUG修复
-2.7 <a name="v110_2_7"></a>DMA BUFFER放置于RAM末尾
-2.8 <a name="v110_2_8"></a>增加spi_flash_read_sfdp API
+2.5 <a name="v110_2_5"></a>__HAL_TIM_DISABLE_IT() API bug修复  
+2.6 <a name="v110_2_6"></a>IWDG LP0 BUG修复  
+2.7 <a name="v110_2_7"></a>DMA BUFFER放置于RAM末尾  
+2.8 <a name="v110_2_8"></a>增加spi_flash_read_sfdp API  
 
 ### 3、BLE
 
