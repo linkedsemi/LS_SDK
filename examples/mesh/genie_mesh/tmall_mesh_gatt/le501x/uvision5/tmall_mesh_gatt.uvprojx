@@ -360,7 +360,7 @@
 							<MiscControls></MiscControls>
 							<Define>LE501X</Define>
 							<Undefine></Undefine>
-							<IncludePath>..\..; ..\..\..\..\..\..\peripheral\inc; ..\..\..\..\..\..\peripheral\api; ..\..\..\..\..\..\module\common; ..\..\..\..\..\..\module\crc; ..\..\..\..\..\..\module\debug; ..\..\..\..\..\..\module\debug\RTT; ..\..\..\..\..\..\module\static_buffer; ..\..\..\..\..\..\module\tinyfs; ..\..\..\..\..\..\module\tinycrypt\lib\include; ..\..\..\..\..\..\module\ble; ..\..\..\..\..\..\module\ble\prf; ..\..\..\..\..\..\module\settings; ..\..\..\..\..\..\soc; ..\..\..\..\..\..\soc\arm_cm; ..\..\..\..\..\..\soc\arm_cm\cmsis; ..\..\..\..\..\..\soc\arm_cm\le501x; ..\..\..\..\..\..\soc\arm_cm\le501x\integration</IncludePath>
+							<IncludePath>..\..; ..\..\..\genie_ota; ..\..\..\..\..\..\peripheral\inc; ..\..\..\..\..\..\peripheral\api; ..\..\..\..\..\..\module\common; ..\..\..\..\..\..\module\crc; ..\..\..\..\..\..\module\debug; ..\..\..\..\..\..\module\debug\RTT; ..\..\..\..\..\..\module\static_buffer; ..\..\..\..\..\..\module\tinyfs; ..\..\..\..\..\..\module\tinycrypt\lib\include; ..\..\..\..\..\..\module\ble; ..\..\..\..\..\..\module\ble\prf; ..\..\..\..\..\..\module\settings; ..\..\..\..\..\..\soc; ..\..\..\..\..\..\soc\arm_cm; ..\..\..\..\..\..\soc\arm_cm\cmsis; ..\..\..\..\..\..\soc\arm_cm\le501x; ..\..\..\..\..\..\soc\arm_cm\le501x\integration</IncludePath>
 						</VariousControls>
 					</Cads>
 					<Aads>
@@ -407,6 +407,11 @@
 							<FileType>5</FileType>
 							<FileName>adc_msp.h</FileName>
 							<FilePath>..\..\..\..\..\..\peripheral\inc\adc_msp.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ali_dfu_port.h</FileName>
+							<FilePath>..\..\..\genie_ota\ali_dfu_port.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -642,6 +647,21 @@
 							<FileType>5</FileType>
 							<FileName>flash_svcall_int.h</FileName>
 							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\flash_svcall_int.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>genie_crc16.h</FileName>
+							<FilePath>..\..\..\genie_ota\genie_crc16.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>genie_crypto.h</FileName>
+							<FilePath>..\..\..\genie_ota\genie_crypto.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>genie_triple.h</FileName>
+							<FilePath>..\..\..\genie_ota\genie_triple.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -1270,6 +1290,21 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
+							<FileName>tmall_ais_main.h</FileName>
+							<FilePath>..\..\..\genie_ota\tmall_ais_main.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>tmall_genie_ais.h</FileName>
+							<FilePath>..\..\..\genie_ota\tmall_genie_ais.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>tmall_genie_ota.h</FileName>
+							<FilePath>..\..\..\genie_ota\tmall_genie_ota.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>tmall_light_cfg.h</FileName>
 							<FilePath>..\..\tmall_light_cfg.h</FilePath>
 						</File>
@@ -1305,8 +1340,38 @@
 					<Files>
 						<File>
 							<FileType>1</FileType>
+							<FileName>ali_dfu_port.c</FileName>
+							<FilePath>..\..\..\genie_ota\ali_dfu_port.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>genie_crc16.c</FileName>
+							<FilePath>..\..\..\genie_ota\genie_crc16.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>genie_crypto.c</FileName>
+							<FilePath>..\..\..\genie_ota\genie_crypto.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>genie_triple.c</FileName>
+							<FilePath>..\..\..\genie_ota\genie_triple.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
 							<FileName>main.c</FileName>
 							<FilePath>..\..\main.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>tmall_genie_ais.c</FileName>
+							<FilePath>..\..\..\genie_ota\tmall_genie_ais.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>tmall_genie_ota.c</FileName>
+							<FilePath>..\..\..\genie_ota\tmall_genie_ota.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
@@ -1333,6 +1398,16 @@
 				<Group>
 					<GroupName>module</GroupName>
 					<Files>
+						<File>
+							<FileType>1</FileType>
+							<FileName>aes_decrypt.c</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\source\aes_decrypt.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>aes_encrypt.c</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\source\aes_encrypt.c</FilePath>
+						</File>
 						<File>
 							<FileType>1</FileType>
 							<FileName>ble_common_api.c</FileName>
