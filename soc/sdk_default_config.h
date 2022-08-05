@@ -57,6 +57,10 @@
 #define DEBUG_MODE 1
 #endif
 
+#ifndef CHIP_TEMP_SENSOR
+#define CHIP_TEMP_SENSOR 0
+#endif
+
 #define SDK_PCLK_MHZ (SDK_HCLK_MHZ/SDK_PCLK_DIV)
 #define SDK_MAX_ACT_NUM    (SDK_MAX_CONN_NUM + 2)
 #define SDK_BUILTIN_TASK_NUM 1

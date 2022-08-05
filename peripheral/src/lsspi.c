@@ -6,6 +6,7 @@
 #include "log.h"
 #include "systick.h"
 #include "ls_dbg.h"
+#include "common.h"
 
 #define SPI_DEFAULT_TIMEOUT 100U
 
@@ -180,21 +181,20 @@ __weak void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
    */
 }
 
-
-static bool spi_flag_poll(va_list va)
-{
-      SPI_HandleTypeDef * hspi = va_arg(va,SPI_HandleTypeDef *);
-      uint32_t flag = va_arg(va,uint32_t);
-      if (__HAL_SPI_GET_FLAG(hspi, flag))
-      {
-        return true;
-      }
-      else
-      {
-        hspi->State = HAL_SPI_STATE_READY;
-        return false;
-      }
-}
+// static bool spi_flag_poll(va_list va)
+// {
+//       SPI_HandleTypeDef * hspi = va_arg(va,SPI_HandleTypeDef *);
+//       uint32_t flag = va_arg(va,uint32_t);
+//       if (__HAL_SPI_GET_FLAG(hspi, flag))
+//       {
+//         return true;
+//       }
+//       else
+//       {
+//         hspi->State = HAL_SPI_STATE_READY;
+//         return false;
+//       }
+// }
 static bool spi_flag_poll1(va_list va)
 {
       SPI_HandleTypeDef * hspi = va_arg(va,SPI_HandleTypeDef *);
@@ -209,21 +209,21 @@ static bool spi_flag_poll1(va_list va)
         return true;
       }
 }
-static bool spi_flag_poll2(va_list va)
-{
-      SPI_HandleTypeDef * hspi = va_arg(va,SPI_HandleTypeDef *);
-      uint32_t flag1 = va_arg(va,uint32_t);
-      uint32_t flag2 = va_arg(va,uint32_t);
-      if (__HAL_SPI_GET_FLAG(hspi, flag1) || __HAL_SPI_GET_FLAG(hspi, flag2))
-      {
-        return true;
-      }
-      else
-      {
-        hspi->State = HAL_SPI_STATE_READY;
-        return false;
-      }
-}
+// static bool spi_flag_poll2(va_list va)
+// {
+//       SPI_HandleTypeDef * hspi = va_arg(va,SPI_HandleTypeDef *);
+//       uint32_t flag1 = va_arg(va,uint32_t);
+//       uint32_t flag2 = va_arg(va,uint32_t);
+//       if (__HAL_SPI_GET_FLAG(hspi, flag1) || __HAL_SPI_GET_FLAG(hspi, flag2))
+//       {
+//         return true;
+//       }
+//       else
+//       {
+//         hspi->State = HAL_SPI_STATE_READY;
+//         return false;
+//       }
+// }
 
 /**
   * @brief  Transmit an amount of data in blocking mode.
@@ -238,7 +238,6 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
 {
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
-  uint32_t             txallowed = 1U;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   /* Check Direction parameter */
   LS_ASSERT(IS_SPI_DIRECTION_2LINES_OR_1LINE(hspi->Init.Direction));
@@ -288,6 +287,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
     __HAL_SPI_ENABLE(hspi);
   }
 
+  uint32_t end_tick = tickstart + timeout;
   /* Transmit data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
@@ -296,23 +296,35 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
       hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint16_t);
       hspi->TxXferCount--;
-      txallowed = 0U;
+    //   txallowed = 0U;
     }
-    /* Transmit data in 16 Bit mode */
-    while (hspi->TxXferCount > 0U)
+    if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-        if(systick_poll_timeout(tickstart,timeout,spi_flag_poll,hspi,SPI_FLAG_TXE))
+        while (hspi->TxXferCount > 0U)
         {
-            errorcode = HAL_TIMEOUT;
-            goto error;
-        }
-        else
-        {
-            //while((REG_FIELD_RD(hspi->Instance->SR,SPI_SR_TXFLV) != 0X0F)&&(hspi->TxXferCount > 0U))
+            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)))
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
-                hspi->TxXferCount-=sizeof(uint16_t);
+                hspi->TxXferCount--;
+            }
+        }
+    }
+    else // SPI_MODE_SLAVE
+    {
+        while (hspi->TxXferCount > 0U)
+        {
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+            {
+                hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint16_t);
+                hspi->TxXferCount--;
+            }
+
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                errorcode = HAL_TIMEOUT;
+                goto error;
             }
         }
     }
@@ -320,38 +332,43 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
   /* Transmit data in 8 Bit mode */
   else
   {
-    //if (hspi->Init.Mode == SPI_MODE_SLAVE) //|| (initial_TxXferCount == 0x01U))
-    if(hspi->TxXferCount >0)
+    if (hspi->Init.Mode == SPI_MODE_SLAVE) //|| (initial_TxXferCount == 0x01U))
+    // if(hspi->TxXferCount >0)
     {
       *((uint8_t *)&hspi->Instance->DR) = *((uint8_t *)hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint8_t);
       hspi->TxXferCount--;
-      txallowed = 0U;
+    //   txallowed = 0U;
     }
-    while (hspi->TxXferCount > 0U)
+    if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-        if(systick_poll_timeout(tickstart,timeout,spi_flag_poll2,hspi,SPI_FLAG_TXE,SPI_FLAG_RXNE))
+        while (hspi->TxXferCount > 0U)
         {
-            errorcode = HAL_TIMEOUT;
-            goto error;
-        }
-        else
-        {
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U) && (txallowed == 1U))
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
             {
-                *((uint8_t *)&hspi->Instance->DR) =  *((uint8_t *)hspi->pTxBuffPtr);
-                hspi->pTxBuffPtr += 1;
+                *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint8_t);
                 hspi->TxXferCount--;
-                txallowed = 0U;
-            }
-              /* Check RXNE flag */
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
-            {
-                txallowed = hspi->Instance->DR; //clear RXNE flag
-                txallowed = 1U;
             }
         }
+    }
+    else // SPI_MODE_SLAVE
+    {
+        while (hspi->TxXferCount > 0U)
+        {
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+            {
+                *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint8_t);
+                hspi->TxXferCount--;
+            }
 
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                errorcode = HAL_TIMEOUT;
+                goto error;
+            }
+        }
     }
   }
 
@@ -444,44 +461,72 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
     __HAL_SPI_ENABLE(hspi);
   }
 
+  uint32_t end_tick = tickstart + timeout;
   /* Receive data in 8 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_8BIT)
   {
-    /* Transfer loop */
-    while (hspi->RxXferCount > 0U)
+    if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-      /* Check the RXNE flag */
-     if(systick_poll_timeout(tickstart,timeout,spi_flag_poll,hspi,SPI_FLAG_RXNE))
-      {
-          errorcode = HAL_TIMEOUT;
-          goto error;
-      }
-      else
-      {
-        (* (uint8_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
-        hspi->pRxBuffPtr += sizeof(uint8_t);
-        hspi->RxXferCount--;
-      }
+        while (hspi->RxXferCount > 0U)
+        {
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            {
+                *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
+                hspi->pRxBuffPtr += sizeof(uint8_t);
+                hspi->RxXferCount--;
+            }
+        }
+    }
+    else
+    {
+        while (hspi->RxXferCount > 0U)
+        {
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            {
+                *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
+                hspi->pRxBuffPtr += sizeof(uint8_t);
+                hspi->RxXferCount--;
+            }
+
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                errorcode = HAL_TIMEOUT;
+                goto error;
+            }
+        }
     }
   }
   else
   {
-    /* Transfer loop */
-    while (hspi->RxXferCount > 0U)
+    if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
+        while (hspi->RxXferCount > 0U)
+        {
+            while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            {
+                *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
+                hspi->pRxBuffPtr += sizeof(uint16_t);
+                hspi->RxXferCount--;
+            }
+        }
+    }
+    else // SPI_MODE_SLAVE
+    {
+        while (hspi->RxXferCount > 0U)
+        {
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            {
+                *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
+                hspi->pRxBuffPtr += sizeof(uint16_t);
+                hspi->RxXferCount--;
+            }
 
-     if(systick_poll_timeout(tickstart,timeout,spi_flag_poll,hspi,SPI_FLAG_RXNE))
-      {
-          errorcode = HAL_TIMEOUT;
-          goto error;
-      }
-      else
-      {
-          /* read the received data */
-        (* (uint16_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
-        hspi->pRxBuffPtr += sizeof(uint16_t);
-        hspi->RxXferCount-= sizeof(uint16_t);
-      }
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                errorcode = HAL_TIMEOUT;
+                goto error;
+            }
+        }
     }
   }
 
@@ -519,7 +564,6 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
   uint32_t             tmp_mode;
   HAL_SPI_StateTypeDef tmp_state;
   uint32_t             tickstart;
-  uint32_t             txallowed = 1U;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   /* Variable used to alternate Rx and Tx during transfer */
   HAL_StatusTypeDef    errorcode = HAL_OK;
@@ -577,6 +621,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     __HAL_SPI_ENABLE(hspi);
   }
 
+  uint32_t end_tick = tickstart + timeout;
   /* Transmit and Receive data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
@@ -584,33 +629,49 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     {
       hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint16_t);
-      hspi->TxXferCount-=sizeof(uint16_t);
+      hspi->TxXferCount--;
     }
-    while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
+    if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-        if(systick_poll_timeout(tickstart,timeout,spi_flag_poll2,hspi,SPI_FLAG_TXE,SPI_FLAG_RXNE))
+        while (hspi->RxXferCount > 0U)
         {
-            errorcode = HAL_TIMEOUT;
-            goto error;
-        }
-        else
-        {
-            /* Check TXE flag */
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U) )
-            {
-               while((REG_FIELD_RD(hspi->Instance->SR,SPI_SR_TXFLV) != 0X0F)&&(hspi->TxXferCount > 0U))
-               {
-                   hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
-                   hspi->pTxBuffPtr += sizeof(uint16_t);
-                   hspi->TxXferCount -=sizeof(uint16_t);
-               }
-            }
-              /* Check RXNE flag */
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE)) && (hspi->RxXferCount > 0U))
+            while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
             {
                 *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint16_t);
-                hspi->RxXferCount-=sizeof(uint16_t );
+                hspi->RxXferCount--;
+            }
+            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+            {
+                hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint16_t);
+                hspi->TxXferCount--;
+            }
+        }
+        
+    }
+    else // SPI_MODE_SLAVE
+    {
+        while (hspi->RxXferCount > 0U)
+        {
+            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+            {
+                hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint16_t);
+                hspi->TxXferCount--;
+            }
+
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            {
+                *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
+                hspi->pRxBuffPtr += sizeof(uint16_t);
+                hspi->RxXferCount--;
+            }
+
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                errorcode = HAL_TIMEOUT;
+                goto error;
             }
         }
     }
@@ -623,35 +684,48 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
       *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint8_t);
       hspi->TxXferCount--;
-      txallowed = 0U;
     }
-    while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
+    
+    if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-        if(systick_poll_timeout(tickstart,timeout,spi_flag_poll2,hspi,SPI_FLAG_TXE,SPI_FLAG_RXNE))
+        while (hspi->RxXferCount > 0U)
         {
-            errorcode = HAL_TIMEOUT;
-            goto error;
-        }
-        else
-        {
-            /* Check TXE flag */
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U) && (txallowed == 1U))
-            {
-                *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
-                hspi->pTxBuffPtr += sizeof(uint8_t);
-                hspi->TxXferCount--;
-                /* Next Data is a reception (Rx). Tx not allowed */
-                txallowed = 0U;
-
-            }
-            /* Check RXNE flag */
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE)) && (hspi->RxXferCount > 0U))
+            while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
             {
                 *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint8_t);
                 hspi->RxXferCount--;
-                /* Next Data is a Transmission (Tx). Tx is allowed */
-                txallowed = 1U;
+            }
+            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+            {
+                *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint8_t);
+                hspi->TxXferCount--;
+            }
+        }
+    }
+    else // SPI_MODE_SLAVE
+    {
+        while (hspi->RxXferCount > 0U)
+        {
+            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+            {
+                *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint8_t);
+                hspi->TxXferCount--;
+            }
+
+            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            {
+                *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
+                hspi->pRxBuffPtr += sizeof(uint8_t);
+                hspi->RxXferCount--;
+            }
+
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                errorcode = HAL_TIMEOUT;
+                goto error;
             }
         }
     }

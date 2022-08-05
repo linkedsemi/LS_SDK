@@ -37,22 +37,21 @@
  Uncomment this line to use the board as master, if not it is used as slave */
 #define MASTER_BOARD
 
-
+#define LED_IO PA01
 /* Size of buffer */
 #define BUFFERSIZE                       COUNTOF(aTxBuffer)
 
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
 /* SPI handler declaration */
-SPI_HandleTypeDef SpiHandle;
+static SPI_HandleTypeDef SpiHandle;
 
 /* Buffer used for transmission */
-uint8_t aTxBuffer[] = "****SPI - Two Boards communication based on Polling ";
-uint8_t aRxBuffer[BUFFERSIZE];
+__attribute__((aligned(2))) uint8_t aTxBuffer[] = "****SPI - Two Boards communication based on Polling ";
+__attribute__((aligned(2))) uint8_t aRxBuffer[BUFFERSIZE];
 
 /* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);
-
 
 static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
 {
@@ -73,18 +72,18 @@ static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
 static void spi_init(void)
 {
   /* Configure the GPIO AF */
-  /* CLK-------------PB12 */	
-  /* SSN-------------PB13 */	
-  /* MOSI------------PB14 */	
-  /* MISO------------PB15 */	
-	spi2_clk_io_init(PB12);
-    spi2_nss_io_init(PB13);
-    spi2_mosi_io_init(PB14);
-    spi2_miso_io_init(PB15);
+  /* CLK-------------PA00 */	
+  /* SSN-------------PA07 */	
+  /* MOSI------------PB08 */	
+  /* MISO------------PB09 */	
+	spi2_clk_io_init(PA00);
+    spi2_nss_io_init(PA07);
+    spi2_mosi_io_init(PB08);
+    spi2_miso_io_init(PB09);
 
   /* Set the SPI parameters */
   SpiHandle.Instance               = SPI2;
-  SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
   SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
   SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;
@@ -107,12 +106,12 @@ static void spi_init(void)
 
 void LED_init(void)
 {
-    io_cfg_output(PB09);   //PB09 config output
-    io_write_pin(PB09,1);  //PB09 write high power
+    io_cfg_output(LED_IO);   //PB09 config output
+    io_write_pin(LED_IO,1);  //PB09 write high power
 }
 void LED_flicker(void)
 {
-    io_toggle_pin(PB09);
+    io_toggle_pin(LED_IO);
 	DELAY_US(500000);
 }
 
@@ -129,13 +128,20 @@ int main(void)
   spi_init();
   LED_init();
 
-  //switch(HAL_SPI_Transmit(&SpiHandle, (uint8_t*)aTxBuffer, BUFFERSIZE, 10000) != HAL_OK)
-  //switch(HAL_SPI_Receive(&SpiHandle, (uint8_t*)aRxBuffer, BUFFERSIZE, 10000))
-  switch(HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)aTxBuffer,(uint8_t*)aRxBuffer, BUFFERSIZE, 10000))
+  uint16_t data_length = BUFFERSIZE;
+  uint8_t mult_factor = 1;
+  if (SpiHandle.Init.DataSize == SPI_DATASIZE_16BIT)
+  {
+    data_length >>= 1;
+    mult_factor = sizeof(uint16_t);
+  }
+//   switch(HAL_SPI_Transmit(&SpiHandle, (uint8_t*)aTxBuffer, data_length, 10000))
+//   switch(HAL_SPI_Receive(&SpiHandle, (uint8_t*)aRxBuffer, data_length, 10000))
+  switch(HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)aTxBuffer,(uint8_t*)aRxBuffer, data_length, 10000))
   {
     case HAL_OK:
       /* Compare the sent and received buffers */
-      if (Buffercmp((uint8_t *)aTxBuffer, (uint8_t *)aRxBuffer, BUFFERSIZE))
+      if (Buffercmp((uint8_t *)aTxBuffer, (uint8_t *)aRxBuffer, data_length * mult_factor))
       {
         /* Transfer error in transmission process */
         Error_Handler();
