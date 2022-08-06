@@ -239,6 +239,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+  uint32_t end_tick = tickstart + timeout;
   /* Check Direction parameter */
   LS_ASSERT(IS_SPI_DIRECTION_2LINES_OR_1LINE(hspi->Init.Direction));
 
@@ -287,7 +288,6 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
     __HAL_SPI_ENABLE(hspi);
   }
 
-  uint32_t end_tick = tickstart + timeout;
   /* Transmit data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
@@ -409,6 +409,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+  uint32_t end_tick = tickstart + timeout;
   if ((hspi->Init.Mode == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES))
   {
     hspi->State = HAL_SPI_STATE_BUSY_RX;
@@ -461,7 +462,6 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
     __HAL_SPI_ENABLE(hspi);
   }
 
-  uint32_t end_tick = tickstart + timeout;
   /* Receive data in 8 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_8BIT)
   {
@@ -565,6 +565,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
   HAL_SPI_StateTypeDef tmp_state;
   uint32_t             tickstart;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+  uint32_t end_tick = tickstart + timeout;    
   /* Variable used to alternate Rx and Tx during transfer */
   HAL_StatusTypeDef    errorcode = HAL_OK;
 
@@ -621,7 +622,6 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     __HAL_SPI_ENABLE(hspi);
   }
 
-  uint32_t end_tick = tickstart + timeout;
   /* Transmit and Receive data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
