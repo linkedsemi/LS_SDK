@@ -26,6 +26,7 @@
 2.6 <a name="v110_2_6"></a>IWDG LP0 BUG修复  
 2.7 <a name="v110_2_7"></a>DMA BUFFER放置于RAM末尾  
 2.8 <a name="v110_2_8"></a>增加spi_flash_read_sfdp API  
+2.9 <a name="v110_2_9"></a>SPI阻塞API更新  
 
 ### 3、BLE
 
@@ -46,7 +47,11 @@
 3.15 <a name="v110_3_15"></a>增加rtos_ble_task_func_post API,支持RTOS环境下，向ble任务发送消息  
 3.16 <a name="v110_3_16"></a>调整协议栈全局变量地址，置于向量表之后  
 3.17 <a name="v110_3_17"></a>唤醒BLE时钟恢复bug修复  
-3.18 <a name="v110_3_18"></a>设定BLE MAX TIME上限为2120，优化个别手机的吞吐率
+3.18 <a name="v110_3_18"></a>设定BLE MAX TIME上限为2120，优化个别手机的吞吐率  
+3.19 <a name="v110_3_19"></a>增加射频参数温度校准机制  
+3.20 <a name="v110_3_20"></a>修复SMP流程在连续func_post过程中被阻塞的问题  
+3.21 <a name="v110_3_21"></a>天猫精灵Mesh OTA流程支持  
+3.22 <a name="v110_3_22"></a>设置Mesh协议栈加载地址4K对齐  
 
 ### 4、Demos
 
@@ -56,11 +61,12 @@
 4.4 <a name="v110_4_4"></a>输入捕获示例中调试IO不翻转bug修复  
 4.5 <a name="v110_4_5"></a>增加BLE主从配对示例  
 4.6 <a name="v110_4_6"></a>SSI示例标志位BUG修复  
+4.7 <a name="v110_4_7"></a>Mesh例程更新
 
 ### 5、LE5010
 
 5.1 <a name="v110_5_1"></a>1M Flash 烧录算法支持  
-5.2 <a name="v110_5_2"></a>进入LP2 LP3函数BUG修复（新增stop systick & global irq disable）
+5.2 <a name="v110_5_2"></a>进入LP2 LP3函数BUG修复（新增stop systick & global irq disable）  
 
 ### 6、Prop 2.4G
 
@@ -89,6 +95,14 @@
 
 | Commit Hash                              |                |
 | ---------------------------------------- | -------------- |
+| b57306199141956ee914bc59aaf0370f43f5725b |                  |
+| 10acbf88c158f07a80fe2e94bc55b6fdc4d21e31 | [4.7](#v110_4_7) |
+| 74b1ff220c3457bfdc462abf7d271190935bf9eb |                  |
+| 34660d6e3832baebb592dd3f241bf72486ccf380 | [2.9](#v110_2_9) |
+| 811f59a2092a96a34fadd23aecce2c4b08f2adf6 | [3.22](#v110_3_22) |
+| 8919e5a73acd4e6051ba77d091ee52ef8716c70e | [3.21](#v110_3_21) |
+| 911a2c095c1430d822b54b2389438978d8c9d3c7 | [3.20](#v110_3_20) |
+| ae1280a45a4574b3a1c419a5f10a064ead984047 | [3.19](#v110_3_19) |
 | 9200c6b2c7d88627f57dc41d9e7ef56729038a38 | [4.5](#v110_4_5) |
 | 79b9ee570c7e621fd8407b1ccce0b86c4e494d72 | [6.9](#v110_6_9) |
 | d733ff0ca843ebbc64fa737244e2e217355a8e99 | [2.3](#v110_2_3) |
