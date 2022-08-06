@@ -236,7 +236,7 @@ static bool spi_flag_poll1(va_list va)
   */
 HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
-  uint32_t tickstart;
+  uint32_t tickstart = systick_get_value();
   HAL_StatusTypeDef errorcode = HAL_OK;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   uint32_t end_tick = tickstart + timeout;
@@ -245,9 +245,6 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
 
   /* Process Locked */
   __HAL_LOCK(hspi);
-
-  /* Init tickstart for timeout management*/
-  tickstart = systick_get_value();
 
   if (hspi->State != HAL_SPI_STATE_READY)
   {
@@ -406,7 +403,7 @@ error:
   */
 HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
-  uint32_t tickstart;
+  uint32_t tickstart = systick_get_value();
   HAL_StatusTypeDef errorcode = HAL_OK;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   uint32_t end_tick = tickstart + timeout;
@@ -419,9 +416,6 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
 
   /* Process Locked */
   __HAL_LOCK(hspi);
-
-  /* Init tickstart for timeout management*/
-  tickstart = systick_get_value();
 
   if (hspi->State != HAL_SPI_STATE_READY)
   {
@@ -563,7 +557,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
   uint16_t             initial_TxXferCount;
   uint32_t             tmp_mode;
   HAL_SPI_StateTypeDef tmp_state;
-  uint32_t             tickstart;
+  uint32_t             tickstart = systick_get_value();
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   uint32_t end_tick = tickstart + timeout;    
   /* Variable used to alternate Rx and Tx during transfer */
@@ -574,9 +568,6 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
 
   /* Process Locked */
   __HAL_LOCK(hspi);
-
-  /* Init tickstart for timeout management*/
-  tickstart = systick_get_value();
 
   /* Init temporary variables */
   tmp_state           = hspi->State;
