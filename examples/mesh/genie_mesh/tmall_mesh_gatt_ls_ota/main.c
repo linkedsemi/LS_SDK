@@ -19,8 +19,7 @@
 #include "builtin_timer.h"
 #include "ota_settings.h"
 
-static struct builtin_timer *tmall_gatt_timer_inst = NULL;
-static void ls_tmall_gatt_timer_cb(void *param);
+
 #define TMALL_GATT_TIMEOUT 5000
 #define ALI_COMPANY_ID 0x01a8
 #define COMPA_DATA_PAGES 1
@@ -36,6 +35,8 @@ static void ls_tmall_gatt_timer_cb(void *param);
 #define TMALL_GATT_SRC_ADDR_INVALID (0xffff)
 #define UPADTE_TMALL_GATT_SRC_ADDR_TYPE  (0xff)
 #define TMALL_GATT_MESH_MODEL_INDEX_INVALID  (0xff)
+#define PROXY_CON_INTERVAL_MS 1000  //100ms
+#define GATT_CON_INTERVAL_SLOT  160 //160*625us=100ms
 
 
 bool sent_adv_ready=true;
@@ -65,7 +66,10 @@ static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0};
 uint8_t rsp_data_info[40] = {0};
 uint8_t tmall_ModelHandle = 0;
 
-static uint16_t mesh_src_addr;
+static struct builtin_timer *tmall_gatt_timer_inst = NULL;
+static void ls_tmall_gatt_timer_cb(void *param);
+
+static uint16_t provisioner_unicast_addr;
 void create_adv_obj(void);
 
 static struct gatt_svc_env tmall_aiots_svc_env;
@@ -126,18 +130,21 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0, 
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_READ_VAL] = {
         .uuid = tmall_aiots_read_char_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_VAL] = {
@@ -145,12 +152,14 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.wr_req = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_IND_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_IND_VAL] = {
@@ -158,32 +167,38 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.ind_en = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_IND_CCC] = {
         .uuid = att_client_char_cfg_uuid,
         .s.max_len = 0,
+        .char_prop.ind_en =1,
         .char_prop.wr_req = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_CMD_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_CMD_VAL] = {
         .uuid = tmall_aiots_write_cmd_char_uuid,
-        .s.max_len = 0,
+        .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.wr_cmd = 1,
         .char_prop.rd_en  = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_NTF_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_NTF_VAL] = {
@@ -191,13 +206,16 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.ntf_en = 1,
         .char_prop.rd_en  = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_NTF_CCC] = {
         .uuid = att_client_char_cfg_uuid,
         .s.max_len = 0,
         .char_prop.wr_req = 1,
+        .char_prop.ntf_en = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
 };
@@ -297,6 +315,15 @@ static uint8_t gen_ali_authValue(void)
     return (1);
 }
 
+void ls_sig_mesh_set_proxy_con_interval(uint16_t *interval_ms)
+{
+    *interval_ms = PROXY_CON_INTERVAL_MS;
+}
+
+ void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot)  /**< 1slot=625us */
+ {
+    *interval_slot = GATT_CON_INTERVAL_SLOT;
+ }
 void auto_check_unbind(void)
 {
     uint16_t length = 1;
@@ -341,9 +368,9 @@ void disable_tx_unprov_beacon(void)
     stop_tx_unprov_beacon();
 }
 
-void prov_succeed_src_addr_ind(uint16_t unicast_address)
+void report_provisioner_unicast_address_ind(uint16_t unicast_address)
 {
-    mesh_src_addr= unicast_address;
+    provisioner_unicast_addr = unicast_address;
     tinyfs_write(mesh_dir, RECORD_KEY2, (uint8_t *)&unicast_address, sizeof(unicast_address));
     tinyfs_write_through();
 }
@@ -527,11 +554,11 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         Node_Get_Proved_State = evt->st_proved.proved_state;
         if (Node_Get_Proved_State == PROVISIONED_OK)
         {
-            uint16_t length = sizeof(mesh_src_addr);
-            LOG_I("src_addr=%x",mesh_src_addr);
+            uint16_t length = sizeof(provisioner_unicast_addr);
+            LOG_I("src_addr=%x",provisioner_unicast_addr);
             LOG_I("The node is provisioned");
             tmall_light_set_lightness(0xffff);
-            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&mesh_src_addr, &length);
+            tinyfs_read(mesh_dir, RECORD_KEY2, (uint8_t*)&provisioner_unicast_addr, &length);
         }
         else
         {
