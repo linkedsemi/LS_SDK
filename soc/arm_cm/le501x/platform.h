@@ -91,6 +91,8 @@ void lvd33_enable(void);
 
 void lvd33_disable(void);
 
+void mesh_stack_data_bss_init(void);
+
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))
 #define OSTICK_HS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step)/625)
