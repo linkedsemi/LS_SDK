@@ -476,6 +476,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tmall_light_init();
     gen_ali_authValue();
     ble_init();

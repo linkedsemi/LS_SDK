@@ -498,6 +498,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
     #if (AUTO_SIG_MESH_LP_MODE == 0)
     io_cfg_output(PROV_SUCCESS_LED);

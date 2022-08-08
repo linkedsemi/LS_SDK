@@ -875,6 +875,7 @@ void exti_io_enable(void)
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     exti_io_enable();
     gen_ali_authValue();
     ble_init();

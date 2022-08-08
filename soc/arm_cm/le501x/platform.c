@@ -76,17 +76,33 @@ __attribute__((weak)) uint32_t __stack_bss_size__;
 __attribute__((weak)) uint32_t __stack_data_lma__;
 __attribute__((weak)) uint32_t __stack_data_size__;
 __attribute__((weak)) uint32_t __stack_data_start__;
+__attribute__((weak)) uint32_t __mesh_stack_bss_start__;
+__attribute__((weak)) uint32_t __mesh_stack_bss_size__;
+__attribute__((weak)) uint32_t __mesh_stack_data_lma__;
+__attribute__((weak)) uint32_t __mesh_stack_data_start__;
+__attribute__((weak)) uint32_t __mesh_stack_data_size__;
 #elif defined(__GNUC__)
 extern uint32_t __stack_bss_start__;
 extern uint32_t __stack_bss_size__;
 extern uint32_t __stack_data_lma__;
 extern uint32_t __stack_data_size__;
 extern uint32_t __stack_data_start__;
+extern uint32_t __mesh_stack_bss_start__;
+extern uint32_t __mesh_stack_bss_size__;
+extern uint32_t __mesh_stack_data_lma__;
+extern uint32_t __mesh_stack_data_start__;
+extern uint32_t __mesh_stack_data_size__;
 #endif
 static void stack_data_bss_init()
 {
     memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_size__);
     memcpy(&__stack_data_start__,&__stack_data_lma__,(uint32_t)&__stack_data_size__);
+}
+
+void mesh_stack_data_bss_init()
+{
+    memset(&__mesh_stack_bss_start__,0,(uint32_t)&__mesh_stack_bss_size__);
+    memcpy(&__mesh_stack_data_start__,&__mesh_stack_data_lma__,(uint32_t)&__mesh_stack_data_size__);
 }
 
 static void ble_irq_clr()
