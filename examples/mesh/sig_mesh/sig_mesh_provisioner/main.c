@@ -438,6 +438,7 @@ void prover_send_message_vendor_model(uint32_t vendor_opcode, uint32_t model_id,
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tinyfs_mkdir(&ls_sigmesh_provision_dir, ROOT_DIR, 5);   
     ble_init();
     auto_check_unbind();
