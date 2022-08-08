@@ -99,7 +99,7 @@ static void stack_data_bss_init()
     memcpy(&__stack_data_start__,&__stack_data_lma__,(uint32_t)&__stack_data_size__);
 }
 
-void mesh_stack_data_bss_init()
+void mesh_stack_data_bss_init(void)
 {
     memset(&__mesh_stack_bss_start__,0,(uint32_t)&__mesh_stack_bss_size__);
     memcpy(&__mesh_stack_data_start__,&__mesh_stack_data_lma__,(uint32_t)&__mesh_stack_data_size__);
