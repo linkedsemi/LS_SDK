@@ -222,9 +222,15 @@ void trim_version_4202_load()
         io_toggle_for_clock(PB11);
     break;
     case 0x3202:
+    case 0x3211:
+    case 0x2401:
+    case 0x4831:
         io_toggle_for_clock(PB03);
     break;
+    case 0x2831:
+        io_toggle_for_clock(PA14);
     case 0x4803:
+    case 0x4811:
 
     break;
     }
