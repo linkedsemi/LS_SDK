@@ -9,27 +9,27 @@
 #include "sleep.h"
 #include "le501x.h"
 #include "log.h"
-#include "lsqspi_msp.h"
-#include "spi_flash.h"
+#include "ls_msp_qspi.h"
+#include "ls_hal_flash.h"
 #include "compile_flag.h"
-#include "lscache.h"
+#include "ls_hal_cache.h"
 #include "reg_rcc.h"
 #include "modem_rf_le501x.h"
 #include "modem_rf_le501x_24g.h"
 #include "calc_acc.h"
 #include "builtin_timer.h"
 #include "reg_syscfg.h"
-#include "lsecc.h"
-#include "lstrng.h"
+#include "ls_hal_ecc.h"
+#include "ls_hal_trng.h"
 #include "field_manipulate.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "ls_dbg.h"
 #include "systick.h"
-#include "lspis.h"
-#include "lstimer.h"
+#include "ls_hal_pis.h"
+#include "ls_hal_timer.h"
 #include "reg_lptim.h"
 #include "sw_timer.h"
-#include "lsecc.h"
+#include "ls_hal_ecc.h"
 #define XTAL_STB_VAL 20
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
@@ -45,8 +45,6 @@ void stack_var_ptr_init(void);
 void main_task_app_init(void);
 
 void main_task_itf_init(void);
-
-void mac_init_for_sw_timer(void);
 
 __attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}
 
@@ -126,7 +124,7 @@ void ble_irq_clr_and_enable()
 uint32_t config_word_get(uint32_t offset)
 {
     uint32_t data;
-    spi_flash_quad_io_read(offset,(uint8_t *)&data,sizeof(data));
+    hal_flash_quad_io_read(offset,(uint8_t *)&data,sizeof(data));
     return data;
 }
 
@@ -353,7 +351,7 @@ static void rco_val_init()
     SYSCFG->PMU_ANALOG = 0;
 }
 
-XIP_BANNED void LVD33_Handler()
+void XIP_BANNED_FUNC(LVD33_Handler,)
 {
     while(REG_FIELD_RD(SYSCFG->RSTST,SYSCFG_LVD33_FLAG))
     {
@@ -396,7 +394,7 @@ static void var_init()
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
-    spi_flash_drv_var_init(true,false);
+    hal_flash_drv_var_init(true,false);
 }
 
 void sys_init_itf()
@@ -420,7 +418,7 @@ void sys_init_none()
     analog_init();
     rco_freq_counting_init();
     HAL_PIS_Init();
-    spi_flash_drv_var_init(true,false);
+    hal_flash_drv_var_init(true,false);
     cpu_sleep_recover_init();
     calc_acc_init();
     mac_init();
@@ -430,7 +428,6 @@ void sys_init_none()
     LOG_INIT();
     rco_freq_counting_config();
     rco_freq_counting_start();
-    mac_init_for_sw_timer();
     sw_timer_module_init();
     rco_freq_counting_sync();
 }
@@ -448,7 +445,7 @@ static void ll_var_init()
     stack_data_bss_init();
     bb_mem_clr();
     ll_stack_var_ptr_init();
-    spi_flash_drv_var_init(true,false);
+    hal_flash_drv_var_init(true,false);
 }
 
 void sys_init_ll()
@@ -512,84 +509,84 @@ __attribute__((weak)) uint32_t ble_isr(){return 0;}
 
 __attribute__((weak)) void ble_stack_isr(){ble_isr();}
 
-XIP_BANNED void BLE_Handler()
+void XIP_BANNED_FUNC(BLE_Handler,)
 {
-    bool flash_writing_status = spi_flash_writing_busy();
-    bool xip = spi_flash_xip_status_get();
+    bool flash_writing_status = hal_flash_writing_busy();
+    bool xip = hal_flash_xip_status_get();
     if(flash_writing_status)
     {
         LS_RAM_ASSERT(xip == false);
-        spi_flash_prog_erase_suspend();
+        hal_flash_prog_erase_suspend();
         uint8_t status_reg1;
         do{
-            spi_flash_read_status_register_1(&status_reg1);
-        }while(spi_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
+            hal_flash_read_status_register_1(&status_reg1);
+        }while(hal_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
     }
     if(xip == false)
     {
-        spi_flash_xip_start();
+        hal_flash_xip_start();
     }
     ble_stack_isr();
     if(xip == false)
     {
-        spi_flash_xip_stop();
+        hal_flash_xip_stop();
     }
     if(flash_writing_status)
     {
-        spi_flash_prog_erase_resume();
+        hal_flash_prog_erase_resume();
         DELAY_US(8);
     }
 }
 
-XIP_BANNED void switch_to_rc32k()
+void XIP_BANNED_FUNC(switch_to_rc32k,)
 {
     MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, (uint32_t)2<<RCC_SYSCLK_SW_POS | (uint32_t)1<<RCC_CKCFG_POS);
 }
 
-XIP_BANNED void switch_to_xo16m()
+void XIP_BANNED_FUNC(switch_to_xo16m,)
 {
     MODIFY_REG(RCC->CFG, RCC_HCLK_SCAL_MASK | RCC_CKCFG_MASK | RCC_SYSCLK_SW_MASK, (uint32_t)1<<RCC_CKCFG_POS | (uint32_t)1<<RCC_SYSCLK_SW_POS);
 }
 
 #if (SDK_HCLK_MHZ==16)
-XIP_BANNED bool clk_check()
+bool XIP_BANNED_FUNC(clk_check,)
 {
     uint32_t rcc_cfg = RCC->CFG;
     return REG_FIELD_RD(rcc_cfg, RCC_SYSCLK_SW) == 1 && REG_FIELD_RD(rcc_cfg, RCC_HCLK_SCAL) == 0;
 }
 
-XIP_BANNED void clk_switch()
+void XIP_BANNED_FUNC(clk_switch,)
 {
     switch_to_xo16m();
 }
 
 #else
-XIP_BANNED static void switch_to_pll(uint8_t hclk_scal)
+static void XIP_BANNED_FUNC(switch_to_pll,uint8_t hclk_scal)
 {
     MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, (uint32_t)4 <<RCC_SYSCLK_SW_POS | (uint32_t)1<<RCC_CKCFG_POS | (uint32_t)hclk_scal << RCC_HCLK_SCAL_POS);
 }
 
 #if (SDK_HCLK_MHZ==32)
 
-XIP_BANNED bool clk_check()
+bool XIP_BANNED_FUNC(clk_check,)
 {
     uint32_t rcc_cfg = RCC->CFG;
     return REG_FIELD_RD(rcc_cfg, RCC_SYSCLK_SW) == 4 && REG_FIELD_RD(rcc_cfg, RCC_HCLK_SCAL) == 0x8;
 }
 
-XIP_BANNED void clk_switch()
+void XIP_BANNED_FUNC(clk_switch,)
 {
     switch_to_pll(0x8);
 }
 #elif(SDK_HCLK_MHZ==64)
 
-XIP_BANNED bool clk_check()
+bool XIP_BANNED_FUNC(clk_check,)
 {
     uint32_t rcc_cfg = RCC->CFG;
     return REG_FIELD_RD(rcc_cfg, RCC_SYSCLK_SW) == 4 && REG_FIELD_RD(rcc_cfg, RCC_HCLK_SCAL) == 0;
 }
 
-XIP_BANNED void clk_switch()
+void XIP_BANNED_FUNC(clk_switch,)
 {
     switch_to_pll(0);
 }
@@ -601,7 +598,7 @@ XIP_BANNED void clk_switch()
 
 uint32_t get_ota_settings_offset()
 {
-    return spi_flash_total_size_get() - FLASH_PAGE_SIZE;
+    return hal_flash_total_size_get() - FLASH_PAGE_SIZE;
 }
 
 uint32_t get_app_image_base()

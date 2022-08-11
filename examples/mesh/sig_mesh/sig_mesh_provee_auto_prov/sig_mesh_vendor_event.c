@@ -6,8 +6,8 @@
 #include "platform.h"
 #include "sig_mesh_ctl.h"
 #include "sig_mesh_vendor_event.h"
-#include "lsuart.h"
-#include "io_config.h"
+#include "ls_hal_uart.h"
+#include "ls_soc_gpio.h"
 #include "reg_syscfg.h"
 
 #define UART_BUFFER_SIZE (1024)
@@ -30,7 +30,7 @@ static uint32_t cnt_vendor_event_info=0;
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Server_Config.Init.MSBEN = 0;

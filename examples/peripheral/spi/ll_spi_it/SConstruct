@@ -1,0 +1,12 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'main.c',
+    'll_spi_handler.c',
+]
+inc = [
+    '.'
+]
+env.app_build('ll_spi_it',src,inc,ble = False)

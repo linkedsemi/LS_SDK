@@ -6,7 +6,7 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tinyfs.h"
 #include "tinycrypt/sha256.h"
 #include "tinycrypt/constants.h"
@@ -14,7 +14,7 @@
 #include "le501x.h"
 #include "sig_mesh_ctl.h"
 #include "sig_mesh_vendor_event.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "builtin_timer.h"
 
 #define COMPANY_ID 0x093A

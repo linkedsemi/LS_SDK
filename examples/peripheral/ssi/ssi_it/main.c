@@ -12,20 +12,17 @@
 
 /* Includes ------------------------------------------------------------------*/
 #define LOG_TAG "MAIN"
-#include "ls_ble.h"
 #include "platform.h"
-#include "prf_diss.h"
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
-#include "lsspi.h"
-#include "lsssi.h"
-#include "lsdmac.h"
+#include "ls_hal_spi.h"
+#include "ls_hal_ssi.h"
+#include "ls_hal_dmac.h"
 
 /* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);
@@ -52,10 +49,10 @@ void HAL_SSI_TxRxCpltCallback(SSI_HandleTypeDef *hssi)
 
 static void ssi_test_init(void)
 {
-    ssi_clk_io_init(PB09);		/* CLK-------------PB09 */	
-	ssi_nss0_io_init(PB08);	/* SSN-------------PB08 */	
-	ssi_dq0_io_init(PA07);		/* MOSI------------PA07 */	
-	ssi_dq1_io_init(PA00);		/* MISO------------PA00 */	
+    pinmux_ssi_clk_init(PB09);		/* CLK-------------PB09 */	
+	pinmux_ssi_nss0_init(PB08);	/* SSN-------------PB08 */	
+	pinmux_ssi_dq0_init(PA07);		/* MOSI------------PA07 */	
+	pinmux_ssi_dq1_init(PA00);		/* MISO------------PA00 */	
 	
 	SsiHandle.REG = LSSSI;
 	SsiHandle.Init.clk_div = 128;

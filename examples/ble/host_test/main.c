@@ -1,7 +1,7 @@
 #include "ls_ble.h"
 #include "platform.h"
-#include "lsuart.h"
-#include "io_config.h"
+#include "ls_hal_uart.h"
+#include "ls_soc_gpio.h"
 UART_HandleTypeDef UART_Config; 
 static void (*eif_read_callback)(void *,uint8_t);
 static void (*eif_write_callback)(void *,uint8_t);
@@ -49,7 +49,7 @@ bool uart_eif_flow_off(void)
 
 static void uart_test_init(void)
 {
-    uart1_io_init(PB00,PB01);
+    pinmux_uart1_init(PB00,PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;

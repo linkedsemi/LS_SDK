@@ -4,9 +4,9 @@
 #include "le501x.h"
 #include "sleep.h"
 #include "sys_stat.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "ls_dbg.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "ls_24g_common_freertos.h"
 #include "ls_24g.h"
 #include "app_user_24g.h"
@@ -71,7 +71,7 @@ _ISR static void app_user_24g_rx_cb(void *param)
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -83,7 +83,7 @@ static void ls_uart_init(void)
 }
 static void ls_uart_deinit(void)
 {
-    uart1_io_deinit();
+    pinmux_uart1_deinit();
     HAL_UART_DeInit(&UART_Config);
 }
 static void ls_uart_recv_restart(void)

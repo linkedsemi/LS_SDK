@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tinyfs.h"
 #include "builtin_timer.h"
-#include "lsuart.h"
-#include "io_config.h"
+#include "ls_hal_uart.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include "co_math.h"
 #include "ls_mesh.h"
@@ -196,7 +196,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_9600;

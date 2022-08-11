@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "prf_fotas.h"
 #include "SEGGER_RTT.h"
 

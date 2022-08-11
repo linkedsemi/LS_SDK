@@ -1,6 +1,6 @@
-#include "lsi2c.h"
+#include "ls_hal_i2c.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
@@ -46,7 +46,7 @@ int main(void)
   /* Configure the GPIO AF */
   /* SDA-------------PB12 */	
   /* SCL-------------PB13 */	
-  iic1_io_init( PB13, PB12);
+  pinmux_iic1_init( PB13, PB12);
 
 	
   /*##-1- Configure the I2C peripheral ######################################*/

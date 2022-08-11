@@ -1,0 +1,324 @@
+gemini_ecb_cbc_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_it && scons ic=gemini
+
+gemini_ecb_cbc_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecb_cbc_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+gemini_ecb_cbc_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_polling && scons ic=gemini
+
+gemini_ecb_cbc_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_polling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecb_cbc_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+# gemini_gpio_build:
+#   stage: build
+#   script:
+#     - cd examples/peripheral/gpio && scons ic=gemini
+
+# gemini_gpio_keil_build:
+#   stage: build
+#   rules:
+#     - !reference [.release_rule, rules]
+#   script:
+#     - cd examples/peripheral/gpio/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b gpio.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+gemini_i2c_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_it && scons ic=gemini
+
+gemini_i2c_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_it.uvprojx -o UVBuild/build.txt -j0
+
+
+gemini_i2c_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_it && scons ic=gemini
+
+gemini_ll_i2c_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_it.uvprojx -o UVBuild/build.txt -j0
+
+gemini_i2c_mem_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_mem_polling && scons ic=gemini
+
+gemini_i2c_mem_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_mem_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_mem_polling.uvprojx -o UVBuild/build.txt -j0
+
+gemini_i2c_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_polling && scons ic=gemini
+
+gemini_i2c_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_polling.uvprojx -o UVBuild/build.txt -j0
+
+# gemini_pdm_build:
+#   stage: build
+#   script:
+#     - cd examples/peripheral/pdm && scons ic=gemini
+
+# gemini_pdm_keil_build:
+#   stage: build
+#   rules:
+#     - !reference [.release_rule, rules]
+#   script:
+#     - cd examples/peripheral/pdm/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b pdm.uvprojx -o UVBuild/build.txt -j0
+
+gemini_software_calendar_build:
+  stage: build
+  script:
+    - cd examples/peripheral/software_calendar && scons ic=gemini
+
+gemini_software_calendar_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/software_calendar/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b software_calendar.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+gemini_software_timers_build:
+  stage: build
+  script:
+    - cd examples/peripheral/software_timers && scons ic=gemini
+
+gemini_software_timers_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/software_timers/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b software_timers.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+gemini_ll_spi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/ll_spi_it && scons ic=gemini
+
+gemini_ll_spi_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/ll_spi_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_it.uvprojx -o UVBuild/build.txt -j0
+
+gemini_ll_spi_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/ll_spi_polling && scons ic=gemini
+
+gemini_ll_spi_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/ll_spi_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_polling.uvprojx -o UVBuild/build.txt -j0
+
+# gemini_spi_dma_build:
+#   stage: build
+#   script:
+#     - cd examples/peripheral/spi/spi_dma && scons ic=gemini
+
+# gemini_spi_dma_keil_build:
+#   stage: build
+#   rules:
+#     - !reference [.release_rule, rules]
+#   script:
+#     - cd examples/peripheral/spi/spi_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma.uvprojx -o UVBuild/build.txt -j0
+
+gemini_spi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_it && scons ic=gemini
+
+gemini_spi_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it.uvprojx -o UVBuild/build.txt -j0
+
+gemini_spi_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_polling && scons ic=gemini
+
+gemini_spi_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling.uvprojx -o UVBuild/build.txt -j0
+
+gemini_ll_ssi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ll_ssi_it && scons ic=gemini
+
+gemini_ll_ssi_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ssi/ll_ssi_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_ssi_it.uvprojx -o UVBuild/build.txt -j0
+
+# gemini_ssi_dma_build:
+#   stage: build
+#   script:
+#     - cd examples/peripheral/ssi/ssi_dma && scons ic=gemini
+
+# gemini_ssi_dma_keil_build:
+#   stage: build
+#   rules:
+#     - !reference [.release_rule, rules]
+#   script:
+#     - cd examples/peripheral/ssi/ssi_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ssi_dma.uvprojx -o UVBuild/build.txt -j0
+
+gemini_ssi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ssi_it && scons ic=gemini
+
+gemini_ssi_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ssi/ssi_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ssi_it.uvprojx -o UVBuild/build.txt -j0
+
+gemini_Basic_PWM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Basic_PWM && scons ic=gemini
+
+gemini_Basic_PWM_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Basic_PWM/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b Basic_PWM.uvprojx -o UVBuild/build.txt -j0
+
+gemini_Basic_TIM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Basic_TIM && scons ic=gemini
+
+gemini_Basic_TIM_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Basic_TIM/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b Basic_TIM.uvprojx -o UVBuild/build.txt -j0
+
+gemini_DTC_PWM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/DTC_PWM && scons ic=gemini
+
+gemini_DTC_PWM_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/DTC_PWM/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b DTC_PWM.uvprojx -o UVBuild/build.txt -j0
+
+gemini_input_Capture_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/input_Capture && scons ic=gemini
+
+gemini_input_Capture_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/input_Capture/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b input_Capture.uvprojx -o UVBuild/build.txt -j0
+
+# gemini_uart_dma_build:
+#   stage: build
+#   script:
+#     - cd examples/peripheral/uart/uart_dma && scons ic=gemini
+
+# gemini_uart_dma_keil_build:
+#   stage: build
+#   rules:
+#     - !reference [.release_rule, rules]
+#   script:
+#     - cd examples/peripheral/uart/uart_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_dma.uvprojx -o UVBuild/build.txt -j0
+
+gemini_uart_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/uart_it && scons ic=gemini
+
+gemini_uart_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/uart_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_it.uvprojx -o UVBuild/build.txt -j0
+
+gemini_ll_uart_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/ll_uart_it && scons ic=gemini
+
+gemini_ll_uart_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/ll_uart_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_uart_it.uvprojx -o UVBuild/build.txt -j0
+
+gemini_ll_uart_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/ll_uart_polling && scons ic=gemini
+
+gemini_ll_uart_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/ll_uart_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_uart_polling.uvprojx -o UVBuild/build.txt -j0
+
+gemini_uart_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/uart_polling && scons ic=gemini
+
+gemini_uart_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/uart_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_polling.uvprojx -o UVBuild/build.txt -j0

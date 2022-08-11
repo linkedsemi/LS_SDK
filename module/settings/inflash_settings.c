@@ -1,5 +1,5 @@
 #include "inflash_settings.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "common.h"
 #include "ls_dbg.h"
 #define NOT_PROGRAMMED_DATA 0xffffffff
@@ -7,7 +7,7 @@
 static void invalid_flag_write(uint32_t offset)
 {
     uint8_t flag[4] = {'I','N','V','A'};
-    spi_flash_multi_io_page_program(offset,flag,sizeof(flag));
+    hal_flash_multi_io_page_program(offset,flag,sizeof(flag));
 }
 
 static void inversion_data_write(uint32_t offset,uint32_t *data,uint8_t size_by_word)
@@ -19,7 +19,7 @@ static void inversion_data_write(uint32_t offset,uint32_t *data,uint8_t size_by_
     {
         buf[size_by_word + i] = ~data[i];
     }
-    spi_flash_multi_io_page_program(offset,(uint8_t *)buf,sizeof(buf));
+    hal_flash_multi_io_page_program(offset,(uint8_t *)buf,sizeof(buf));
 }
 
 static bool inversion_data_check(uint32_t *data,uint8_t size_by_word)
@@ -53,10 +53,10 @@ static bool _settings_get(const struct setting_info *info,uint32_t *buf,uint16_t
     while(offset<info->start+info->range)
     {
         *valid_offset = offset;
-        spi_flash_multi_io_read(offset,(uint8_t *)buf,buf_size);
+        hal_flash_multi_io_read(offset,(uint8_t *)buf,buf_size);
         offset += buf_size;
         uint32_t flag;
-        spi_flash_multi_io_read(offset,(uint8_t *)&flag,sizeof(uint32_t));
+        hal_flash_multi_io_read(offset,(uint8_t *)&flag,sizeof(uint32_t));
         offset += sizeof(uint32_t);
         if(flag == NOT_PROGRAMMED_DATA)
         {

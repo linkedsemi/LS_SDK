@@ -4,7 +4,7 @@
 #include "log.h"
 #include "le501x.h"
 #include "tmall_light_cfg.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 extern struct mesh_model_info model_env;
 //static uint8_t advertising_data[28];

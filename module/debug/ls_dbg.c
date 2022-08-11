@@ -16,7 +16,7 @@ void ls_assert(const char *expr,const char *file,int line)
     while(1);
 }
 
-XIP_BANNED void ls_ram_assert()
+void XIP_BANNED_FUNC(ls_ram_assert,)
 {
     disable_global_irq();
     while(1);

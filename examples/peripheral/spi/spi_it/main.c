@@ -20,18 +20,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #define LOG_TAG "MAIN"
-#include "ls_ble.h"
 #include "platform.h"
-#include "prf_diss.h"
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
-#include "lsspi.h"
+#include "ls_hal_spi.h"
 
 /* Uncomment this line to use the board as master, if not it is used as slave */
 #define MASTER_BOARD
@@ -87,10 +84,10 @@ static void spi_init(void)
   /* SSN-------------PB13 */	
   /* MOSI------------PB14 */	
   /* MISO------------PB15 */	
-	spi2_clk_io_init(PB12);
-    spi2_nss_io_init(PB13);
-    spi2_mosi_io_init(PB14);
-    spi2_miso_io_init(PB15);
+	pinmux_spi2_clk_init(PB12);
+    pinmux_spi2_nss_init(PB13);
+    pinmux_spi2_mosi_init(PB14);
+    pinmux_spi2_miso_init(PB15);
 
   /* Set the SPI parameters */
   SpiHandle.Instance               = SPI2;

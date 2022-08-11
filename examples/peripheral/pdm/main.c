@@ -1,9 +1,9 @@
 #include "platform.h"
-#include "lspdm.h"
-#include "lsdmac.h"
+#include "ls_hal_pdm.h"
+#include "ls_hal_dmac.h"
 #include "log.h"
-#include "io_config.h"
-#include "lsuart.h"
+#include "ls_soc_gpio.h"
+#include "ls_hal_uart.h"
 #include "cpu.h"
 #define PDM_CLK_KHZ 1024
 #define PDM_SAMPLE_RATE_HZ 16000
@@ -21,7 +21,7 @@ static bool buf1_flag = false;
 static void ls_pdm_uart_init(void)
 {
 
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_PDM_Config.UARTX = UART1;
     UART_PDM_Config.DMAC_Instance = &dmac1_inst;
@@ -66,8 +66,8 @@ void pdm_dma_test()
 
 void pdm_init()
 {
-    pdm_clk_io_init(PB10);
-    pdm_data0_io_init(PB09);
+    pinmux_pdm_clk_init(PB10);
+    pinmux_pdm_data0_init(PB09);
     pdm.Instance = LSPDM;
     PDM_Init_TypeDef Init = 
     {

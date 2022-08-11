@@ -1,5 +1,5 @@
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "log.h"
 #include "SEGGER_RTT.h"
-#include "lsuart.h"
-#include "io_config.h"
+#include "ls_hal_uart.h"
+#include "ls_soc_gpio.h"
 
 #define JLINK_RTT           1
 #define UART_LOG           2
@@ -34,14 +34,14 @@ static void log_uart_tx(char *ptr,int len)
 
 static void log_uart_init()
 {
-    uart3_io_init(LOG_UART_TXD, LOG_UART_RXD);
+    pinmux_uart3_init(LOG_UART_TXD, LOG_UART_RXD);
     HAL_UART_Init(&log_uart);
 }
 
 static void log_uart_deinit()
 {
     HAL_UART_DeInit(&log_uart);
-    uart3_io_deinit();
+    pinmux_uart3_deinit();
 }
 
 void uart_log_pause()

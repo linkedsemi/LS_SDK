@@ -1,9 +1,9 @@
-#include "lsadc.h"
+#include "ls_hal_adc.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
-#include "lsdmac.h"
+#include "ls_hal_dmac.h"
 
 
 
@@ -21,17 +21,17 @@ volatile uint8_t recv_flag = 0;
 
 /* Private functions ---------------------------------------------------------*/
 
-static void adc_io_init(void)
+static void pinmux_adc_init(void)
 {
-    adc12b_in0_io_init();
-    adc12b_in1_io_init();
-    adc12b_in2_io_init();
-    adc12b_in3_io_init();
-    adc12b_in4_io_init();
-    adc12b_in5_io_init();
-    adc12b_in6_io_init();
-    adc12b_in7_io_init();
-    adc12b_in8_io_init();
+    pinmux_adc12b_in0_init();
+    pinmux_adc12b_in1_init();
+    pinmux_adc12b_in2_init();
+    pinmux_adc12b_in3_init();
+    pinmux_adc12b_in4_init();
+    pinmux_adc12b_in5_init();
+    pinmux_adc12b_in6_init();
+    pinmux_adc12b_in7_init();
+    pinmux_adc12b_in8_init();
 }
 
 void lsadc_init(void)
@@ -128,7 +128,7 @@ void lsadc_init(void)
 int main(void)
 {
     sys_init_none();
-	adc_io_init();
+	pinmux_adc_init();
 	lsadc_init();
 
   /* Start ADC conversion on regular group with transfer by IT */
