@@ -423,6 +423,19 @@ le501x_i2c_it_keil_build:
   script:
     - cd examples/peripheral/i2c/i2c_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+
+le501x_i2c_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_it && scons
+
+le501x_ll_i2c_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_it.uvprojx -o UVBuild/build.txt -j0
+
 le501x_i2c_mem_polling_build:
   stage: build
   script:
@@ -495,6 +508,18 @@ le501x_software_timers_keil_build:
   script:
     - cd examples/peripheral/software_timers/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b software_timers.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+le501x_ll_spi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/ll_spi_it && scons
+
+le501x_ll_spi_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/ll_spi_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_it.uvprojx -o UVBuild/build.txt -j0
+
 le501x_spi_dma_build:
   stage: build
   script:
@@ -530,6 +555,18 @@ le501x_spi_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi/spi_polling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_ll_ssi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ll_ssi_it && scons
+
+le501x_ll_ssi_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ssi/ll_ssi_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_ssi_it.uvprojx -o UVBuild/build.txt -j0
 
 le501x_ssi_dma_build:
   stage: build
@@ -626,6 +663,18 @@ le501x_uart_it_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/uart/uart_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_ll_uart_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/ll_uart_it && scons
+
+le501x_ll_uart_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/ll_uart_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_uart_it.uvprojx -o UVBuild/build.txt -j0
 
 le501x_uart_polling_build:
   stage: build

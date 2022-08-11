@@ -9,7 +9,7 @@
 #include "tinycrypt/sha256.h"
 #include "ota_settings.h"
 #include "inflash_settings.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "fota_svc_server.h"
 #include "log.h"
 
@@ -230,7 +230,7 @@ static void fotas_flash_cleanup(void)
     uint32_t offset = fotas_env.new_image.base - FLASH_BASE_ADDR;
     while(size)
     {
-        spi_flash_sector_erase(offset);
+        hal_flash_sector_erase(offset);
         if(size > FLASH_SECTOR_SIZE)
         {
             size -= FLASH_SECTOR_SIZE;
@@ -261,7 +261,7 @@ static bool fw_digest_check(void)
             length = size;
             size = 0;
         }
-        spi_flash_quad_io_read(offset,buf, length);
+        hal_flash_quad_io_read(offset,buf, length);
         tc_sha256_update(&sha256,buf, length);
         offset += length;
     }
@@ -439,25 +439,25 @@ void ls_ota_server_write_req_ind(struct gatt_server_write_req *wr_req, uint8_t c
         if (end_addr > page_aligned_addr)
         {
             pro_len = page_aligned_addr - start_addr;
-            spi_flash_multi_io_page_program(start_addr, data_ptr, pro_len);
+            hal_flash_multi_io_page_program(start_addr, data_ptr, pro_len);
             start_addr += pro_len;
             data_ptr += pro_len;
             len -= pro_len;
             while (len >= FOTAS_PAGE_SIZE)
             {
-                spi_flash_multi_io_page_program(start_addr, data_ptr, FOTAS_PAGE_SIZE);
+                hal_flash_multi_io_page_program(start_addr, data_ptr, FOTAS_PAGE_SIZE);
                 start_addr += FOTAS_PAGE_SIZE;
                 data_ptr += FOTAS_PAGE_SIZE;
                 len -= FOTAS_PAGE_SIZE;
             }
             if (len > 0)
             {
-                spi_flash_multi_io_page_program(start_addr, data_ptr, len);
+                hal_flash_multi_io_page_program(start_addr, data_ptr, len);
             }
         }
         else
         {
-            spi_flash_multi_io_page_program(start_addr, data_ptr, len);
+            hal_flash_multi_io_page_program(start_addr, data_ptr, len);
         }
         
         fotas_env.ack[ptr->segment_id/8] |= 1<< ptr->segment_id % 8;

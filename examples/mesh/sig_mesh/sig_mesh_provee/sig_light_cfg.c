@@ -1,7 +1,7 @@
 #include "sig_light_cfg.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "sig_mesh_ctl.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "log.h"
 #include "builtin_timer.h"
 
@@ -152,9 +152,9 @@ void ls_mesh_pwm_init(void)
     uint16_t level_t = 0x5FF;
     light_tim_hdl.Instance = TIMx;
 
-    gptimb1_ch1_io_init(LIGHT_LED_1,true,0);
-	gptimb1_ch2_io_init(LIGHT_LED_2,true,0);
-    gptimb1_ch3_io_init(LIGHT_LED_3,true,0);
+    pinmux_gptimb1_ch1_init(LIGHT_LED_1,true,0);
+	pinmux_gptimb1_ch2_init(LIGHT_LED_2,true,0);
+    pinmux_gptimb1_ch3_init(LIGHT_LED_3,true,0);
   
     light_tim_hdl.Init.Prescaler = 15;
     light_tim_hdl.Init.Period = 0xfffe;
@@ -255,7 +255,7 @@ void io_exti_callback(uint8_t pin) // override io_exti_callback
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_SIG_MESH_Config.UARTX = UART1;
     UART_SIG_MESH_Config.Init.BaudRate = UART_BAUDRATE_115200;

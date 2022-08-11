@@ -1,6 +1,6 @@
 #include "ota_settings.h"
 #include "inflash_settings.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "prf_fotas.h"
 #define OTA_COPY_INFO_OFFSET 128
 #define OTA_COPY_INFO_RANGE 128
@@ -42,7 +42,7 @@ static inline struct setting_info get_ota_settings_erase_req_info()
 
 void ota_settings_erase(void)
 {
-    spi_flash_sector_erase(get_ota_settings_offset());
+    hal_flash_sector_erase(get_ota_settings_offset());
 }
 
 

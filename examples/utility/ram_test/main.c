@@ -1,7 +1,7 @@
 #include "ls_ble.h"
 #include "platform.h"
-#include "lsuart.h"
-#include "io_config.h"
+#include "ls_hal_uart.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 UART_HandleTypeDef UART_Config2;
 
@@ -103,7 +103,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 static void uart_test_init(void)
 {
-    uart1_io_init(PA10,PA11);
+    pinmux_uart1_init(PA10,PA11);
     io_pull_write(PA11, IO_PULL_UP);
     UART_Config2.UARTX = UART1;
     UART_Config2.Init.BaudRate = UART_BAUDRATE_115200;

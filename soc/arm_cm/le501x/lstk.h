@@ -143,7 +143,7 @@ extern "C"
 #define CHELR  0x14
 #define CHEHR  0x15
 #define GSR    0x1E
-#define SCR    0x1F
+#define SCCR    0x1F
 #define SPR    0x21
 #define CNTLR  0x22
 #define CNTHR  0x23

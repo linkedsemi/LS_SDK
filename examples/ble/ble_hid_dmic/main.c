@@ -5,19 +5,19 @@
 #include "prf_bass.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include "log.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"   
 #include "tinyfs.h"
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include "co_list.h"
 #include "adpcm.h"
-#include "lsdmac.h"
-#include "lspdm.h"
+#include "ls_hal_dmac.h"
+#include "ls_hal_pdm.h"
 #include "main.h"
 
 #define APP_HID_DEV_NAME ("BLE_HID_DIC_DEMO")
@@ -1718,8 +1718,8 @@ void dmic_pdm_dma_init(void)
 
 void dmic_pdm_init(void)
 {
-    pdm_clk_io_init(DMIC_CLK_IO);
-    pdm_data0_io_init(DMIC_DATA_IO);
+    pinmux_pdm_clk_init(DMIC_CLK_IO);
+    pinmux_pdm_data0_init(DMIC_DATA_IO);
     hdmic.Instance = LSPDM;
     PDM_Init_TypeDef Init = 
     {

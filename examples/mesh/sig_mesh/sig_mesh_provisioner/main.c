@@ -9,7 +9,7 @@
 #include "sig_mesh_prover_ctl.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tinyfs.h"
 #include "field_manipulate.h"
 #include "le501x.h"

@@ -1,11 +1,11 @@
 #define LOG_TAG "RTC_DEMO"
-#include "lsrtc.h"
+#include "ls_hal_rtc.h"
 #include "le501x.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include "sleep.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "reg_syscfg.h"
 #include "log.h"
 

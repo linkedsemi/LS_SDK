@@ -5,7 +5,7 @@
 #include "builtin_timer.h"
 #include "ls_sys.h"
 #include "cpu.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "tinyfs.h"
 
 #define RECORD_BLEAT 1
@@ -231,7 +231,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
 	io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -309,7 +309,7 @@ void at_store_info_to_flash(void)
     tinyfs_write_through();
 }
 
-void wkup_io_init(void)
+void wkup_io_setup(void)
 {
     io_cfg_input(PB15);
     io_pull_write(PB15,IO_PULL_DOWN);

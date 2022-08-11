@@ -1,10 +1,10 @@
-#include "lsadc.h"
+#include "ls_hal_adc.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
-#include "lsdmac.h"
+#include "ls_hal_dmac.h"
 #include "reg_syscfg.h"
 static void Error_Handler(void);
 

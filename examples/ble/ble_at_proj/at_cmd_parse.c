@@ -1,8 +1,8 @@
 #include "at_recv_cmd.h"
 #include "at_cmd_parse.h"
-#include "lsrtc.h"
+#include "ls_hal_rtc.h"
 #include "sleep.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 #define WAKEUP_MS 5000
 
@@ -413,10 +413,10 @@ static void at_sleep_handler(uint8_t *p_cmd_parse)
             msg_len = sprintf((char *)msg_rsp,"\r\n+SLEEP:\r\nOK\r\n");
             uart_write(msg_rsp,msg_len);
             HAL_UART_DeInit(&UART_Server_Config);
-            uart1_io_deinit();
+            pinmux_uart1_deinit();
             io_pull_write(PB01,IO_PULL_DISABLE);
             if(sleep_mode_set==0){
-                wkup_io_init();
+                wkup_io_setup();
             }
             else if(sleep_mode_set==1){
                 HAL_RTC_Init(RTC_CKSEL_LSI);

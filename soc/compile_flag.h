@@ -1,21 +1,21 @@
 #ifndef COMPILE_FLAG_H_
 #define COMPILE_FLAG_H_
 #include <stdint.h>
-#if (ROM_CODE==1 || BOOT_RAM==1)
+#if (ROM_CODE==1)
 #define ROM_SYMBOL
-#define XIP_BANNED 
+#else 
+#define ROM_SYMBOL __attribute__((weak))
+#endif
+
+#if (ROM_CODE==1 || BOOT_RAM==1)
+#define XIP_BANNED_FUNC(__NAME,...) __NAME(__VA_ARGS__)
 #if defined(BOOT_ROM)
 #define LL_PKT_ISR 
 #else
 #define LL_PKT_ISR __attribute((section(".ll_pkt_isr")))
 #endif
 #else
-#define ROM_SYMBOL __attribute__((weak))
-#ifdef FLASH_PROG_ALGO
-#define XIP_BANNED
-#else
-#define XIP_BANNED __attribute__((section(".xip_banned")))
-#endif
+#define XIP_BANNED_FUNC(__NAME,...) __attribute__((section(".xip_banned."#__NAME))) __NAME(__VA_ARGS__)
 #define LL_PKT_ISR 
 #endif
 

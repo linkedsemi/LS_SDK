@@ -11,4 +11,8 @@
     <ChipInfo Vendor="LinkedSemi" Name="LE503X" Core="JLINK_CORE_CORTEX_M0" WorkRAMAddr="0x20000000" WorkRAMSize="0xc000" JLinkScriptFile="LinkedSemi/LE503X.jlinkscript"/>
     <FlashBankInfo Name="QSPI Flash" BaseAddr="0x00000000" MaxSize="0x3c00" Loader="LinkedSemi/le503x_tk_algo.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
+  <Device>
+    <ChipInfo Vendor="LinkedSemi" Name="GEMINI" Core="JLINK_CORE_CORTEX_M4" WorkRAMAddr="0x20001000" WorkRAMSize="0x1000"/>
+    <FlashBankInfo Name="SPI Flash" BaseAddr="0x00800000" MaxSize="0x80000" Loader="LinkedSemi/gemini_flash_algo.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+  </Device>
 </DataBase>

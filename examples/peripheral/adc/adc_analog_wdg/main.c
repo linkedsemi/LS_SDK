@@ -1,13 +1,13 @@
-#include "lsadc.h"
+#include "ls_hal_adc.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
-#include "lsdmac.h"
-#include "lstimer.h"
+#include "ls_hal_dmac.h"
+#include "ls_hal_timer.h"
 #include "pis_config.h"
-#include "lspis.h"
+#include "ls_hal_pis.h"
 #include "reg_syscfg.h"
 
 #define LED_IO PA01
@@ -36,7 +36,7 @@ static void pis_cfg(void)
 
 static void adc_analog_wdg_test_init(void)
 {
-    adc12b_in0_io_init(); 
+    pinmux_adc12b_in0_init(); 
 
     hadc.Instance = LSADC;
     hadc.Init.DataAlign             = ADC_DATAALIGN_RIGHT;

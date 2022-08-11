@@ -1,5 +1,5 @@
 #include "tmall_light_cfg.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
@@ -63,8 +63,8 @@ void tmall_light_init(void)
     uint16_t level_t = 0x55FF;
     light_tim_hdl.Instance = TIMx;
 
-    gptimb1_ch1_io_init(PA00,true,0);
-	gptimb1_ch2_io_init(PA01,true,0);
+    pinmux_gptimb1_ch1_init(PA00,true,0);
+	pinmux_gptimb1_ch2_init(PA01,true,0);
   
     light_tim_hdl.Init.Prescaler = SDK_HCLK_MHZ-1;
     light_tim_hdl.Init.Period = 249;

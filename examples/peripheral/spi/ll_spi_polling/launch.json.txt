@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/spi/ll_spi_polling/build/gemini/ll_spi_polling.elf",
+            "name": "GEMINI Debug LL_SPI_POLLING",
+            "device": "GEMINI",
+            "interface": "swd",
+            "preLaunchCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/gemini/fw.elf",  
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/spi/ll_spi_polling/build/gemini/ll_spi_polling.elf",
+            "name": "GEMINI Attach LL_SPI_POLLING",
+            "device": "GEMINI",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/gemini/fw.elf",  
+            ]
+        },
+    ]
+}

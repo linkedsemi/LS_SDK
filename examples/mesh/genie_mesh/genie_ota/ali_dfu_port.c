@@ -2,7 +2,7 @@
 #include "genie_crc16.h"
 #include "platform.h"
 #include "reg_base_addr.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tmall_genie_ota.h"
 #include "log.h"
 
@@ -17,7 +17,7 @@ int32_t hal_flash_erase(uint32_t off_set, uint32_t size)
 {
     while(size)
     {
-        spi_flash_sector_erase(off_set);
+        hal_flash_sector_erase(off_set);
         if(size > FLASH_SECTOR_SIZE)
         {
             size -= FLASH_SECTOR_SIZE;
@@ -35,7 +35,7 @@ int32_t hal_flash_erase(uint32_t off_set, uint32_t size)
 int32_t hal_flash_read(uint32_t *off_set, void *out_buf, uint32_t out_buf_size)
 {
     uint32_t current = *off_set;
-    spi_flash_quad_io_read(current - FLASH_BASE_ADDR,out_buf,out_buf_size);
+    hal_flash_quad_io_read(current - FLASH_BASE_ADDR,out_buf,out_buf_size);
     current += out_buf_size;
     *off_set = current;
     return 0;
@@ -85,7 +85,7 @@ int32_t hal_flash_write(uint32_t *off_set,const void *in_buf, uint32_t in_buf_si
     }
     if(length)
     {
-        spi_flash_quad_page_program(ais_ota_ptr.fw_copy_src_addr  + current - FLASH_BASE_ADDR,(void *)in_buf,length);
+        hal_flash_quad_page_program(ais_ota_ptr.fw_copy_src_addr  + current - FLASH_BASE_ADDR,(void *)in_buf,length);
         in_buf_size -= length;
         current += length;
         in_buf = (uint8_t *)in_buf + length; 
@@ -93,7 +93,7 @@ int32_t hal_flash_write(uint32_t *off_set,const void *in_buf, uint32_t in_buf_si
     while(in_buf_size)
     {
         length = in_buf_size > 256 ? 256 : in_buf_size;
-        spi_flash_quad_page_program(ais_ota_ptr.fw_copy_src_addr  + current - FLASH_BASE_ADDR,(void *)in_buf,length);
+        hal_flash_quad_page_program(ais_ota_ptr.fw_copy_src_addr  + current - FLASH_BASE_ADDR,(void *)in_buf,length);
         in_buf_size -= length;
         current += length;
         in_buf = (uint8_t *)in_buf + length; 

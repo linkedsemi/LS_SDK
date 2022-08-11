@@ -1,10 +1,10 @@
-#include "lsadc.h"
+#include "ls_hal_adc.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
-#include "lsdmac.h"
+#include "ls_hal_dmac.h"
 #include "log.h"
 
 #define CONVER_COMPLETED 1
@@ -28,17 +28,17 @@ DMA_RAM_ATTR uint16_t result_mutil_channel_single_sampling[CT_MUTLI_CHANNEL_SING
 volatile uint8_t conver_flag = 0;
 
 /* Private functions ---------------------------------------------------------*/  
-static void adc_io_init(void)
+static void pinmux_adc_init(void)
 {
-		 adc12b_in0_io_init(); 
-		 adc12b_in1_io_init();
-		 adc12b_in2_io_init();
-		 adc12b_in3_io_init();
-		 adc12b_in4_io_init();
-		 adc12b_in5_io_init();
-		 adc12b_in6_io_init();
-		 adc12b_in7_io_init();
-		 adc12b_in8_io_init();
+		 pinmux_adc12b_in0_init(); 
+		 pinmux_adc12b_in1_init();
+		 pinmux_adc12b_in2_init();
+		 pinmux_adc12b_in3_init();
+		 pinmux_adc12b_in4_init();
+		 pinmux_adc12b_in5_init();
+		 pinmux_adc12b_in6_init();
+		 pinmux_adc12b_in7_init();
+		 pinmux_adc12b_in8_init();
 }
 
 static void lsadc_multi_channel_single_sampling_init(void)
@@ -156,7 +156,7 @@ static void lsadc_multi_channel_single_sampling_init(void)
 int main(void)
 {
     sys_init_none();
-    adc_io_init();
+    pinmux_adc_init();
 	memset(&result_mutil_channel_single_sampling[0],0,sizeof(result_mutil_channel_single_sampling));
 	lsadc_multi_channel_single_sampling_init();
 

@@ -4,7 +4,7 @@
 #include "reg_rf.h"
 #include "reg_mdm2.h"
 #include "reg_syscfg.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "ls_dbg.h"
 #include "sdk_config.h"
 
@@ -422,7 +422,7 @@ void modem_rf_reinit()
 void modem_rf_init()
 {
     RCC->APB1EN |= 1<<RCC_RF_POS | 1<<RCC_MDM2_POS;
-    spi_flash_read_security_area(FLASH_SECURITY_AREA_INDEX_1, SECURITY_AREA_PACKAGEID_OFFSET,(void *)&package_id, sizeof(uint16_t));
+    hal_flash_read_security_area(FLASH_SECURITY_AREA_INDEX_1, SECURITY_AREA_PACKAGEID_OFFSET,(void *)&package_id, sizeof(uint16_t));
     rf_reg_retention();
     pll_cal_testreg_init();
     BPF_CAL();

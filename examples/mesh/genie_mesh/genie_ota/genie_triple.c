@@ -7,7 +7,6 @@
 #include <ctype.h>
 
 #include "genie_triple.h"
-#include "spi_flash.h"
 
 #define TMALL_TRITUPLE_FLASH_OFFSET (0x0200)
 

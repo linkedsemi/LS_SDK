@@ -1,13 +1,13 @@
 #ifndef TMALL_LIGHT_CFG_H_
 #define TMALL_LIGHT_CFG_H_
 
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include "le501x.h"
 #include "platform.h"
 #include "reg_rcc.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "field_manipulate.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 #include <string.h>
 

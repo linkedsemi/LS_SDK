@@ -1,11 +1,11 @@
-#include "lsadc.h"
+#include "ls_hal_adc.h"
 #include "ls_ble.h"
 #include "cpu.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
-#include "lsdmac.h"
+#include "ls_hal_dmac.h"
 #include "log.h"
 #include "field_manipulate.h"
 

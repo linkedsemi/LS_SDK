@@ -1,4 +1,8 @@
-
+PHDRS
+{
+	text PT_LOAD ;
+	desc PT_LOAD ;
+}
 SECTIONS
 {
 	PrgCode :
@@ -11,15 +15,20 @@ SECTIONS
 		KEEP(*(.text.ProgramPage))
 		KEEP(*(.text.Verify))
 		*(.text* .rodata*)
-	}
+		*(.xip_banned*)
+		. = ALIGN(16);
+	} :text
 	PrgData :
 	{
+		*(.got*)
+		KEEP(*(.bss.PRGDATA_StartMarker))
 		*(.data*)
 		*(.bss*)
 		*(COMMON)
-	}
+        . = ALIGN(16);
+	} 
 	DevDscr : 
 	{
 		KEEP(*(DevDscr))
-	} 
+	} :desc
 }

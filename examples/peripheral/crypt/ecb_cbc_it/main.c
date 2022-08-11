@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
-#include "lscrypt.h"
+#include "ls_hal_crypt.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "log.h"
 
 enum lscrypt_mode

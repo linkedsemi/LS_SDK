@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
-#include "lscrypt.h"
+#include "ls_hal_crypt.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "log.h"
 /**cbc-ecb-key-ciphertext-128**/
 uint32_t cbc_ecb_key_128[] = {

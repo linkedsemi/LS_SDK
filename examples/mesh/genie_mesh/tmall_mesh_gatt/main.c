@@ -6,9 +6,8 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "cpu.h"
+#include "ls_hal_flash.h"
 #include "co_math.h"
-#include "spi_flash.h"
 #include "tinyfs.h"
 #include "tinycrypt/sha256.h"
 #include "tinycrypt/constants.h"
@@ -293,7 +292,7 @@ static uint8_t gen_ali_authValue(void)
     uint8_t tmp_arry[ALI_AUTH_VALUE_LEN] = {0};
 
     uint8_t ali_trituple[ALI_TRIPLE_SUM_LEN] = {0};
-    spi_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
+    hal_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
     if ((ali_trituple[0] != 0xff) && (ali_trituple[1] != 0xff) && (ali_trituple[2] != 0xff))
     {
         ali_pid_u32 = (((uint32_t)ali_trituple[0]) << 24) | (((uint32_t)ali_trituple[1]) << 16) | (((uint32_t)ali_trituple[2]) << 8) | (((uint32_t)ali_trituple[3]));

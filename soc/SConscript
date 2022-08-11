@@ -3,6 +3,7 @@ import os
 Import('env')
 plf = {
     'le501x': 'arm_cm',
+    'gemini': 'arm_cm',
 }
 if env.get('IC') is None:
     env['IC'] = ARGUMENTS.get('ic','le501x')
@@ -39,11 +40,10 @@ flags = env.ParseFlags(ARGUMENTS.get('flags'))
 env.MergeFlags(flags)
 
 ### default build parameters
-default_opt_level = '-Os'
 for v in flags['CCFLAGS']:
     print(v)
     if '-O' in v:
-        default_opt_level = ''
+        env['DEFAULT_OPT_LVL'] = ''
         break
-env.MergeFlags(default_opt_level)
+env.MergeFlags(env['DEFAULT_OPT_LVL'])
 

@@ -1,4 +1,4 @@
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "platform.h"
 #include <string.h>
 
