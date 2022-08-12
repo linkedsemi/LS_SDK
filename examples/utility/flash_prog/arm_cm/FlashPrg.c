@@ -62,10 +62,20 @@ uint32_t PRGDATA_StartMarker;
  *                    fnc:  Function Code (1 - Erase, 2 - Program, 3 - Verify)
  *    Return Value:   0 - OK,  1 - Failed
  */
+#ifdef GEMINI
+static void io_pull_up_cfg()
+{
+    io_pull_write(PD14,IO_PULL_UP);
+    io_pull_write(PD15,IO_PULL_UP);
+}
+#else
+static void io_pull_up_cfg(){}
+#endif
 
 int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     disable_global_irq();
     //clk_switch();
+    io_pull_up_cfg();
     pinmux_hal_flash_quad_init();
     hal_flash_drv_var_init(false,false);
     hal_flash_dual_mode_set(false);
