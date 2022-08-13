@@ -13,13 +13,14 @@
 #include "systick.h"
 #include "sys_stat.h"
 #include "cpu.h"
+#include "ls_msp_qspiv2.h"
 static uint32_t CPU_MSP;
 static uint32_t CPU_PSP;
 static uint8_t CPU_CONTROL;
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x20000000))
 void cpu_sleep_asm(void);
 void cpu_recover_asm(void);
-void SystemInit(void);
+void dpll_qspi_clk_config(void);
 void cpu_sleep_recover_init()
 {
     V33_RG->SFT_CTRL03 =(((uint32_t)cpu_recover_asm)>>1)<<24; 
@@ -46,6 +47,7 @@ void XIP_BANNED_FUNC(before_wfi,)
 
 void XIP_BANNED_FUNC(after_wfi,)
 {
+
 }
 
 void sleep_wakeup_config()
@@ -54,7 +56,7 @@ void sleep_wakeup_config()
                           |FIELD_BUILD(V33_RG_HPLDO_PD_EN,1)
                           |FIELD_BUILD(V33_RG_MSI_PD_EN,1)
                           |FIELD_BUILD(V33_RG_BG_PD_EN,0)
-                          |FIELD_BUILD(V33_RG_BGIB_PD_EN,0)
+                          |FIELD_BUILD(V33_RG_BGIB_PD_EN,1)
                           |FIELD_BUILD(V33_RG_LSI_PD_EN,!SDK_LSI_USED)
                           |FIELD_BUILD(V33_RG_HSE_PD_EN,1)
                           |FIELD_BUILD(V33_RG_SRAM_DS_PD_EN,1)
@@ -148,6 +150,8 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     }
     gpio_pd_latch_state_exit();
     hal_flash_init();
+    MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+    dpll_qspi_clk_config();
     hal_flash_release_from_deep_power_down();
     DELAY_US(8);
     hal_flash_xip_start();
@@ -163,7 +167,7 @@ void deep_sleep_no_ble()
     uint32_t NVIC_IP[CEILING(IRQn_Max,4)];
     memcpy32(NVIC_IP,(uint32_t *)NVIC->IP,CEILING(IRQn_Max,4));
     cpu_flash_deep_sleep_and_recover();
-    SystemInit();
+    SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
     memcpy32((uint32_t *)NVIC->IP,NVIC_IP,CEILING(IRQn_Max,4));
     io_irq_enable();
     systick_start();

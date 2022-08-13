@@ -161,6 +161,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_xip_stop,)
         return;
     }
     uint32_t cpu_stat = enter_critical();
+    sync_for_xip_stop();
     if(hal_flash_dual_mode_get())
     {
         hal_flash_dual_xip_mode_exit();

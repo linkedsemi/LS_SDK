@@ -5,6 +5,7 @@
 #include "platform.h"
 #include "ls_soc_gpio.h"
 #include "common.h"
+#include "reg_sysc_awo_type.h"
 #define APP_ADDR 0x800200
 
 __NO_RETURN static void boot_app(uint32_t base)
@@ -19,6 +20,7 @@ __NO_RETURN static void boot_app(uint32_t base)
 __NO_RETURN void boot_ram_start()
 {
     __disable_irq();
+    SYSC_AWO->IO[3].PUPD = 0xf000;
     hal_flash_dual_mode_set(true);
     hal_flash_xip_start();
     lscache_cache_enable(1);

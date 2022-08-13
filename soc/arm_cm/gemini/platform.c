@@ -11,11 +11,20 @@
 #include "sleep.h"
 #include "systick.h"
 #include "ls_dbg.h"
+#include "ls_msp_qspiv2.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x20000000))
+#define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((weak)) void SystemInit(){
-    SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
+    MODIFY_REG(V33_RG->TRIM0,V33_RG_HSE_BIAS_ADJ_MASK|V33_RG_HSE_LP_MASK,1<<V33_RG_HSE_LP_POS|3<<V33_RG_HSE_BIAS_ADJ_POS);
+    V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
+    V33_RG->PMU_SET_VAL = V33_RG_PMU_SET_TGGL_MASK | PMU_CLK_VAL;
+    V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
+    if(SDK_HSE_USED)
+    {//delay for hse stabilization
+        arm_cm_delay_asm(14400);
+    }
 }
 
 void clk_switch()
@@ -23,81 +32,61 @@ void clk_switch()
     hclk_set(SDK_HCLK_MHZ);
 }
 
-static void dpll_clk_config(enum dpll_clk clk)
+void XIP_BANNED_FUNC(dpll_qspi_clk_config,)
 {
-    // if(clk==DPLL_136M)
-    // {
-    //     LS_ASSERT(SDK_HSE_USED == 1 || SDK_HSE_MHZ >= 16);
-    //     // TODO
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_SEL_REF_24M, 2);//配置pdll的时钟源位HSE
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_NDIV, 16);//配置倍频参数
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_SEL_144M, 0);//配置时钟分频 0：1/3  1：1/2
-    //     /*使能PDLL*/
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_EN_128M, 1);
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_LOCK_BYPS, 1);
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_EN, 1);
-    // }
-    // else
-    // {
-        // TODO
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_SEL_REF_24M, 0);//配置pdll的时钟源位HSE
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_NDIV, (uint8_t)(SDK_HCLK_MHZ/10)-1);//配置倍频参数
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_SEL_144M, 0);//配置时钟分频 0：1/3  1：1/2
-        /*使能PDLL*/
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_EN_128M, 1);
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_LOCK_BYPS, 1);
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0, SYSC_AWO_AWO_DPLL_EN, 1);
-    // }
+    SYSC_AWO->PD_AWO_ANA0 = 0;
+    uint8_t ndiv;
+    if(SDK_HSE_USED)
+    {
+        switch(SDK_HSE_MHZ)
+        {
+        case 8:
+            ndiv = 23;
+        break;
+        case 12:
+            ndiv = 15;
+        break;
+        case 16:
+            ndiv = 11;
+        break;
+        case 24:
+        default:
+            ndiv = 7;
+        break;
+        }
+    }else
+    {
+        ndiv = 7;
+    }
+    SYSC_AWO->PD_AWO_ANA0 = FIELD_BUILD(SYSC_AWO_AWO_DPLL_EN,1) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_SEL_REF_24M,!SDK_HSE_USED) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_SEL_144M,0) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_EN_48M,1) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_EN_128M,1) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_LOCK_BYPS,0) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_DPLL_TESTEN,0) |
+                            FIELD_BUILD(SYSC_AWO_AWO_DPLL_NDIV, ndiv);
+    arm_cm_delay_asm(50);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_QSPI,4);
 }
 
-static void hclk_switch_to_hse()
+NOINLINE static void XIP_BANNED_FUNC(clk_flash_init,)
 {
-    /*HSE起振*/
-    REG_FIELD_WR(V33_RG->PMU_SET_VAL, V33_RG_CLK_SET_HSE, 1);
-    REG_FIELD_WR(V33_RG->PMU_SET_VAL, V33_RG_PMU_SET_TGGL, 1);
-    REG_FIELD_WR(V33_RG->PMU_SET_VAL, V33_RG_PMU_SET_TGGL, 0);
-    
+    dpll_qspi_clk_config();
+    MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
 }
-
-static void hclk_switch_to_hsi()
-{
-    /*HSI起振*/
-    REG_FIELD_WR(V33_RG->PMU_SET_VAL, V33_RG_CLK_SET_HSI, 1);
-    REG_FIELD_WR(V33_RG->PMU_SET_VAL, V33_RG_PMU_SET_TGGL, 1);
-    REG_FIELD_WR(V33_RG->PMU_SET_VAL, V33_RG_PMU_SET_TGGL, 0);
-    
-}
-
 
 void hclk_set(uint32_t mhz)
 {
-    if(SDK_HSE_USED)
-    {
-        hclk_switch_to_hse();
-    }else
-    {
-        hclk_switch_to_hsi();
-    }
     switch(mhz)
     {
-    // case 136:
-    //     dpll_clk_config(DPLL_136M);
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS, 8);
-    //     break;
     case 128:
-        dpll_clk_config(DPLL_128M);
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS, 8);
+        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK, 8<<SYSC_AWO_CLK_SEL_HBUS_POS);
     break;
-    // case 68:
-    //     dpll_clk_config(DPLL_136M);
-    //     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS, 4);
-    // break;
     case 64:
-        dpll_clk_config(DPLL_128M);
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS, 8);
+        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK|SYSC_AWO_CLK_DIV_PARA_HBUS_M1_MASK, 4<<SYSC_AWO_CLK_SEL_HBUS_POS|1<<SYSC_AWO_CLK_DIV_PARA_HBUS_M1_POS);
     case 32:
-        dpll_clk_config(DPLL_128M);
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS, 8);
+        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK|SYSC_AWO_CLK_DIV_PARA_HBUS_M1_MASK, 4<<SYSC_AWO_CLK_SEL_HBUS_POS|3<<SYSC_AWO_CLK_DIV_PARA_HBUS_M1_POS);
     break;
     case 24:
         LS_ASSERT(SDK_HSE_USED==0);
@@ -120,6 +109,7 @@ void arm_cm_set_int_isr(uint8_t type,void (*isr)())
 
 void sys_init_none()
 {
+    clk_flash_init();
     clk_switch();
     io_init();
     low_power_init();
@@ -129,4 +119,9 @@ void sys_init_none()
 void platform_reset(uint32_t error)
 {
 
+}
+
+void XIP_BANNED_FUNC(sync_for_xip_stop,)
+{
+    while((SYSC_AWO->IO[3].DIN&1<<10)==0);
 }
