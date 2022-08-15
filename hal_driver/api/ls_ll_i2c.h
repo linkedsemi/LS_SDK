@@ -23,26 +23,55 @@
 /******************************************************************************
  External Macro Definition
  ******************************************************************************/
-#define I2C_CLOCK (SDK_PCLK_MHZ * 1000000)
+
+/**
+ * @brief i2c closk
+ * 
+ */
+#define I2C_CLOCK (SDK_PCLK_MHZ * 1000000)  /*!<  i2c closk           */
 /******************************************************************************
  External Variable Definition
  ******************************************************************************/
 
-#define WRITEFERDIRECTION 0x00000000U
-#define READDIRECTION I2C_CR2_RD_WEN_MASK
+/**
+ * @brief i2c date dirction
+ * 
+ */
+#define WRITEFERDIRECTION 0x00000000U       /* !<  i2c Writefer Direction       */
+#define READDIRECTION I2C_CR2_RD_WEN_MASK   /* !<  i2c Read Direction           */
 
-#define LL_I2C_ACK 0x00000000U
-#define LL_I2C_NACK I2C_CR2_NACK_MASK
+/**
+ * @brief i2c ack mode
+ * 
+ */
+#define LL_I2C_ACK 0x00000000U          /* !<  i2c ack mode        */
+#define LL_I2C_NACK I2C_CR2_NACK_MASK   /* !<  i2c nack mode       */
 
-#define LL_I2C_OWNADDRESS1_7BIT 0x00000000U
-#define LL_I2C_OWNADDRESS1_10BIT I2C_OAR1_OA1MODE_MASK
+/**
+ * @brief i2c address lenght
+ * 
+ */
+#define LL_I2C_OWNADDRESS1_7BIT 0x00000000U              /* !<  i2c 7bit address         */
+#define LL_I2C_OWNADDRESS1_10BIT I2C_OAR1_OA1MODE_MASK   /* !<  i2c 10bit address        */
 
-#define I2C_TIMEOUTR_TIMEOUTA0 0x00000000U
-#define I2C_TIMEOUTR_TIMEOUTA1 I2C_TIMEOUTR_TIMEOUTA_MASK
+/**
+ * @brief i2c bus timeout A
+ * 
+ */
+#define LL_I2C_TIMEOUTR_TIMEOUTA0 0x00000000U                  /* !<  i2c scl low speed timeout        */
+#define LL_I2C_TIMEOUTR_TIMEOUTA1 I2C_TIMEOUTR_TIMEOUTA_MASK   /* !<  i2c bus idla timeout             */
 
-#define I2C_TIMEOUTR_SCL_LOWTIMEOUT 0x00000000U
-#define I2C_TIMEOUTR_SCL_SDA_HIGHTIMEOUT I2C_TIMEOUTR_TIDLE_MASK
+/**
+ * @brief i2c check idle sck timeout 
+ * 
+ */
+#define LL_I2C_TIMEOUTR_SCL_LOWTIMEOUT 0x00000000U                    /* !<  i2c scl low  timeout check        */ 
+#define LL_I2C_TIMEOUTR_SCL_SDA_HIGHTIMEOUT I2C_TIMEOUTR_TIDLE_MASK   /* !<  i2c scl and sda high  timeout check       */
 
+/**
+ * @brief i2c resigest bit 
+ * 
+ */
 #define I2C_SR_TXE      I2C_SR_TXE_MASK
 #define I2C_SR_RXNE     I2C_SR_RXNE_MASK
 #define I2C_SR_ADDR     I2C_SR_ADDR_MASK
@@ -920,8 +949,8 @@ static inline void LL_I2C_SetTimeOutA(reg_i2c_t *I2Cx, uint32_t TimeOutA)
  * @brief  Set Idle time timeout detection.
  * @param  I2Cx I2C Instance.
  * @param  DetectionType This parameter can be one of the following values:
- *         @arg I2C_TIMEOUTR_SCL_LOWTIMEOUT
- *         @arg I2C_TIMEOUTR_SCL_SDA_HIGHTIMEOUT
+ *         @arg LL_I2C_TIMEOUTR_SCL_LOWTIMEOUT
+ *         @arg LL_I2C_TIMEOUTR_SCL_SDA_HIGHTIMEOUT
  * @retval None
  */
 static inline void LL_I2C_SetTimeIdle(reg_i2c_t *I2Cx, uint32_t DetectionType)

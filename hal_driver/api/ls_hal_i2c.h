@@ -14,7 +14,7 @@
  *  @{
  */
                         
-/** @defgroup SPI_Error_Code SPI Error Code
+/** @defgroup I2C_Error_Code I2C Error Code
   * @{
   */
 #define HAL_I2C_ERROR_NONE              0x00000000U    /*!< No error              */
@@ -63,7 +63,7 @@
 
 
  /**
-  * @brief  SPI Configuration Structure definition
+  * @brief  I2C Configuration Structure definition
   */
 typedef struct
 {
