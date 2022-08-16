@@ -21,7 +21,8 @@ __NO_RETURN void boot_ram_start()
 {
     __disable_irq();
     SYSC_AWO->IO[3].PUPD = 0xf000;
-    hal_flash_dual_mode_set(true);
+    hal_flash_dual_mode_set(false);
+    pinmux_hal_flash_quad_init();
     hal_flash_xip_start();
     lscache_cache_enable(1);
     boot_app(APP_ADDR);
