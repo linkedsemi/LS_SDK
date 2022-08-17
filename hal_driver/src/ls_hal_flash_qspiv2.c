@@ -41,57 +41,6 @@ static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_enter,)
     #endif
 }
 
-static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
-{
-    uint8_t dummy;
-    struct lsqspiv2_stg_cfg cfg;
-    cfg.ctrl.sw_cyc = 7;
-    cfg.ctrl.sw_en = 1;
-    cfg.ctrl.mw_wid = DUAL_WIRE;
-    cfg.ctrl.hz_cyc = 0;
-    cfg.ctrl.mw_cyc = 15;
-    cfg.ctrl.mw_en = 1;
-    cfg.ctrl.reserved0 = 0;
-    cfg.ctrl.reserved1 = 0;
-    cfg.ctrl.reserved2 = 0;
-    cfg.ctrl.reserved3 = 0;
-    cfg.ctrl.reserved4 = 0;
-    cfg.ca_high = DUAL_IO_READ_OPCODE<<24;
-    cfg.ca_low = 0x20<<24;
-    cfg.dat_ctrl.dat_en = 1;
-    cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
-    cfg.dat_ctrl.dat_bytes = 0;
-    cfg.dat_ctrl.reserved0 = 0;
-    cfg.dat_ctrl.reserved1 = 0;
-    cfg.dat_ctrl.reserved2 = 0;
-    cfg.data = &dummy;
-    lsqspiv2_stg_read_write(&cfg);
-    #ifndef FLASH_PROG_ALGO
-    LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
-    #endif
-}
-
-ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_xip_start,)
-{
-    if(hal_flash_xip_status_get())
-    {
-        return;
-    }
-    uint32_t cpu_stat = enter_critical();
-    if(hal_flash_dual_mode_get())
-    {
-        hal_flash_dual_xip_mode_enter();
-        lsqspiv2_direct_dual_read_config();
-    }else
-    {
-        hal_flash_quad_xip_mode_enter();
-        lsqspiv2_direct_quad_read_config();
-    } 
-    hal_flash_xip_status_set(true);
-    exit_critical(cpu_stat);
-}
-
 static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_exit,)
 {
     uint8_t dummy;
@@ -109,6 +58,41 @@ static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_exit,)
     cfg.ctrl.reserved4 = 0;
     cfg.ca_high = 0;
     cfg.ca_low = 0x0<<24;
+    cfg.dat_ctrl.dat_en = 1;
+    cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
+    cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
+    cfg.dat_ctrl.dat_bytes = 0;
+    cfg.dat_ctrl.reserved0 = 0;
+    cfg.dat_ctrl.reserved1 = 0;
+    cfg.dat_ctrl.reserved2 = 0;
+    cfg.data = &dummy;
+    lsqspiv2_stg_read_write(&cfg);
+    #ifndef FLASH_PROG_ALGO
+    LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
+    #endif
+}
+
+#if DUAL_CONTINUOUS_MODE_OFF
+static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,){}
+static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_exit,){}
+#else
+static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
+{
+    uint8_t dummy;
+    struct lsqspiv2_stg_cfg cfg;
+    cfg.ctrl.sw_cyc = 7;
+    cfg.ctrl.sw_en = 1;
+    cfg.ctrl.mw_wid = DUAL_WIRE;
+    cfg.ctrl.hz_cyc = 0;
+    cfg.ctrl.mw_cyc = 15;
+    cfg.ctrl.mw_en = 1;
+    cfg.ctrl.reserved0 = 0;
+    cfg.ctrl.reserved1 = 0;
+    cfg.ctrl.reserved2 = 0;
+    cfg.ctrl.reserved3 = 0;
+    cfg.ctrl.reserved4 = 0;
+    cfg.ca_high = DUAL_IO_READ_OPCODE<<24;
+    cfg.ca_low = 0x20<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
     cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
@@ -152,6 +136,27 @@ static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_exit,)
     #ifndef FLASH_PROG_ALGO
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
     #endif
+}
+#endif
+
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_xip_start,)
+{
+    if(hal_flash_xip_status_get())
+    {
+        return;
+    }
+    uint32_t cpu_stat = enter_critical();
+    if(hal_flash_dual_mode_get())
+    {
+        hal_flash_dual_xip_mode_enter();
+        lsqspiv2_direct_dual_read_config();
+    }else
+    {
+        hal_flash_quad_xip_mode_enter();
+        lsqspiv2_direct_quad_read_config();
+    } 
+    hal_flash_xip_status_set(true);
+    exit_critical(cpu_stat);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_xip_stop,)
