@@ -270,11 +270,12 @@ io_pull_type_t io_pull_read(uint8_t pin)
     return pull_down(x->port,x->num)|pull_up(x->port,x->num);
 }
 
-static inline void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
+static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
 {
     switch(edge)
     {
     case INT_EDGE_NONE:
+        V33_RG->EXTI_CTRL2 = 1<<group | (1<<8<<group);
         V33_RG->EXTI_CTRL0 &= ~(1<<group | 1<<8<<group);
     break;
     case INT_EDGE_RISING:
