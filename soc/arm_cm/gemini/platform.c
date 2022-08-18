@@ -27,14 +27,28 @@ __attribute__((weak)) void SystemInit(){
     }
 }
 
-void clk_switch()
+static inline void shut_down_hsi()
+{
+    V33_RG->PMU_SET_VAL = 1 << V33_RG_CLK_SET_HSE_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS;
+    V33_RG->PMU_SET_VAL = V33_RG_PMU_SET_TGGL_MASK | 1 << V33_RG_CLK_SET_HSE_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS;
+    V33_RG->PMU_SET_VAL = 1 << V33_RG_CLK_SET_HSE_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS;
+}
+
+static void XIP_BANNED_FUNC(clk_switch,)
 {
     hclk_set(SDK_HCLK_MHZ);
+    if(SDK_HSE_USED)
+    {
+        shut_down_hsi();
+    }
 }
 
 void XIP_BANNED_FUNC(dpll_qspi_clk_config,)
 {
-    SYSC_AWO->PD_AWO_ANA0 = 0;
+    if(SYSC_AWO->ANA_STAT & SYSC_AWO_DPLL_LOCK_MASK)
+    {
+        return;
+    }
     uint8_t ndiv;
     if(SDK_HSE_USED)
     {
@@ -70,40 +84,11 @@ void XIP_BANNED_FUNC(dpll_qspi_clk_config,)
     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_QSPI,4);
 }
 
-NOINLINE static void XIP_BANNED_FUNC(clk_flash_init,)
+NOINLINE void XIP_BANNED_FUNC(clk_flash_init,)
 {
     dpll_qspi_clk_config();
     MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
-}
-
-void hclk_set(uint32_t mhz)
-{
-    switch(mhz)
-    {
-    case 128:
-        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK, 8<<SYSC_AWO_CLK_SEL_HBUS_POS);
-    break;
-    case 64:
-        SYSC_AWO->PD_AWO_CLKG_SRST = SYSC_AWO_CLKG_SET_DIV_HBUS_MASK;
-        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK|SYSC_AWO_CLK_DIV_PARA_HBUS_M1_MASK, 4<<SYSC_AWO_CLK_SEL_HBUS_POS|1<<SYSC_AWO_CLK_DIV_PARA_HBUS_M1_POS);
-    break;
-    case 32:
-        SYSC_AWO->PD_AWO_CLKG_SRST = SYSC_AWO_CLKG_SET_DIV_HBUS_MASK;
-        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK|SYSC_AWO_CLK_DIV_PARA_HBUS_M1_MASK, 4<<SYSC_AWO_CLK_SEL_HBUS_POS|3<<SYSC_AWO_CLK_DIV_PARA_HBUS_M1_POS);
-    break;
-    case 24:
-        LS_ASSERT(SDK_HSE_USED==0);
-        REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS, 1);
-    break;
-    case 16:
-        LS_ASSERT(SDK_HSE_USED==1);
-        SYSC_AWO->PD_AWO_CLKG_SRST = SYSC_AWO_CLKG_SET_DIV_HBUS_MASK;
-        MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_MASK|SYSC_AWO_CLK_DIV_PARA_HBUS_M1_MASK, 4<<SYSC_AWO_CLK_SEL_HBUS_POS|7<<SYSC_AWO_CLK_DIV_PARA_HBUS_M1_POS);
-    break;
-    default:
-        LS_ASSERT(0);
-    break;
-    }
+    clk_switch();
 }
 
 void arm_cm_set_int_isr(uint8_t type,void (*isr)())
