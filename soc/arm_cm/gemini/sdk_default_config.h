@@ -31,5 +31,21 @@
 
 #define SDK_PCLK_MHZ (SDK_HCLK_MHZ/SDK_PCLK_DIV)
 
+#ifndef SDK_SRAM1_PWR_DOWN
+#define SDK_SRAM1_PWR_DOWN 0
+#endif
+
+#ifndef SDK_SRAM2_PWR_DOWN
+#define SDK_SRAM2_PWR_DOWN 0
+#endif
+
+#ifndef SDK_SRAM3_PWR_DOWN
+#define SDK_SRAM3_PWR_DOWN 0
+#endif
+
+#ifndef SDK_SRAM4_PWR_DOWN
+#define SDK_SRAM4_PWR_DOWN 0
+#endif
+
 #endif
 
