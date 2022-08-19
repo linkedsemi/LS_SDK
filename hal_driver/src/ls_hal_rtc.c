@@ -72,6 +72,8 @@ void RTC_CalendarSet(calendar_cal_t *calendar_cal,calendar_time_t *calendar_time
     save_seconds_remainder(0);
     #endif
     REG_FIELD_WR(RTC->CTRL,RTC_CTRL_RTCEN,0);
+
+    DELAY_US(50);
     
     REG_FIELD_WR(RTC->CAL,RTC_CAL_YEAR_T,(calendar_cal->year/10)%100);
     REG_FIELD_WR(RTC->CAL,RTC_CAL_YEAR_U,(calendar_cal->year%100)%10);
