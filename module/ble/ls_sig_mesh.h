@@ -781,7 +781,7 @@ void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool
  * 
  *  * @param seq_offset  set offset of seqence number by length of message
  */
-void ls_sig_mesh_auto_prov_update_ivseq_handler(uint8_t seq_offset);
+void ls_sig_mesh_auto_prov_update_ivseq_handler(uint32_t seq_offset);
 /**
  * @brief Report unicast_address of provisioner
  * 
