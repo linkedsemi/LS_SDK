@@ -239,6 +239,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         connect_id = 0xff;
         uart_server_mtu = UART_SERVER_MTU_DFT;
         LOG_I("disconnected!");
+        fota_clean_state();
         start_adv();
     break;
     case CONN_PARAM_REQ:
