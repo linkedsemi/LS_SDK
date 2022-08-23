@@ -16,12 +16,12 @@ LR_FLASH FLASH_BASE_USER FLASH_SIZE{
 	
     RAM_DATA_CODE defined(__mesh_stack_bss_end__)?MESH_STACK_BSS_END:defined(__stack_bss_end__)?BLE_STACK_BSS_END:ImageLimit(VECTOR_CODE){
         *(+RW)
-        *(.xip_banned)
+        *(.xip_banned*)
     }
     
     FLASH_CODE FLASH_BASE_USER+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE) ALIGN 0x4{
         *(InRoot$$Sections)
-        *(+RO)
+        .ANY(+RO)
     }
     ScatterAssert(ImageLimit(FLASH_CODE) <= FLASH_END)
     
