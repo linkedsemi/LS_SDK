@@ -478,3 +478,7 @@ void fotas_register_svc(uint16_t start_hdl)
 {
     gatt_manager_svc_register(start_hdl, FOTAS_IDX_NB, &ls_ota_svc_env);
 }
+void fota_clean_state(void)
+{
+    fota_state_set(FOTAS_IDLE);
+}
