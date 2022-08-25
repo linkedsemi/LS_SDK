@@ -39,6 +39,7 @@ __attribute((weak)) uint8_t max_activity_num;
 __attribute((weak)) uint8_t max_profile_num;
 __attribute((weak)) uint8_t max_ral_num;
 __attribute((weak)) uint8_t max_user_task_num;
+__attribute((weak)) bool slave_md_enable_default;
 
 #if !defined(CONFIG_AOS)
 struct {
@@ -161,6 +162,7 @@ void stack_var_ptr_init()
     max_profile_num = SDK_MAX_PROFILE_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
+    slave_md_enable_default = false;
 
     statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
     prf_fn_init();
@@ -257,6 +259,7 @@ void ll_stack_var_ptr_init()
     max_activity_num = SDK_MAX_ACT_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
+    slave_md_enable_default = false;
 
     ll_stack_buffer_init(ENV_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
 }
