@@ -35,6 +35,7 @@ typedef enum
     INT_EDGE_FALLING = 0x1,
     INT_EDGE_RISING = 0x2,
     INT_EDGE_BOTH = (INT_EDGE_FALLING|INT_EDGE_RISING),
+    INT_EDGE_UNKNOWN = 0xff,
 }exti_edge_t;
 
 typedef struct

@@ -206,7 +206,7 @@ void light_button_init(void)
     ls_uart_init();
 }
 
-void io_exti_callback(uint8_t pin) // override io_exti_callback
+void io_exti_callback(uint8_t pin,exti_edge_t edge) // override io_exti_callback
 {
     switch (pin)
     {

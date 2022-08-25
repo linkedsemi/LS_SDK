@@ -23,15 +23,19 @@ typedef enum
 /**@brief IO pull type */
 typedef enum
 {
-    IO_PULL_DISABLE,
-    IO_PULL_UP,
-    IO_PULL_DOWN,
+    IO_PULL_DISABLE = 0,
+    IO_PULL_UP = 0x1,
+    IO_PULL_DOWN = 0x2,
+    IO_PULL_UP_DOWN = (IO_PULL_UP|IO_PULL_DOWN),
 }io_pull_type_t;
 
 typedef enum
 {
-    INT_EDGE_FALLING,
-    INT_EDGE_RISING,
+    INT_EDGE_NONE = 0,
+    INT_EDGE_FALLING = 0x1,
+    INT_EDGE_RISING = 0x2,
+    INT_EDGE_BOTH = (INT_EDGE_FALLING|INT_EDGE_RISING),
+    INT_EDGE_UNKNOWN = 0xff,
 }exti_edge_t;
 
 typedef struct
@@ -250,7 +254,7 @@ void io_exti_enable(uint8_t pin,bool enable);
   * @brief GPIO external interrupt callback
   * @param pin specific GPIO pin
   */
-void io_exti_callback(uint8_t pin);
+void io_exti_callback(uint8_t pin,exti_edge_t edge);
 
 /**
   * @brief Set GPIO mode

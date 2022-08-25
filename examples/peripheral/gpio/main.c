@@ -28,7 +28,7 @@ int main(void)
     }
 }
 
-void io_exti_callback(uint8_t pin) 
+void io_exti_callback(uint8_t pin,exti_edge_t edge) 
 {
     switch (pin)
     {

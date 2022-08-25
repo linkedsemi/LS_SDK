@@ -215,7 +215,7 @@ static void _AMIC_ExtChannel_Init(ADC_HandleTypeDef *hadc, void (*Callback)(ADC_
 static void _AMIC_Timer_Init(TIM_HandleTypeDef *TimHandle, bool isStart);
 
 //System weak define callback
-void io_exti_callback(uint8_t pin);
+void io_exti_callback(uint8_t pin,exti_edge_t edge);
 /******************************************************************************
  Local Function Definition
  ******************************************************************************/
@@ -445,7 +445,7 @@ static void _AMIC_Sample_Channel_Enable(uint32_t channel)
  * Overview:
  * Note:
  ******************************************************************************/
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
 	switch (pin) {
 		case BTN_IO:
