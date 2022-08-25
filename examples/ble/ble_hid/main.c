@@ -446,7 +446,7 @@ void gpio_exit_init(void)
     io_exti_enable(PB15,true);
 }
 
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch(pin)
     {

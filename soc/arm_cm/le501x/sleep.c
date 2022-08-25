@@ -394,28 +394,28 @@ void LPWKUP_Handler(void)
     {
         if(exti_int_pending(PB15)==false)
         {
-            io_exti_callback(PB15);
+            io_exti_callback(PB15,INT_EDGE_UNKNOWN);
         }
     }
     if(wkup_stat&PA00_IO_WKUP)
     {
         if(exti_int_pending(PA00)==false)
         {
-            io_exti_callback(PA00);
+            io_exti_callback(PA00,INT_EDGE_UNKNOWN);
         }
     }
     if(wkup_stat&PA07_IO_WKUP)
     {
         if(exti_int_pending(PA07)==false)
         {
-            io_exti_callback(PA07);
+            io_exti_callback(PA07,INT_EDGE_UNKNOWN);
         }
     }
     if(wkup_stat&PB11_IO_WKUP)
     {
         if(exti_int_pending(PB11)==false)
         {
-            io_exti_callback(PB11);
+            io_exti_callback(PB11,INT_EDGE_UNKNOWN);
         }
     }
     if (wkup_stat & RTC_WKUP)

@@ -113,7 +113,7 @@ static void exti_io_handler(uint8_t port,uint8_t num)
 {
     uint8_t pin = port<<4 | num;
     EXTI->EICR = 1<<num;
-    io_exti_callback(pin,INT_EDGE_NONE);
+    io_exti_callback(pin,INT_EDGE_UNKNOWN);
 }
 
 

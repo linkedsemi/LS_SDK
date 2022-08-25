@@ -1032,7 +1032,7 @@ void exti_io_enable(void)
     io_exti_enable(PA07,true);    //PA07 interrupt enable
 }
 
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     if (pin == PA07)
     {
