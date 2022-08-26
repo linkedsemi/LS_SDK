@@ -522,7 +522,6 @@ static void Init_GPIO(void)
     io_cfg_input(PB15);
     io_pull_write(PB15, IO_PULL_UP);
     io_exti_config(PB15, INT_EDGE_FALLING);
-    io_exti_enable(PB15, true);
     /*LED io initial*/
     for (uint8_t i = 0; i < 8; i++)
     {

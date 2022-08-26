@@ -40,8 +40,6 @@ static inline void hclk_set(uint32_t mhz)
 
 void clk_flash_init(void);
 
-void stack_assert_asm(uint32_t,uint32_t,uint32_t);
-
 void platform_reset(uint32_t error);
 
 void arm_cm_set_int_isr(uint8_t type,void (*isr)());
@@ -49,10 +47,6 @@ void arm_cm_set_int_isr(uint8_t type,void (*isr)());
 void arm_cm_delay_asm(uint32_t);
 
 void sys_init_none();
-
-void pll_enable();
-
-void irq_priority(void);
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/5)
 

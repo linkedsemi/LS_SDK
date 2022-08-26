@@ -431,19 +431,19 @@ void gpio_exit_init(void)
 {
     io_cfg_input(PA00);
     io_exti_config(PA00,INT_EDGE_RISING);
-    io_exti_enable(PA00,true);
+    
 
     io_cfg_input(PA07);
     io_exti_config(PA07,INT_EDGE_RISING);
-    io_exti_enable(PA07,true);
+    
 
     io_cfg_input(PB11);
     io_exti_config(PB11,INT_EDGE_RISING);
-    io_exti_enable(PB11,true);
+    
 
     io_cfg_input(PB15);
     io_exti_config(PB15,INT_EDGE_RISING);
-    io_exti_enable(PB15,true);
+    
 }
 
 void io_exti_callback(uint8_t pin,exti_edge_t edge)

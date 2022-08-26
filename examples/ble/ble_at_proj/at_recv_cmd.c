@@ -314,7 +314,7 @@ void wkup_io_setup(void)
     io_cfg_input(PB15);
     io_pull_write(PB15,IO_PULL_DOWN);
     io_exti_config(PB15,INT_EDGE_RISING); 
-    io_exti_enable(PB15,true); 
+     
 }
 
 void io_exti_callback(uint8_t pin,exti_edge_t edge)

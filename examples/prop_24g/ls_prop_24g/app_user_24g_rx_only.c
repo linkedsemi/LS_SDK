@@ -149,7 +149,7 @@ static void app_user_24g_peri_init(void)
     // io_pull_write(USER_TEST_IO, IO_PULL_UP);
     // io_cfg_input(USER_TEST_IO);
     // io_exti_config(USER_TEST_IO,INT_EDGE_FALLING);
-    // io_exti_enable(USER_TEST_IO,true);
+    // 
 
     // io_cfg_output(PA00);
     ls_uart_init();
@@ -175,7 +175,7 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge)
     switch (pin)
     {
     case USER_TEST_IO:
-        io_exti_enable(USER_TEST_IO,false);
+        io_exti_config(USER_TEST_IO,INT_EDGE_DISABLE);
         NVIC_DisableIRQ(EXTI_IRQn);
         sw_timer_start(&io_filter_timer);
         break;
@@ -216,7 +216,7 @@ static bool timer_cb(void *param)
                 timer_continue = false;
                 io_pull_write(USER_TEST_IO, IO_PULL_UP);
                 io_exti_config(USER_TEST_IO,INT_EDGE_FALLING);
-                io_exti_enable(USER_TEST_IO,true);
+                
                 NVIC_EnableIRQ(EXTI_IRQn);
                 gpio_filter_high_cnt = 0;
             }
@@ -233,7 +233,7 @@ static bool timer_cb(void *param)
                 timer_continue = false;
                 io_pull_write(USER_TEST_IO, IO_PULL_DOWN);
                 io_exti_config(USER_TEST_IO,INT_EDGE_RISING);
-                io_exti_enable(USER_TEST_IO,true);
+                
                 NVIC_EnableIRQ(EXTI_IRQn);
                 gpio_filter_low_cnt = 0;
             }

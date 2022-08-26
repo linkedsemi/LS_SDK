@@ -69,7 +69,6 @@
 	io_pull_write(IO, PULL);			\
 	if (IRQ) {						\
 		io_exti_config(IO, EDGE);	\
-		io_exti_enable(IO, true);	\
 	}								\
 }
 

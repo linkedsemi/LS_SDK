@@ -15,8 +15,8 @@ void exti_test(void)
     io_cfg_input(PB11);    //PB11 config input
     io_pull_write(PB11, IO_PULL_UP);    //PB11 config pullup
     io_exti_config(PB11,INT_EDGE_FALLING);    //PB11 interrupt falling edge
-    io_exti_enable(PB11,true);    //PB11 interrupt enable
 }
+
 int main(void)
 {
     sys_init_none();
@@ -35,6 +35,7 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge)
     case PB11:
         // do something
         io_toggle_pin(PB10);  
+        io_exti_config(PB11,INT_EDGE_DISABLE);
         break;
     default:
         break;

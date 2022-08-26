@@ -31,7 +31,7 @@ typedef enum
 
 typedef enum
 {
-    INT_EDGE_NONE = 0,
+    INT_EDGE_DISABLE = 0,
     INT_EDGE_FALLING = 0x1,
     INT_EDGE_RISING = 0x2,
     INT_EDGE_BOTH = (INT_EDGE_FALLING|INT_EDGE_RISING),
@@ -225,30 +225,11 @@ void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive);
 io_drive_type_t io_drive_capacity_read(uint8_t pin);
 
 /**
-  * @brief GPIO external interrupt enable 
-  * @param  pin  Specific GPIO pin
-  */
-void io_ext_intrp_enable(uint8_t pin);
-
-/**
-  * @brief GPIO external interrupt disable
-  * @param  pin  Specific GPIO pin
-  */
-void io_ext_intrp_disable(uint8_t pin);
-
-/**
   * @brief Sets the trigger edge for IO interrupt 
   * @param  pin  Specific GPIO pin 
   * @param  edge edges for IO interrupts 
   */
 void io_exti_config(uint8_t pin,exti_edge_t edge);
-
-/**
-  * @brief GPIO external interrupt enable or disable
-  * @param  pin  Specific GPIO pin
-  * @param  enable
-  */
-void io_exti_enable(uint8_t pin,bool enable);
 
 /**
   * @brief GPIO external interrupt callback

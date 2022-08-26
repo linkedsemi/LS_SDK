@@ -63,7 +63,7 @@ void V33_EXTI_Handler(void)
     uint32_t int_stat = V33_RG->GPIO_INTR;
     for(i=0;i<8;i++)
     {
-        exti_edge_t edge = INT_EDGE_NONE;
+        exti_edge_t edge = INT_EDGE_DISABLE;
         if (1<<i & int_stat)
         {
             V33_RG->EXTI_CTRL2 = 1<<i;
@@ -274,7 +274,7 @@ static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
 {
     switch(edge)
     {
-    case INT_EDGE_NONE:
+    case INT_EDGE_DISABLE:
         V33_RG->EXTI_CTRL0 &= ~(1<<group | 1<<8<<group);
     break;
     case INT_EDGE_RISING:
@@ -389,7 +389,7 @@ void io_exti_config(uint8_t pin,exti_edge_t edge)
         }
         switch(edge)
         {
-        case INT_EDGE_NONE:
+        case INT_EDGE_DISABLE:
             EXTI->EIDR = 1 << x->num;
             EXTI->ERTS &= ~(1<<x->num);
             EXTI->EFTS &= ~(1<<x->num);
