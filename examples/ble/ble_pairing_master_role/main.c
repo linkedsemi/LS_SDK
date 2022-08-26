@@ -1029,7 +1029,7 @@ void exti_io_enable(void)
     io_cfg_input(PA07);    //PA07 config input
     io_pull_write(PA07, IO_PULL_UP);    //PA07 config pullup
     io_exti_config(PA07,INT_EDGE_FALLING);    //PA07 interrupt falling edge
-    io_exti_enable(PA07,true);    //PA07 interrupt enable
+        //PA07 interrupt enable
 }
 
 void io_exti_callback(uint8_t pin,exti_edge_t edge)

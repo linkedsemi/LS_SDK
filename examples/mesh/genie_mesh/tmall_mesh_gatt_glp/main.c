@@ -869,7 +869,7 @@ void exti_io_enable(void)
     io_cfg_input(PA07);    //PA00 config input
     io_pull_write(PA07, IO_PULL_UP);    //PA00 config pullup
     io_exti_config(PA07,INT_EDGE_FALLING);    //PA00 interrupt falling edge
-    io_exti_enable(PA07,true);    //PA00 interrupt enable
+        //PA00 interrupt enable
 }
 
 int main()

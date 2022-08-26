@@ -1754,7 +1754,6 @@ void gpio_exit_init(void)
 {
     io_cfg_input(PB15);
     io_exti_config(PB15, INT_EDGE_RISING);
-    io_exti_enable(PB15, true);
 }
 
 void io_exti_callback(uint8_t pin,exti_edge_t edge)

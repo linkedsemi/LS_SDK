@@ -31,7 +31,7 @@ typedef enum
 
 typedef enum
 {
-    INT_EDGE_NONE = 0,
+    INT_EDGE_DISABLE = 0,
     INT_EDGE_FALLING = 0x1,
     INT_EDGE_RISING = 0x2,
     INT_EDGE_BOTH = (INT_EDGE_FALLING|INT_EDGE_RISING),

@@ -985,93 +985,68 @@ void io_exti_config(uint8_t pin,exti_edge_t edge)
     {
         EXTI->ERTS &= ~(1 << x->num);
         EXTI->EFTS |= 1 << x->num;
+        EXTI->EICR =  1 << x->num;
+        EXTI->EIER =  1 << x->num;
         switch(pin)
         {
         case PA00:
-            CLEAR_BIT(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EDGE_POS);
+            MODIFY_REG(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EDGE_POS,PA00_IO_WKUP<<WKUP_EN_POS);
         break;
         case PA07:
-            CLEAR_BIT(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EDGE_POS);
+            MODIFY_REG(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EDGE_POS,PA07_IO_WKUP<<WKUP_EN_POS);
         break;
         case PB11:
-            CLEAR_BIT(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EDGE_POS);
+            MODIFY_REG(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EDGE_POS,PB11_IO_WKUP<<WKUP_EN_POS);
         break;
         case PB15:
-            CLEAR_BIT(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EDGE_POS);
+            MODIFY_REG(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EDGE_POS,PB15_IO_WKUP<<WKUP_EN_POS);
         break;
         }
-    }else
+    }else if(edge == INT_EDGE_RISING)
     {
         EXTI->EFTS &= ~(1 << x->num);
         EXTI->ERTS |= 1 << x->num;
+        EXTI->EICR =  1 << x->num;
+        EXTI->EIER =  1 << x->num;
         switch(pin)
         {
         case PA00:
-            SET_BIT(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EDGE_POS);
+            SET_BIT(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EDGE_POS|PA00_IO_WKUP<<WKUP_EN_POS);
         break;
         case PA07:
-            SET_BIT(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EDGE_POS);
+            SET_BIT(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EDGE_POS|PA07_IO_WKUP<<WKUP_EN_POS);
         break;
         case PB11:
-            SET_BIT(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EDGE_POS);
+            SET_BIT(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EDGE_POS|PB11_IO_WKUP<<WKUP_EN_POS);
         break;
         case PB15:
-            SET_BIT(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EDGE_POS);
+            SET_BIT(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EDGE_POS|PB15_IO_WKUP<<WKUP_EN_POS);
         break;
         }
-    }
-}
-
-void io_ext_intrp_disable(uint8_t pin)
-{
-    gpio_pin_t *x = (gpio_pin_t *)&pin;
-    EXTI->EIDR =  1 << x->num;
-    switch(pin)
+    }else if(edge == INT_EDGE_BOTH)
     {
-    case PA00:
-        CLEAR_BIT(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EN_POS);
-    break;
-    case PA07:
-        CLEAR_BIT(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EN_POS);
-    break;
-    case PB11:
-        CLEAR_BIT(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EN_POS);
-    break;
-    case PB15:
-        CLEAR_BIT(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EN_POS);
-    break;
-    }
-}
-
-void io_ext_intrp_enable(uint8_t pin)
-{
-    gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(pin)
-    {
-    case PA00:
-        SET_BIT(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EN_POS);
-    break;
-    case PA07:
-        SET_BIT(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EN_POS);
-    break;
-    case PB11:
-        SET_BIT(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EN_POS);
-    break;
-    case PB15:
-        SET_BIT(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EN_POS);
-    break;
-    }
-    EXTI->EIER =  1 << x->num;
-}
-
-void io_exti_enable(uint8_t pin,bool enable)
-{
-    if(enable==false)
-    {
-        io_ext_intrp_disable(pin);
+        EXTI->ERTS |= 1 << x->num;
+        EXTI->EFTS |= 1 << x->num;
+        EXTI->EICR =  1 << x->num;
+        EXTI->EIER =  1 << x->num;
     }else
     {
-        io_ext_intrp_enable(pin);
+        EXTI->EIDR =  1 << x->num;
+        switch(pin)
+        {
+        case PA00:
+            CLEAR_BIT(SYSCFG->PMU_WKUP,PA00_IO_WKUP<<WKUP_EN_POS);
+        break;
+        case PA07:
+            CLEAR_BIT(SYSCFG->PMU_WKUP,PA07_IO_WKUP<<WKUP_EN_POS);
+        break;
+        case PB11:
+            CLEAR_BIT(SYSCFG->PMU_WKUP,PB11_IO_WKUP<<WKUP_EN_POS);
+        break;
+        case PB15:
+            CLEAR_BIT(SYSCFG->PMU_WKUP,PB15_IO_WKUP<<WKUP_EN_POS);
+        break;
+        }
     }
 }
 
