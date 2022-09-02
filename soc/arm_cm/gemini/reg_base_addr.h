@@ -39,7 +39,7 @@
 
 #define LSPDM_BASE_ADDR (0x4008A000)
 
-#define LSIWDG_BASE_ADDR ()
+#define LSIWDG_BASE_ADDR (0x4000F120)
 
 #define LSRTC_BASE_ADDR ()
 

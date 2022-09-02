@@ -16,7 +16,7 @@ void PDM_Handler()
 
 void HAL_PDM_MSP_Init(PDM_HandleTypeDef *hpdm)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG2, SYSC_PER_CLKG_SET_PDM, 1);
+    SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_SET_PDM_MASK;
     arm_cm_set_int_isr(PDM_IRQn, PDM_Handler);
     pdm_inst = hpdm;
     __NVIC_ClearPendingIRQ(PDM_IRQn);
@@ -26,7 +26,7 @@ void HAL_PDM_MSP_Init(PDM_HandleTypeDef *hpdm)
 void HAL_PDM_MSP_DeInit(PDM_HandleTypeDef *hpdm)
 {
     __NVIC_DisableIRQ(PDM_IRQn);
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG2, SYSC_PER_CLKG_CLR_PDM, 1);
+    SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_PDM_MASK;
 }
 
 void HAL_PDM_MSP_Busy_Set(PDM_HandleTypeDef *hpdm)

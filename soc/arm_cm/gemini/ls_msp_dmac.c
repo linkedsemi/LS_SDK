@@ -18,7 +18,7 @@ void HAL_DMA_Controller_MSP_Init(DMA_Controller_HandleTypeDef *hdma)
 {
     dmac_ptr = hdma;
     arm_cm_set_int_isr(DMAC_IRQn, DMAC_Handler);
-    REG_FIELD_WR(SYSC_CPU->PD_CPU_CLKG, SYSC_CPU_CLKG_SET_DMAC, 1);
+    SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_DMAC_MASK;
     __NVIC_ClearPendingIRQ(DMAC_IRQn);
     __NVIC_EnableIRQ(DMAC_IRQn);
 }
@@ -26,7 +26,7 @@ void HAL_DMA_Controller_MSP_Init(DMA_Controller_HandleTypeDef *hdma)
 void HAL_DMA_Controller_MSP_DeInit(DMA_Controller_HandleTypeDef *hdma)
 {
     __NVIC_DisableIRQ(DMAC_IRQn);
-    REG_FIELD_WR(SYSC_CPU->PD_CPU_CLKG, SYSC_CPU_CLKG_CLR_DMAC, 1);
+    SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_CLR_DMAC_MASK;
 }
 
 void HAL_DMA_Controller_MSP_Busy_Set(DMA_Controller_HandleTypeDef *hdma)

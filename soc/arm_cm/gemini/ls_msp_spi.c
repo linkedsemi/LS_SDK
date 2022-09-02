@@ -25,14 +25,14 @@ void HAL_SPI_MSP_Init(SPI_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)SPI2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_SPI2, 1);
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI2_MASK;
         arm_cm_set_int_isr(SPI2_IRQn, SPI2_Handler);
         spi_inst_env[0] = inst;
         __NVIC_ClearPendingIRQ(SPI2_IRQn);
         __NVIC_EnableIRQ(SPI2_IRQn);
         break;
     case (uint32_t)SPI3:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_SPI3, 1);
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI3_MASK;
         arm_cm_set_int_isr(SPI3_IRQn, SPI3_Handler);
         spi_inst_env[1] = inst;
         __NVIC_ClearPendingIRQ(SPI3_IRQn);
@@ -46,11 +46,11 @@ void HAL_SPI_MSP_DeInit(SPI_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)SPI2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_SPI2, 1);
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI2_MASK;
         __NVIC_DisableIRQ(SPI2_IRQn);
         break;
     case (uint32_t)SPI3:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_SPI3, 1);
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI3_MASK;
         __NVIC_DisableIRQ(SPI3_IRQn);
         break;
     }
@@ -82,23 +82,24 @@ void HAL_SPI_MSP_Idle_Set(SPI_HandleTypeDef *inst)
 __attribute__((weak)) void LL_SPI2_IRQHandler(){}
 void LL_SPI2_MSP_Init(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_SPI2, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI2_MASK;
     arm_cm_set_int_isr(SPI2_IRQn, LL_SPI2_IRQHandler);
 }
 
 void LL_SPI2_MSP_DeInit(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_SPI2, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI2_MASK;
+
 }
 
 __attribute__((weak)) void LL_SPI3_IRQHandler(){}
 void LL_SPI3_MSP_Init(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_SPI3, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI3_MASK;
     arm_cm_set_int_isr(SPI3_IRQn, LL_SPI3_IRQHandler);
 }
 
 void LL_SPI_MSP_DeInit(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_SPI3, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI3_MASK;
 }
