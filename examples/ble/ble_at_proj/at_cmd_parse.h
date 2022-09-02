@@ -36,7 +36,7 @@ typedef struct _at_recv_cmd
 typedef struct at_defualt_info
 {
     uint8_t auto_trans;
-    uint8_t rfpower;
+    int8_t rfpower;
     uint8_t advint;
     uint8_t auto_sleep;
 } default_info_t;
