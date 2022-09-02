@@ -44,42 +44,42 @@ void HAL_TIM_MSP_Init(TIM_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)LSBSTIM:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_SET_BSTIM1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_BSTIM1_MASK;
         arm_cm_set_int_isr(BSTIM_IRQn, BSTIM1_Handler);
         inst_env[0] = inst;
         __NVIC_ClearPendingIRQ(BSTIM_IRQn);
         __NVIC_EnableIRQ(BSTIM_IRQn);
         break;
     case (uint32_t)LSGPTIMA:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_SET_GPTIMA1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_GPTIMA1_MASK;
         arm_cm_set_int_isr(GPTIMA1_IRQn, GPTIMA1_Handler);
         inst_env[1] = inst;
         __NVIC_ClearPendingIRQ(GPTIMA1_IRQn);
         __NVIC_EnableIRQ(GPTIMA1_IRQn);
         break;
     case (uint32_t)LSGPTIMB:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_SET_GPTIMB1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_GPTIMB1_MASK;
         arm_cm_set_int_isr(GPTIMB1_IRQn, GPTIMB1_Handler);
         inst_env[2] = inst;
         __NVIC_ClearPendingIRQ(GPTIMB1_IRQn);
         __NVIC_EnableIRQ(GPTIMB1_IRQn);
         break;
     case (uint32_t)LSGPTIMC:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_SET_GPTIMC1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_GPTIMC1_MASK;
         arm_cm_set_int_isr(GPTIMC1_IRQn, GPTIMC1_Handler);
         inst_env[3] = inst;
         __NVIC_ClearPendingIRQ(GPTIMC1_IRQn);
         __NVIC_EnableIRQ(GPTIMC1_IRQn);
         break;
     case (uint32_t)LSADTIM1:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_SET_ADTIM1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_ADTIM1_MASK;
         arm_cm_set_int_isr(ADTIM1_IRQn, ADTIM1_Handler);
         inst_env[4] = inst;
         __NVIC_ClearPendingIRQ(ADTIM1_IRQn);
         __NVIC_EnableIRQ(ADTIM1_IRQn);
         break;
     case (uint32_t)LSADTIM2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_ADTIM2, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_ADTIM2_MASK;
         arm_cm_set_int_isr(ADTIM2_IRQn, ADTIM2_Handler);
         inst_env[5] = inst;
         __NVIC_ClearPendingIRQ(ADTIM2_IRQn);
@@ -93,27 +93,27 @@ void HAL_TIM_MSP_DeInit(TIM_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)LSBSTIM:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_BSTIM1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_BSTIM1_MASK;
         __NVIC_DisableIRQ(BSTIM_IRQn);
         break;
     case (uint32_t)LSGPTIMA:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_GPTIMA1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_GPTIMA1_MASK;
         __NVIC_DisableIRQ(GPTIMA1_IRQn);
         break;
     case (uint32_t)LSGPTIMB:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_GPTIMB1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_GPTIMB1_MASK;
         __NVIC_DisableIRQ(GPTIMB1_IRQn);
         break;
     case (uint32_t)LSGPTIMC:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_GPTIMC1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_GPTIMC1_MASK;
         __NVIC_DisableIRQ(GPTIMC1_IRQn);
         break;
     case (uint32_t)LSADTIM1:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_ADTIM1, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_ADTIM1_MASK;
         __NVIC_DisableIRQ(ADTIM1_IRQn);
         break;
     case (uint32_t)LSADTIM2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG0, SYSC_PER_CLKG_CLR_ADTIM2, 1);
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_ADTIM2_MASK;
         __NVIC_DisableIRQ(ADTIM2_IRQn);
         break;
     }

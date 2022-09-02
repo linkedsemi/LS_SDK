@@ -14,7 +14,7 @@ void RTC_handler(void)
 
 void HAL_MSP_RTC_Init(void)
 {
-    REG_FIELD_WR(V33_RG->CLKG_SRST, V33_RG_CLKG_SET_RTC, 1);
+    V33_RG->CLKG_SRST = V33_RG_CLKG_SET_RTC_MASK;
     arm_cm_set_int_isr(RTC_IRQn, RTC_handler);
     __NVIC_ClearPendingIRQ(RTC_IRQn);
     __NVIC_EnableIRQ(RTC_IRQn);
@@ -22,6 +22,6 @@ void HAL_MSP_RTC_Init(void)
 
 void HAL_MSP_RTC_DeInit(void)
 {
-    REG_FIELD_WR(V33_RG->CLKG_SRST, V33_RG_CLKG_CLR_RTC, 1);
+    V33_RG->CLKG_SRST = V33_RG_CLKG_CLR_RTC_MASK;
 }
 

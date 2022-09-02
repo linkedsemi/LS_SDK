@@ -9,7 +9,7 @@
 
 void HAL_TRNG_MSP_Init(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG3, SYSC_PER_CLKG_SET_TRNG, 1);
+    SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_SET_TRNG_MASK;
     arm_cm_set_int_isr(TRNG_IRQn, HAL_TRNG_IRQHandler);
     __NVIC_ClearPendingIRQ(TRNG_IRQn);
     __NVIC_EnableIRQ(TRNG_IRQn);
@@ -17,7 +17,7 @@ void HAL_TRNG_MSP_Init(void)
 
 void HAL_TRNG_MSP_DeInit(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG3, SYSC_PER_CLKG_CLR_TRNG, 1);
+    SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_CLR_TRNG_MASK;
     __NVIC_DisableIRQ(TRNG_IRQn);
 }
 

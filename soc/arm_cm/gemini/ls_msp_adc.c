@@ -25,14 +25,14 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)LSADC:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG2, SYSC_PER_CLKG_SET_ADC0, 1);
+        SYSC_PER->PD_PER = SYSC_PER_CLKG_SET_ADC0_MASK;
         arm_cm_set_int_isr(ADC0_IRQn, ADC1_Handler);
         adc_inst_env[0] = inst;
         __NVIC_ClearPendingIRQ(ADC0_IRQn);
         __NVIC_EnableIRQ(ADC0_IRQn);
         break;
     case (uint32_t)LSADC2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG2, SYSC_PER_CLKG_SET_ADC1, 1);
+         SYSC_PER->PD_PER = SYSC_PER_CLKG_SET_ADC1_MASK;
         arm_cm_set_int_isr(ADC1_IRQn, ADC2_Handler);
         adc_inst_env[1] = inst;
         __NVIC_ClearPendingIRQ(ADC1_IRQn);
@@ -46,11 +46,11 @@ void HAL_ADC_MSP_DeInit(ADC_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)LSADC:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG2, SYSC_PER_CLKG_CLR_ADC0, 1);
+        SYSC_PER->PD_PER = SYSC_PER_CLKG_CLR_ADC0_MASK;
         NVIC_DisableIRQ(ADC0_IRQn);
         break;
     case (uint32_t)LSADC2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG2, SYSC_PER_CLKG_CLR_ADC1, 1);
+        SYSC_PER->PD_PER = SYSC_PER_CLKG_CLR_ADC1_MASK;
         NVIC_DisableIRQ(ADC1_IRQn);
         break;
     }

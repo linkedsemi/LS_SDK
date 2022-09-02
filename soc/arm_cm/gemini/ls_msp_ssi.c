@@ -14,7 +14,7 @@ static void SSI_Handler()
 
 void HAL_SSI_MSP_Init(SSI_HandleTypeDef *hssi)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_SPI1, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI1_MASK;
     arm_cm_set_int_isr(I2C1_IRQn, SSI_Handler);
     ssi_inst_env[0] = hssi;
     __NVIC_ClearPendingIRQ(SPI1_IRQn);
@@ -23,7 +23,7 @@ void HAL_SSI_MSP_Init(SSI_HandleTypeDef *hssi)
 
 void HAL_SSI_MSP_DeInit(SSI_HandleTypeDef *hssi)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART1, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI1_MASK;
     __NVIC_DisableIRQ(SPI1_IRQn);
 }
 
@@ -41,11 +41,11 @@ __attribute__((weak)) void LL_SSI_IRQHandler(){}
 void LL_SSI_MSP_Init(void)
 {
 
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_SPI1, 1);
-    arm_cm_set_int_isr(SPI1_IRQn,LL_SSI_IRQHandler);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI1_MASK;
+        arm_cm_set_int_isr(SPI1_IRQn, LL_SSI_IRQHandler);
 }
 
 void LL_SSI_MSP_DeInit(void)
 {
-    REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART1, 1);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI1_MASK;
 }

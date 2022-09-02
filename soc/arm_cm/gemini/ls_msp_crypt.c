@@ -7,7 +7,7 @@
 #include "sys_stat.h"
 void HAL_LSCRYPT_MSP_Init(void)
 {
-    REG_FIELD_WR(SYSC_CPU->PD_CPU_CLKG, SYSC_CPU_CLKG_SET_CRYPT, 1);
+    SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_CRYPT_MASK;
     arm_cm_set_int_isr(CRYPT_IRQn, HAL_LSCRYPT_IRQHandler);
     __NVIC_ClearPendingIRQ(CRYPT_IRQn);
     __NVIC_EnableIRQ(CRYPT_IRQn);
@@ -16,7 +16,7 @@ void HAL_LSCRYPT_MSP_Init(void)
 void HAL_LSCRYPT_MSP_DeInit(void)
 {
     __NVIC_DisableIRQ(CRYPT_IRQn);
-    REG_FIELD_WR(SYSC_CPU->PD_CPU_CLKG, SYSC_CPU_CLKG_CLR_CRYPT, 1);
+    SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_CLR_CRYPT_MASK;
 }
 
 void HAL_LSCRYPT_MSP_Busy_Set(void)
