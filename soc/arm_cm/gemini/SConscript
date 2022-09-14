@@ -47,6 +47,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/gemini/ls_msp_uart.c',
         'arm_cm/gemini/sys_stat.c',
         'arm_cm/gemini/sw_timer_port.c',
+        'arm_cm/gemini/rom_flash_api_wrapper.c',
         'arm_cm/gemini/compiler/$COMPILER/svcall_asm.S',
         'arm_cm/gemini/compiler/$COMPILER/delay_asm.S',
         'arm_cm/gemini/compiler/$COMPILER/sleep_asm.S',

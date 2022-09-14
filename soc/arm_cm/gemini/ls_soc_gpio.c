@@ -9,6 +9,7 @@
 #include "reg_sysc_awo_type.h"
 #include "reg_exti_type.h"
 #include "ls_dbg.h"
+#include "compile_flag.h"
 
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
@@ -790,22 +791,22 @@ void pinmux_gptimc1_bk_deinit(void)
 }
 
 
-void pinmux_hal_flash_init(void)
+ROM_SYMBOL void pinmux_hal_flash_init(void)
 {
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0xf);
 }
 
-void pinmux_hal_flash_deinit(void)
+ROM_SYMBOL void pinmux_hal_flash_deinit(void)
 {
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
 }
 
-void pinmux_hal_flash_quad_init(void)
+ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
 {
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x3f);
 }
 
-void pinmux_hal_flash_quad_deinit(void)
+ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
 {
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
 }
