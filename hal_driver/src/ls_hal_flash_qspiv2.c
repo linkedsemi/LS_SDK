@@ -198,6 +198,12 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_write_status_reg_func,void * param)
     lsqspiv2_stg_write_register(WRITE_STATUS_REGISTER_OPCODE,param, sizeof(uint16_t));
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_xip_mode_reset,)
+{
+    uint8_t data = CONTINUOUS_READ_MODE_RESET;
+    lsqspiv2_stg_write_register(CONTINUOUS_READ_MODE_RESET,&data,sizeof(data));
+}
+
 ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_prog_func,void *param)
 {
     lsqspiv2_stg_read_write(param);

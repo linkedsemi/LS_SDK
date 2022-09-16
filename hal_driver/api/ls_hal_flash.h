@@ -182,15 +182,17 @@ bool hal_flash_xip_status_get(void);
  */
 uint32_t hal_flash_total_size_get(void);
 
+/** \brief Release the Continuous Read Mode and return to normal SPI operation */
+void hal_flash_xip_mode_reset(void);
 
 #if defined(GEMINI) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void hal_flash_drv_var_init(bool,bool);
 __attribute__((long_call)) void hal_flash_init();
 __attribute__((long_call)) void hal_flash_software_reset();
 __attribute__((long_call)) void hal_flash_release_from_deep_power_down();
-__attribute__((long_call)) void hal_flash_chip_erase();
-__attribute__((long_call)) void hal_flash_sector_erase(uint32_t);
-__attribute__((long_call)) void hal_flash_page_program(uint32_t,uint8_t *,uint16_t);
+__attribute__((long_call)) void _hal_flash_chip_erase();
+__attribute__((long_call)) void _hal_flash_sector_erase(uint32_t);
+__attribute__((long_call)) void _hal_flash_page_program(uint32_t,uint8_t *,uint16_t);
 __attribute__((long_call)) void hal_flash_write_status_register(uint16_t);
 __attribute__((long_call)) void hal_flash_read_status_register_1(uint8_t *);
 __attribute__((long_call)) void hal_flash_read_status_register_0(uint8_t *);
