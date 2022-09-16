@@ -260,3 +260,9 @@ void XIP_BANNED_FUNC(hal_flash_prog_erase_resume,)
 }
 
 __attribute__((weak)) void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length){}
+
+void XIP_BANNED_FUNC(hal_flash_xip_mode_reset,)
+{
+    uint8_t data = CONTINUOUS_READ_MODE_RESET;
+    lsqspi_stig_write_register(CONTINUOUS_READ_MODE_RESET,&data,sizeof(data));
+}

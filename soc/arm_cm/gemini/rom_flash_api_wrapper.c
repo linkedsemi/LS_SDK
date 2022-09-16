@@ -1,6 +1,5 @@
 #include "hal_flash_int.h"
 #include "compile_flag.h"
-#ifndef FLASH_PROG_ALGO
 
 void _hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 void XIP_BANNED_FUNC(hal_flash_program_security_area,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
@@ -113,6 +112,3 @@ void XIP_BANNED_FUNC(hal_flash_page_erase,uint32_t offset)
     _hal_flash_erase_operation(offset,PAGE_ERASE_OPCODE);
     hal_flash_xip_start();
 }
-
-
-#endif

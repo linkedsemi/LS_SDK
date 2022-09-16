@@ -68,6 +68,7 @@ static void io_pull_up_cfg()
     io_pull_write(PD14,IO_PULL_UP);
     io_pull_write(PD15,IO_PULL_UP);
 }
+__attribute__((long_call)) void pinmux_hal_flash_quad_init(void);
 #else
 static void io_pull_up_cfg(){}
 #endif
@@ -80,6 +81,7 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     hal_flash_drv_var_init(false,false);
     hal_flash_dual_mode_set(false);
     hal_flash_init();
+    hal_flash_xip_mode_reset();
     hal_flash_software_reset();
     DELAY_US(500);
     hal_flash_release_from_deep_power_down();
@@ -110,7 +112,6 @@ int UnInit (unsigned long fnc) {
 
 int EraseChip (void) {
     disable_global_irq();
-    hal_flash_xip_stop();
     hal_flash_chip_erase();
     return (0);                                  // Finished without Errors
 }
@@ -124,7 +125,6 @@ int EraseChip (void) {
 
 int EraseSector (unsigned long adr) {
     disable_global_irq();
-    hal_flash_xip_stop();
     hal_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
     return (0);                                  // Finished without Errors
 }
@@ -140,7 +140,6 @@ int EraseSector (unsigned long adr) {
 
 int ProgramPage (unsigned long adr, unsigned long sz, unsigned char *buf) {
     disable_global_irq();
-    hal_flash_xip_stop();
     hal_flash_page_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz);
     return (0);                                  // Finished without Errors
 }
