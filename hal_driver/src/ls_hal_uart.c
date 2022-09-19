@@ -86,7 +86,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         {
             while (huart->Tx_Env.Interrupt.XferCount > 0U )
             {
-                if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
+                if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFEM))
                 {
                     huart->gState = HAL_UART_STATE_READY;
                     return HAL_TIMEOUT;
