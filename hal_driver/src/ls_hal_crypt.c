@@ -40,54 +40,54 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_Key_Config(const uint32_t *key,enum aes_key_ty
     return HAL_OK;
 }
 
-static uint32_t get_uint32_t(const uint8_t *data)
+static inline uint32_t get_uint32_t(const uint8_t *data)
 {
-    return data[3]<<24|data[2]<<16|data[1]<<8|data[0];
+    return data[0]<<24|data[1]<<16|data[2]<<8|data[3];
 }
 
-static void set_uint32_t(uint32_t src,uint8_t *dst)
+static inline void set_uint32_t(uint32_t src,uint8_t *dst)
 {
-    *dst++ = src;
-    *dst++ = src>>8;
-    *dst++ = src>>16;
     *dst++ = src>>24;
+    *dst++ = src>>16;
+    *dst++ = src>>8;
+    *dst++ = src;
 }
 
-static uint32_t last_word_data_pack(uint8_t length,const uint8_t *in)
+static inline uint32_t last_word_data_pack(uint8_t length,const uint8_t *in)
 {
     LS_ASSERT(length<4);
     uint32_t data = 0;
     switch(length)
     {
     case 3:
-        data = in[2]<<16|in[1]<<8|in[0];
+        data = in[2]<<8|in[1]<<16|in[0]<<24;
     break;
     case 2:
-        data = in[1]<<8|in[0];
+        data = in[1]<<16|in[0]<<24;
     break;
     case 1:
-        data = in[0];
+        data = in[0]<<24;
     break;
     }
     return data;
 }
 
-static void last_word_data_unpack(uint8_t length,uint8_t *data,uint32_t word)
+static inline void last_word_data_unpack(uint8_t length,uint8_t *data,uint32_t word)
 {
     LS_ASSERT(length<4);
     switch(length)
     {
     case 3:
-        *data++ = word;
-        *data++ = word>>8;
+        *data++ = word>>24;
         *data++ = word>>16;
+        *data++ = word>>8;
     break;
     case 2:
-        *data++ = word;
-        *data++ = word>>8;
+        *data++ = word>>24;
+        *data++ = word>>16;
     break;
     case 1:
-        *data++ = word;
+        *data++ = word>>24;
     break;
     }
 }
@@ -98,44 +98,44 @@ static void crypt_data_in()
     switch(current_length)
     {
     case AES_BLOCK_SIZE:
-        LSCRYPT->DATA0 = get_uint32_t(in);
-        in += sizeof(uint32_t);
-        LSCRYPT->DATA1 = get_uint32_t(in);
+        LSCRYPT->DATA3 = get_uint32_t(in);
         in += sizeof(uint32_t);
         LSCRYPT->DATA2 = get_uint32_t(in);
         in += sizeof(uint32_t);
-        LSCRYPT->DATA3 = get_uint32_t(in);
+        LSCRYPT->DATA1 = get_uint32_t(in);
+        in += sizeof(uint32_t);
+        LSCRYPT->DATA0 = get_uint32_t(in);
         in += sizeof(uint32_t);
     break;
     case 15: case 14: case 13: case 12:
-        LSCRYPT->DATA0 = get_uint32_t(in);
-        in += sizeof(uint32_t);
-        LSCRYPT->DATA1 = get_uint32_t(in);
+        LSCRYPT->DATA3 = get_uint32_t(in);
         in += sizeof(uint32_t);
         LSCRYPT->DATA2 = get_uint32_t(in);
         in += sizeof(uint32_t);
-        LSCRYPT->DATA3 = last_word_data_pack(current_length - 12,in);
-    break;
-    case 11: case 10: case 9: case 8:
-        LSCRYPT->DATA0 = get_uint32_t(in);
-        in += sizeof(uint32_t);
         LSCRYPT->DATA1 = get_uint32_t(in);
         in += sizeof(uint32_t);
-        LSCRYPT->DATA2 = last_word_data_pack(current_length - 8,in);
-        LSCRYPT->DATA3 = 0;
+        LSCRYPT->DATA0 = last_word_data_pack(current_length - 12,in);
+    break;
+    case 11: case 10: case 9: case 8:
+        LSCRYPT->DATA3 = get_uint32_t(in);
+        in += sizeof(uint32_t);
+        LSCRYPT->DATA2 = get_uint32_t(in);
+        in += sizeof(uint32_t);
+        LSCRYPT->DATA1 = last_word_data_pack(current_length - 8,in);
+        LSCRYPT->DATA0 = 0;
     break;
     case 7: case 6: case 5: case 4:
-        LSCRYPT->DATA0 = get_uint32_t(in);
+        LSCRYPT->DATA3 = get_uint32_t(in);
         in += sizeof(uint32_t);
-        LSCRYPT->DATA1 = last_word_data_pack(current_length - 4,in);
-        LSCRYPT->DATA2 = 0;
-        LSCRYPT->DATA3 = 0;
+        LSCRYPT->DATA2 = last_word_data_pack(current_length - 4,in);
+        LSCRYPT->DATA1 = 0;
+        LSCRYPT->DATA0 = 0;
     break;
     case 3: case 2: case 1: case 0:
-        LSCRYPT->DATA0 = last_word_data_pack(current_length,in);
-        LSCRYPT->DATA1 = 0;
+        LSCRYPT->DATA3 = last_word_data_pack(current_length,in);
         LSCRYPT->DATA2 = 0;
-        LSCRYPT->DATA3 = 0;
+        LSCRYPT->DATA1 = 0;
+        LSCRYPT->DATA0 = 0;
     break;
     }
 }
@@ -146,38 +146,38 @@ static void crypt_data_out()
     switch(current_length)
     {
     case AES_BLOCK_SIZE:
-        set_uint32_t(LSCRYPT->RES0,out);
-        out += sizeof(uint32_t);
-        set_uint32_t(LSCRYPT->RES1,out);
+        set_uint32_t(LSCRYPT->RES3,out);
         out += sizeof(uint32_t);
         set_uint32_t(LSCRYPT->RES2,out);
         out += sizeof(uint32_t);
-        set_uint32_t(LSCRYPT->RES3,out);
+        set_uint32_t(LSCRYPT->RES1,out);
+        out += sizeof(uint32_t);
+        set_uint32_t(LSCRYPT->RES0,out);
         out += sizeof(uint32_t);
     break;
     case 15: case 14: case 13: case 12:
-        set_uint32_t(LSCRYPT->RES0,out);
-        out += sizeof(uint32_t);
-        set_uint32_t(LSCRYPT->RES1,out);
+        set_uint32_t(LSCRYPT->RES3,out);
         out += sizeof(uint32_t);
         set_uint32_t(LSCRYPT->RES2,out);
         out += sizeof(uint32_t);
-        last_word_data_unpack(current_length - 12,out,LSCRYPT->RES3);
-    break;
-    case 11: case 10: case 9: case 8:
-        set_uint32_t(LSCRYPT->RES0,out);
-        out += sizeof(uint32_t);
         set_uint32_t(LSCRYPT->RES1,out);
         out += sizeof(uint32_t);
-        last_word_data_unpack(current_length - 8,out,LSCRYPT->RES2);
+        last_word_data_unpack(current_length - 12,out,LSCRYPT->RES0);
+    break;
+    case 11: case 10: case 9: case 8:
+        set_uint32_t(LSCRYPT->RES3,out);
+        out += sizeof(uint32_t);
+        set_uint32_t(LSCRYPT->RES2,out);
+        out += sizeof(uint32_t);
+        last_word_data_unpack(current_length - 8,out,LSCRYPT->RES1);
     break;
     case 7: case 6: case 5: case 4:
-        set_uint32_t(LSCRYPT->RES0,out);
+        set_uint32_t(LSCRYPT->RES3,out);
         out += sizeof(uint32_t);
-        last_word_data_unpack(current_length - 4,out,LSCRYPT->RES1);
+        last_word_data_unpack(current_length - 4,out,LSCRYPT->RES2);
     break;
     case 3: case 2: case 1: case 0:
-        last_word_data_unpack(current_length,out,LSCRYPT->RES0);
+        last_word_data_unpack(current_length,out,LSCRYPT->RES3);
     break;
     }
 }
