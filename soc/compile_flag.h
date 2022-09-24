@@ -1,7 +1,7 @@
 #ifndef COMPILE_FLAG_H_
 #define COMPILE_FLAG_H_
 #include <stdint.h>
-#if (ROM_CODE==1)
+#if (ROM_CODE==1||(defined(FLASH_PROG_ALGO)&&defined(LE501X)))
 #define ROM_SYMBOL
 #else 
 #define ROM_SYMBOL __attribute__((weak))
