@@ -953,6 +953,14 @@ void ble_loop(void);
 void dev_manager_init(void (*cb)(enum dev_evt_type,union dev_evt_u *));
 /**
  ****************************************************************************************
+ * \brief Re-register callback of dev_manager.
+ * 
+ * \param[in]  cb                Callback function to handle all the dev_manager messages.
+ ****************************************************************************************
+ */
+void dev_manager_register_callback(void (*cb)(enum dev_evt_type,union dev_evt_u *));
+/**
+ ****************************************************************************************
  * \brief Initialization of dev_manager stack.
  * 
  * \param[in]  cfg               BLE stack configuration.
@@ -1170,6 +1178,15 @@ uint8_t dev_manager_update_adv_interval(uint8_t adv_handle, uint32_t new_intv_mi
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 /**
  ****************************************************************************************
+ * \brief Re-register callback of gap_manager.
+ * 
+ * \param[in]  evt_cb             Callback function to handle all the gap_manager messages.
+ * 
+ ****************************************************************************************
+ */
+void gap_manager_register_callback(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
+/**
+ ****************************************************************************************
  * \brief Disconnect specified connection.
  * 
  * \param[in]  con_idx            Connection ID number to disconnect.
@@ -1353,6 +1370,15 @@ void gap_manager_get_peer_rssi(uint8_t link_id);
  ****************************************************************************************
  */
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
+/**
+ ****************************************************************************************
+ * \brief Re-register callback of GATT manager.
+ *
+ * \param[in]  evt_cb               Callback function for gatt service.
+ *
+ ****************************************************************************************
+ */
+void gatt_manager_register_callback(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 /**
  ****************************************************************************************
  * \brief Register service in GATT manager.
