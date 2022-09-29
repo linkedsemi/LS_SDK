@@ -61,9 +61,9 @@ static void iic_init(void)
     I2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     I2cHandle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 #if CURRENT_ROLE == I2C_MASTER_ROLE
-    I2cHandle.Init.OwnAddress2 = 0xFE;
+    I2cHandle.Init.OwnAddress2 = 0x7E;
 #else 
-    I2cHandle.Init.OwnAddress2 = 0x8E;
+    I2cHandle.Init.OwnAddress2 = 0x7E;
     I2cHandle.Init.Oar2msk_Mask = 0x7; //0x7: send ack to master call with any addr. 0x6: only send ack when addr matches OA2[7]
 #endif
 }

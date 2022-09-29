@@ -41,7 +41,7 @@ int main(void)
   I2cHandle.Init.OwnAddress1     = I2C_ADDRESS;
   I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
   I2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  I2cHandle.Init.OwnAddress2     = 0xFE;
+  I2cHandle.Init.OwnAddress2     = 0x7E;
   I2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
   I2cHandle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;  
   
