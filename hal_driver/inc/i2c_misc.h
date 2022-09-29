@@ -112,7 +112,7 @@ enum
 
 #define IS_I2C_CLOCK_SPEED(SPEED) (((SPEED) == I2C_SPEED_NORMAL_100K) || ((SPEED) == I2C_SPEED_FAST_400K) || ((SPEED) == I2C_SPEED_FAST_ULTRA_1M))
 #define IS_I2C_OWN_ADDRESS1(ADDRESS1) (((ADDRESS1) & 0xFFFFFC00U) == 0U)
-#define IS_I2C_OWN_ADDRESS2(ADDRESS2) (((ADDRESS2) & 0xFFFFFF01U) == 0U)
+#define IS_I2C_OWN_ADDRESS2(ADDRESS2) (((ADDRESS2<<1) & 0xFFFFFF01U) == 0U)
 #define IS_I2C_TRANSFER_OPTIONS_REQUEST(REQUEST)      (((REQUEST) == I2C_FIRST_FRAME)              || \
                                                        ((REQUEST) == I2C_FIRST_AND_NEXT_FRAME)     || \
                                                        ((REQUEST) == I2C_NEXT_FRAME)               || \
