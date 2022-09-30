@@ -146,6 +146,15 @@ enum phy_type
     PHY_TYPE_CODED,                                /*!< LE Coded phy*/ 
 };
 /**
+  * @brief PHY option.
+  */
+enum phy_option
+{
+    PHY_OPT_LE_CODED_ALL_RATES     = (1 << 0),   	/*!< No preference for rate used when transmitting on the LE Coded PHY*/
+    PHY_OPT_LE_CODED_500K_RATE     = (1 << 1),    	/*!< 500kbps rate preferred when transmitting on the LE Coded PHY*/
+    PHY_OPT_LE_CODED_125K_RATE     = (1 << 2),		/*!< 125kbps  when transmitting on the LE Coded PHY*/
+};  
+/**
   * @brief Extended adv object parameters structure.
   */
 struct ext_adv_obj_param
@@ -465,6 +474,7 @@ enum gap_evt_type
     GET_DEV_INFO_APPEARANCE,                        /*!< Get appearance Icon of device information*/
     GET_DEV_INFO_SLV_PRE_PARAM,                     /*!< Get slave preferred parameters of device information*/
     GET_DEV_INFO_PEER_RSSI,                         /*!< Get connection RSSI indication*/
+    PHY_UPDATED,										                /*!< PHY updated event*/
 };
 /**
   * @brief BLE roles enumeration.
@@ -578,6 +588,15 @@ struct gap_connected
 struct gap_disconnected
 {
     uint8_t reason;                         /*!< Reason for disconnection*/
+};
+
+/**
+  * @brief Disconnected indication event structure.
+  */
+struct gap_phy_updated
+{
+    uint8_t tx_phy;                         /// LE PHY for data transmission (@see enum phy_type)
+    uint8_t rx_phy;                         /// LE PHY for data reception (@see enum phy_type)
 };
 
 /**
@@ -703,6 +722,7 @@ union gap_evt_u
     struct gap_dev_info_appearance get_appearance;             /*!< Get Get appearance*/
     struct gap_dev_info_slave_pref_param slv_pref_param;       /*!< Get slave preferred parameters*/
     struct gap_dev_info_peer_rssi peer_rssi;                   /*!< Get RSSI value of the current connection*/
+    struct gap_phy_updated phy_updated;                        /*!< PHY updated event*/
 };
 /**
   * @brief Connection parameter update.
@@ -1195,6 +1215,18 @@ void gap_manager_register_callback(void (*evt_cb)(enum gap_evt_type,union gap_ev
  ****************************************************************************************
  */
 void gap_manager_disconnect(uint8_t con_idx,uint8_t reason);
+/**
+ ****************************************************************************************
+ * \brief Set Phy for specific connection.
+ * 
+ * \param[in]  con_idx            Connection ID number to disconnect.
+ * \param[in]  tx_phy             Supported LE PHY for data transmission (@see enum phy_type)
+ * \param[in]  rx_phy             Supported LE PHY for data reception (@see enum phy_type)
+ * \param[in]  phy_opt            PHY options (@see enum phy_option)
+ * 
+ ****************************************************************************************
+ */   
+void gap_manager_set_phy(uint8_t con_idx,uint8_t tx_phy,uint8_t rx_phy,uint8_t phy_opt);
 /**
  ****************************************************************************************
  * \brief The master starts the bonding process
