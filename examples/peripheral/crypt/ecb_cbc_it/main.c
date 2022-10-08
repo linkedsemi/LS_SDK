@@ -190,7 +190,7 @@ int main()
     crypt_cbc_ecb_test();
 }
 
-void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC)
+void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
 {
     switch (lscrypt_type_flag)
     {

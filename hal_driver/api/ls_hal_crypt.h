@@ -22,6 +22,18 @@ enum aes_key_type
     AES_KEY_256,
 };
 
+/// Padding mode
+// https://asecuritysite.com/encryption/go_pad
+// https://en.wikipedia.org/wiki/Padding_(cryptography)
+enum padding_mode
+{
+    Padding_None,
+    Padding_PKCS7,
+    Padding_ANSIX923,
+    Padding_ISO7816,
+    Padding_ISO10126,
+};
+
 /** \brief LSCRYPT Initialize 
  *  \return status 
  */
@@ -39,13 +51,19 @@ HAL_StatusTypeDef HAL_LSCRYPT_DeInit(void);
  */
 HAL_StatusTypeDef HAL_LSCRYPT_AES_Key_Config(const uint32_t *key,enum aes_key_type key_size);
 
+/** \brief LSCRYPT Block Padding Mode Set
+ *  \param[in] mode @ref padding_mode
+ *  \return status 
+ */
+HAL_StatusTypeDef HAL_LSCRYPT_Block_Padding_Mode_Set(enum padding_mode mode);
+
 /** \brief LSCRYPT AES ECB Encrypt (Block Mode)
  *  \param[in] plaintext Input data
  *  \param[in] length Input data Length
  *  \param[out] ciphertext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(const uint8_t *plaintext,uint32_t *length,uint8_t *ciphertext);
 
 /** \brief LSCRYPT AES ECB Decrypt (Block Mode)
  *  \param[in] ciphertext Input data
@@ -53,7 +71,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(const uint8_t *plaintext,uint32_t 
  *  \param[out] plaintext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t *length,uint8_t *plaintext);
 
 /** \brief LSCRYPT AES CBC Encrypt (Block Mode)
  *  \param[in] iv Initial vector
@@ -62,7 +80,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t
  *  \param[out] ciphertext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t *length,uint8_t *ciphertext);
 
 /** \brief LSCRYPT AES CBC Decrypt (Block Mode)
  *  \param[in] iv Initial vector
@@ -71,7 +89,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t
  *  \param[out] plaintext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t *length,uint8_t *plaintext);
 
 /** \brief LSCRYPT AES ECB Encrypt (Interrupt Mode)
  *  \param[in] plaintext Input data
@@ -111,8 +129,9 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(const uint32_t iv[4],const uint
  *  Overwrite this function to get notification of completion of AES operation.
  *  \param Encrypt the complete operation is Encryption if ture else Decryption
  *  \param CBC the block cipher mode of the complete operation is CBC if true else ECB
+ *  \param length Output data length of the operation
  */
-void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt,bool CBC);
+void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt,bool CBC,uint32_t length);
 
 void HAL_LSCRYPT_IRQHandler(void);
 
