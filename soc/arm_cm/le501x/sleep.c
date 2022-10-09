@@ -98,12 +98,12 @@ void XIP_BANNED_FUNC(iwdg_check,)
 
 void XIP_BANNED_FUNC(before_wfi,)
 {
+    iwdg_check();
     sleep_mode_set();
     while(REG_FIELD_RD(SYSCFG->PMU_PWR, SYSCFG_BLE_PWR3_ST));
     ble_hclk_clr();
     switch_to_xo16m();
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
-    iwdg_check();
 }
 
 static void XIP_BANNED_FUNC(wait_dpll_lock,)
