@@ -34,6 +34,30 @@ gemini_ecb_it_padding_keil_build:
   script:
     - cd examples/peripheral/crypt/ecb_it_padding/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecb_it_padding.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+gemini_sm4_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sm4/sm4_polling && scons ic=gemini
+
+gemini_sm4_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sm4/sm4_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sm4_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+gemini_sm4_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sm4/sm4_it && scons ic=gemini
+
+gemini_sm4_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sm4/sm4_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sm4_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
 gemini_gpio_build:
   stage: build
   script:
