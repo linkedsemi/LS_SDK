@@ -12,6 +12,7 @@
 #include "systick.h"
 #include "ls_dbg.h"
 #include "ls_msp_qspiv2.h"
+#include "log.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x20000000))
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
@@ -100,6 +101,7 @@ void sys_init_none()
 {
     clk_flash_init();
     clk_switch();
+    LOG_INIT();
     io_init();
     low_power_init();
     systick_start();

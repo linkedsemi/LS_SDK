@@ -394,19 +394,21 @@ __attribute__((weak)) void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt,bool C
 
 void HAL_LSCRYPT_IRQHandler()
 {
-    if(LSCRYPT->SR&CRYPT_AESRIF_MASK)
+    if (LSCRYPT->SR & CRYPT_AESRIF_MASK)
     {
         LSCRYPT->ICFR = CRYPT_AESIF_MASK;
         aes_end();
-        if(length_out == length_in && !((length_residue == 0) & (crypt_padding_mode == Padding_None)))
+        if (length_out == length_in && !((length_residue == 0) & (crypt_padding_mode == Padding_None)))
         {
             aes_start();
-        }else{
-            HAL_LSCRYPT_AES_Complete_Callback(REG_FIELD_RD(LSCRYPT->CR,CRYPT_ENCS),REG_FIELD_RD(LSCRYPT->CR,CRYPT_MODE),length_out);
+        }
+        else
+        {
+            HAL_LSCRYPT_AES_Complete_Callback(REG_FIELD_RD(LSCRYPT->CR, CRYPT_ENCS), REG_FIELD_RD(LSCRYPT->CR, CRYPT_MODE), length_out);
         }
     }
-    if(LSCRYPT->SR&CRYPT_DESRIF_MASK)
+    if (LSCRYPT->SR & CRYPT_DESRIF_MASK)
     {
-      LSCRYPT->ICFR = CRYPT_DESIF_MASK;
+        LSCRYPT->ICFR = CRYPT_DESIF_MASK;
     }
 }

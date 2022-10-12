@@ -5,6 +5,7 @@ INPUT                  = hal_driver/api/ls_hal_flash.h \
                          hal_driver/api/ls_hal_ecc.h \
                          hal_driver/api/ls_hal_dmac.h \
                          hal_driver/api/ls_hal_crypt.h \
+                         hal_driver/api/ls_hal_sm4.h \
                          hal_driver/api/ls_hal_ssi.h \
                          hal_driver/api/ls_hal_pdm.h \
                          hal_driver/api/ls_hal_rtc.h \
