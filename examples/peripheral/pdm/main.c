@@ -40,7 +40,7 @@ void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart)
     LOG_I("uart send Done");
 }
 
-void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx)
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t ch_idx,uint8_t buf_idx)
 {
     if(buf_idx)
     {

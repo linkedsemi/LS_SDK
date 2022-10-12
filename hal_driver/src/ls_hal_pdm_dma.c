@@ -12,7 +12,7 @@ static void DMA_Channel_PingPong_Update(DMA_Controller_HandleTypeDef *hdma,uint8
     HAL_DMA_Channel_Config_Set(hdma,ch_idx,alt,&cfg);
 }
 
-__attribute__((weak)) void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx){}
+__attribute__((weak)) void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t ch_idx,uint8_t buf_idx){}
 
 static void PDM_DMA_CH0_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool current_alt)
 {
@@ -21,7 +21,7 @@ static void PDM_DMA_CH0_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool c
     hpdm->Env.DMA.Channel_Done[0] = true;
     if(hpdm->Env.DMA.Channel_Done[1])
     {
-        HAL_PDM_DMA_CpltCallback(hpdm,current_alt?0:1);
+        HAL_PDM_DMA_CpltCallback(hpdm,ch_idx,current_alt?0:1);
     }
 }
 
@@ -32,7 +32,7 @@ static void PDM_DMA_CH1_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool c
     hpdm->Env.DMA.Channel_Done[1] = true;
     if(hpdm->Env.DMA.Channel_Done[0])
     {
-        HAL_PDM_DMA_CpltCallback(hpdm,current_alt?0:1);
+        HAL_PDM_DMA_CpltCallback(hpdm,ch_idx,current_alt?0:1);
     }
 }
 
@@ -66,11 +66,12 @@ HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *
         prim.dummy = (uint32_t)PDM_DMA_CH1_Callback;
         HAL_DMA_Channel_Config_Set(hpdm->DMAC_Instance,hpdm->Env.DMA.Channel[1],false,&prim);
         HAL_DMA_Channel_Start_IT(hpdm->DMAC_Instance,hpdm->Env.DMA.Channel[1],HAL_PDM_CH1_Handshake_Get(hpdm),(uint32_t)hpdm);
+        REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,3);
     }else
     {
         hpdm->Env.DMA.Channel_Done[1] = true;
+        REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,1);
     }
-    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,1);
     return HAL_OK;
 }
 
@@ -115,11 +116,12 @@ HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,s
         HAL_DMA_Channel_Config_Set(hpdm->DMAC_Instance,hpdm->Env.DMA.Channel[1],false,&prim);
         HAL_DMA_Channel_Config_Set(hpdm->DMAC_Instance,hpdm->Env.DMA.Channel[1],true,&alt);
         HAL_DMA_Channel_Start_IT(hpdm->DMAC_Instance,hpdm->Env.DMA.Channel[1],HAL_PDM_CH1_Handshake_Get(hpdm),(uint32_t)hpdm);
+        REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,3);
     }else
     {
         hpdm->Env.DMA.Channel_Done[1] = true;
+        REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,1);
     }
-    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,1);
     return HAL_OK;
 }
 

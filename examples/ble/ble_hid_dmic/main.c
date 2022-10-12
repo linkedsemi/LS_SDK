@@ -1682,7 +1682,7 @@ static void data_sender(void)
     }   
 }
 
-void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm, uint8_t buf_idx)
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t ch_idx,uint8_t buf_idx)
 {
     if (get_cur_connected_state())
     {

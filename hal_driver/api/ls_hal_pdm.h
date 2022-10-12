@@ -140,9 +140,10 @@ HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,s
 
 /** Callback function that will be invoked in the interrupt context when PDM Transfer (DMA Mode) is complete
  *  \param hpdm Handle of PDM
+ *  \param ch_idx  PDM Channel IDX
  *  \param buf_idx Transfer data to complete IDX
  */
-void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx);
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t ch_idx,uint8_t buf_idx);
 
 /** PDM peripheral start working
  *  \param[in] hpdm Handle of PDM
