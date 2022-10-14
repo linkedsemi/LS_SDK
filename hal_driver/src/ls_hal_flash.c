@@ -9,6 +9,23 @@ ROM_SYMBOL struct hal_flash_status
 
 ROM_SYMBOL bool flash_dual_mode_only;
 
+ROM_SYMBOL void (*hal_flash_xip_stop_fn)();
+ROM_SYMBOL void (*hal_flash_xip_start_fn)();
+
+static void xip_dummy(){}
+
+ROM_SYMBOL void hal_flash_xip_func_ptr_dummy()
+{
+    hal_flash_xip_start_fn = xip_dummy;
+    hal_flash_xip_stop_fn = xip_dummy;
+}
+
+ROM_SYMBOL void hal_flash_xip_func_ptr_init()
+{
+    hal_flash_xip_start_fn = hal_flash_xip_start;
+    hal_flash_xip_stop_fn = hal_flash_xip_stop;
+}
+
 ROM_SYMBOL void hal_flash_dual_mode_set(bool dual)
 {
     flash_dual_mode_only= dual;
@@ -50,18 +67,22 @@ static void XIP_BANNED_FUNC(hal_flash_write_status_check,)
 #if ROM_CODE == 1
 void flash_reading_critical(void (*func)(void *),void *param)
 {
+    hal_flash_xip_stop_fn();
     func(param);
+    hal_flash_xip_start_fn();
 }
 
 void flash_writing_critical(void (*func)(void *),void *param)
 {
-    uint32_t cpu_stat = enter_critical();
+    uint32_t cpu_stat = ENTER_CRITICAL();
+    hal_flash_xip_stop_fn();
     hal_flash_write_enable();
     func(param);
     flash_stat.writing = true;
-    exit_critical(cpu_stat);
+    EXIT_CRITICAL(cpu_stat);
     hal_flash_write_status_check();
     flash_stat.writing = false;
+    hal_flash_xip_start_fn();
 }
 #else
 NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flash_reading_critical,void (*func)(void *),void *param)
@@ -84,18 +105,18 @@ ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void
         hal_flash_xip_start();
     }else
     {
-        uint32_t cpu_stat = enter_critical();
+        uint32_t cpu_stat = ENTER_CRITICAL();
         hal_flash_xip_stop();
         hal_flash_write_enable();
         func(param);
         uint32_t writing_end_time = systick_get_value();
         DELAY_US(500);
         flash_stat.writing = true;
-        exit_critical(cpu_stat);
+        EXIT_CRITICAL(cpu_stat);
         systick_poll_timeout(writing_end_time,func == do_hal_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
-        cpu_stat = enter_critical();
+        cpu_stat = ENTER_CRITICAL();
         hal_flash_write_status_check();
-        exit_critical(cpu_stat);
+        EXIT_CRITICAL(cpu_stat);
         flash_stat.writing = false;
         hal_flash_xip_start();
     }
@@ -105,24 +126,24 @@ ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void
 
 ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void *param)
 {
-    uint32_t cpu_stat = enter_critical();
+    uint32_t cpu_stat = ENTER_CRITICAL();
     hal_flash_xip_stop();
     hal_flash_write_enable();
     func(param);
     hal_flash_write_status_check();
     hal_flash_xip_start();
-    exit_critical(cpu_stat);
+    EXIT_CRITICAL(cpu_stat);
 }
 
 #elif SUSPEND_WORKAROUND == 0
 ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void *param)
 {
-    uint32_t cpu_stat = enter_critical();
+    uint32_t cpu_stat = ENTER_CRITICAL();
     hal_flash_xip_stop();
     hal_flash_write_enable();
     func(param);
     flash_stat.writing = true;
-    exit_critical(cpu_stat);
+    EXIT_CRITICAL(cpu_stat);
     hal_flash_write_status_check();
     flash_stat.writing = false;
     hal_flash_xip_start();
