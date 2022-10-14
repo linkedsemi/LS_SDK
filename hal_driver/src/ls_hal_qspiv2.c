@@ -1,5 +1,4 @@
 #include "ls_hal_qspiv2.h"
-#include "ls_msp_qspiv2.h"
 #include "compile_flag.h"
 #include "field_manipulate.h"
 #include "hal_flash_int.h"
@@ -119,6 +118,7 @@ static void XIP_BANNED_FUNC(read_data_from_fifo,struct lsqspiv2_stg_cfg *cfg)
 
 ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,struct lsqspiv2_stg_cfg *cfg)
 {
+    uint32_t cpu_stat = ENTER_CRITICAL();
     LSQSPIV2->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
     REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
     uint32_t *ctrl = (uint32_t *)&cfg->ctrl;
@@ -131,15 +131,17 @@ ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,struct lsqspiv2_stg_cfg 
     if(cfg->dat_ctrl.dat_en == 0)
     {
         while((LSQSPIV2->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
-        return;
-    }
-    if(cfg->dat_ctrl.dat_dir == WRITE_TO_FLASH)
-    {
-        write_data_to_fifo(cfg);
     }else
     {
-        read_data_from_fifo(cfg);
+        if(cfg->dat_ctrl.dat_dir == WRITE_TO_FLASH)
+        {
+            write_data_to_fifo(cfg);
+        }else
+        {
+            read_data_from_fifo(cfg);
+        }
     }
+    EXIT_CRITICAL(cpu_stat);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_send_command,uint8_t opcode)

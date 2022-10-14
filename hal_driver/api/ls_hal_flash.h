@@ -185,6 +185,10 @@ uint32_t hal_flash_total_size_get(void);
 /** \brief Release the Continuous Read Mode and return to normal SPI operation */
 void hal_flash_xip_mode_reset(void);
 
+void hal_flash_xip_func_ptr_dummy(void);
+
+void hal_flash_xip_func_ptr_init(void);
+
 #if defined(GEMINI) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void hal_flash_drv_var_init(bool,bool);
 __attribute__((long_call)) void hal_flash_init();
