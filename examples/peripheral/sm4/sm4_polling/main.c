@@ -36,20 +36,20 @@ void sm4_crypt_test(void)
     HAL_SM4_Encrypt(plaintext, cipherbuffer, length);
     if(!memcmp(cipherbuffer,ciphertext,length))
     {
-        LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_SUCCESS!",length);
+        LOG_I("SM4_ENCRYPT_POLLING_%d_TEST_SUCCESS!",length);
     }
     else
     {
-        LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_FAIL!",length);
+        LOG_I("SM4_ENCRYPT_POLLING_%d_TEST_FAIL!",length);
     }
     HAL_SM4_Decrypt(ciphertext, plainbuffer, length);
     if(!memcmp(plainbuffer,plaintext,length))
     {
-        LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_SUCCESS!",length);
+        LOG_I("SM4_DECRYPT_POLLING_%d_TEST_SUCCESS!",length);
     }
     else
     {
-        LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_FAIL!",length);
+        LOG_I("SM4_DECRYPT_POLLING_%d_TEST_FAIL!",length);
     }
 }
 

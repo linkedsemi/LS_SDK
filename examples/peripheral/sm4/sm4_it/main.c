@@ -77,22 +77,22 @@ void HAL_SM4_Calculation_Complete_Callback()
     case SM4_ENCRYPT:
         if(!memcmp(cipherbuffer,ciphertext,length))
         {
-            LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_SUCCESS!",length);
+            LOG_I("SM4_ENCRYPT_IT_%d_TEST_SUCCESS!",length);
         }
         else
         {
-            LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_FAIL!",length);
+            LOG_I("SM4_ENCRYPT_IT_%d_TEST_FAIL!",length);
         }
         flag = SM4_DECRYPT;
         break;
     case SM4_DECRYPT:
         if(!memcmp(cipherbuffer,ciphertext,length))
         {
-            LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_SUCCESS!",length);
+            LOG_I("SM4_DECRYPT_IT_%d_TEST_SUCCESS!",length);
         }
         else
         {
-            LOG_I("CRYPT_SM4_ENCRYPT_%d_TEST_FAIL!",length);
+            LOG_I("SM4_DECRYPT_IT_%d_TEST_FAIL!",length);
         }
         flag = SM4_ENCRYPT;
         break;

@@ -59,6 +59,7 @@ HAL_StatusTypeDef HAL_SM4_KeyExpansion_IT(const uint8_t *key)
 
 static void sm4_data_length_inout_config(const uint8_t *data, uint32_t length, uint8_t *result)
 {
+    LS_ASSERT(length % 16 == 0);
     writeflag = true;
     crypt_in = data;
     crypt_out = result;
