@@ -398,9 +398,16 @@ void HAL_LSCRYPT_IRQHandler()
     {
         LSCRYPT->ICFR = CRYPT_AESIF_MASK;
         aes_end();
-        if (length_out == length_in && !((length_residue == 0) & (crypt_padding_mode == Padding_None)))
+        if (length_out == length_in)
         {
-            aes_start();
+            if((length_residue == 0) && (crypt_padding_mode == Padding_None))
+            {
+                HAL_LSCRYPT_AES_Complete_Callback(REG_FIELD_RD(LSCRYPT->CR, CRYPT_ENCS), REG_FIELD_RD(LSCRYPT->CR, CRYPT_MODE), length_out);
+            }
+            else
+            {
+                aes_start();
+            }
         }
         else
         {

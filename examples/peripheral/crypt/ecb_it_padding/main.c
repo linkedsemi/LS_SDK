@@ -192,8 +192,8 @@ void crypt_cbc_ecb_test_128_ISO7816(void)
     HAL_LSCRYPT_Block_Padding_Mode_Set(mode);
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
  
-    // HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
-    // while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
+    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
+    while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
 
     HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ISO7816_aligned, sizeof(ecb_ciphertext_128_ISO7816_aligned), plaintext_buff);
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
