@@ -38,7 +38,7 @@ HAL_StatusTypeDef HAL_SM4_KeyExpansion_IT(const uint8_t *key);
  * 
  * @param data Intput data
  * @param result Output data
- * @param length the length of Intput data
+ * @param length the length of Intput data，Must be 16 byte aligned
  * @return HAL_StatusTypeDef 
  */
 HAL_StatusTypeDef HAL_SM4_Encrypt(const uint8_t *data,uint8_t *result,uint32_t length);
@@ -48,7 +48,7 @@ HAL_StatusTypeDef HAL_SM4_Encrypt(const uint8_t *data,uint8_t *result,uint32_t l
  * 
  * @param data Intput data
  * @param result Output data
- * @param length the length of Intput data
+ * @param length the length of Intput data，Must be 16 byte aligned
  * @return HAL_StatusTypeDef 
  */
 HAL_StatusTypeDef HAL_SM4_Decrypt(const uint8_t *data, uint8_t *result, uint32_t length);
@@ -58,7 +58,7 @@ HAL_StatusTypeDef HAL_SM4_Decrypt(const uint8_t *data, uint8_t *result, uint32_t
  * 
  * @param data Intput data
  * @param result Output data
- * @param length the length of Intput data
+ * @param length the length of Intput data，Must be 16 byte aligned
  * @return HAL_StatusTypeDef 
  */
 HAL_StatusTypeDef HAL_SM4_Encrypt_IT(const uint8_t *data,uint8_t *result,uint32_t length);
@@ -68,7 +68,7 @@ HAL_StatusTypeDef HAL_SM4_Encrypt_IT(const uint8_t *data,uint8_t *result,uint32_
  * 
  * @param data Intput data
  * @param result Output data
- * @param length the length of Intput data
+ * @param length the length of Intput data，Must be 16 byte aligned
  * @return HAL_StatusTypeDef 
  */
 HAL_StatusTypeDef HAL_SM4_Decrypt_IT(const uint8_t *data,uint8_t *result,uint32_t length);
