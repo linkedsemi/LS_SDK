@@ -19,6 +19,7 @@
 #include "ls_soc_gpio.h"
 #include "reg_base_addr.h"
 #include "ota_settings.h"
+#include "sleep.h"
 #define TRIM_4202_BUF_SIZE (12)
 
 static void swd_pull_down()
@@ -292,7 +293,8 @@ void boot_ram_start(uint32_t exec_addr)
     clk_switch();
     uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     set_wakeup_source(wkup_stat);
-    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    MODIFY_REG(SYSCFG->PMU_WKUP,SYSCFG_SLP_LVL_MASK,
+        NORMAL_SLEEP<<SYSCFG_SLP_LVL_POS|SYSCFG_LP_WKUP_CLR_MASK);
     DELAY_US(200);
     SYSCFG->PMU_PWR = 0;
     hal_flash_drv_var_init(false,false);
