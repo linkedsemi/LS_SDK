@@ -107,6 +107,7 @@ uint8_t cbc_ecb_plaintext[] = {
 /**buff**/
 uint8_t ciphertext_buff[64];
 uint8_t plaintext_buff[64];
+uint32_t expected_length = sizeof(cbc_ecb_plaintext);
 uint32_t length;
 
 void crypt_init(void)
@@ -118,43 +119,42 @@ void crypt_cbc_ecb_test_128(void)
 {
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
     /*CRYPT_AES_ECB_TEST*/
-    length = sizeof(cbc_ecb_plaintext);
-    HAL_LSCRYPT_AES_ECB_Encrypt(cbc_ecb_plaintext, &length, ciphertext_buff);
-    
-    if (!(memcmp(ecb_ciphertext_128, ciphertext_buff, sizeof(ecb_ciphertext_128))))
+    length = sizeof(ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt(cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, &length);
+    if (!(memcmp(ecb_ciphertext_128, ciphertext_buff, sizeof(ecb_ciphertext_128))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_ECB_ENCRYPT_128_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_ECB_ENCRYPT_128_TEST_SUCCESS!------Length of encrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_ECB_ENCRYPT_128_TEST_FAIL!");
     }
-    length = sizeof(ecb_ciphertext_128);
-    HAL_LSCRYPT_AES_ECB_Decrypt(ecb_ciphertext_128,  &length, plaintext_buff);
-    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
+    length = sizeof(plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt(ecb_ciphertext_128, sizeof(ecb_ciphertext_128), plaintext_buff, &length);
+    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_ECB_DECRYPT_128_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_ECB_DECRYPT_128_TEST_SUCCESS!------Length of decrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_ECB_DECRYPT_128_TEST_FAIL!");
     }
     /*CRYPT_AES_CBC_TEST*/
-    length =  sizeof(cbc_ecb_plaintext);
-    HAL_LSCRYPT_AES_CBC_Encrypt(cbc_iv, cbc_ecb_plaintext,  &length, ciphertext_buff);
-    if (!(memcmp(cbc_ciphertext_128, ciphertext_buff, sizeof(ecb_ciphertext_128))))
+    length = sizeof(ciphertext_buff);
+    HAL_LSCRYPT_AES_CBC_Encrypt(cbc_iv, cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, &length);
+    if (!(memcmp(cbc_ciphertext_128, ciphertext_buff, sizeof(ecb_ciphertext_128))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_CBC_ENCRYPT_128_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_CBC_ENCRYPT_128_TEST_SUCCESS!------Length of encrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_CBC_ENCRYPT_128_TEST_FAIL!");
     }
-    length = sizeof(cbc_ciphertext_128);
-    HAL_LSCRYPT_AES_CBC_Decrypt(cbc_iv, cbc_ciphertext_128,  &length , plaintext_buff);
-    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff,  sizeof(cbc_ecb_plaintext))))
+    length = sizeof(plaintext_buff);
+    HAL_LSCRYPT_AES_CBC_Decrypt(cbc_iv, cbc_ciphertext_128, sizeof(cbc_ciphertext_128), plaintext_buff, &length);
+    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_CBC_DECRYPT_128_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_CBC_DECRYPT_128_TEST_SUCCESS!------Length of decrypted data = %d",length);
     }
     else
     {
@@ -166,42 +166,42 @@ void crypt_cbc_ecb_test_192(void)
 {
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_192, AES_KEY_192);
     /*CRYPT_AES_ECB_TEST*/
-    length = sizeof(cbc_ecb_plaintext);
-    HAL_LSCRYPT_AES_ECB_Encrypt(cbc_ecb_plaintext, &length, ciphertext_buff);
-    if (!(memcmp(ecb_ciphertext_192, ciphertext_buff, sizeof(ecb_ciphertext_192))))
+    length = sizeof(ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt(cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, &length);
+    if (!(memcmp(ecb_ciphertext_192, ciphertext_buff, sizeof(ecb_ciphertext_192))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_ECB_ENCRYPT_192_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_ECB_ENCRYPT_192_TEST_SUCCESS!------Length of encrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_ECB_ENCRYPT_192_TEST_FAIL!");
     }
-    length = sizeof(ecb_ciphertext_192);
-    HAL_LSCRYPT_AES_ECB_Decrypt(ecb_ciphertext_192, &length , plaintext_buff);
-    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
+    length = sizeof(plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt(ecb_ciphertext_192, sizeof(ecb_ciphertext_192), plaintext_buff, &length);
+    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_ECB_DECRYPT_192_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_ECB_DECRYPT_192_TEST_SUCCESS!------Length of decrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_ECB_DECRYPT_192_TEST_FAIL!");
     }
     /*CRYPT_AES_CBC_TEST*/
-    length = sizeof(cbc_ecb_plaintext);
-    HAL_LSCRYPT_AES_CBC_Encrypt(cbc_iv, cbc_ecb_plaintext,&length, ciphertext_buff);
-    if (!(memcmp(cbc_ciphertext_192, ciphertext_buff, sizeof(cbc_ciphertext_192))))
+    length = sizeof(ciphertext_buff);
+    HAL_LSCRYPT_AES_CBC_Encrypt(cbc_iv, cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, &length);
+    if (!(memcmp(cbc_ciphertext_192, ciphertext_buff, sizeof(cbc_ciphertext_192))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_CBC_ENCRYPT_192_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_CBC_ENCRYPT_192_TEST_SUCCESS!------Length of encrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_CBC_ENCRYPT_192_TEST_FAIL!");
     }
-    length = sizeof(ecb_ciphertext_192);
-    HAL_LSCRYPT_AES_CBC_Decrypt(cbc_iv, cbc_ciphertext_192, &length, plaintext_buff);
-    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
+    length = sizeof(plaintext_buff);
+    HAL_LSCRYPT_AES_CBC_Decrypt(cbc_iv, cbc_ciphertext_192, sizeof(cbc_ciphertext_192), plaintext_buff, &length);
+    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_CBC_DECRYPT_192_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_CBC_DECRYPT_192_TEST_SUCCESS!------Length of decrypted data = %d",length);
     }
     else
     {
@@ -213,42 +213,42 @@ void crypt_cbc_ecb_test_256(void)
 {
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_256, AES_KEY_256);
     /*CRYPT_AES_ECB_TEST*/
-    length = sizeof(cbc_ecb_plaintext);
-    HAL_LSCRYPT_AES_ECB_Encrypt(cbc_ecb_plaintext, &length, ciphertext_buff);
-    if (!(memcmp(ecb_ciphertext_256, ciphertext_buff, sizeof(ecb_ciphertext_256))))
+    length = sizeof(ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt(cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, &length);
+    if (!(memcmp(ecb_ciphertext_256, ciphertext_buff, sizeof(ecb_ciphertext_256))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_ECB_ENCRYPT_256_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_ECB_ENCRYPT_256_TEST_SUCCESS!------Length of encrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_ECB_ENCRYPT_256_TEST_FAIL!");
     }
-    length = sizeof(ecb_ciphertext_256);
-    HAL_LSCRYPT_AES_ECB_Decrypt(ecb_ciphertext_256, &length, plaintext_buff);
-    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
+    length = sizeof(plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt(ecb_ciphertext_256, sizeof(ecb_ciphertext_256), plaintext_buff, &length);
+    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_ECB_DECRYPT_256_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_ECB_DECRYPT_256_TEST_SUCCESS!------Length of decrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_ECB_DECRYPT_256_TEST_FAIL!");
     }
     /*CRYPT_AES_CBC_TEST*/
-    length = sizeof(cbc_ecb_plaintext);
-    HAL_LSCRYPT_AES_CBC_Encrypt(cbc_iv, cbc_ecb_plaintext,&length, ciphertext_buff);
-    if (!(memcmp(cbc_ciphertext_256, ciphertext_buff, sizeof(cbc_ciphertext_256))))
+    length = sizeof(ciphertext_buff);
+    HAL_LSCRYPT_AES_CBC_Encrypt(cbc_iv, cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, &length);
+    if (!(memcmp(cbc_ciphertext_256, ciphertext_buff, sizeof(cbc_ciphertext_256))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_CBC_ENCRYPT_256_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_CBC_ENCRYPT_256_TEST_SUCCESS!------Length of encrypted data = %d",length);
     }
     else
     {
         LOG_I("CRYPT_AES_CBC_ENCRYPT_256_TEST_FAIL!");
     }
-    length = sizeof(ecb_ciphertext_256);
-    HAL_LSCRYPT_AES_CBC_Decrypt(cbc_iv, cbc_ciphertext_256, &length, plaintext_buff);
-    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
+    length = sizeof(plaintext_buff);
+    HAL_LSCRYPT_AES_CBC_Decrypt(cbc_iv, cbc_ciphertext_256, sizeof(cbc_ciphertext_256), plaintext_buff, &length);
+    if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))) && (length == expected_length))
     {
-        LOG_I("CRYPT_AES_CBC_DECRYPT_256_TEST_SUCCESS!");
+        LOG_I("CRYPT_AES_CBC_DECRYPT_256_TEST_SUCCESS!------Length of decrypted data = %d",length);
     }
     else
     {
@@ -273,4 +273,3 @@ int main()
     {
     }
 }
-

@@ -2,7 +2,7 @@
 #include "ls_msp_crypt.h"
 #include "field_manipulate.h"
 #include "ls_dbg.h"
- #include <stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 #define AES_BLOCK_SIZE 16
 static const uint8_t *current_in;
@@ -105,7 +105,7 @@ static void crypt_data_in_Padding_PKCS7(const uint8_t *in_src, uint8_t *in_res,u
         else
         {
             length_out += 1;
-             in_res[i] = AES_BLOCK_SIZE - read_length;
+            in_res[i] = AES_BLOCK_SIZE - read_length;
         }
     }
 }
@@ -314,19 +314,32 @@ static void aes_enc_dec(bool enc, bool cbc)
     } while (length_out == length_in);
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(const uint8_t *plaintext,uint32_t *length,uint8_t *ciphertext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t *ciphertextlength)
 {
-    crypt_in_out_length_set(plaintext,ciphertext,*length);
-    aes_enc_dec(true,false);
-    *length = length_out;
+    if(crypt_padding_mode != Padding_None)
+    {
+        LS_ASSERT(*ciphertextlength >= plaintextlength + 16 - plaintextlength % 16);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        aes_enc_dec(true,false);
+        *ciphertextlength =  length_out;
+    }
+    else
+    {
+        LS_ASSERT(*ciphertextlength >= plaintextlength);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        aes_enc_dec(true,false);
+        *ciphertextlength = length_out;
+    }
+    
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t *length,uint8_t *plaintext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength)
 {
-    crypt_in_out_length_set(ciphertext,plaintext,*length);
-    aes_enc_dec(false,false);
-    *length = length_out;
+    LS_ASSERT(*plaintextlength >= ciphertextlength);
+    crypt_in_out_length_set(ciphertext, plaintext, ciphertextlength);
+    aes_enc_dec(false, false);
+    *plaintextlength = length_out;
     return HAL_OK;
 }
 
@@ -338,52 +351,90 @@ static void iv_set(const uint32_t iv[4])
     LSCRYPT->IVR3 = iv[3];
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t *length,uint8_t *ciphertext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t *ciphertextlength)
 {
-    crypt_in_out_length_set(plaintext,ciphertext,*length);
-    iv_set(iv);
-    aes_enc_dec(true,true);
-    *length = length_out;
+    if(crypt_padding_mode != Padding_None)
+    {
+        LS_ASSERT(*ciphertextlength >= plaintextlength + 16 - plaintextlength % 16);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        iv_set(iv);
+        aes_enc_dec(true,true);
+        *ciphertextlength = length_out;
+    }
+    else
+    {
+        LS_ASSERT(*ciphertextlength >= plaintextlength);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        iv_set(iv);
+        aes_enc_dec(true,true);
+        *ciphertextlength = length_out;
+    }
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t *length,uint8_t *plaintext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength)
 {
-    crypt_in_out_length_set(ciphertext,plaintext,*length);
+    LS_ASSERT(*plaintextlength >= ciphertextlength);
+    crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
     iv_set(iv);
     aes_enc_dec(false,true);
-    *length = length_out;
+    *plaintextlength = length_out;
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext)
-{
-    crypt_in_out_length_set(plaintext,ciphertext,length);
-    aes_config(false,false,true,true);
-    aes_start();
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
+{ 
+    if(crypt_padding_mode != Padding_None)
+    {
+        LS_ASSERT(ciphertextlength >= plaintextlength + 16 - plaintextlength % 16);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        aes_config(false,false,true,true);
+        aes_start();
+    }
+    else 
+    {
+        LS_ASSERT(ciphertextlength >= plaintextlength);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        aes_config(false,false,true,true);
+        aes_start();
+    }
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt_IT(const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt_IT(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t plaintextlength)
 {
-    crypt_in_out_length_set(ciphertext,plaintext,length);
+    LS_ASSERT(plaintextlength >= ciphertextlength);
+    crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
     aes_config(false,false,false,true);
     aes_start();
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(const uint32_t iv[4],const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(const uint32_t iv[4],const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
 {
-    crypt_in_out_length_set(plaintext,ciphertext,length);
-    iv_set(iv);
-    aes_config(true,true,true,true);
-    aes_start();
+    if(crypt_padding_mode != Padding_None)
+    {
+        LS_ASSERT(ciphertextlength >= plaintextlength + 16 - plaintextlength % 16);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        iv_set(iv);
+        aes_config(true,true,true,true);
+        aes_start();
+    }
+    else 
+    {
+        LS_ASSERT(ciphertextlength >= plaintextlength);
+        crypt_in_out_length_set(plaintext,ciphertext,plaintextlength);
+        iv_set(iv);
+        aes_config(true,true,true,true);
+        aes_start();
+    }
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t plaintextlength)
 {
-    crypt_in_out_length_set(ciphertext,plaintext,length);
+    LS_ASSERT(plaintextlength >= ciphertextlength);
+    crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
     iv_set(iv);
     aes_config(true,true,false,true);
     aes_start();

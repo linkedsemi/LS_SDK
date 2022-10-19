@@ -149,17 +149,19 @@ const uint8_t cbc_ecb_plaintext_unaligned[] = {
 /**buff**/
 uint8_t ciphertext_buff[64];
 uint8_t plaintext_buff[64];
+uint32_t encrypt_expected_length;
+uint32_t decrypt_expected_length = sizeof(cbc_ecb_plaintext_aligned);
 enum padding_mode mode;
 
 void crypt_cbc_ecb_test_128_None(void)
 {
     HAL_LSCRYPT_Block_Padding_Mode_Set(mode);
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
- 
-    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
+
+    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff, sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
 
-    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_None_aligned, sizeof(ecb_ciphertext_128_None_aligned), plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_None_aligned, sizeof(ecb_ciphertext_128_None_aligned), plaintext_buff,sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
 }
 
@@ -168,10 +170,10 @@ void crypt_cbc_ecb_test_128_PKCS7(void)
     HAL_LSCRYPT_Block_Padding_Mode_Set(mode);
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
  
-    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff,sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
 
-    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_PKCS7_aligned, sizeof(ecb_ciphertext_128_PKCS7_aligned), plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_PKCS7_aligned, sizeof(ecb_ciphertext_128_PKCS7_aligned), plaintext_buff,sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
 }
 
@@ -180,10 +182,10 @@ void crypt_cbc_ecb_test_128_ANSIX923(void)
     HAL_LSCRYPT_Block_Padding_Mode_Set(mode);
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
  
-    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff,sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
 
-    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ANSIX923_aligned, sizeof(ecb_ciphertext_128_ANSIX923_aligned), plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ANSIX923_aligned, sizeof(ecb_ciphertext_128_ANSIX923_aligned), plaintext_buff,sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
 }
 
@@ -192,10 +194,10 @@ void crypt_cbc_ecb_test_128_ISO7816(void)
     HAL_LSCRYPT_Block_Padding_Mode_Set(mode);
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
  
-    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff,sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
 
-    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ISO7816_aligned, sizeof(ecb_ciphertext_128_ISO7816_aligned), plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ISO7816_aligned, sizeof(ecb_ciphertext_128_ISO7816_aligned), plaintext_buff,sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
 }
 
@@ -204,10 +206,10 @@ void crypt_cbc_ecb_test_128_ISO10126(void)
     HAL_LSCRYPT_Block_Padding_Mode_Set(mode);
     HAL_LSCRYPT_AES_Key_Config(cbc_ecb_key_128, AES_KEY_128);
  
-    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff);
+    HAL_LSCRYPT_AES_ECB_Encrypt_IT(cbc_ecb_plaintext_aligned, sizeof(cbc_ecb_plaintext_aligned), ciphertext_buff,sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_ENCRYPT_128);
 
-    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ISO10126_aligned, sizeof(ecb_ciphertext_128_ISO10126_aligned), plaintext_buff);
+    HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_128_ISO10126_aligned, sizeof(ecb_ciphertext_128_ISO10126_aligned), plaintext_buff,sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
 }
 
@@ -216,8 +218,10 @@ int main()
     sys_init_none();
     HAL_LSCRYPT_Init();
     mode = Padding_None;
+    encrypt_expected_length = sizeof(cbc_ecb_plaintext_aligned);
     crypt_cbc_ecb_test_128_None();
     mode = Padding_PKCS7;
+    encrypt_expected_length = sizeof(cbc_ecb_plaintext_aligned) + 16 - sizeof(cbc_ecb_plaintext_aligned) % 16;
     crypt_cbc_ecb_test_128_PKCS7();
     mode = Padding_ANSIX923;
     crypt_cbc_ecb_test_128_ANSIX923();
@@ -237,9 +241,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
         case LSCRYPT_ECB_ENCRYPT_128:
         {
-            if (!(memcmp(ecb_ciphertext_128_None_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_None_aligned))))
+            if (!(memcmp(ecb_ciphertext_128_None_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_None_aligned))) && (length == encrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_None_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_None_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {
@@ -250,9 +254,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         break;
         case LSCRYPT_ECB_DECRYPT_128:
         {
-            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))))
+            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))) && (length == decrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_None_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_None_TEST_SUCCESS!------Length of decrypted data = %d",length);
             }
             else
             {
@@ -270,9 +274,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
         case LSCRYPT_ECB_ENCRYPT_128:
         {
-            if (!(memcmp(ecb_ciphertext_128_PKCS7_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_PKCS7_aligned))))
+            if (!(memcmp(ecb_ciphertext_128_PKCS7_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_PKCS7_aligned))) && (length == encrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_PKCS7_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_PKCS7_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {
@@ -283,9 +287,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         break;
         case LSCRYPT_ECB_DECRYPT_128:
         {
-            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))))
+            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))) && (length == decrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_PKCS7_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_PKCS7_TEST_SUCCESS!------Length of decrypted data = %d",length);
             }
             else
             {
@@ -303,9 +307,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
         case LSCRYPT_ECB_ENCRYPT_128:
         {
-            if (!(memcmp(ecb_ciphertext_128_ANSIX923_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_ANSIX923_aligned))))
+            if (!(memcmp(ecb_ciphertext_128_ANSIX923_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_ANSIX923_aligned))) && (length == encrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ANSIX923_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ANSIX923_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {
@@ -316,9 +320,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         break;
         case LSCRYPT_ECB_DECRYPT_128:
         {
-            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))))
+            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))) && (length == decrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_ANSIX923_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_ANSIX923_TEST_SUCCESS!------Length of decrypted data = %d",length);
             }
             else
             {
@@ -336,9 +340,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
         case LSCRYPT_ECB_ENCRYPT_128:
         {
-            if (!(memcmp(ecb_ciphertext_128_ISO7816_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_ISO7816_aligned))))
+            if (!(memcmp(ecb_ciphertext_128_ISO7816_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_ISO7816_aligned))) && (length == encrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO7816_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO7816_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {
@@ -349,9 +353,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         break;
         case LSCRYPT_ECB_DECRYPT_128:
         {
-            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))))
+            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))) && (length == decrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_ISO7816_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_ISO7816_TEST_SUCCESS!------Length of decrypted data = %d",length);
             }
             else
             {
@@ -369,9 +373,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
         case LSCRYPT_ECB_ENCRYPT_128:
         {
-            if (!(memcmp(ecb_ciphertext_128_ISO10126_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_ISO10126_aligned))))
+            if (!(memcmp(ecb_ciphertext_128_ISO10126_aligned, ciphertext_buff, sizeof(ecb_ciphertext_128_ISO10126_aligned))) && (length == encrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO10126_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO10126_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {
@@ -382,9 +386,9 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         break;
         case LSCRYPT_ECB_DECRYPT_128:
         {
-            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))))
+            if (!(memcmp(cbc_ecb_plaintext_aligned, plaintext_buff, sizeof(cbc_ecb_plaintext_aligned))) && (length == decrypt_expected_length))
             {
-                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_ISO10126_TEST_SUCCESS!");
+                LOG_I("CRYPT_AES_ECB_DECRYPT_Padding_ISO10126_TEST_SUCCESS!------Length of decrypted data = %d",length);
             }
             else
             {
