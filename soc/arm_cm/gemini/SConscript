@@ -5,7 +5,9 @@ env['CPU'] = 'cortex-m4'
 env['LLVM_CFG'] = 'armv7em_hard_fpv4_sp_d16_nosys.cfg'
 if not 'DEFAULT_OPT_LVL' in env:
     env['DEFAULT_OPT_LVL'] = '-Os'
-env.Append(CCFLAGS = ' -mfpu=fpv4-sp-d16 ')
+gcc_fpu_flag = ' -mfloat-abi=hard -mfpu=fpv4-sp-d16 '
+env.Append(CCFLAGS = gcc_fpu_flag)
+env.Append(LINKFLAGS = gcc_fpu_flag)
 def plf_postaction(self,target):
     if 'progen' in self['TOOLS']:
         return
