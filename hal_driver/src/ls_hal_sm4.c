@@ -141,7 +141,7 @@ HAL_StatusTypeDef HAL_SM4_Decrypt_IT(const uint8_t *data, uint8_t *result, uint3
     return HAL_OK;
 }
 
-__attribute__((weak)) void HAL_SM4_Calculation_Complete_Callback();
+__attribute__((weak)) void HAL_SM4_Calculation_Complete_Callback(bool Encrypt);
 __attribute__((weak)) void HAL_SM4_KeyExpansion_Complete_Callback();
 
 void HAL_SM4_IRQHandler()
@@ -164,7 +164,7 @@ void HAL_SM4_IRQHandler()
     {
         sm4_end();
         LSSM4->INTR_CLR = SM4_INTR_END_MASK;
-        HAL_SM4_Calculation_Complete_Callback();
+        HAL_SM4_Calculation_Complete_Callback(!REG_FIELD_RD(LSSM4->SM4_CTRL,SM4_CALC_DEC));
     }
     if(REG_FIELD_RD(LSSM4->INTR_STT, SM4_KEY_END))
     {

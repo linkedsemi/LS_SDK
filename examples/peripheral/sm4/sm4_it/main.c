@@ -70,12 +70,11 @@ void HAL_SM4_KeyExpansion_Complete_Callback()
     LOG_I("CRYPT_SM4_KeyExpansion_TEST_SUCCESS!");
 }
 
-void HAL_SM4_Calculation_Complete_Callback()
+void HAL_SM4_Calculation_Complete_Callback(bool Encrypt)
 {
-    switch (flag)
+    if(Encrypt)
     {
-    case SM4_ENCRYPT:
-        if(!memcmp(cipherbuffer,ciphertext,length))
+         if(!memcmp(cipherbuffer,ciphertext,length))
         {
             LOG_I("SM4_ENCRYPT_IT_%d_TEST_SUCCESS!",length);
         }
@@ -84,9 +83,10 @@ void HAL_SM4_Calculation_Complete_Callback()
             LOG_I("SM4_ENCRYPT_IT_%d_TEST_FAIL!",length);
         }
         flag = SM4_DECRYPT;
-        break;
-    case SM4_DECRYPT:
-        if(!memcmp(cipherbuffer,ciphertext,length))
+    }
+    else
+    {
+         if(!memcmp(cipherbuffer,ciphertext,length))
         {
             LOG_I("SM4_DECRYPT_IT_%d_TEST_SUCCESS!",length);
         }
@@ -95,8 +95,5 @@ void HAL_SM4_Calculation_Complete_Callback()
             LOG_I("SM4_DECRYPT_IT_%d_TEST_FAIL!",length);
         }
         flag = SM4_ENCRYPT;
-        break;
-    default:
-        break;
     }
 }
