@@ -136,7 +136,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     for(i=0;i<4;++i)
     {
         GPIO_OE_DOT[i] = SYSC_AWO->IO[i].OE_DOT;
-        GPIO_IEN_OD[i] = SYSC_AWO->IO[i].IE_OD;
+        GPIO_IEN_OD[i] = SYSC_AWO->IO[i].IEN_OD;
         GPIO_PUPD[i] = SYSC_AWO->IO[i].PUPD;
     }
     gpio_pd_latch_state_enter();
@@ -145,7 +145,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     for(i=0;i<4;++i)
     {
         SYSC_AWO->IO[i].OE_DOT = GPIO_OE_DOT[i];
-        SYSC_AWO->IO[i].IE_OD = GPIO_IEN_OD[i];
+        SYSC_AWO->IO[i].IEN_OD = GPIO_IEN_OD[i];
         SYSC_AWO->IO[i].PUPD = GPIO_PUPD[i];
     }
     gpio_pd_latch_state_exit();
