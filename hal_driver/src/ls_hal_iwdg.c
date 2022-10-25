@@ -13,9 +13,11 @@ HAL_StatusTypeDef HAL_IWDG_Init(uint32_t LoadValue)
 
 HAL_StatusTypeDef HAL_IWDG_Refresh(void)
 {
+    volatile uint8_t j = 0;
     LSIWDG->IWDG_INTCLR = 1;
     for (uint8_t i = 0; i < 200; i++)  //200 delay count
     {
+        for(j=0;j<5;j++);
         LSIWDG->IWDG_INTCLR;
     }
     return HAL_OK;
