@@ -42,7 +42,7 @@ void clk_flash_init(void);
 
 void platform_reset(uint32_t error);
 
-void arm_cm_set_int_isr(uint8_t type,void (*isr)());
+void arm_cm_set_int_isr(int8_t type,void (*isr)());
 
 void arm_cm_delay_asm(uint32_t);
 
