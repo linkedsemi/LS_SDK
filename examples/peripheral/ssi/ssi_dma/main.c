@@ -12,20 +12,21 @@
 
 /* Includes ------------------------------------------------------------------*/
 #define LOG_TAG "MAIN"
-#include "ls_ble.h"
 #include "platform.h"
-#include "prf_diss.h"
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
 #include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
 #include "ls_hal_spi.h"
 #include "ls_hal_ssi.h"
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#else
 #include "ls_hal_dmac.h"
+#endif
 
 /* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);

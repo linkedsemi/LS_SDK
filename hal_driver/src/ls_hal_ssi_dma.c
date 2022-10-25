@@ -1,6 +1,6 @@
 #include <stddef.h>
+#include "sdk_config.h"
 #include "ls_msp_ssi.h"
-#include "ls_hal_dmac.h"
 #include "ssi_misc.h"
 #include "field_manipulate.h"
 #include "ls_hal_ssi.h"
@@ -33,6 +33,81 @@ static void SSI_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_chann
     ssi_rx_done(hssi,HAL_SSI_RxDMACpltCallback,HAL_SSI_TxRxDMACpltCallback,HAL_SSI_TxRxHalfDuplexDMACpltCallback);
 }
 
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t TX_Count,uint16_t RX_Count)
+{
+    hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|
+        FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
+        FIELD_BUILD(SSI_TXEIM,0);
+    hssi->REG->SSIENR = SSI_Enabled;
+    uint8_t data_width;
+    if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
+    {
+        data_width = DMA_SIZE_BYTE;
+    }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
+    {
+        data_width = DMA_SIZE_HALFWORD;
+    }else
+    {
+        data_width = DMA_SIZE_WORD;
+    }
+    struct DMA_Channel_Config cfg;
+    if(RX_Data)
+    {
+        cfg.ctrl.channel_en = 1;
+        cfg.ctrl.circular_mode_en = 0;
+        cfg.ctrl.peripheral_flow_ctrl = 0;
+        cfg.ctrl.direct_mode_en = 0;
+        cfg.ctrl.dma_mode_sel = Peri2Mem;
+        cfg.ctrl.channel_priority = 0;
+        cfg.ctrl.peripheral_handshake = HAL_SSI_RX_DMA_Handshake_Get(hssi);
+        cfg.ctrl.src_inc = 0;
+        cfg.ctrl.src_width = data_width;
+        cfg.ctrl.src_burst = 0;
+        cfg.ctrl.src_inc_offset = 0;
+        cfg.ctrl.rsvd0 = 0;
+        cfg.ctrl.dst_inc = 1;
+        cfg.ctrl.dst_witdh = data_width;
+        cfg.ctrl.dst_burst = 0;
+        cfg.ctrl.dst_inc_offset = 0;
+        cfg.ctrl.rsvd1 = 0;
+        cfg.src_addr = (uint32_t)hssi->DR_REG;
+        cfg.dst_addr = (uint32_t)RX_Data;
+        cfg.byte_count = RX_Count;
+        cfg.dummy = 0;
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Rx_Env.DMA.DMA_Channel,&cfg,(void *)SSI_Receive_DMA_Callback,(uint32_t)hssi);
+    }
+    hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
+    if(TX_Data)
+    {
+        cfg.ctrl.channel_en = 1;
+        cfg.ctrl.circular_mode_en = 0;
+        cfg.ctrl.peripheral_flow_ctrl = 0;
+        cfg.ctrl.direct_mode_en = 0;
+        cfg.ctrl.direct_mode_en = 0;
+        cfg.ctrl.dma_mode_sel = Mem2Peri;
+        cfg.ctrl.channel_priority = 0;
+        cfg.ctrl.peripheral_handshake = HAL_SSI_TX_DMA_Handshake_Get(hssi);
+        cfg.ctrl.src_inc = 1;
+        cfg.ctrl.src_width = data_width;
+        cfg.ctrl.src_burst = 0;
+        cfg.ctrl.src_inc_offset = 0;
+        cfg.ctrl.rsvd0 = 0;
+        cfg.ctrl.dst_inc = 0;
+        cfg.ctrl.dst_witdh = data_width;
+        cfg.ctrl.dst_burst = 0;
+        cfg.ctrl.dst_inc_offset = 0;
+        cfg.ctrl.rsvd1 = 0;
+        cfg.src_addr = (uint32_t)TX_Data;
+        cfg.dst_addr = (uint32_t)hssi->DR_REG;
+        cfg.byte_count = TX_Count;
+        cfg.dummy = 0;
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,&cfg,(void *)SSI_Transmit_DMA_Callback,(uint32_t)hssi);
+    }
+}
+#else
+#include "ls_hal_dmac.h"
 static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t TX_Count,uint16_t RX_Count)
 {
     hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|
@@ -101,6 +176,8 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,HAL_SSI_TX_DMA_Handshake_Get(hssi),(uint32_t)hssi);
     }
 }
+
+#endif
 
 HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
