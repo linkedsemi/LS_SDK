@@ -58,7 +58,7 @@ static inline uint8_t v33_ext_group_sel_get(uint8_t group)
     return V33_RG->GPIO_SEL>>(2*group) & 0x1;
 }
 
-void V33_EXTI_Handler(void)
+void V33_EXTI_Async_Handler(void)
 {
     uint8_t i;
     uint32_t int_stat = V33_RG->GPIO_INTR;
@@ -118,7 +118,7 @@ static void exti_io_handler(uint8_t port,uint8_t num)
 }
 
 
-void GPIO_Handler(void)
+void EXTI_Handler(void)
 {
     uint16_t int_stat = EXTI->EEIFM;
     uint8_t i;
@@ -143,22 +143,24 @@ void GPIO_Handler(void)
 
 void io_irq_enable()
 {
-    __NVIC_EnableIRQ(EXT_IRQn);
-    __NVIC_EnableIRQ(GPIO_IRQn);
+    __NVIC_EnableIRQ(EXTI_ASYNC_IRQn);
+    __NVIC_EnableIRQ(EXTI_IRQn);
 }
 
 void io_init(void)
 {
-    SYSC_AWO->IO[0].IE_OD = 0x9fff0000;
+    SYSC_AWO->IO[0].IEN_OD = 0x9fff0000;
     SYSC_AWO->IO[0].OE_DOT= 0;
-    SYSC_AWO->IO[1].IE_OD = 0xffff0000;
+    SYSC_AWO->IO[1].IEN_OD = 0xffff0000;
     SYSC_AWO->IO[1].OE_DOT = 0;
-    SYSC_AWO->IO[2].IE_OD = 0xffff0000;
+    SYSC_AWO->IO[2].IEN_OD = 0xffff0000;
     SYSC_AWO->IO[2].OE_DOT = 0;
-    SYSC_AWO->IO[3].IE_OD = 0x03ff0000;
+    SYSC_AWO->IO[3].IEN_OD = 0x03ff0000;
     SYSC_AWO->IO[3].OE_DOT = 0;
-    arm_cm_set_int_isr(EXT_IRQn,V33_EXTI_Handler);
-    arm_cm_set_int_isr(GPIO_IRQn,GPIO_Handler);
+    arm_cm_set_int_isr(EXTI_ASYNC_IRQn,V33_EXTI_Async_Handler);
+    arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
+    __NVIC_ClearPendingIRQ(EXTI_ASYNC_IRQn);
+    __NVIC_ClearPendingIRQ(EXTI_IRQn);
     io_irq_enable();
 }
 
@@ -173,7 +175,7 @@ void io_cfg_input(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     SYSC_AWO->IO[x->port].OE_DOT &= ~(1<<16<<x->num);
-    SYSC_AWO->IO[x->port].IE_OD &= ~(1<<16<<x->num); 
+    SYSC_AWO->IO[x->port].IEN_OD &= ~(1<<16<<x->num); 
 }
 
 void io_write_pin(uint8_t pin,uint8_t val)
@@ -290,6 +292,7 @@ static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
         V33_RG->EXTI_CTRL2 = 1<<group | (1<<8<<group);
         V33_RG->EXTI_CTRL0 |= 1<<group | (1<<8<<group);
     break;
+    default:break;
     }
     V33_RG->EXTI_CTRL2 = 0;
 }
@@ -413,6 +416,7 @@ void io_exti_config(uint8_t pin,exti_edge_t edge)
             EXTI->EICR = 1 << x->num;
             EXTI->EIER = 1 << x->num;
         break;
+        default:break;
         }
     }
 }

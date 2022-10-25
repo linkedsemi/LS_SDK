@@ -9,7 +9,7 @@ typedef struct
     volatile uint32_t LOCK;
     volatile uint32_t OE_DOT;
     volatile uint32_t PUPD;
-    volatile uint32_t IE_OD;
+    volatile uint32_t IEN_OD;
     volatile uint32_t DS;
     volatile uint32_t AE;
     volatile uint32_t FIR;
@@ -152,7 +152,7 @@ enum SYSC_AWO_REG_IOA_PD_PU_FIELD
     SYSC_AWO_GPIOA_PD_POS = 16,
 };
 
-enum SYSC_AWO_REG_IOA_IE_OD_FIELD
+enum SYSC_AWO_REG_IOA_IEN_OD_FIELD
 {
     SYSC_AWO_GPIOA_OD_MASK = (int)0xffff,
     SYSC_AWO_GPIOA_OD_POS = 0,
@@ -210,7 +210,7 @@ enum SYSC_AWO_REG_IOB_PD_PU_FIELD
     SYSC_AWO_GPIOB_PD_POS = 16,
 };
 
-enum SYSC_AWO_REG_IOB_IE_OD_FIELD
+enum SYSC_AWO_REG_IOB_IEN_OD_FIELD
 {
     SYSC_AWO_GPIOB_OD_MASK = (int)0xffff,
     SYSC_AWO_GPIOB_OD_POS = 0,
@@ -268,7 +268,7 @@ enum SYSC_AWO_REG_IOC_PD_PU_FIELD
     SYSC_AWO_GPIOC_PD_POS = 16,
 };
 
-enum SYSC_AWO_REG_IOC_IE_OD_FIELD
+enum SYSC_AWO_REG_IOC_IEN_OD_FIELD
 {
     SYSC_AWO_GPIOC_OD_MASK = (int)0xffff,
     SYSC_AWO_GPIOC_OD_POS = 0,
@@ -326,7 +326,7 @@ enum SYSC_AWO_REG_IOD_PD_PU_FIELD
     SYSC_AWO_GPIOD_PD_POS = 16,
 };
 
-enum SYSC_AWO_REG_IOD_IE_OD_FIELD
+enum SYSC_AWO_REG_IOD_IEN_OD_FIELD
 {
     SYSC_AWO_GPIOD_OD_MASK = (int)0xffff,
     SYSC_AWO_GPIOD_OD_POS = 0,
