@@ -1,10 +1,9 @@
-#include "ls_msp_dmac.h"
 #include "gemini.h"
 #include "platform.h"
 #include "field_manipulate.h"
 #include "reg_sysc_cpu_type.h"
 #include "sys_stat.h"
-#include "ls_hal_dmac.h"
+#include "ls_hal_dmacv2.h"
 
 
 static DMA_Controller_HandleTypeDef *dmac_ptr;

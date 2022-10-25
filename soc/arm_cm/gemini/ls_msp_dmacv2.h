@@ -1,6 +1,7 @@
-#ifndef LS_MSP_DMAC_H_
-#define LS_MSP_DMAC_H_
-#include "reg_dmac_type.h"
+#ifndef LS_MSP_DMACV2_H_
+#define LS_MSP_DMACV2_H_
+#define DMAC_CHANNEL_NUM 6
+#include "reg_dmacv2_type.h"
 #include "reg_base_addr.h"
 
 #ifdef DMAC1_BASE_ADDR

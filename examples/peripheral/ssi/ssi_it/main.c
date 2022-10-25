@@ -22,7 +22,6 @@
 #include "SEGGER_RTT.h"
 #include "ls_hal_spi.h"
 #include "ls_hal_ssi.h"
-#include "ls_hal_dmac.h"
 
 /* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);

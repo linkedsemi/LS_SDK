@@ -47,5 +47,7 @@
 #define SDK_SRAM4_PWR_DOWN 0
 #endif
 
+#define DMACV2 1
+
 #endif
 
