@@ -92,7 +92,7 @@ NOINLINE void XIP_BANNED_FUNC(clk_flash_init,)
     clk_switch();
 }
 
-void arm_cm_set_int_isr(uint8_t type,void (*isr)())
+void arm_cm_set_int_isr(int8_t type,void (*isr)())
 {
     ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
 }
