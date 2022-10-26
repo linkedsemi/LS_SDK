@@ -83,7 +83,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'src/ls_hal_qspiv2.c',
         'src/ls_hal_flash_qspiv2.c',
         'src/ls_hal_flash.c',
-        # 'src/ls_hal_uart_dma.c',
+        'src/ls_hal_uart_dma.c',
         'src/ls_hal_uart.c',
         'src/ls_hal_ecc.c',
         'src/ls_hal_crc.c',

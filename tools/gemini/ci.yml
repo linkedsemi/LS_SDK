@@ -299,17 +299,17 @@ gemini_input_Capture_keil_build:
   script:
     - cd examples/peripheral/timer/input_Capture/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b input_Capture.uvprojx -o UVBuild/build.txt -j0
 
-# gemini_uart_dma_build:
-#   stage: build
-#   script:
-#     - cd examples/peripheral/uart/uart_dma && scons ic=gemini
+gemini_uart_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/uart_dma && scons ic=gemini
 
-# gemini_uart_dma_keil_build:
-#   stage: build
-#   rules:
-#     - !reference [.release_rule, rules]
-#   script:
-#     - cd examples/peripheral/uart/uart_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_dma.uvprojx -o UVBuild/build.txt -j0
+gemini_uart_dma_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/uart_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_dma.uvprojx -o UVBuild/build.txt -j0
 
 gemini_uart_it_build:
   stage: build

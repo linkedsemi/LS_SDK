@@ -5,6 +5,7 @@
 #include "sys_stat.h"
 #include "HAL_def.h"
 #include "platform.h"
+#include "dmac_config.h"
 #include "reg_sysc_per_type.h"
 
 static UART_HandleTypeDef *UART_inst_env[5];
@@ -198,3 +199,51 @@ void LL_UART5_MSP_DeInit(void)
         REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART5, 1);
 }
 
+uint8_t HAL_UART_TX_DMA_Handshake_Get(UART_HandleTypeDef *inst)
+{
+    uint8_t handshake = 0;
+    switch((uint32_t)inst->UARTX)
+    {
+    case (uint32_t)UART1:
+        handshake = CH_UART1_TX;
+    break;
+    case (uint32_t)UART2:
+        handshake = CH_UART2_TX;
+    break;
+    case (uint32_t)UART3:
+        handshake = CH_UART3_TX;
+    break;
+    case (uint32_t)UART4:
+        handshake = CH_UART4_TX;
+    break;
+    default:
+        LS_ASSERT(0);
+    }
+    return handshake;
+}
+
+uint8_t HAL_UART_RX_DMA_Handshake_Get(UART_HandleTypeDef *inst)
+{
+    uint8_t handshake = 0;
+    switch((uint32_t)inst->UARTX)
+    {
+    case (uint32_t)UART1:
+        handshake = CH_UART1_RX;
+    break;
+    case (uint32_t)UART2:
+        handshake = CH_UART2_RX;
+    break;
+    case (uint32_t)UART3:
+        handshake = CH_UART3_RX;
+    break;
+    case (uint32_t)UART4:
+        handshake = CH_UART4_RX;
+    break;
+    case (uint32_t)UART5:
+        handshake = CH_UART5_RX;
+    break;
+    default:
+        LS_ASSERT(0);
+    }
+    return handshake;
+}
