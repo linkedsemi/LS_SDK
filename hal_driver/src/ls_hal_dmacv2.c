@@ -34,6 +34,7 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
     {
         if(irq&3<<(i*2))
         {
+            hdma->Instance->ICR = 3<<(i*2);
             hdma->channel_callback[i](hdma,hdma->param[i],i);
         }
     }

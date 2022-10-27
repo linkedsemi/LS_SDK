@@ -4,7 +4,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#else
 #include "ls_hal_dmac.h"
+#endif
 
 #define BUF_SIZE 256
 #define DMA_UART
