@@ -52,6 +52,8 @@ void HAL_SSI_TxRxDMACpltCallback(SSI_HandleTypeDef *hssi)
 
 static void ssi_test_init(void)
 {
+    io_cfg_output(PA01);
+    io_write_pin(PA01, 1);
     pinmux_ssi_clk_init(PB09);		/* CLK-------------PB09 */	
 	pinmux_ssi_nss0_init(PB08);	/* SSN-------------PB08 */	
 	pinmux_ssi_dq0_init(PA07);		/* MOSI------------PA07 */	
