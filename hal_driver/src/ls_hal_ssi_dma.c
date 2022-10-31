@@ -48,9 +48,13 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
     }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
     {
         data_width = DMA_SIZE_HALFWORD;
+        TX_Count *= 2;
+        RX_Count *= 2;
     }else
     {
         data_width = DMA_SIZE_WORD;
+        TX_Count *= 4;
+        RX_Count *= 4;
     }
     struct DMA_Channel_Config cfg;
     if(RX_Data)
