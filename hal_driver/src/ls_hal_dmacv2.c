@@ -1,5 +1,5 @@
 #include "ls_hal_dmacv2.h"
-
+#include "ls_dbg.h"
 
 void HAL_DMA_Controller_Init(DMA_Controller_HandleTypeDef *hdma)
 {
@@ -30,11 +30,12 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
 {
     uint32_t irq = hdma->Instance->IFM;
     uint8_t i;
+    LS_ASSERT((irq&0xaaaaaaaa)==0);
     for(i=0;i<DMAC_CHANNEL_NUM;++i)
     {
-        if(irq&3<<(i*2))
+        if(irq&1<<(i*2))
         {
-            hdma->Instance->ICR = 3<<(i*2);
+            hdma->Instance->ICR = 1<<(i*2);
             hdma->channel_callback[i](hdma,hdma->param[i],i);
         }
     }
