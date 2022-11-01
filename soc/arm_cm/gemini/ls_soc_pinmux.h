@@ -467,96 +467,6 @@ void pinmux_gptimc1_bk_init(uint8_t pin);
 void pinmux_gptimc1_bk_deinit(void);
 
 /**
-  * @brief Set mux function of pin gadc12b of in0
-  */
-void pinmux_adc12b_in0_init(void);
-
-/**
-  * @brief clear mux function of pin gadc12b of in0
-  */
-void pinmux_adc12b_in0_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in1
-  */
-void pinmux_adc12b_in1_init(void);
-
-/**
-  * @brief clear mux function of pin adc12b of in1
-  */
-void pinmux_adc12b_in1_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in2
-  */
-void pinmux_adc12b_in2_init(void);
-
-/**
-  * @brief clear mux function of pin adc12b of in2
-  */
-void pinmux_adc12b_in2_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in3
-  */
-void pinmux_adc12b_in3_init(void);
-
-/**
-  * @brief clear mux function of pin adc12b of in3
-  */
-void pinmux_adc12b_in3_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in4
-  */
-void pinmux_adc12b_in4_init(void);
-
-/**
-  * @brief clear mux function of pin adc12b of in4
-  */
-void pinmux_adc12b_in4_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in5
-  */
-void pinmux_adc12b_in5_init(void);
-
-/**
-  * @brief clear  mux function of pin adc12b of in5
-  */
-void pinmux_adc12b_in5_deinit(void);
-
-/**
-  * @brief Set mux function of pin  adc12b of in6
-  */
-void pinmux_adc12b_in6_init(void);
-
-/**
-  * @brief clear  mux function of pin adc12b of in6
-  */
-void pinmux_adc12b_in6_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in7
-  */
-void pinmux_adc12b_in7_init(void);
-
-/**
-  * @brief clear mux function of pin adc12b of in7
-  */
-void pinmux_adc12b_in7_deinit(void);
-
-/**
-  * @brief Set mux function of pin adc12b of in8
-  */
-void pinmux_adc12b_in8_init(void);
-
-/**
-  * @brief clear mux function of pin adc12b of in8
-  */
-void pinmux_adc12b_in8_deinit(void);
-
-/**
   * @brief        configure gpio pin as pdm_clk
   * @param  pin   Specific GPIO pin 
   */
@@ -590,8 +500,167 @@ void pinmux_pdm_data1_init(uint8_t pin);
 void pinmux_pdm_data1_deinit(void);
 
 /**
+  * @brief Set mux function of pin gadc0 of in0
+  */
+void pinmux_adc0_in0_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in0
+  */
+void pinmux_adc0_in0_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in1
+  */
+void pinmux_adc0_in1_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in1
+  */
+void pinmux_adc0_in1_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in2
+  */
+void pinmux_adc0_in2_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in2
+  */
+void pinmux_adc0_in2_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in3
+  */
+void pinmux_adc0_in3_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in3
+  */
+void pinmux_adc0_in3_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in4
+  */
+void pinmux_adc0_in4_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in4
+  */
+void pinmux_adc0_in4_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in5
+  */
+void pinmux_adc0_in5_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in5
+  */
+void pinmux_adc0_in5_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in6
+  */
+void pinmux_adc0_in6_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in6
+  */
+void pinmux_adc0_in6_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc0 of in7
+  */
+void pinmux_adc0_in7_init(void);
+
+/**
+  * @brief clear mux function of pin gadc0 of in7
+  */
+void pinmux_adc0_in7_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in0
+  */
+void pinmux_adc1_in0_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in0
+  */
+void pinmux_adc1_in0_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in1
+  */
+void pinmux_adc1_in1_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in1
+  */
+void pinmux_adc1_in1_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in2
+  */
+void pinmux_adc1_in2_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in2
+  */
+void pinmux_adc1_in2_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in3
+  */
+void pinmux_adc1_in3_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in3
+  */
+void pinmux_adc1_in3_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in4
+  */
+void pinmux_adc1_in4_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in4
+  */
+void pinmux_adc1_in4_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in5
+  */
+void pinmux_adc1_in5_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in5
+  */
+void pinmux_adc1_in5_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in6
+  */
+void pinmux_adc1_in6_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in6
+  */
+void pinmux_adc1_in6_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc1 of in7
+  */
+void pinmux_adc1_in7_init(void);
+
+/**
+  * @brief clear mux function of pin gadc1 of in7
+  */
+void pinmux_adc1_in7_deinit(void);
+
+/**
   * @brief       configure gpio pin as touchkey cmod
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_cmod_init();
 
@@ -602,7 +671,6 @@ void pinmux_touchkey_cmod_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch0
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch0_init();
 
@@ -613,7 +681,6 @@ void pinmux_touchkey_ch0_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch1
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch1_init();
 
@@ -624,7 +691,6 @@ void pinmux_touchkey_ch1_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch2
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch2_init();
 
@@ -635,7 +701,6 @@ void pinmux_touchkey_ch2_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch3
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch3_init();
 
@@ -646,7 +711,6 @@ void pinmux_touchkey_ch3_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch4
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch4_init();
 
@@ -657,7 +721,6 @@ void pinmux_touchkey_ch4_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch5
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch5_init();
 
@@ -668,7 +731,6 @@ void pinmux_touchkey_ch5_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch6
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch6_init();
 
@@ -679,7 +741,6 @@ void pinmux_touchkey_ch6_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch7
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch7_init();
 
@@ -690,7 +751,6 @@ void pinmux_touchkey_ch7_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch8
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch8_init();
 
@@ -701,7 +761,6 @@ void pinmux_touchkey_ch8_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch9
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch9_init();
 
@@ -712,7 +771,6 @@ void pinmux_touchkey_ch9_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch10
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch10_init();
 
@@ -723,7 +781,6 @@ void pinmux_touchkey_ch10_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch11
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch11_init();
 
@@ -733,8 +790,7 @@ void pinmux_touchkey_ch11_init();
 void pinmux_touchkey_ch11_deinit();
 
 /**
-  * @brief       configure gpio pin as touchkey ch12
-  * @param  pin  Specific GPIO pin 
+  * @brief       configure gpio pin as touchkey ch12 
   */
 void pinmux_touchkey_ch12_init();
 
@@ -745,7 +801,6 @@ void pinmux_touchkey_ch12_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch13
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch13_init();
 
@@ -756,7 +811,6 @@ void pinmux_touchkey_ch13_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch14
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch14_init();
 
@@ -767,7 +821,6 @@ void pinmux_touchkey_ch14_deinit();
 
 /**
   * @brief       configure gpio pin as touchkey ch15
-  * @param  pin  Specific GPIO pin 
   */
 void pinmux_touchkey_ch15_init();
 
@@ -775,7 +828,5 @@ void pinmux_touchkey_ch15_init();
   * @brief disable pin mux function from touchkey ch15
   */
 void pinmux_touchkey_ch15_deinit();
-
-
 
 #endif

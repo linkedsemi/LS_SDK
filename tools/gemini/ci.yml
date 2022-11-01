@@ -382,3 +382,52 @@ gemini_uart_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/uart/uart_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_polling.uvprojx -o UVBuild/build.txt -j0
+
+gemini_adc_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_blocking_sampling && scons ic=gemini
+
+gemini_adc_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_blocking_sampling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_blocking_sampling.uvprojx -o UVBuild/build.txt -j0
+
+gemini_adc_single_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_single_channel && scons ic=gemini
+
+gemini_adc_single_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_single_channel/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_single_channel.uvprojx -o UVBuild/build.txt -j0
+
+gemini_adc_multi_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel && scons ic=gemini
+
+gemini_adc_multi_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_multi_channel.uvprojx -o UVBuild/build.txt -j0
+
+gemini_adc_analog_wdg_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_analog_wdg && scons ic=gemini
+
+gemini_adc_analog_wdg_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_analog_wdg/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_analog_wdg.uvprojx -o UVBuild/build.txt -j0
+

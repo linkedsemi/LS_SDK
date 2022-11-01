@@ -1,7 +1,8 @@
 #ifndef LS_MSP_ADC_H_
 #define LS_MSP_ADC_H_
 #include "reg_base_addr.h"
-#include "reg_lsadc_type.h" 
+#include "reg_adc_typev2.h" 
+#include "ls_hal_adcv2.h"
 
 /// LSADC Macro for Register Access
 #ifdef LSADC_BASE_ADDR

@@ -178,6 +178,13 @@ void io_cfg_input(uint8_t pin)
     SYSC_AWO->IO[x->port].IEN_OD &= ~(1<<16<<x->num); 
 }
 
+void io_cfg_disable(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].OE_DOT &= ~(1<<16<<x->num);
+    SYSC_AWO->IO[x->port].IEN_OD |= 1<<16<<x->num; 
+}
+
 void io_write_pin(uint8_t pin,uint8_t val)
 {
     if(val)
@@ -1158,6 +1165,179 @@ void pinmux_touchkey_ch15_init()
 void pinmux_touchkey_ch15_deinit()
 {
     io_ae1_enable(PD02, 0);
+}
+
+void pinmux_ana_func1_init(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].AE |= 1<<16<<x->num;
+}
+
+void gpio_ana_deinit(uint8_t ain)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&ain;
+    SYSC_AWO->IO[x->port].AE &= ~(1<<16<<x->num);
+    io_cfg_disable(ain);
+}
+
+void pinmux_adc0_in0_init(void)
+{
+    pinmux_ana_func1_init(PC00);
+}
+
+void pinmux_adc0_in0_deinit(void)
+{
+    gpio_ana_deinit(PC00);
+}
+
+void pinmux_adc0_in1_init(void)
+{
+    pinmux_ana_func1_init(PC01);
+}
+
+void pinmux_adc0_in1_deinit(void)
+{
+    gpio_ana_deinit(PC01);
+}
+
+void pinmux_adc0_in2_init(void)
+{
+    pinmux_ana_func1_init(PC02);
+}
+
+void pinmux_adc0_in2_deinit(void)
+{
+    gpio_ana_deinit(PC02);
+}
+
+void pinmux_adc0_in3_init(void)
+{
+    pinmux_ana_func1_init(PC03);
+}
+
+void pinmux_adc0_in3_deinit(void)
+{
+    gpio_ana_deinit(PC03);
+}
+
+void pinmux_adc0_in4_init(void)
+{
+    pinmux_ana_func1_init(PA00);
+}
+
+void pinmux_adc0_in4_deinit(void)
+{
+    gpio_ana_deinit(PC04);
+}
+
+void pinmux_adc0_in5_init(void)
+{
+    pinmux_ana_func1_init(PA01);
+}
+
+void pinmux_adc0_in5_deinit(void)
+{
+    gpio_ana_deinit(PA01);
+}
+
+void pinmux_adc0_in6_init(void)
+{
+    pinmux_ana_func1_init(PA02);
+}
+
+void pinmux_adc0_in6_deinit(void)
+{
+    gpio_ana_deinit(PA02);
+}
+
+void pinmux_adc0_in7_init(void)
+{
+    pinmux_ana_func1_init(PA03);
+}
+
+void pinmux_adc0_in7_deinit(void)
+{
+    gpio_ana_deinit(PA03);
+}
+
+void pinmux_adc1_in0_init(void)
+{
+    pinmux_ana_func1_init(PC00);
+}
+
+void pinmux_adc1_in0_deinit(void)
+{
+    gpio_ana_deinit(PC00);
+}
+
+void pinmux_adc1_in1_init(void)
+{
+    pinmux_ana_func1_init(PC01);
+}
+
+void pinmux_adc1_in1_deinit(void)
+{
+    gpio_ana_deinit(PC01);
+}
+
+void pinmux_adc1_in2_init(void)
+{
+    pinmux_ana_func1_init(PC02);
+}
+
+void pinmux_adc1_in2_deinit(void)
+{
+    gpio_ana_deinit(PC02);
+}
+
+void pinmux_adc1_in3_init(void)
+{
+    pinmux_ana_func1_init(PC03);
+}
+
+void pinmux_adc1_in3_deinit(void)
+{
+    gpio_ana_deinit(PC03);
+}
+
+void pinmux_adc1_in4_init(void)
+{
+    pinmux_ana_func1_init(PA00);
+}
+
+void pinmux_adc1_in4_deinit(void)
+{
+    gpio_ana_deinit(PC04);
+}
+
+void pinmux_adc1_in5_init(void)
+{
+    pinmux_ana_func1_init(PA01);
+}
+
+void pinmux_adc1_in5_deinit(void)
+{
+    gpio_ana_deinit(PA01);
+}
+
+void pinmux_adc1_in6_init(void)
+{
+    pinmux_ana_func1_init(PA02);
+}
+
+void pinmux_adc1_in6_deinit(void)
+{
+    gpio_ana_deinit(PA02);
+}
+
+void pinmux_adc1_in7_init(void)
+{
+    pinmux_ana_func1_init(PA03);
+}
+
+void pinmux_adc1_in7_deinit(void)
+{
+    gpio_ana_deinit(PA03);
 }
 
 void pinmux_uart2_init(uint8_t txd,uint8_t rxd);
