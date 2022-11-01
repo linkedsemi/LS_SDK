@@ -984,6 +984,181 @@ void pinmux_ssi_dq3_deinit(void)
     set_gpio_mode((gpio_pin_t *)&ssi_dq3);
 }
 
+static void io_ae1_enable(uint8_t pin, uint8_t val)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    *PERI_BIT_BAND_ADDR(&SYSC_AWO->IO[x->port].AE, x->num + 16) = val;
+}
+
+void pinmux_touchkey_cmod_init()
+{
+    io_ae1_enable(PB03, 1);
+}
+
+void pinmux_touchkey_cmod_deinit()
+{
+    io_ae1_enable(PB03, 0);
+}
+
+void pinmux_touchkey_ch0_init()
+{
+    io_ae1_enable(PA08, 1);
+}
+
+void pinmux_touchkey_ch0_deinit()
+{
+    io_ae1_enable(PA08, 0);
+}
+
+void pinmux_touchkey_ch1_init()
+{
+    io_ae1_enable(PA09, 1);
+}
+
+void pinmux_touchkey_ch1_deinit()
+{
+    io_ae1_enable(PA09, 0);
+}
+
+void pinmux_touchkey_ch2_init()
+{
+    io_ae1_enable(PA10, 1);
+}
+
+void pinmux_touchkey_ch2_deinit()
+{
+    io_ae1_enable(PA10, 0);
+}
+
+void pinmux_touchkey_ch3_init()
+{
+    io_ae1_enable(PC11, 1);
+}
+
+void pinmux_touchkey_ch3_deinit()
+{
+    io_ae1_enable(PC11, 0);
+}
+
+void pinmux_touchkey_ch4_init()
+{
+    io_ae1_enable(PB04, 1);
+}
+
+void pinmux_touchkey_ch4_deinit()
+{
+    io_ae1_enable(PB04, 0);
+}
+
+void pinmux_touchkey_ch5_init()
+{
+    io_ae1_enable(PB05, 1);
+}
+
+void pinmux_touchkey_ch5_deinit()
+{
+    io_ae1_enable(PB05, 0);
+}
+
+void pinmux_touchkey_ch6_init()
+{
+    io_ae1_enable(PB06, 1);
+}
+
+void pinmux_touchkey_ch6_deinit()
+{
+    io_ae1_enable(PB06, 0);
+}
+
+void pinmux_touchkey_ch7_init()
+{
+    io_ae1_enable(PB07, 1);
+}
+
+void pinmux_touchkey_ch7_deinit()
+{
+    io_ae1_enable(PB07, 0);
+}
+
+void pinmux_touchkey_ch8_init()
+{
+    io_ae1_enable(PB08, 1);
+}
+
+void pinmux_touchkey_ch8_deinit()
+{
+    io_ae1_enable(PB08, 0);
+}
+
+void pinmux_touchkey_ch9_init()
+{
+    io_ae1_enable(PB09, 1);
+}
+
+void pinmux_touchkey_ch9_deinit()
+{
+    io_ae1_enable(PB09, 0);
+}
+
+void pinmux_touchkey_ch10_init()
+{
+    io_ae1_enable(PC06, 1);
+}
+
+void pinmux_touchkey_ch10_deinit()
+{
+    io_ae1_enable(PC06, 0);
+}
+
+void pinmux_touchkey_ch11_init()
+{
+    io_ae1_enable(PC07, 1);
+}
+
+void pinmux_touchkey_ch11_deinit()
+{
+    io_ae1_enable(PC07, 0);
+}
+
+void pinmux_touchkey_ch12_init()
+{
+    io_ae1_enable(PC08, 1);
+}
+
+void pinmux_touchkey_ch12_deinit()
+{
+    io_ae1_enable(PC08, 0);
+}
+
+void pinmux_touchkey_ch13_init()
+{
+    io_ae1_enable(PC09, 1);
+}
+
+void pinmux_touchkey_ch13_deinit()
+{
+    io_ae1_enable(PC09, 0);
+}
+
+void pinmux_touchkey_ch14_init()
+{
+    io_ae1_enable(PC12, 1);
+}
+
+void pinmux_touchkey_ch14_deinit()
+{
+    io_ae1_enable(PC12, 0);
+}
+
+void pinmux_touchkey_ch15_init()
+{
+    io_ae1_enable(PD02, 1);
+}
+
+void pinmux_touchkey_ch15_deinit()
+{
+    io_ae1_enable(PD02, 0);
+}
 
 void pinmux_uart2_init(uint8_t txd,uint8_t rxd);
 void pinmux_uart2_deinit(void);
