@@ -27,8 +27,9 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__data_start__ = .;
-		*(.data*)
+		*(.xip_banned.cpu_recover_asm)
 		*(.xip_banned*)
+		*(.data*)
 		__data_end__ = ALIGN(4);
 	}>RAM AT>FLASH
 
