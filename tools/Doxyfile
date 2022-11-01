@@ -15,6 +15,7 @@ INPUT                  = hal_driver/api/ls_hal_flash.h \
                          hal_driver/api/ls_hal_trng.h \
                          hal_driver/api/ls_hal_iwdg.h \
                          hal_driver/api/ls_hal_timer.h \
+                         hal_driver/api/ls_hal_touchkey.h \
                          hal_driver/api/ls_hal_pis.h \
                          hal_driver/api/ls_ll_i2c.h \
                          hal_driver/api/ls_ll_spi.h \

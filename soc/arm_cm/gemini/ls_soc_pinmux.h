@@ -589,7 +589,192 @@ void pinmux_pdm_data1_init(uint8_t pin);
   */
 void pinmux_pdm_data1_deinit(void);
 
+/**
+  * @brief       configure gpio pin as touchkey cmod
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_cmod_init();
 
+/**
+  * @brief disable pin mux function from touchkey cmod
+  */
+void pinmux_touchkey_cmod_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch0
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch0_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch0
+  */
+void pinmux_touchkey_ch0_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch1
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch1_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch1
+  */
+void pinmux_touchkey_ch1_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch2
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch2_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch2
+  */
+void pinmux_touchkey_ch2_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch3
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch3_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch3
+  */
+void pinmux_touchkey_ch3_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch4
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch4_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch4
+  */
+void pinmux_touchkey_ch4_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch5
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch5_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch5
+  */
+void pinmux_touchkey_ch5_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch6
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch6_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch6
+  */
+void pinmux_touchkey_ch6_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch7
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch7_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch7
+  */
+void pinmux_touchkey_ch7_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch8
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch8_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch8
+  */
+void pinmux_touchkey_ch8_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch9
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch9_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch9
+  */
+void pinmux_touchkey_ch9_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch10
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch10_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch10
+  */
+void pinmux_touchkey_ch10_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch11
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch11_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch11
+  */
+void pinmux_touchkey_ch11_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch12
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch12_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch12
+  */
+void pinmux_touchkey_ch12_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch13
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch13_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch13
+  */
+void pinmux_touchkey_ch13_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch14
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch14_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch14
+  */
+void pinmux_touchkey_ch14_deinit();
+
+/**
+  * @brief       configure gpio pin as touchkey ch15
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_touchkey_ch15_init();
+
+/**
+  * @brief disable pin mux function from touchkey ch15
+  */
+void pinmux_touchkey_ch15_deinit();
 
 
 
