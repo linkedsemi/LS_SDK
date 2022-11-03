@@ -13,8 +13,26 @@
 
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
+gpio_pin_t uart1_ctsn;
+gpio_pin_t uart1_rtsn;
+gpio_pin_t uart1_ck;
+
+gpio_pin_t uart2_txd;
+gpio_pin_t uart2_rxd;
+gpio_pin_t uart3_txd;
+gpio_pin_t uart3_rxd;
+gpio_pin_t uart4_txd;
+gpio_pin_t uart4_rxd;
+gpio_pin_t uart5_txd;
+gpio_pin_t uart5_rxd;
+
 gpio_pin_t iic1_scl;
 gpio_pin_t iic1_sda;
+gpio_pin_t iic2_scl;
+gpio_pin_t iic2_sda;
+gpio_pin_t iic3_sda;
+gpio_pin_t iic3_scl;
+
 static gpio_pin_t adtim1_ch1;
 static gpio_pin_t adtim1_ch1n;
 static gpio_pin_t adtim1_ch2;
@@ -24,20 +42,38 @@ static gpio_pin_t adtim1_ch3n;
 static gpio_pin_t adtim1_ch4;
 static gpio_pin_t adtim1_etr;
 static gpio_pin_t adtim1_bk;
+
+static gpio_pin_t adtim2_ch1;
+static gpio_pin_t adtim2_ch1n;
+static gpio_pin_t adtim2_ch2;
+static gpio_pin_t adtim2_ch2n;
+static gpio_pin_t adtim2_ch3;
+static gpio_pin_t adtim2_ch3n;
+static gpio_pin_t adtim2_ch4;
+static gpio_pin_t adtim2_etr;
+static gpio_pin_t adtim2_bk;
+
 static gpio_pin_t gptima1_ch1;
 static gpio_pin_t gptima1_ch2;
 static gpio_pin_t gptima1_ch3;
 static gpio_pin_t gptima1_ch4;
 static gpio_pin_t gptima1_etr;
+
 static gpio_pin_t gptimb1_ch1;
 static gpio_pin_t gptimb1_ch2;
 static gpio_pin_t gptimb1_ch3;
 static gpio_pin_t gptimb1_ch4;
 static gpio_pin_t gptimb1_etr;
+
 static gpio_pin_t gptimc1_ch1;
 static gpio_pin_t gptimc1_ch1n;
 static gpio_pin_t gptimc1_ch2;
 static gpio_pin_t gptimc1_bk;
+
+static gpio_pin_t pdm_clk;
+static gpio_pin_t pdm_data0;
+static gpio_pin_t pdm_data1;
+
 static gpio_pin_t spi2_clk;
 static gpio_pin_t spi2_nss;
 static gpio_pin_t spi2_mosi;
@@ -54,6 +90,14 @@ static gpio_pin_t ssi_dq0;
 static gpio_pin_t ssi_dq1;
 static gpio_pin_t ssi_dq2;
 static gpio_pin_t ssi_dq3;
+
+static gpio_pin_t bxcan_txd;
+static gpio_pin_t bxcan_rxd;
+static gpio_pin_t usb_dp;
+static gpio_pin_t usb_dm;
+static gpio_pin_t comp0_dat;
+static gpio_pin_t comp1_dat;
+static gpio_pin_t comp2_dat;
 
 __attribute__((weak)) void io_exti_callback(uint8_t pin,exti_edge_t edge){}
 
@@ -284,6 +328,19 @@ io_pull_type_t io_pull_read(uint8_t pin)
     return pull_down(x->port,x->num)|pull_up(x->port,x->num);
 }
 
+void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    MODIFY_REG(SYSC_AWO->IO[x->port].DS, SYSC_AWO_GPIOA_DS2_MASK << 2*x->num, drive << 2*x->num);
+}
+
+io_drive_type_t io_drive_capacity_read(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    io_drive_type_t drive = (io_drive_type_t)((SYSC_AWO->IO[x->port].DS >> 2 * x->num) & SYSC_AWO_GPIOA_DS2_MASK);
+    return drive;
+}
+
 static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
 {
     switch(edge)
@@ -439,6 +496,15 @@ static void uart_io_cfg(uint8_t txd,uint8_t rxd)
     io_cfg_input(rxd);
 }
 
+static void uart_7816_io_cfg(uint8_t txd,uint8_t ck)
+{
+    io_set_pin(txd);
+    io_set_pin(ck);
+    io_cfg_opendrain(txd);
+    io_cfg_output(txd);
+    io_cfg_output(ck);
+}
+
 static uint8_t pin2func_io(gpio_pin_t *x)
 {
     return x->port*16+x->num;
@@ -472,6 +538,8 @@ static void iic_io_cfg(uint8_t scl,uint8_t sda)
 {
     io_cfg_input(scl);
     io_cfg_input(sda);
+    io_pull_write(scl,IO_PULL_UP);
+    io_pull_write(sda,IO_PULL_UP);
 }
 
 void pinmux_iic1_init(uint8_t scl,uint8_t sda)
@@ -489,6 +557,63 @@ void pinmux_iic1_deinit(void)
     per_func_disable(pin2func_io((gpio_pin_t *)&iic1_sda));
 }
 
+void pinmux_iic2_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic2_scl = scl;
+    *(uint8_t *)&iic2_sda = sda;
+    iic_io_cfg(scl,sda);
+    per_func_enable(pin2func_io((gpio_pin_t *)&scl), IIC2_SCL);
+    per_func_enable(pin2func_io((gpio_pin_t *)&sda), IIC2_SDA);
+}
+
+void pinmux_iic2_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&iic2_scl));
+    per_func_disable(pin2func_io((gpio_pin_t *)&iic2_sda));
+}
+
+void pinmux_iic3_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic3_scl = scl;
+    *(uint8_t *)&iic3_sda = sda;
+    iic_io_cfg(scl,sda);
+    per_func_enable(pin2func_io((gpio_pin_t *)&scl), IIC3_SCL);
+    per_func_enable(pin2func_io((gpio_pin_t *)&sda), IIC3_SDA);
+}
+
+void pinmux_iic3_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&iic3_scl));
+    per_func_disable(pin2func_io((gpio_pin_t *)&iic3_sda));
+}
+
+void io_cfg_opendrain(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].IEN_OD |= 1<<x->num;
+}
+
+void io_cfg_pushpull(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].IEN_OD &=~(1<<x->num);
+}
+
+void pinmux_uart1_7816_init(uint8_t txd,uint8_t ck)
+{
+    *(uint8_t *)&uart1_txd = txd;
+    *(uint8_t *)&uart1_ck = ck;
+    uart_7816_io_cfg(txd,ck);
+    per_func_enable(pin2func_io((gpio_pin_t *)&txd),UART1_TXD);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ck),UART1_CK);
+}
+
+void pinmux_uart1_7816_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart1_txd));
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart1_ck));
+}
+
 void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
 {
     *(uint8_t *)&uart1_txd = txd;
@@ -502,6 +627,81 @@ void pinmux_uart1_deinit(void)
 {
     per_func_disable(pin2func_io((gpio_pin_t *)&uart1_txd));
     per_func_disable(pin2func_io((gpio_pin_t *)&uart1_rxd));
+}
+
+void pinmux_uart1_rts_cts_init(uint8_t rtsn,uint8_t ctsn)
+{
+    *(uint8_t *)&uart1_rtsn = rtsn;
+    *(uint8_t *)&uart1_ctsn = ctsn;
+    uart_io_cfg(rtsn,ctsn);
+    per_func_enable(pin2func_io((gpio_pin_t *)&rtsn),UART1_RTSN);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ctsn),UART1_CTSN);
+}
+
+void pinmux_uart1_rts_cts_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart1_rtsn));
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart1_ctsn));
+}
+
+void pinmux_uart2_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&uart2_txd = txd;
+    *(uint8_t *)&uart2_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_pin_t *)&txd),UART2_TXD);
+    per_func_enable(pin2func_io((gpio_pin_t *)&rxd),UART2_RXD);
+}
+
+void pinmux_uart2_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart2_txd));
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart2_rxd));
+}
+
+void pinmux_uart3_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&uart3_txd = txd;
+    *(uint8_t *)&uart3_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_pin_t *)&txd),UART3_TXD);
+    per_func_enable(pin2func_io((gpio_pin_t *)&rxd),UART3_RXD);
+}
+
+void pinmux_uart3_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart3_txd));
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart3_rxd));
+}
+
+void pinmux_uart4_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&uart4_txd = txd;
+    *(uint8_t *)&uart4_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_pin_t *)&txd),UART4_TXD);
+    per_func_enable(pin2func_io((gpio_pin_t *)&rxd),UART4_RXD);
+}
+
+void pinmux_uart4_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart4_txd));
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart4_rxd));
+}
+
+void pinmux_uart5_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&uart5_txd = txd;
+    *(uint8_t *)&uart5_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_pin_t *)&txd),UART5_TXD);
+    per_func_enable(pin2func_io((gpio_pin_t *)&rxd),UART5_RXD);
+}
+
+void pinmux_uart5_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart5_txd));
+    per_func_disable(pin2func_io((gpio_pin_t *)&uart5_rxd));
 }
 
 static void timer_ch_io_output_cfg(uint8_t pin,uint8_t default_val)
@@ -632,6 +832,115 @@ void pinmux_adtim1_bk_init(uint8_t pin)
 void pinmux_adtim1_bk_deinit(void)
 {
     set_gpio_mode((gpio_pin_t *)&adtim1_bk);
+}
+
+
+void pinmux_adtim2_ch1_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim2_ch1 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH1);
+}
+
+void pinmux_adtim2_ch1_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch1);
+}
+
+void pinmux_adtim2_ch2_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim2_ch2 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH2);
+}
+
+void pinmux_adtim2_ch2_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch2);
+}
+
+void pinmux_adtim2_ch3_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim2_ch3 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH3);
+}
+
+void pinmux_adtim2_ch3_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch3);
+}
+
+void pinmux_adtim2_ch4_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim2_ch4 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH4);
+}
+
+void pinmux_adtim2_ch4_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch4);
+}
+
+void pinmux_adtim2_ch1n_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_ch1n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&adtim2_ch1));
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH1N);
+}
+
+void pinmux_adtim2_ch1n_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch1n);
+}
+
+void pinmux_adtim2_ch2n_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_ch2n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&adtim2_ch2));
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH2N);
+}
+
+void pinmux_adtim2_ch2n_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch2n);
+}
+
+void pinmux_adtim2_ch3n_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim2_ch3n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&adtim2_ch3));
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_CH3N);
+}
+
+void pinmux_adtim2_ch3n_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_ch3n);
+}
+
+void pinmux_adtim2_etr_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim2_etr = pin;
+    io_cfg_input(pin);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_ETR);
+}
+
+void pinmux_adtim2_etr_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_etr);
+}
+
+void pinmux_adtim2_bk_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim2_bk = pin;
+    io_cfg_input(pin);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pin),ADTIM2_BK);
+}
+
+void pinmux_adtim2_bk_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim2_bk);
 }
 
 void pinmux_gptima1_ch1_init(uint8_t pin,bool output,uint8_t default_val)
@@ -803,10 +1112,45 @@ void pinmux_gptimc1_bk_deinit(void)
     set_gpio_mode((gpio_pin_t *)&gptimc1_bk);
 }
 
+void pinmux_pdm_clk_init(uint8_t pin)
+{
+    *(uint8_t *)&pdm_clk = pin;
+    io_cfg_output(pin);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pdm_clk), PDM_CLK);
+}
+
+void pinmux_pdm_clk_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&pdm_clk);
+}
+
+void pinmux_pdm_data0_init(uint8_t pin)
+{
+    *(uint8_t *)&pdm_data0 = pin;
+    io_cfg_input(pin);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pdm_data0), PDM_DATA0);
+}
+
+void pinmux_pdm_data0_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&pdm_data0);
+}
+
+void pinmux_pdm_data1_init(uint8_t pin)
+{
+    *(uint8_t *)&pdm_data1 = pin;
+    io_cfg_input(pin);
+    per_func_enable(pin2func_io((gpio_pin_t *)&pdm_data1), PDM_DATA1);
+}
+
+void pinmux_pdm_data1_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&pdm_data1);
+}
 
 ROM_SYMBOL void pinmux_hal_flash_init(void)
 {
-    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0xf);
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0xf); 
 }
 
 ROM_SYMBOL void pinmux_hal_flash_deinit(void)
@@ -816,7 +1160,7 @@ ROM_SYMBOL void pinmux_hal_flash_deinit(void)
 
 ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
 {
-    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x3f);
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x3f); 
 }
 
 ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
@@ -1461,6 +1805,86 @@ void pinmux_adc1_in7_init(void)
 void pinmux_adc1_in7_deinit(void)
 {
     gpio_ana_deinit(PA03);
+}
+
+void pinmux_bxcan_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&bxcan_txd = txd;
+    *(uint8_t *)&bxcan_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_pin_t *)&txd),BXCAN_TXD);
+    per_func_enable(pin2func_io((gpio_pin_t *)&rxd),BXCAN_RXD);
+}
+
+void pinmux_bxcan_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&bxcan_txd));
+    per_func_disable(pin2func_io((gpio_pin_t *)&bxcan_rxd));
+}
+
+static void usb_io_cfg(uint8_t dp,uint8_t dm)
+{
+    io_clr_pin(dp);
+    io_clr_pin(dm);
+    io_cfg_output(dp);
+    io_cfg_output(dm);
+}
+
+void pinmux_usb_init(uint8_t dp,uint8_t dm)
+{
+    *(uint8_t *)&usb_dp = dp;
+    *(uint8_t *)&usb_dm = dm;
+    usb_io_cfg(dp,dm);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dp),USB_DP);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dm),USB_DM);
+}
+
+void pinmux_usb_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&usb_dp));
+    per_func_disable(pin2func_io((gpio_pin_t *)&usb_dm));
+}
+
+static void  comp_io_cfg(uint8_t dat)
+{
+    io_clr_pin(dat);
+    io_cfg_output(dat);
+}
+
+void pinmux_comp0_init(uint8_t dat)
+{
+    *(uint8_t *)&comp0_dat = dat;
+    comp_io_cfg(dat);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dat),COMP0_DAT);
+}
+
+void pinmux_comp0_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&comp0_dat));
+}
+
+void pinmux_comp1_init(uint8_t dat)
+{
+    *(uint8_t *)&comp1_dat = dat;
+    comp_io_cfg(dat);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dat),COMP1_DAT);
+}
+
+void pinmux_comp1_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&comp1_dat));
+}
+
+void pinmux_comp2_init(uint8_t dat)
+{
+    *(uint8_t *)&comp2_dat = dat;
+    comp_io_cfg(dat);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dat),COMP2_DAT);
+}
+
+void pinmux_comp2_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&comp2_dat));
 }
 
 void pinmux_uart2_init(uint8_t txd,uint8_t rxd);
