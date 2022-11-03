@@ -84,10 +84,10 @@ static void spi_init(void)
   /* SSN-------------PB13 */	
   /* MOSI------------PB14 */	
   /* MISO------------PB15 */	
-	pinmux_spi2_clk_init(PB12);
-    pinmux_spi2_nss_init(PB13);
-    pinmux_spi2_mosi_init(PB14);
-    pinmux_spi2_miso_init(PB15);
+	  pinmux_spi2_master_clk_init(PB12);
+    pinmux_spi2_master_nss_init(PB13);
+    pinmux_spi2_master_mosi_init(PB14);
+    pinmux_spi2_master_miso_init(PB15);
 
   /* Set the SPI parameters */
   SpiHandle.Instance               = SPI2;

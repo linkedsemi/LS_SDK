@@ -139,56 +139,104 @@ void pinmux_hal_flash_quad_init(void){}
 
 void pinmux_hal_flash_quad_deinit(void){}
 
-static void spi_clk_io_cfg(uint8_t clk)
+static void spi_master_clk_io_cfg(uint8_t clk)
 {
     io_set_pin(clk);
     io_cfg_output(clk);
 }
 
-static void spi_nss_io_cfg(uint8_t nss)
+static void spi_master_nss_io_cfg(uint8_t nss)
 {
     io_set_pin(nss);
     io_pull_write(nss,IO_PULL_UP);
     io_cfg_output(nss);
 }
 
-static void spi_mosi_io_cfg(uint8_t mosi)
+static void spi_master_mosi_io_cfg(uint8_t mosi)
 {
     io_set_pin(mosi);
     io_cfg_output(mosi);
 }
 
-static void spi_miso_io_cfg(uint8_t miso)
+static void spi_master_miso_io_cfg(uint8_t miso)
 {
     io_cfg_input(miso);
 }
 
-void pinmux_spi2_clk_init(uint8_t clk)
+static void spi_slave_clk_io_cfg(uint8_t clk)
+{
+    io_cfg_input(clk);
+}
+
+static void spi_slave_nss_io_cfg(uint8_t nss)
+{
+    io_cfg_input(nss);
+}
+
+static void spi_slave_mosi_io_cfg(uint8_t mosi)
+{
+    io_cfg_input(mosi);
+}
+
+static void spi_slave_miso_io_cfg(uint8_t miso)
+{
+    io_set_pin(miso);
+    io_cfg_output(miso);
+}
+
+void pinmux_spi2_master_clk_init(uint8_t clk)
 {
     *(uint8_t *)&spi2_clk = clk;
-    spi_clk_io_cfg( clk);
+    spi_master_clk_io_cfg(clk);
     gpio_af_init((gpio_pin_t *)&clk,AF_SPI2_SCK);
 }
 
-void pinmux_spi2_nss_init(uint8_t nss)
+void pinmux_spi2_master_nss_init(uint8_t nss)
 {
     *(uint8_t *)&spi2_nss = nss;
-    spi_nss_io_cfg( nss);
+    spi_master_nss_io_cfg(nss);
     gpio_af_init((gpio_pin_t *)&nss,AF_SPI2_NSS);    
 }
 
-void pinmux_spi2_mosi_init(uint8_t mosi)
+void pinmux_spi2_master_mosi_init(uint8_t mosi)
 {
     *(uint8_t *)&spi2_mosi = mosi;
-    spi_mosi_io_cfg( mosi);
+    spi_master_mosi_io_cfg(mosi);
     gpio_af_init((gpio_pin_t *)&mosi,AF_SPI2_MOSI);
 }
 
-void pinmux_spi2_miso_init(uint8_t miso)
+void pinmux_spi2_master_miso_init(uint8_t miso)
 {
-
     *(uint8_t *)&spi2_miso = miso;
-    spi_miso_io_cfg( miso);
+    spi_master_miso_io_cfg(miso);
+    gpio_af_init((gpio_pin_t *)&miso,AF_SPI2_MISO); 
+}
+
+void pinmux_spi2_slave_clk_init(uint8_t clk)
+{
+    *(uint8_t *)&spi2_clk = clk;
+    spi_slave_clk_io_cfg(clk);
+    gpio_af_init((gpio_pin_t *)&clk,AF_SPI2_SCK);
+}
+
+void pinmux_spi2_slave_nss_init(uint8_t nss)
+{
+    *(uint8_t *)&spi2_nss = nss;
+    spi_slave_nss_io_cfg(nss);
+    gpio_af_init((gpio_pin_t *)&nss,AF_SPI2_NSS);    
+}
+
+void pinmux_spi2_slave_mosi_init(uint8_t mosi)
+{
+    *(uint8_t *)&spi2_mosi = mosi;
+    spi_slave_mosi_io_cfg(mosi);
+    gpio_af_init((gpio_pin_t *)&mosi,AF_SPI2_MOSI);
+}
+
+void pinmux_spi2_slave_miso_init(uint8_t miso)
+{
+    *(uint8_t *)&spi2_miso = miso;
+    spi_slave_miso_io_cfg(miso);
     gpio_af_init((gpio_pin_t *)&miso,AF_SPI2_MISO); 
 }
 
@@ -216,52 +264,49 @@ void pinmux_spi2_miso_deinit(void)
 void pinmux_ssi_clk_init(uint8_t clk)
 {
     *(uint8_t *)&ssi_clk = clk;
-    spi_clk_io_cfg(clk);
+    spi_master_clk_io_cfg(clk);
     gpio_af_init((gpio_pin_t *)&clk,AF_SPI1_SCK);
 }
 
 void pinmux_ssi_nss0_init(uint8_t nss0)
 {
     *(uint8_t *)&ssi_nss0 = nss0;
-    spi_nss_io_cfg(nss0);
+    spi_master_nss_io_cfg(nss0);
     gpio_af_init((gpio_pin_t *)&nss0,AF_SPI1_NSS0);
 }
 
 void pinmux_ssi_nss1_init(uint8_t nss1)
 {
     *(uint8_t *)&ssi_nss1 = nss1;
-    spi_nss_io_cfg(nss1);
+    spi_master_nss_io_cfg(nss1);
     gpio_af_init((gpio_pin_t *)&nss1,AF_SPI1_NSS0);    
 }
 
 void pinmux_ssi_dq0_init(uint8_t dq0)
 {
     *(uint8_t *)&ssi_dq0 = dq0;
-    spi_mosi_io_cfg(dq0);
+    spi_master_mosi_io_cfg(dq0);
     gpio_af_init((gpio_pin_t *)&dq0,AF_SPI1_DQ0);
 }
 
 void pinmux_ssi_dq1_init(uint8_t dq1)
 {
-
     *(uint8_t *)&ssi_dq1 = dq1;
-    spi_miso_io_cfg(dq1);
+    spi_master_miso_io_cfg(dq1);
     gpio_af_init((gpio_pin_t *)&dq1,AF_SPI1_DQ1); 
 }
 
 void pinmux_ssi_dq2_init(uint8_t dq2)
 {
-
     *(uint8_t *)&ssi_dq2 = dq2;
-    spi_miso_io_cfg(dq2);
+    spi_master_miso_io_cfg(dq2);
     gpio_af_init((gpio_pin_t *)&dq2,AF_SPI1_DQ2); 
 }
 
 void pinmux_ssi_dq3_init(uint8_t dq3)
 {
-
     *(uint8_t *)&ssi_dq3 = dq3;
-    spi_miso_io_cfg(dq3);
+    spi_master_miso_io_cfg(dq3);
     gpio_af_init((gpio_pin_t *)&dq3,AF_SPI1_DQ3); 
 }
 
@@ -360,10 +405,10 @@ void pinmux_uart1_7816_deinit()
 }
 static void i2c_io_cfg(uint8_t scl,uint8_t sda)
 {
-    io_set_pin(scl);
-    io_set_pin(sda);
-    io_cfg_output(scl);
-	io_cfg_output(sda);
+    io_cfg_input(scl);
+	io_cfg_input(sda);
+    io_pull_write(scl,IO_PULL_UP);
+    io_pull_write(sda,IO_PULL_UP);
 }
 void pinmux_iic1_init(uint8_t scl,uint8_t sda)
 {
