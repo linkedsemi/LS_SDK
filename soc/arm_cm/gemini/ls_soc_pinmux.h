@@ -67,28 +67,52 @@ void pinmux_ssi_dq2_init(uint8_t dq2);
 void pinmux_ssi_dq3_init(uint8_t dq3);
 
 /**
-  * @brief  Set pin mux function to spi2 clk
+  * @brief  Set pin mux function to spi2 master clk
   * @param  clk   Specific GPIO pin
   */
-void pinmux_spi2_clk_init(uint8_t clk);
+void pinmux_spi2_master_clk_init(uint8_t clk);
 
 /**
-  * @brief   Set pin mux function to spi2 nss
+  * @brief   Set pin mux function to spi2 master nss
   * @param  nss  Specific GPIO pin
   */
-void pinmux_spi2_nss_init(uint8_t nss);
+void pinmux_spi2_master_nss_init(uint8_t nss);
 
 /**
-  * @brief   Set pin mux function to spi2 mosi
+  * @brief   Set pin mux function to spi2 master mosi
   * @param  mosi   Specific GPIO pin
   */
-void pinmux_spi2_mosi_init(uint8_t mosi);
+void pinmux_spi2_master_mosi_init(uint8_t mosi);
 
 /**
-  * @brief    Set pin mux function to spi2 mosi
+  * @brief    Set pin mux function to spi2 master mosi
   * @param  miso   Specific GPIO pin
   */
-void pinmux_spi2_miso_init(uint8_t miso);
+void pinmux_spi2_master_miso_init(uint8_t miso);
+
+/**
+  * @brief  Set pin mux function to spi2 slave clk
+  * @param  clk   Specific GPIO pin
+  */
+void pinmux_spi2_slave_clk_init(uint8_t clk);
+
+/**
+  * @brief   Set pin mux function to spi2 slave nss
+  * @param  nss  Specific GPIO pin
+  */
+void pinmux_spi2_slave_nss_init(uint8_t nss);
+
+/**
+  * @brief   Set pin mux function to spi2 slave mosi
+  * @param  mosi   Specific GPIO pin
+  */
+void pinmux_spi2_slave_mosi_init(uint8_t mosi);
+
+/**
+  * @brief    Set pin mux function to spi2 slave mosi
+  * @param  miso   Specific GPIO pin
+  */
+void pinmux_spi2_slave_miso_init(uint8_t miso);
 
 /**
   * @brief  clear pin mux function of spi2_clk
@@ -111,6 +135,74 @@ void pinmux_spi2_mosi_deinit(void);
 void pinmux_spi2_miso_deinit(void);
 
 /**
+  * @brief  Set pin mux function to spi3 master clk
+  * @param  clk   Specific GPIO pin
+  */
+void pinmux_spi3_master_clk_init(uint8_t clk);
+
+/**
+  * @brief   Set pin mux function to spi3 master nss
+  * @param  nss  Specific GPIO pin
+  */
+void pinmux_spi3_master_nss_init(uint8_t nss);
+
+/**
+  * @brief   Set pin mux function to spi3 master mosi
+  * @param  mosi   Specific GPIO pin
+  */
+void pinmux_spi3_master_mosi_init(uint8_t mosi);
+
+/**
+  * @brief    Set pin mux function to spi3 master mosi
+  * @param  miso   Specific GPIO pin
+  */
+void pinmux_spi3_master_miso_init(uint8_t miso);
+
+/**
+  * @brief  Set pin mux function to spi3 slave clk
+  * @param  clk   Specific GPIO pin
+  */
+void pinmux_spi3_slave_clk_init(uint8_t clk);
+
+/**
+  * @brief   Set pin mux function to spi3 slave nss
+  * @param  nss  Specific GPIO pin
+  */
+void pinmux_spi3_slave_nss_init(uint8_t nss);
+
+/**
+  * @brief   Set pin mux function to spi3 slave mosi
+  * @param  mosi   Specific GPIO pin
+  */
+void pinmux_spi3_slave_mosi_init(uint8_t mosi);
+
+/**
+  * @brief    Set pin mux function to spi3 slave mosi
+  * @param  miso   Specific GPIO pin
+  */
+void pinmux_spi3_slave_miso_init(uint8_t miso);
+
+/**
+  * @brief  clear pin mux function of spi3_clk
+  */
+void pinmux_spi3_clk_deinit(void);
+
+/**
+  * @brief  clear pin mux functions of spi3_nss
+  */
+void pinmux_spi3_nss_deinit(void);
+
+/**
+  * @brief   clear pin mux function of spi3_mosi
+  */
+void pinmux_spi3_mosi_deinit(void);
+
+/**
+  * @brief   clear pin mux function of spi3_miso
+  */
+void pinmux_spi3_miso_deinit(void);
+
+/**
   * @brief       Set pin mux function as iic1_io_init
   * @param  scl  Specific GPIO pin 
   * @param  sda  Specific GPIO pin 
@@ -121,7 +213,6 @@ void pinmux_iic1_init(uint8_t scl,uint8_t sda);
   * @brief clean pin mux function  of iic1
   */
 void pinmux_iic1_deinit(void);
-
 
 /**
   * @brief         Set pin mux function as iic2_io_init
