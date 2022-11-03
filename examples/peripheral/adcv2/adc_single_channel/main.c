@@ -58,7 +58,7 @@ void ADC_InjMode_Channel_setCfg(void)
     sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_15CYCLES;
     sConfigInjected.InjectedOffset = 0;
     sConfigInjected.InjectedClk = ADC_CH_CLOCK_DIV8;
-    sConfigInjected.InjectedNbrOfConversion = ADC_CH_CLOCK_DIV8;
+    sConfigInjected.InjectedNbrOfConversion = 1;
     sConfigInjected.InjectedDiscontinuousConvMode = DISABLE;
     if (HAL_ADCEx_InjectedConfigChannel(&ADCx_Hdl, &sConfigInjected) != HAL_OK)
     {
