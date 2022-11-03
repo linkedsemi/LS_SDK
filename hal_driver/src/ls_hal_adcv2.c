@@ -281,7 +281,14 @@ static void HAL_ADC_Ch_cfg_Reg_SetConfig(reg_adc_t *ADCx, uint32_t Channel)
 {
     // ADC Channel Enable
     ADCx->CH_CFG |= 1<<Channel;
-    ADCx->CH_CFG |= 1<<16<<Channel;
+    if(Channel > ADC_CHANNEL_3 && Channel <= ADC_CHANNEL_7)
+    {
+        ADCx->CH_CFG |= 1<<16<<Channel;
+    }
+    else
+    {
+        ADCx->CH_CFG &=~(1<<16<<Channel);
+    }  
 }
 
 HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConfTypeDef *sConfig)
