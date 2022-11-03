@@ -13,7 +13,7 @@ void pinmux_hal_flash_init(void);
   * @brief DeInit SPI Flash IO
   */
 void pinmux_hal_flash_deinit(void);
-
+ 
 /**
   * @brief Init IO for QSPI Flash (CS CLK DQ0 DQ1 DQ2 DQ3)
   */
@@ -65,6 +65,41 @@ void pinmux_ssi_dq2_init(uint8_t dq2);
   * @param  dq3   Specific GPIO pin
   */
 void pinmux_ssi_dq3_init(uint8_t dq3);
+
+/**
+  * @brief    DeInit SSI Clk IO
+  */
+void pinmux_ssi_clk_deinit(void);
+
+/**
+  * @brief    DeInit SSI nss0 IO
+  */
+void pinmux_ssi_nss0_deinit(void);
+
+/**
+  * @brief    DeInit SSI nss1 IO
+  */
+void pinmux_ssi_nss1_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq0 IO
+  */
+void pinmux_ssi_dq0_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq1 IO
+  */
+void pinmux_ssi_dq1_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq2 IO
+  */
+void pinmux_ssi_dq2_deinit(void);
+
+/**
+  * @brief  DeInit SSI dq3 IO
+  */
+void pinmux_ssi_dq3_deinit(void);
 
 /**
   * @brief  Set pin mux function to spi2 master clk
@@ -225,7 +260,19 @@ void pinmux_iic2_init(uint8_t scl,uint8_t sda);
 /**
   * @brief clean pin mux function of iic2
   */
-void pinmux_iic2_deinit(void);
+void pinmux_iic2_deinit(void);  
+
+/**
+  * @brief         Set pin mux function as iic3_io_init
+  * @param  scl    Specific GPIO pin  
+  * @param  sda    Specific GPIO pin 
+  */
+void pinmux_iic3_init(uint8_t scl,uint8_t sda);
+
+/**
+  * @brief clean pin mux function of iic3
+  */
+void pinmux_iic3_deinit(void);   
 
 /**
   * @brief         Set pin mux function to uart1 (config of gpio)
@@ -240,11 +287,23 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd);
 void pinmux_uart1_deinit(void);
 
 /**
+ * @brief           set pin mux function to uart1_rts_cts
+ * @param    rtsn   Specific GPIO pin
+ * @param    ctsn   Specific GPIO pin
+ */
+void pinmux_uart1_rts_cts_init(uint8_t rtsn,uint8_t ctsn);
+
+/**
+ * @brief  clear  pin mux function of uart1_rts_cts
+ */
+void pinmux_uart1_rts_cts_deinit(void);
+
+/**
   * @brief          Set pin mux function to uart1_7816
-   * @param  txd    Specific GPIO pin  
+  * @param  txd    Specific GPIO pin  
   * @param   ck     Specific GPIO pin  
   */
-void pinmux_uart1_7816_init(uint8_t txd,uint8_t ck);
+void pinmux_uart1_7816_init(uint8_t txd,uint8_t ck); 
 
 /**
   * @brief clear pin mux function of uart1_7816
@@ -273,7 +332,31 @@ void pinmux_uart3_init(uint8_t txd,uint8_t rxd);
 /**
   * @brief clear  pin mux function of uart3
   */
-void pinmux_uart3_deinit(void);
+void pinmux_uart3_deinit(void);  
+
+/**
+  * @brief          Set pin mux function to uart4
+  * @param  txd     Specific GPIO pin  
+  * @param rxd      Specific GPIO pin  
+  */
+void pinmux_uart4_init(uint8_t txd,uint8_t rxd);    
+
+/**
+  * @brief clear  pin mux function of uart4
+  */
+void pinmux_uart4_deinit(void);      
+
+/**
+  * @brief       Set pin mux function to uart5
+  * @param  txd   Specific GPIO pin  
+  * @param rxd   Specific GPIO pin   
+  */
+void pinmux_uart5_init(uint8_t txd,uint8_t rxd);     
+
+/**
+  * @brief clear  pin mux function of uart5
+  */
+void pinmux_uart5_deinit(void);  
 
 /**
   * @brief Set pin mux function to adtim1 
@@ -382,6 +465,114 @@ void pinmux_adtim1_bk_init(uint8_t pin);
  @brief clear  mux function of pin adtim1_bk 
   */
 void pinmux_adtim1_bk_deinit(void);
+
+/**
+  * @brief Set pin mux function to adtim2 
+  * @param   pin Specific GPIO pin 
+  * @param  output config pin output status
+  * @param  default_val  config pin output high level or low level
+  */
+void pinmux_adtim2_ch1_init(uint8_t pin,bool output,uint8_t default_val);
+
+/**
+  * @brief clear  mux function of pin adtim2
+  */
+void pinmux_adtim2_ch1_deinit(void);
+
+/**
+  * @brief Set  mux function of pin adtmi2 of channel 2
+  * @param  pin Specific GPIO pin  
+  * @param  output config pin output status
+  * @param  default_val  config pin output high level or low level 
+  */
+void pinmux_adtim2_ch2_init(uint8_t pin,bool output,uint8_t default_val);
+
+/**
+  * @brief clear mux function of pin adtim2
+  */
+void pinmux_adtim2_ch2_deinit(void);
+
+/**
+  * @brief Set  mux function of pin adtmi2 of channel 3
+  * @param   pin Specific GPIO pin  
+  * @param  output config pin output status
+  * @param  default_val  config pin output high level or low level
+  */
+void pinmux_adtim2_ch3_init(uint8_t pin,bool output,uint8_t default_val);
+
+/**
+  * @brief Set pin mux function
+  */
+void pinmux_adtim2_ch3_deinit(void);
+
+/**
+  * @brief  Set  mux function of pin adtmi2 of channel 4
+  * @param   pin Specific GPIO pin 
+  * @param  output config pin output status
+  * @param  default_val  config pin output high level or low level
+  */
+void pinmux_adtim2_ch4_init(uint8_t pin,bool output,uint8_t default_val);
+
+/**
+  * @brief clear mux function of pin adtim2 of channel 4
+  */
+void pinmux_adtim2_ch4_deinit(void);
+
+/**
+  * @brief      Set mux function of pin adtim2  of ch1n as input and output
+  * @param  pin  Specific GPIO pin 
+  */
+void pinmux_adtim2_ch1n_init(uint8_t pin);
+
+/**
+  * @brief clear mux function of pin adtim2 of ch1n
+  */
+void pinmux_adtim2_ch1n_deinit(void);
+
+/**
+  * @brief           Set mux function of pin adtim2 of ch2n
+  * @param  pin      Specific GPIO pin 
+  */
+
+void pinmux_adtim2_ch2n_init(uint8_t pin);
+
+/**
+  * @brief          clear  mux function of pin adtim2 of ch2n
+  */
+void pinmux_adtim2_ch2n_deinit(void);
+
+/**
+    @brief          Set mux function of pin adtim2 of ch3n
+  * @param  pin     Specific GPIO pin 
+  */
+void pinmux_adtim2_ch3n_init(uint8_t pin);
+
+/**
+  @brief             clear mux function of pin adtim2 of ch3n
+  */
+void pinmux_adtim2_ch3n_deinit(void);
+
+/**
+    @brief           Set mux function of pin adtim2 of etr
+  * @param  pin      Specific GPIO pin 
+  */
+void pinmux_adtim2_etr_init(uint8_t pin);
+
+/**
+  @brief      clear mux function of pin adtim2 of etr
+  */
+void pinmux_adtim2_etr_deinit(void);
+
+/**
+    @brief           configure gpio pin as adtim2_bk
+  * @param  pin      Specific GPIO pin 
+  */
+void pinmux_adtim2_bk_init(uint8_t pin);
+
+/**
+ @brief clear  mux function of pin adtim2_bk 
+  */
+void pinmux_adtim2_bk_deinit(void);
 
 /**
   *  @brief Set mux function of pin gptima1 of channel 1
@@ -589,6 +780,30 @@ void pinmux_pdm_data1_init(uint8_t pin);
   * @brief disable pin mux function from pdm_data1
   */
 void pinmux_pdm_data1_deinit(void);
+
+/**
+ * @brief          Set pin mux function to bxcan (config of gpio)
+ * @param txd      Specific GPIO pin 
+ * @param rxd      Specific GPIO pin 
+ */
+void pinmux_bxcan_init(uint8_t txd,uint8_t rxd);
+
+/**
+ * @brief clear pin mux function of bxcan
+ */
+void pinmux_bxcan_deinit(void);
+
+/**
+ * @brief         Set pin mux function to usb
+ * @param dp      Specific GPIO pin 
+ * @param dm      Specific GPIO pin 
+ */
+void pinmux_usb_init(uint8_t dp,uint8_t dm);
+
+/**
+ * @brief clear pin mux function of usb
+ */
+void pinmux_usb_deinit(void);
 
 /**
   * @brief Set mux function of pin gadc0 of in0
@@ -920,4 +1135,36 @@ void pinmux_touchkey_ch15_init();
   */
 void pinmux_touchkey_ch15_deinit();
 
+/**
+ * @brief         set pin mux function to comp0
+ * @param dat     Specific GPIO pin
+ */
+void pinmux_comp0_init(uint8_t dat);
+
+/**
+ * @brief clear pin mux function of comp0
+ */
+void pinmux_comp0_deinit(void);
+
+/**
+ * @brief         set pin mux function to comp1
+ * @param dat     Specific GPIO pin
+ */
+void pinmux_comp1_init(uint8_t dat);
+
+/**
+ * @brief clear pin mux function of comp1
+ */
+void pinmux_comp1_deinit(void);
+
+/**
+ * @brief         set pin mux function to comp2
+ * @param dat     Specific GPIO pin
+ */
+void pinmux_comp2_init(uint8_t dat);
+
+/**
+ * @brief clear pin mux function of comp2
+ */
+void pinmux_comp2_deinit(void);
 #endif
