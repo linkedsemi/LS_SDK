@@ -21,7 +21,6 @@
  pinmux_hal_flash_init                       =0x000022c5 ;
  HAL_LSCRC_32bit_Reverse                     =0x00001e3d ;
  memset32                                    =0x00000107 ;
- HAL_LSSHA_MSP_DeInit                        =0x00002325 ;
  arm_cm_delay_asm                            =0x00002379 ;
  sec_boot                                    =0x200000ee ;
  lsqspiv2_stg_read_register                  =0x0000190d ;
@@ -38,7 +37,6 @@
  _hal_flash_erase_security_area               =0x00001431 ;
  _hal_flash_fast_read                         =0x00001ab1 ;
  _hal_flash_read_id                           =0x000013f5 ;
- HAL_LSSHA_SHA256                            =0x00001de5 ;
  _hal_flash_sector_erase                      =0x000013c5 ;
  _hal_flash_dual_page_program                 =0x0000138f ;
  _hal_flash_read_unique_id                    =0x00001af9 ;
@@ -53,9 +51,6 @@
  hal_flash_release_from_deep_power_down      =0x00001ae7 ;
  SVC_Handler_C                               =0x00001efd ;
  hal_flash_read_status_register_1            =0x000019d7 ;
- sha256_start                                =0x00001bcd ;
- sha_data_config                             =0x00001c69 ;
- sha_rslt_copy                               =0x00001c3d ;
  flash_dual_mode_only                        =0x20000144 ;
  do_hal_flash_prog_func                      =0x000019ba ;
  do_hal_flash_program_security_area_func     =0x000019be ;
