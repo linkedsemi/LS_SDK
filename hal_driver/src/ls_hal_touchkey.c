@@ -40,7 +40,7 @@ HAL_StatusTypeDef HAL_TOUCHKEY_StartScan(uint32_t cntresult[16])
         ;
     REG_FIELD_WR(LSTOUCHKEY->INTR_CLR, TOUCHKEY_INTR_END, 1);
     uint32_t sccfg = LSTOUCHKEY->TOUCHKEY_SCAN_CFG;
-    uint32_t *ptr = &LSTOUCHKEY->CH0_CNT;
+    uint32_t *ptr = (uint32_t *)&LSTOUCHKEY->CH0_CNT;
     for (uint8_t i = 0; i < 16; i++)
     {
         cntresult[i] = sccfg & CO_BIT(i + 12) ? *ptr : 0;
@@ -67,7 +67,7 @@ void HAL_TOUCHKEY_IRQHandler()
     {
         REG_FIELD_WR(LSTOUCHKEY->INTR_CLR, TOUCHKEY_INTR_END, 1);
         uint32_t sccfg = LSTOUCHKEY->TOUCHKEY_SCAN_CFG;
-        uint32_t *ptr = &LSTOUCHKEY->CH0_CNT;
+        uint32_t *ptr = (uint32_t *)&LSTOUCHKEY->CH0_CNT;
         uint32_t cntresult[16];
         for (uint8_t i = 0; i < 16; i++)
         {
