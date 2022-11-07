@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include "sys_stat.h"
 #include "reg_sysc_per_type.h"
+#include "dmac_config.h"
 
 static SPI_HandleTypeDef *spi_inst_env[2];
 
@@ -77,6 +78,32 @@ void HAL_SPI_MSP_Busy_Set(SPI_HandleTypeDef *inst)
 void HAL_SPI_MSP_Idle_Set(SPI_HandleTypeDef *inst)
 {
     spi_status_set(inst, 0);
+}
+
+uint8_t HAL_SPI_TX_DMA_Handshake_Get(SPI_HandleTypeDef *hspi)
+{
+    switch ((uint32_t)hspi->Instance)
+    {
+    case (uint32_t)SPI2:
+        return CH_SPI2_TX;
+        break;
+    case (uint32_t)SPI3:
+        return CH_SPI3_TX;
+        break;
+    }
+}
+
+uint8_t HAL_SPI_RX_DMA_Handshake_Get(SPI_HandleTypeDef *hspi)
+{
+    switch ((uint32_t)hspi->Instance)
+    {
+    case (uint32_t)SPI2:
+        return CH_SPI2_RX;
+        break;
+    case (uint32_t)SPI3:
+        return CH_SPI3_RX;
+        break;
+    }
 }
 
 __attribute__((weak)) void LL_SPI2_IRQHandler(){}

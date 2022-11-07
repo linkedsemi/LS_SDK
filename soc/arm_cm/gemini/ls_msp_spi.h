@@ -16,6 +16,9 @@ void HAL_SPI_MSP_Init(struct __SPI_HandleTypeDef *inst);
 void HAL_SPI_MSP_DeInit(struct __SPI_HandleTypeDef *inst);
 void HAL_SPI_MSP_Busy_Set(struct __SPI_HandleTypeDef *inst);
 void HAL_SPI_MSP_Idle_Set(struct __SPI_HandleTypeDef *inst);
+uint8_t HAL_SPI_TX_DMA_Handshake_Get(struct __SPI_HandleTypeDef *hspi);
+uint8_t HAL_SPI_RX_DMA_Handshake_Get(struct __SPI_HandleTypeDef *hspi);
+
 
 void LL_SPI2_MSP_Init(void);
 void LL_SPI2_MSP_DeInit(void);
