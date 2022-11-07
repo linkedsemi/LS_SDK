@@ -4,17 +4,17 @@
 
 void gpio_init(void)
 {
+    io_cfg_output(PB08);   //PB08 config output
+    io_write_pin(PB08,1);  //PB08 write low level
     io_cfg_output(PB09);   //PB09 config output
-    io_write_pin(PB09,0);  //PB09 write low level
-    io_cfg_output(PB10);   //PB10 config output
-    io_write_pin(PB10,1);  //PB10 write high level
+    io_write_pin(PB09,1);  //PB09 write high level
 }
  
 void exti_test(void)
 {
-    io_cfg_input(PB11);    //PB11 config input
-    io_pull_write(PB11, IO_PULL_UP);    //PB11 config pullup
-    io_exti_config(PB11,INT_EDGE_FALLING);    //PB11 interrupt falling edge
+    io_cfg_input(PB01);    //PB01 config input  pb07
+    io_pull_write(PB01, IO_PULL_UP);    //PB01 config pullup
+    io_exti_config(PB01,INT_EDGE_FALLING);    //PB01 interrupt falling edge
 }
 
 int main(void)
@@ -24,7 +24,7 @@ int main(void)
     exti_test();
     while (1)
     {
-        io_write_pin(PB09,io_read_pin(PB11));
+        io_write_pin(PB08,io_read_pin(PB01));
     }
 }
 
@@ -32,10 +32,10 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch (pin)
     {
-    case PB11:
+    case PB01:
         // do something
-        io_toggle_pin(PB10);  
-        io_exti_config(PB11,INT_EDGE_DISABLE);
+        io_toggle_pin(PB09);  
+        io_exti_config(PB01,INT_EDGE_DISABLE);
         break;
     default:
         break;
