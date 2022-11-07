@@ -1199,6 +1199,7 @@ static void spi_slave_clk_io_cfg(uint8_t clk)
 
 static void spi_slave_nss_io_cfg(uint8_t nss)
 {
+    io_pull_write(nss,IO_PULL_UP);
     io_cfg_input(nss);
 }
 

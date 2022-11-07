@@ -49,21 +49,7 @@ __attribute__((aligned(2))) uint8_t aRxBuffer[BUFFERSIZE];
 
 /* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);
-
-static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
-{
-  while (Length--)
-  {
-    if((*pBuff1) != *pBuff2)
-    {
-      return Length;
-    }
-    pBuff1++;
-    pBuff2++;
-  }
-
-  return 0;
-}
+static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length);
 
 
 static void spi_init(void)
@@ -73,10 +59,17 @@ static void spi_init(void)
   /* SSN-------------PB13 */	
   /* MOSI------------PB14 */	
   /* MISO------------PB15 */	
+	#ifdef 	MASTER_BOARD
 	  pinmux_spi2_master_clk_init(PB12);
     pinmux_spi2_master_nss_init(PB13);
     pinmux_spi2_master_mosi_init(PB14);
     pinmux_spi2_master_miso_init(PB15);
+  #else
+    pinmux_spi2_slave_clk_init(PB12);
+    pinmux_spi2_slave_nss_init(PB13);
+    pinmux_spi2_slave_mosi_init(PB14);
+    pinmux_spi2_slave_miso_init(PB15);
+  #endif
 
   /* Set the SPI parameters */
   SpiHandle.Instance               = SPI2;
@@ -103,13 +96,13 @@ static void spi_init(void)
 
 void LED_init(void)
 {
-    io_cfg_output(LED_IO);   //PB09 config output
-    io_write_pin(LED_IO,1);  //PB09 write high power
+    io_cfg_output(LED_IO);   //PA01 config output
+    io_write_pin(LED_IO,1);  //PBA01 write high power
 }
 void LED_flicker(void)
 {
     io_toggle_pin(LED_IO);
-	DELAY_US(500000);
+	  DELAY_US(500*1000);
 }
 
 /**
@@ -122,8 +115,8 @@ int main(void)
   /* system init app     */
     sys_init_none();
   /* init spi and GPIO   */
-  spi_init();
-  LED_init();
+    spi_init();
+    LED_init();
 
   uint16_t data_length = BUFFERSIZE;
   uint8_t mult_factor = 1;
@@ -132,40 +125,62 @@ int main(void)
     data_length >>= 1;
     mult_factor = sizeof(uint16_t);
   }
-//   switch(HAL_SPI_Transmit(&SpiHandle, (uint8_t*)aTxBuffer, data_length, 10000))
-//   switch(HAL_SPI_Receive(&SpiHandle, (uint8_t*)aRxBuffer, data_length, 10000))
-  switch(HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)aTxBuffer,(uint8_t*)aRxBuffer, data_length, 10000))
+  
+  for (uint8_t i = 0; i < 10; i++)
   {
-    case HAL_OK:
-      /* Compare the sent and received buffers */
-      if (Buffercmp((uint8_t *)aTxBuffer, (uint8_t *)aRxBuffer, data_length * mult_factor))
-      {
-        /* Transfer error in transmission process */
-        Error_Handler();
-      }
-      break;
+    // switch(HAL_SPI_Transmit(&SpiHandle, (uint8_t*)aTxBuffer, data_length, 10000))
+    // switch(HAL_SPI_Receive(&SpiHandle, (uint8_t*)aRxBuffer, data_length, 10000))
+    switch(HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*)aTxBuffer,(uint8_t*)aRxBuffer, data_length, 10000))
+    {
+      case HAL_OK:
+        /* Compare the sent and received buffers */
+        if (Buffercmp((uint8_t *)aTxBuffer, (uint8_t *)aRxBuffer, data_length * mult_factor))
+        {
+          /* Transfer error in transmission process */
+          Error_Handler();
+        }
+        break;
 
-    case HAL_TIMEOUT:
-    case HAL_ERROR:
-      /* Call Timeout Handler */
-      Error_Handler();
-      break;
-    default:
-      break;
+      case HAL_TIMEOUT:
+      case HAL_ERROR:
+        /* Call Timeout Handler */
+        Error_Handler();
+        break;
+      default:
+        break;
+    }
+    #ifdef 	MASTER_BOARD
+    DELAY_US(100*1000);
+    #endif
   }
 
   /* Infinite loop */
   while (1)
   {
-    LED_flicker();		
+    /* USER CODE */	
   }
+}
+
+static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
+{
+  while (Length--)
+  {
+    if((*pBuff1) != *pBuff2)
+    {
+      return Length;
+    }
+    pBuff1++;
+    pBuff2++;
+  }
+
+  return 0;
 }
 
 static void Error_Handler(void)
 {
   while (1)
   {
-		;
+		LED_flicker();
   }
 }
  

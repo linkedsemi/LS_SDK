@@ -10,6 +10,11 @@
 
 #define SPI_DEFAULT_TIMEOUT 100U
 
+#define SPI_TX_FIFO_DEPTH 16
+#define SPI_TX_FIFO_NOT_FULL(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_TXFLV) < SPI_TX_FIFO_DEPTH)
+#define SPI_RX_FIFO_NOT_EMPTY(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_RXFLV) > 0)
+
+
 /* Private macros ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -102,6 +107,7 @@ HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
     WRITE_REG(hspi->Instance->CR2, (((hspi->Init.NSS >> 16U) & SPI_CR2_SSOE_MASK) | hspi->Init.DataSize)); //???16
 
 	MODIFY_REG(hspi->Instance->CR1, SPI_CR1_SSM_MASK, hspi->Init.NSS);	
+  
 
 
 #if defined(SPI_I2SCFGR_I2SMOD)
@@ -238,6 +244,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
 {
   uint32_t tickstart = systick_get_value();
   HAL_StatusTypeDef errorcode = HAL_OK;
+  uint16_t initial_TxXferCount = Size;
   uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   uint32_t end_tick = tickstart + timeout;
   /* Check Direction parameter */
@@ -288,18 +295,17 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
   /* Transmit data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
-    if (hspi->Init.Mode == SPI_MODE_SLAVE) //|| (initial_TxXferCount == 0x01U))
+    if ((hspi->Init.Mode == SPI_MODE_SLAVE) || (initial_TxXferCount == 0x01U))
     {
       hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint16_t);
       hspi->TxXferCount--;
-    //   txallowed = 0U;
     }
     if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
         while (hspi->TxXferCount > 0U)
         {
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)))
+            if (SPI_TX_FIFO_NOT_FULL(hspi))
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
@@ -311,7 +317,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
     {
         while (hspi->TxXferCount > 0U)
         {
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+            if (SPI_TX_FIFO_NOT_FULL(hspi))
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
@@ -329,19 +335,17 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
   /* Transmit data in 8 Bit mode */
   else
   {
-    if (hspi->Init.Mode == SPI_MODE_SLAVE) //|| (initial_TxXferCount == 0x01U))
-    // if(hspi->TxXferCount >0)
+    if ((hspi->Init.Mode == SPI_MODE_SLAVE) || (initial_TxXferCount == 0x01U))
     {
       *((uint8_t *)&hspi->Instance->DR) = *((uint8_t *)hspi->pTxBuffPtr);
       hspi->pTxBuffPtr += sizeof(uint8_t);
       hspi->TxXferCount--;
-    //   txallowed = 0U;
     }
     if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
         while (hspi->TxXferCount > 0U)
         {
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+            if (SPI_TX_FIFO_NOT_FULL(hspi))
             {
                 *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint8_t);
@@ -353,7 +357,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
     {
         while (hspi->TxXferCount > 0U)
         {
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+            if (SPI_TX_FIFO_NOT_FULL(hspi))
             {
                 *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint8_t);
@@ -463,24 +467,66 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
     {
         while (hspi->RxXferCount > 0U)
         {
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            #ifdef LE501X
+            if (SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0U)
+            {
+                /* Receive data in packing Bit mode */
+                if (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) > 1U)
+                {
+                    *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+                    hspi->pRxBuffPtr += sizeof(uint16_t);
+                    hspi->RxXferCount -= sizeof(uint16_t);
+                }
+
+                /* Receive data in 8 Bit mode */
+                if (hspi->RxXferCount == 1U)
+                {
+                    *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+                    hspi->pRxBuffPtr++;
+                    hspi->RxXferCount--;
+                }
+            }
+            #else
+            if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount > 0U))
             {
                 *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint8_t);
                 hspi->RxXferCount--;
             }
+            #endif
         }
     }
     else
     {
         while (hspi->RxXferCount > 0U)
         {
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            #ifdef LE501X
+            if (SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0U)
+            {
+                /* Receive data in packing Bit mode */
+                if (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) > 1U)
+                {
+                    *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+                    hspi->pRxBuffPtr += sizeof(uint16_t);
+                    hspi->RxXferCount -= sizeof(uint16_t);
+                }
+
+                /* Receive data in 8 Bit mode */
+                if (hspi->RxXferCount == 1U)
+                {
+                    *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+                    hspi->pRxBuffPtr++;
+                    hspi->RxXferCount--;
+                }
+            }
+            #else
+            if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount > 0U))
             {
                 *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint8_t);
                 hspi->RxXferCount--;
             }
+            #endif
 
             if (time_diff(systick_get_value(), end_tick) > 0)
             {
@@ -496,7 +542,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
     {
         while (hspi->RxXferCount > 0U)
         {
-            while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            if (SPI_RX_FIFO_NOT_EMPTY(hspi))
             {
                 *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint16_t);
@@ -508,7 +554,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
     {
         while (hspi->RxXferCount > 0U)
         {
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            if (SPI_RX_FIFO_NOT_EMPTY(hspi))
             {
                 *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint16_t);
@@ -624,15 +670,16 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     }
     if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-        while (hspi->RxXferCount > 0U)
+        while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
         {
-            while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount > 0U))
             {
                 *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint16_t);
                 hspi->RxXferCount--;
             }
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+
+            if (SPI_TX_FIFO_NOT_FULL(hspi) && (hspi->TxXferCount > 0U))
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
@@ -643,16 +690,16 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     }
     else // SPI_MODE_SLAVE
     {
-        while (hspi->RxXferCount > 0U)
+        while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
         {
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+            if (SPI_TX_FIFO_NOT_FULL(hspi) && (hspi->TxXferCount > 0U))
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
                 hspi->TxXferCount--;
             }
 
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount > 0U))
             {
                 *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint16_t);
@@ -679,39 +726,82 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     
     if (hspi->Init.Mode == SPI_MODE_MASTER)
     {
-        while (hspi->RxXferCount > 0U)
+        while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
         {
-            while (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            if (SPI_TX_FIFO_NOT_FULL(hspi) && (hspi->TxXferCount > 0U))
+            {
+               *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
+                hspi->pTxBuffPtr += sizeof(uint8_t);
+                hspi->TxXferCount--;
+            }
+
+            #ifdef LE501X
+            if (SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0U)
+            {
+                /* Receive data in packing Bit mode */
+                if (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) > 1U)
+                {
+                    *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+                    hspi->pRxBuffPtr += sizeof(uint16_t);
+                    hspi->RxXferCount -= sizeof(uint16_t);
+                }
+
+                /* Receive data in 8 Bit mode */
+                if (hspi->RxXferCount == 1U)
+                {
+                    *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+                    hspi->pRxBuffPtr++;
+                    hspi->RxXferCount--;
+                }
+            }
+            #else
+            if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount > 0U))
             {
                 *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint8_t);
                 hspi->RxXferCount--;
             }
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
-            {
-                *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
-                hspi->pTxBuffPtr += sizeof(uint8_t);
-                hspi->TxXferCount--;
-            }
+            #endif
         }
     }
     else // SPI_MODE_SLAVE
     {
-        while (hspi->RxXferCount > 0U)
+        while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
         {
-            if ((__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) && (hspi->TxXferCount > 0U))
+            if (SPI_TX_FIFO_NOT_FULL(hspi) && (hspi->TxXferCount > 0U))
             {
                 *(( uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint8_t);
                 hspi->TxXferCount--;
             }
 
-            if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE))
+            #ifdef LE501X
+            if (SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0U)
+            {
+                /* Receive data in packing Bit mode */
+                if (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) > 1U)
+                {
+                    *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+                    hspi->pRxBuffPtr += sizeof(uint16_t);
+                    hspi->RxXferCount -= sizeof(uint16_t);
+                }
+
+                /* Receive data in 8 Bit mode */
+                if (hspi->RxXferCount == 1U)
+                {
+                    *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+                    hspi->pRxBuffPtr++;
+                    hspi->RxXferCount--;
+                }
+            }
+            #else
+            if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount > 0U))
             {
                 *((uint8_t *)hspi->pRxBuffPtr) = (uint8_t)hspi->Instance->DR;
                 hspi->pRxBuffPtr += sizeof(uint8_t);
                 hspi->RxXferCount--;
             }
+            #endif
 
             if (time_diff(systick_get_value(), end_tick) > 0)
             {
@@ -813,6 +903,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
     __HAL_SPI_ENABLE(hspi);
   }
 	
+  #ifdef LE501X
   /* Transmit and Receive data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
@@ -820,6 +911,8 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
         hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+        hspi->pRxBuffPtr += sizeof(uint16_t);
+        hspi->RxXferCount--;
 			}
 
   }
@@ -829,12 +922,13 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
       /* Check TXE flag */
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
-         hspi->TxXferCount--;
         *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+        hspi->TxXferCount--;
         hspi->pTxBuffPtr++;
 	   }
   }
-	
+  #endif
+
 error :
   __HAL_UNLOCK(hspi);
   return errorcode;
@@ -1002,6 +1096,8 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *p
     /* Enable SPI peripheral */
     __HAL_SPI_ENABLE(hspi);
   }
+
+  #ifdef LE501X
   /* Transmit and Receive data in 16 Bit mode */
   if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
   {
@@ -1009,6 +1105,8 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *p
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
         hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+        hspi->pRxBuffPtr += sizeof(uint16_t);
+        hspi->RxXferCount--;
 			}
 
   }
@@ -1018,10 +1116,13 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *p
       /* Check TXE flag */
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
-         hspi->TxXferCount--;
         *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
-			}
+        hspi->TxXferCount--;
+        hspi->pTxBuffPtr++;
+	    }
   }
+  #endif
+
 error :
   /* Process Unlocked */
   __HAL_UNLOCK(hspi);
@@ -1207,10 +1308,34 @@ uint32_t HAL_SPI_GetError(SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  /* Receive data in 8bit mode */
-  *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
-  hspi->pRxBuffPtr++;
-  hspi->RxXferCount--;
+  #ifdef LE501X
+    while(SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0U)
+    {
+      /* Receive data in packing Bit mode */
+      if (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) > 1U)
+      {
+        *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+        hspi->pRxBuffPtr += sizeof(uint16_t);
+        hspi->RxXferCount -=sizeof(uint16_t);
+      }
+
+      /* Receive data in 8 Bit mode */
+     if ((hspi->RxXferCount == 1U) && (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) == 1U))
+      {
+        *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+        hspi->pRxBuffPtr++;
+        hspi->RxXferCount--;
+      }
+    }
+  #else
+    /* Receive data in 8bit mode */
+    while (SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0)
+    {
+      *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+      hspi->pRxBuffPtr++;
+      hspi->RxXferCount--;
+    }
+  #endif
 
   /* Check end of the reception */
   if (hspi->RxXferCount == 0U)
@@ -1234,12 +1359,15 @@ static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesTxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
- hspi->pTxBuffPtr++;
   /* Check the end of the transmission */
   if (hspi->TxXferCount != 0U)
   {
-			 hspi->TxXferCount--;
-			*(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+		while(SPI_TX_FIFO_NOT_FULL(hspi) && hspi->TxXferCount > 0)
+    {
+      *(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+      hspi->pTxBuffPtr++;
+      hspi->TxXferCount--;
+    }
   }
   else
 	{
@@ -1261,9 +1389,12 @@ static void SPI_2linesTxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 static void SPI_2linesRxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
   /* Receive data in 16 Bit mode */
-  *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
-  hspi->pRxBuffPtr += sizeof(uint16_t);
-  hspi->RxXferCount-= sizeof(uint16_t);
+  while(SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0)
+  {
+    *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+    hspi->pRxBuffPtr += sizeof(uint16_t);
+    hspi->RxXferCount--;
+  }
 
   if (hspi->RxXferCount == 0U)
   {
@@ -1286,12 +1417,15 @@ static void SPI_2linesRxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  hspi->TxXferCount-=sizeof(uint16_t);	
-  /* Enable CRC Transmission */
+  /* Check the end of the transmission */
   if (hspi->TxXferCount != 0U)
   {
-		hspi->pTxBuffPtr += sizeof(uint16_t);
-		hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+    while(SPI_TX_FIFO_NOT_FULL(hspi) && hspi->TxXferCount > 0)
+    {
+      hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+      hspi->pTxBuffPtr += sizeof(uint16_t);
+      hspi->TxXferCount--;
+    }
   }
 	else
 	{
@@ -1312,10 +1446,36 @@ static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_RxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  *hspi->pRxBuffPtr = (*(uint8_t *)&hspi->Instance->DR);
-  hspi->pRxBuffPtr++;
-  hspi->RxXferCount--;
+  #ifdef LE501X
+    while(SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0U)
+    {
+      /* Receive data in packing Bit mode */
+      if (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) > 1U)
+      {
+        *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+        hspi->pRxBuffPtr += sizeof(uint16_t);
+        hspi->RxXferCount -=sizeof(uint16_t);
+      }
 
+      /* Receive data in 8 Bit mode */
+     if ((hspi->RxXferCount == 1U) && (REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV) == 1U))
+      {
+        *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+        hspi->pRxBuffPtr++;
+        hspi->RxXferCount--;
+      }
+    }
+  #else
+    /* Receive data in 8bit mode */
+    while(SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0)
+    {
+      *hspi->pRxBuffPtr = *((uint8_t *)&hspi->Instance->DR);
+      hspi->pRxBuffPtr++;
+      hspi->RxXferCount--;
+    }
+  #endif
+
+  /* Check end of the reception */
   if (hspi->RxXferCount == 0U)
   {
     SPI_CloseRx_ISR(hspi);
@@ -1330,9 +1490,13 @@ static void SPI_RxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
-  hspi->pRxBuffPtr += sizeof(uint16_t);
-  hspi->RxXferCount-=sizeof(uint16_t);
+  /* Receive data in 16bit mode */
+  while(SPI_RX_FIFO_NOT_EMPTY(hspi) && hspi->RxXferCount > 0)
+  {
+    *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
+    hspi->pRxBuffPtr += sizeof(uint16_t);
+    hspi->RxXferCount--;
+  }
 
   if (hspi->RxXferCount == 0U)
   {
@@ -1349,10 +1513,13 @@ static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
   if (hspi->TxXferCount != 0U)
-  {
-    *(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
-    hspi->pTxBuffPtr++;
-    hspi->TxXferCount--;
+  {    
+    while(SPI_TX_FIFO_NOT_FULL(hspi) && hspi->TxXferCount > 0)
+    {
+      *(uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+      hspi->pTxBuffPtr++;
+      hspi->TxXferCount--;
+    }
   }
   else
   {
@@ -1368,12 +1535,15 @@ static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_TxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
-  /* Transmit data in 16 Bit mode */
-   hspi->TxXferCount-= sizeof(uint16_t);
+   /* Transmit data in 16 Bit mode */
    if (hspi->TxXferCount != 0U)
-   {
-     hspi->pTxBuffPtr += sizeof(uint16_t);
-     hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+   {    
+      while(SPI_TX_FIFO_NOT_FULL(hspi) && hspi->TxXferCount > 0)
+      {
+        hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
+        hspi->pTxBuffPtr += sizeof(uint16_t);
+        hspi->RxXferCount--;
+      }
    }
    else
    {
@@ -1456,7 +1626,7 @@ static void SPI_CloseRxTx_ISR(SPI_HandleTypeDef *hspi)
   /* Disable ERR interrupt */
   __HAL_SPI_DISABLE_IT(hspi, SPI_IT_ERR);
 
-  /* Wait until TXE flag is set */
+  /* Wait until TX FIFO is full */
   do
   {
     if (count == 0U)
@@ -1465,7 +1635,7 @@ static void SPI_CloseRxTx_ISR(SPI_HandleTypeDef *hspi)
       break;
     }
     count--;
-  } while ((hspi->Instance->SR & SPI_FLAG_TXE) == RESET);
+  } while(!SPI_TX_FIFO_NOT_FULL(hspi));
 
   /* Check the end of the transaction */
   if (SPI_EndRxTxTransaction(hspi, SPI_DEFAULT_TIMEOUT * (SPI_CLOCK / 24U / 1000U), tickstart) != HAL_OK)
@@ -1551,7 +1721,7 @@ static void SPI_CloseTx_ISR(SPI_HandleTypeDef *hspi)
   /* Init tickstart for timeout management*/
   tickstart = systick_get_value();
 
-  /* Wait until TXE flag is set */
+  /* Wait until TX FIFO is full */
   do
   {
     if (count == 0U)
@@ -1560,7 +1730,7 @@ static void SPI_CloseTx_ISR(SPI_HandleTypeDef *hspi)
       break;
     }
     count--;
-  } while ((hspi->Instance->SR & SPI_FLAG_TXE) == RESET);
+  } while(!SPI_TX_FIFO_NOT_FULL(hspi));
 
   /* Disable TXE and ERR interrupt */
   __HAL_SPI_DISABLE_IT(hspi, (SPI_IT_TXE | SPI_IT_ERR));

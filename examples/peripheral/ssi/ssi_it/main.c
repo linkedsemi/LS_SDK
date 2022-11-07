@@ -48,8 +48,8 @@ void HAL_SSI_TxRxCpltCallback(SSI_HandleTypeDef *hssi)
 
 static void ssi_test_init(void)
 {
-    pinmux_ssi_clk_init(PB09);		/* CLK-------------PB09 */	
-	pinmux_ssi_nss0_init(PB08);	/* SSN-------------PB08 */	
+  pinmux_ssi_clk_init(PB09);		/* CLK-------------PB09 */	
+	pinmux_ssi_nss0_init(PB08);	  /* SSN-------------PB08 */	
 	pinmux_ssi_dq0_init(PA07);		/* MOSI------------PA07 */	
 	pinmux_ssi_dq1_init(PA00);		/* MISO------------PA00 */	
 	
@@ -69,7 +69,7 @@ static void ssi_test_init(void)
 
 int main(void)
 {
-	sys_init_none();
+	  sys_init_none();
     ssi_test_init();
 
       /* While the SPI in TransmitReceive process, user can transmit data through 
