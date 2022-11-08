@@ -1,5 +1,5 @@
-#ifndef REG_ADC_TYPE_H_
-#define REG_ADC_TYPE_H_
+#ifndef REG_ADCV2_TYPE_H_
+#define REG_ADCV2_TYPE_H_
 #include <stdint.h>
 
 typedef struct
@@ -301,7 +301,6 @@ enum ADC_REG_MISC_CTRL_FIELD
 {
     ADC_ADC_DIV_MASK = (int)0x1ff0000,
     ADC_ADC_DIV_POS = 16,
-    ADC_DMA_INJ_EN_MASK = (int)0x4000,
     ADC_DMA_EN_MASK = (int)0x1000,
     ADC_DMA_EN_POS = 12,
     ADC_DATA_ALIGN_MASK = (int)0x100,

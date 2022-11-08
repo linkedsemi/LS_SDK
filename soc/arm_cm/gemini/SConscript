@@ -62,7 +62,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
         'src/ls_hal_flash_svcall.c',
-        # 'src/ls_hal_adc_dma.c',
+        'src/ls_hal_adcv2_dma.c',
         # 'src/calc_div.c',
         'src/ls_hal_dmacv2.c',
         'src/ls_hal_adcv2.c',

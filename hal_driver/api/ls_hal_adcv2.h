@@ -1,5 +1,5 @@
-#ifndef LS_HAL_ADC_H_
-#define LS_HAL_ADC_H_
+#ifndef LS_HAL_ADCV2_H_
+#define LS_HAL_ADCV2_H_
 #include <stdbool.h>
 #include "HAL_def.h"
 #include "ls_msp_adc.h"
@@ -502,6 +502,25 @@ void HAL_ADCx_LoopConvCpltCallback(ADC_HandleTypeDef* hadc);
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_ADC_AnalogWDGConfig(ADC_HandleTypeDef* hadc, ADC_AnalogWDGConfTypeDef* AnalogWDGConfig);
+
+/**
+  * @brief  Enables ADC, starts conversion of regular group and transfers result through DMA.
+  * @param  hadc: ADC handle
+  * @param  pData: The destination Buffer address.
+  * @param  Length: The length of data to be transferred from ADC peripheral to memory.
+  * @param  Callback: function pointer.
+  * @retval HAL status.
+  */
+HAL_StatusTypeDef HAL_ADC_LoopChannel_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)(ADC_HandleTypeDef* hadc));
+
+ /**
+  * @brief  Stop ADC conversion of regular group (and injected group in 
+  *         case of auto_injection mode), disable ADC DMA transfer, disable 
+  *         ADC peripheral.
+  * @param  hadc: ADC handle
+  * @retval HAL status.
+  */
+HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc);
 
 /** @}*/
 
