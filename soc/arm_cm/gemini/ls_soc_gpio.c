@@ -205,6 +205,7 @@ void io_init(void)
     SYSC_AWO->IO[2].OE_DOT = 0;
     SYSC_AWO->IO[3].IEN_OD = 0x03ff0000;
     SYSC_AWO->IO[3].OE_DOT = 0;
+    SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_SET_EXTI_MASK;
     arm_cm_set_int_isr(EXTI_ASYNC_IRQn,V33_EXTI_Async_Handler);
     arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
     __NVIC_ClearPendingIRQ(EXTI_ASYNC_IRQn);
