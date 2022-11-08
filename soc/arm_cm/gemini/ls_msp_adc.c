@@ -39,6 +39,9 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
         __NVIC_ClearPendingIRQ(ADC1_IRQn);
         __NVIC_EnableIRQ(ADC1_IRQn);
         break;
+    default:
+        LS_ASSERT(0);
+        break;
     }
 }
 
@@ -54,6 +57,9 @@ void HAL_ADC_MSP_DeInit(ADC_HandleTypeDef *inst)
         SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_ADC1_MASK;
         NVIC_DisableIRQ(ADC1_IRQn);
         break;
+    default:
+        LS_ASSERT(0);
+        break;
     }
 }
 
@@ -66,6 +72,9 @@ static void adc_status_set(ADC_HandleTypeDef *inst, bool status)
         break;
     case (uint32_t)LSADC2:
         adc2_status_set(false);
+        break;
+    default:
+        LS_ASSERT(0);
         break;
     }
 }
@@ -90,4 +99,22 @@ void adc_channel_vbat_enable(void)
 void adc_channel_vbat_disable(void)
 {
     REG_FIELD_WR(V33_RG->ANA_PMU_CTRL, V33_RG_BAT_DET_EN, 0);
+}
+
+uint8_t HAL_ADC_DMA_Handshake_Get(ADC_HandleTypeDef *inst)
+{
+    uint8_t handshake = 0;
+    switch((uint32_t)inst->Instance)
+    {
+    case (uint32_t)LSADC:
+        handshake = CH_ADC0;
+        break;
+    case (uint32_t)LSADC2:
+        handshake = CH_ADC1;
+        break;
+    default:
+        LS_ASSERT(0);
+        break;
+    }
+    return handshake;
 }

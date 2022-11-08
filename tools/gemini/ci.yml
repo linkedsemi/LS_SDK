@@ -431,3 +431,15 @@ gemini_adc_analog_wdg_keil_build:
   script:
     - cd examples/peripheral/adcv2/adc_analog_wdg/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_analog_wdg.uvprojx -o UVBuild/build.txt -j0
 
+gemini_adc_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel_dma && scons ic=gemini
+
+gemini_adc_dma_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_multi_channel_dma.uvprojx -o UVBuild/build.txt -j0
+
