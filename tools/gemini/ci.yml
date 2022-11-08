@@ -119,18 +119,6 @@ gemini_ll_i2c_it_keil_build:
   script:
     - cd examples/peripheral/i2c/ll_i2c_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_it.uvprojx -o UVBuild/build.txt -j0
 
-gemini_i2c_mem_polling_build:
-  stage: build
-  script:
-    - cd examples/peripheral/i2c/i2c_mem_polling && scons ic=gemini
-
-gemini_i2c_mem_polling_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/i2c/i2c_mem_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_mem_polling.uvprojx -o UVBuild/build.txt -j0
-
 gemini_i2c_polling_build:
   stage: build
   script:

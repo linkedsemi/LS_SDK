@@ -124,10 +124,10 @@ typedef struct __I2C_HandleTypeDef
 
   uint16_t                  XferCount;       /*!< I2C transfer counter                     */
 
-  uint32_t                  XferOptions;     /*!< I2C transfer options                     */
+  // uint32_t                  XferOptions;     /*!< I2C transfer options                     */
 
-  uint32_t                  PreviousState;  /*!< I2C communication Previous state and mode
-                                                  context for internal usage               */
+  // uint32_t                  PreviousState;  /*!< I2C communication Previous state and mode
+                                                  // context for internal usage               */
   void                          *DMAC_Instance;
   union{
         struct I2cDMAEnv DMA;
@@ -182,7 +182,7 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c);
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
   */
-HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size, uint32_t Timeout);
 /**
   ****************************************************************************************
   * @brief  Receives in master mode an amount of data in blocking mode.(Blocking mode: Polling)
@@ -196,7 +196,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
   */
-HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size, uint32_t Timeout);
 /**
   * @brief  Transmits in slave mode an amount of data in blocking mode.
   * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
@@ -206,7 +206,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size, uint32_t Timeout);
 /**
   * @brief  Receive in slave mode an amount of data in blocking mode
   * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
@@ -216,55 +216,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-
-/**
-  ****************************************************************************************
-  * @brief  Write an amount of data in blocking mode to a specific memory address
-  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
-  *                the configuration information for the specified I2C.
-  * @param  DevAddress Target device address: The device 7 bits address value
-  *         in datasheet must be shifted to the left before calling the interface
-  * @param  MemAddress Internal memory address
-  * @param  MemAddSize Size of internal memory address
-  * @param  pData Pointer to data buffer
-  * @param  Size Amount of data to be sent
-  * @param  Timeout Timeout duration
-  * @retval HAL status
-  ****************************************************************************************
-  */
-HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-
-/**
-  ****************************************************************************************
-  * @brief  Read an amount of data in blocking mode from a specific memory address
-  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
-  *                the configuration information for the specified I2C.
-  * @param  DevAddress Target device address: The device 7 bits address value
-  *         in datasheet must be shifted to the left before calling the interface
-  * @param  MemAddress Internal memory address
-  * @param  MemAddSize Size of internal memory address
-  * @param  pData Pointer to data buffer
-  * @param  Size Amount of data to be sent
-  * @param  Timeout Timeout duration
-  * @retval HAL status
-  ****************************************************************************************
-  */
-HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-/**
-  ****************************************************************************************
-  * @brief  Checks if target device is ready for communication.
-  * @note   This function is used with Memory devices
-  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
-  *                the configuration information for the specified I2C.
-  * @param  DevAddress Target device address: The device 7 bits address value
-  *         in datasheet must be shifted to the left before calling the interface
-  * @param  Trials Number of trials
-  * @param  Timeout Timeout duration
-  * @retval HAL status
-  ****************************************************************************************
-  */
-HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout);
+HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size, uint32_t Timeout);
 /**
   ****************************************************************************************
   * @brief  Transmit in master mode an amount of data in non-blocking mode with Interrupt(Non-Blocking mode: Interrupt)
@@ -277,7 +229,7 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c, uint16_t DevAdd
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
   */
-HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
 /**
   ****************************************************************************************
   * @brief  Receive in master mode an amount of data in non-blocking mode with Interrupt(Non-Blocking mode: Interrupt)
@@ -290,7 +242,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t D
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
   */
-HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
 /**
  * @brief   * @brief  Transmit in slave mode an amount of data in non-blocking mode with Interrupt
   * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
@@ -299,7 +251,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t De
   * @param  Size Amount of data to be sent
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size);
 /**
   * @brief  Receive in slave mode an amount of data in non-blocking mode with Interrupt
   * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
@@ -308,21 +260,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
   * @param  Size Amount of data to be sent
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);
-/**
-  * @brief  Enable the Address listen mode with Interrupt.
-  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
-  *                the configuration information for the specified I2C.
-  * @retval HAL status
-  */
-HAL_StatusTypeDef HAL_I2C_EnableListen_IT(I2C_HandleTypeDef *hi2c);
-/**
-  * @brief  Disable the Address listen mode with Interrupt.
-  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
-  *                the configuration information for the specified I2C.
-  * @retval HAL status
-  */
-HAL_StatusTypeDef HAL_I2C_DisableListen_IT(I2C_HandleTypeDef *hi2c);
+HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size);
 /**
   ****************************************************************************************
   * @brief  This function handles I2C event interrupt request.
@@ -382,14 +320,6 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
   ****************************************************************************************
   */
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
-/**
-  ****************************************************************************************
-  * @brief  I2C abort callback.
-  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
-  *                the configuration information for the specified I2C.
-  ****************************************************************************************
-  */
-void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c);
 /**
   ****************************************************************************************
   * @brief  Return the I2C handle state.
