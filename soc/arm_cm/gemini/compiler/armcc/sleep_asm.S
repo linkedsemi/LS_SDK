@@ -1,6 +1,6 @@
     PRESERVE8
     THUMB
-    AREA    |.xip_banned.cpu_sleep_asm|, CODE, READONLY
+    AREA    |.xip_banned.sleep_recover_asm|, CODE, READONLY
 cpu_sleep_asm PROC
     EXPORT cpu_sleep_asm
     IMPORT before_wfi
@@ -15,7 +15,7 @@ cpu_sleep_asm PROC
     WFI
     ENDP
 
-    AREA    |.xip_banned.cpu_recover_asm|, CODE, READONLY
+    AREA    |.xip_banned.sleep_recover_asm|, CODE, READONLY
 cpu_recover_asm PROC
     EXPORT cpu_recover_asm
     IMPORT after_wfi
