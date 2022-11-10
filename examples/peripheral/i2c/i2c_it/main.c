@@ -11,11 +11,24 @@
 #define I2C_MASTER_ROLE 0
 #define I2C_SLAVE_ROLE 1
 
-#define CURRENT_ROLE I2C_MASTER_ROLE
-
-#define LED_IO PA01
+#define CURRENT_ROLE I2C_SLAVE_ROLE
+#define I2C_SPEED I2C_SPEED_FAST_400K
 #define I2C_ADDRESS 0x50
 #define BUFFER_LEN 255
+#define SIMU_IRQ_EN 0
+#ifdef LE501X
+#define LED_IO PA01
+// Set PB14 as debug IO
+#define DEBUG_IO_HIGH (*(volatile uint32_t*)0x48000404 |= 1 << 0xE)
+#define DEBUG_IO_LOW (*(volatile uint32_t*)0x48000404 &= ~(1 << 0xE))
+#elif defined GEMINI
+#define LED_IO PB06
+// Set PA15 as debug IO
+#define DEBUG_IO_HIGH (*(volatile uint32_t*)0x4000d064 |= 1 << 15)
+#define DEBUG_IO_LOW (*(volatile uint32_t*)0x4000d064 &= ~(1 << 15))
+#else
+#error "Error config for platform!"
+#endif
 
 enum
 {
@@ -45,9 +58,12 @@ static iic_tx_rx_func tx_func = HAL_I2C_Slave_Transmit_IT;
 static iic_tx_rx_func rx_func = HAL_I2C_Slave_Receive_IT;
 #endif
 
+#if SIMU_IRQ_EN == 1
 static void simu_timer_init(void);
+#endif
 static void Error_Handler(void);
-static void toggle_PB14_init(void);
+static void toggle_debug_IO_init(void);
+void toggle_debug_IO(uint16_t);
 
 static void iic_tx_rx_test_init(uint8_t);
 static void iic_tx_rx_test_it_run(uint8_t);
@@ -56,7 +72,7 @@ static bool iic_tx_rx_check_result(uint8_t*);
 static void iic_init(void)
 {
     I2cHandle.Instance = I2C1;
-    I2cHandle.Init.ClockSpeed = I2C_SPEED_NORMAL_100K;
+    I2cHandle.Init.ClockSpeed = I2C_SPEED;
     I2cHandle.Init.OwnAddress1 = I2C_ADDRESS;
     I2cHandle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     I2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -73,18 +89,18 @@ static uint8_t test_len = 1;
 int main(void)
 {
     sys_init_none();
-    toggle_PB14_init();
-    pinmux_iic1_init(PB09, PB08);//PA08---SDA   PA09---SCL
+    toggle_debug_IO_init();
+    pinmux_iic1_init(PB09, PB08); //PB08---SDA   PB09---SCL
     iic_init();
     if (HAL_I2C_Init(&I2cHandle) != HAL_OK)
     {
         Error_Handler();
     }
+#if SIMU_IRQ_EN == 1
     simu_timer_init();
     __NVIC_SetPriority(I2C1_IRQn,3); 
     __NVIC_SetPriority(GPTIMA1_IRQn,2); 
-    
-    // uint8_t test_len = 0x57;
+#endif
     while (1)
     {
         iic_tx_rx_test_init(test_len);
@@ -98,7 +114,7 @@ int main(void)
                 io_toggle_pin(LED_IO);
                 led_count = 0;
             }
-            DELAY_US(1200);
+            DELAY_US(200);
         }
         else
         {
@@ -212,12 +228,46 @@ static void iic_tx_rx_test_it_run(uint8_t len)
 
     Com_Sta = txing;
     tx_func(&I2cHandle, aRxBuffer, len); // transmit the data just received
-    while (Com_Sta == txing);
+    while (Com_Sta == txing);    
 #endif
 }
 
+
+static void Error_Handler(void)
+{
+    while (1)
+    {
+        ;
+    }
+}
+static void toggle_debug_IO_init(void)
+{
+#ifdef LE501X
+    *(volatile uint32_t*)0x48000418 |= 1 << 0xE; // Set PB14 as debug IO
+#elif defined GEMINI
+    *(volatile uint32_t*)0x4000d064 |= 1 << 31; // Set PA15 as debug IO
+#else
+#error "Error config for platform!"
+#endif
+}
+void XIP_BANNED_FUNC(toggle_debug_IO, uint16_t num)
+{
+    for (uint16_t i = 0; i < num; i++)
+    {
+    #ifdef LE501X
+        DEBUG_IO_HIGH;
+        DEBUG_IO_LOW;
+    #elif defined GEMINI
+        DEBUG_IO_HIGH;
+        DEBUG_IO_LOW;
+    #else
+    #endif
+    }
+}
+
+#if SIMU_IRQ_EN == 1
 #define TIM_PRESCALER     (SDK_HCLK_MHZ-1)
-#define TIM_PERIOD        (5*1000 - 1) /* 10ms period*/
+#define TIM_PERIOD        (5*1000 - 1)
 
 static TIM_HandleTypeDef TimHandle;
 
@@ -234,30 +284,16 @@ static void simu_timer_init(void)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    *(volatile uint32_t*)0x48000404 |= 1 << 0xE; // pull up PB14
+    DEBUG_IO_HIGH;
     uint16_t time_us = rand() % 1000;
     time_us++;
     DELAY_US(time_us);
-    *(volatile uint32_t*)0x48000404 &= ~(1 << 0xE); // pull down PB14
-}
-static void Error_Handler(void)
-{
-    while (1)
+    time_us *= 10;
+    if (time_us < 3000)
     {
-        ;
+        time_us += 3000; // 3ms minimum
     }
+    __HAL_TIM_SET_AUTORELOAD(htim, time_us);
+    DEBUG_IO_LOW;
 }
-static void toggle_PB14_init(void)
-{
-    *(volatile uint32_t*)0x48000418 |= 1 << 0xE;
-}
-// XIP_BANNED void toggle_PB14(uint16_t num)
-void XIP_BANNED_FUNC(toggle_PB14, uint16_t num, ...)
-{
-    for (uint16_t i = 0; i < num; i++)
-    {
-        *(volatile uint32_t*)0x48000404 |= 1 << 0xE;  
-        // __asm("nop");
-        *(volatile uint32_t*)0x48000404 &= ~(1 << 0xE);  
-    }
-}
+#endif

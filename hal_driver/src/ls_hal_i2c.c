@@ -2,7 +2,6 @@
 #include "ls_hal_i2c.h"
 #include "ls_msp_i2c.h" 
 #include "field_manipulate.h"
-#include "log.h"
 #include "systick.h"
 #include "platform.h"
 #include "cpu.h"
@@ -46,6 +45,8 @@ static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeD
 static HAL_StatusTypeDef I2C_WaitOnFLVUntilTimeout(bool (*poll)(va_list), ...);
 static HAL_StatusTypeDef I2C_WaitOnRxFifoFullUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
 
+static void I2C_MasterTransmit_TXE(I2C_HandleTypeDef *hi2c);
+static void I2C_MasterReceive_RXNE(I2C_HandleTypeDef *hi2c);
 static void I2C_SlaveTransmit_TXE(I2C_HandleTypeDef *hi2c);
 static void I2C_SlaveReceive_RXNE(I2C_HandleTypeDef *hi2c);
 
@@ -55,12 +56,13 @@ static bool i2c_rxflvnzandstop_poll(va_list va);
 static bool i2c_txflvnfandstop_poll(va_list va);
 static bool i2c_txflveandstop_poll(va_list va);
 static bool i2c_flag_poll(va_list va);
-// extern void toggle_PB14(uint16_t);
+// extern void toggle_debug_IO(uint16_t);
+
 static bool I2C_speed_config_calc(uint8_t speed, struct i2c_speed_config_t *speed_config)
 {
     uint32_t speed_array[I2C_SPEED_MAX] = {100*1000, 400*1000, 1000*1000};
     uint16_t cycle_count = I2C_CLOCK / speed_array[speed];
-    int8_t scll, sclh, scldel, sdadel;
+    int16_t scll, sclh, scldel, sdadel;
     uint8_t prescaler = 0;
     if (cycle_count > 256)
     {
@@ -114,27 +116,24 @@ static bool I2C_speed_config_calc(uint8_t speed, struct i2c_speed_config_t *spee
     {
         sdadel = 1;
     }
-    /* HW design requires that SCLDEL should be no less than SDADEL + 4 */
-    if (scldel <= sdadel + 4)
+    /* HW design requires that SCLDEL should be no less than SDADEL + 5 */
+    if (scldel <= sdadel + 5)
     {
-        scldel = sdadel + 4;
+        scldel = sdadel + 5;
     }
     speed_config->presc = prescaler;
     speed_config->scll = scll;
     speed_config->sclh = sclh;
     speed_config->scldel = scldel;
     speed_config->sdadel = sdadel;
-    // *(volatile uint8_t*)0x50007ff0 = prescaler;
-    // *(volatile uint8_t*)0x50007ff1 = scll;
-    // *(volatile uint8_t*)0x50007ff2 = sclh;
-    // *(volatile uint8_t*)0x50007ff3 = scldel;
-    // *(volatile uint8_t*)0x50007ff4 = sdadel;
     return true;
 }
+
 static void HAL_I2C_hw_Init(I2C_HandleTypeDef *hi2c)
 {
     HAL_I2C_MSP_Init(hi2c);
     HAL_I2C_MSP_Busy_Set(hi2c);
+    bool re_enable = (hi2c->Instance->CR1 & I2C_CR1_PE_MASK) == I2C_CR1_PE_MASK;
 
     __HAL_I2C_DISABLE(hi2c);
     if (speed_config.reserved == 0)
@@ -176,8 +175,12 @@ static void HAL_I2C_hw_Init(I2C_HandleTypeDef *hi2c)
     __HAL_I2C_SBC_ENABLE(hi2c); // Enable SBC for slave by default
     __HAL_I2C_RXFTH_SET(hi2c, I2C_FIFO_DEPTH-1);
     
-    __HAL_I2C_ENABLE(hi2c);
+    if (re_enable)
+    {
+        __HAL_I2C_ENABLE(hi2c);
+    }
 }
+
 HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c)
 {
     if (hi2c == NULL)
@@ -201,6 +204,7 @@ HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c)
     hi2c->Mode = HAL_I2C_MODE_NONE;
     return HAL_OK;
 }
+
 HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
 {
     if (hi2c == NULL)
@@ -221,6 +225,7 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
 
     return HAL_OK;
 }
+
 HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size, uint32_t Timeout)
 {
     uint32_t tickstart = systick_get_value();
@@ -230,13 +235,13 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
         {
             return HAL_INVALIAD_PARAM;
         }
-
+        __HAL_I2C_ENABLE(hi2c);
         if (I2C_WaitOnFlagUntilTimeout(hi2c, I2C_FLAG_BUSY, SET, I2C_TIMEOUT_BUSY_FLAG, tickstart) != HAL_OK)
         {
+            __HAL_I2C_DISABLE(hi2c);
             return HAL_BUSY;
         }
-        __HAL_I2C_ENABLE(hi2c);
-
+        
         hi2c->State       = HAL_I2C_STATE_BUSY_TX;
         hi2c->Mode        = HAL_I2C_MODE_MASTER;
         hi2c->ErrorCode   = HAL_I2C_ERROR_NONE;
@@ -305,6 +310,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size, uint32_t Timeout)
 {
     uint32_t tickstart = systick_get_value();
@@ -314,12 +320,13 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
         {
             return HAL_INVALIAD_PARAM;
         }
+        __HAL_I2C_ENABLE(hi2c);
         if (I2C_WaitOnFlagUntilTimeout(hi2c, I2C_FLAG_BUSY, SET, I2C_TIMEOUT_BUSY_FLAG, tickstart) != HAL_OK)
         {
+            __HAL_I2C_DISABLE(hi2c);
             return HAL_BUSY;
         }
-        __HAL_I2C_ENABLE(hi2c);
-
+        
         hi2c->State       = HAL_I2C_STATE_BUSY_RX;
         hi2c->Mode        = HAL_I2C_MODE_MASTER;
         hi2c->ErrorCode   = HAL_I2C_ERROR_NONE;
@@ -374,6 +381,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size)
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
@@ -427,6 +435,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t D
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size)
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
@@ -477,6 +486,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t De
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size)
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
@@ -507,7 +517,11 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
             hi2c->pBuffPtr++;
             hi2c->XferCount--;
         }
-        __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_TCR); 
+        #ifndef LE501X
+        /* Clear TXE irq on platforms except for LE501X */
+        __HAL_I2C_CLEAR_IF(hi2c, I2C_IT_TXE);
+        #endif
+
         __HAL_I2C_ENABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_TXE | I2C_IT_ERR);
         return HAL_OK;
     }
@@ -516,6 +530,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size, uint32_t Timeout)
 {
     uint32_t tickstart = systick_get_value();
@@ -548,6 +563,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
 
         if (I2C_WaitOnFlagUntilTimeout(hi2c, I2C_FLAG_ADDR, RESET, Timeout, tickstart) != HAL_OK)
         {
+            __HAL_I2C_DISABLE(hi2c);
             return HAL_ERROR;
         }
         __HAL_I2C_CLEAR_ADDRFLAG(hi2c);
@@ -597,7 +613,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
 
         hi2c->State = HAL_I2C_STATE_READY;
         hi2c->Mode = HAL_I2C_MODE_NONE;
-
+        __HAL_I2C_DISABLE(hi2c);
         return hi2c->ErrorCode == HAL_I2C_ERROR_NONE ? HAL_OK : HAL_ERROR;
     }
     else
@@ -605,6 +621,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size)
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
@@ -632,7 +649,6 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pDa
         {
             __HAL_I2C_NBYTES_SET(hi2c, Size - 1);
         }
-        // __HAL_I2C_ENABLE(hi2c);
         __HAL_I2C_CLEAR_SR(hi2c);
         __HAL_I2C_CLEAR_IF(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_ERR);
         __HAL_I2C_ENABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_ERR);
@@ -644,6 +660,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pDa
         return HAL_BUSY;
     }
 }
+
 HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size, uint32_t Timeout)
 {
     uint32_t tickstart = systick_get_value();
@@ -699,7 +716,6 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData,
                     __HAL_I2C_DISABLE(hi2c);
                     goto RECEIVE_FINISH;
                 }
-                // toggle_PB14(1);
                 uint32_t cpu_stat = enter_critical();
                 if (hi2c->XferCount <= I2C_FIFO_DEPTH + I2C_FIFO_DEPTH && hi2c->XferCount > I2C_FIFO_DEPTH)
                 {
@@ -733,7 +749,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData,
             __HAL_I2C_DISABLE(hi2c);
             goto RECEIVE_FINISH;
         }
-        // toggle_PB14(7);
+
         I2C_FIFO_RX(hi2c);
 
         if (0 == hi2c->XferCount)
@@ -745,8 +761,9 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData,
         hi2c->Mode = HAL_I2C_MODE_NONE;
 
 RECEIVE_FINISH:
+        __HAL_I2C_DISABLE(hi2c);
         HAL_I2C_hw_Init(hi2c); // workaround xxx
-        // toggle_PB14(8);
+
         return hi2c->ErrorCode == HAL_I2C_ERROR_NONE ? HAL_OK : HAL_ERROR;
     }
     else
@@ -754,6 +771,7 @@ RECEIVE_FINISH:
         return HAL_BUSY;
     }
 }
+
 void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
 {
     uint32_t sr1itflags = hi2c->Instance->SR;
@@ -775,16 +793,14 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         {
             if (I2C_CHECK_IT_SOURCE(itsources, I2C_IT_TXE) != RESET)
             {
-                __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_TXEIC_MASK);
-                I2C_FIFO_TX(hi2c);
+                I2C_MasterTransmit_TXE(hi2c);
             }
         }
         else if (CurrentState == HAL_I2C_STATE_BUSY_RX)
         {
             if (I2C_CHECK_IT_SOURCE(itsources, I2C_IT_RXNE) != RESET)
             {
-                __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_RXNEIC_MASK); 
-                I2C_FIFO_RX(hi2c);
+                I2C_MasterReceive_RXNE(hi2c);
             }
         }
     }
@@ -799,24 +815,19 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         {
             __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_STOPIC_MASK);
             I2C_STOPF(hi2c);
-            // toggle_PB14(4);
         }/* Slave transmit */
         else if (CurrentState == HAL_I2C_STATE_BUSY_TX)
         {
             if (I2C_CHECK_IT_SOURCE(itsources, I2C_IT_TXE) != RESET)
-            {
-                __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_TXEIC_MASK); 
+            { 
                 I2C_SlaveTransmit_TXE(hi2c);
-                // toggle_PB14(2);
             }
         }/* Slave receive */
         else if (CurrentState == HAL_I2C_STATE_BUSY_RX)
         {
             if (I2C_CHECK_IT_SOURCE(itsources, I2C_IT_RXNE) != RESET)
-            {
-                __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_RXNEIC_MASK); 
+            { 
                 I2C_SlaveReceive_RXNE(hi2c);
-                // toggle_PB14(3);
             }
         }
     }
@@ -836,44 +847,76 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         I2C_ITError(hi2c);
     }
 }
+
 __weak void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     UNUSED(hi2c);
 }
+
 __weak void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     UNUSED(hi2c);
 }
+
 __weak void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     UNUSED(hi2c);
 }
+
 __weak void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     UNUSED(hi2c);
 }
+
 __weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
 {
     UNUSED(hi2c);
     UNUSED(TransferDirection);
     UNUSED(AddrMatchCode);
 }
+
 __weak void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 {
     UNUSED(hi2c);
 }
+
 HAL_I2C_StateTypeDef HAL_I2C_GetState(I2C_HandleTypeDef *hi2c)
 {
     return hi2c->State;
 }
+
 HAL_I2C_ModeTypeDef HAL_I2C_GetMode(I2C_HandleTypeDef *hi2c)
 {
     return hi2c->Mode;
 }
+
 uint32_t HAL_I2C_GetError(I2C_HandleTypeDef *hi2c)
 {
     return hi2c->ErrorCode;
 }
+
+static void I2C_MasterTransmit_TXE(I2C_HandleTypeDef *hi2c)
+{
+#ifdef LE501X
+    __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_TXEIC_MASK);
+    I2C_FIFO_TX(hi2c);
+#else
+    I2C_FIFO_TX(hi2c);
+    __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_TXEIC_MASK);
+#endif
+}
+
+static void I2C_MasterReceive_RXNE(I2C_HandleTypeDef *hi2c)
+{
+#ifdef LE501X
+    __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_RXNEIC_MASK);
+    I2C_FIFO_RX(hi2c);
+#else
+    I2C_FIFO_RX(hi2c);
+    __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_RXNEIC_MASK); 
+#endif
+}
+
 static void I2C_SlaveTransmit_TXE(I2C_HandleTypeDef *hi2c)
 {
     DELAY_US(i2c_hw_state_switch_delay_us[hi2c->Init.ClockSpeed]); // wait for S_HOLD state
@@ -884,8 +927,10 @@ static void I2C_SlaveTransmit_TXE(I2C_HandleTypeDef *hi2c)
         hi2c->pBuffPtr++;
         hi2c->XferCount--;
     }
+    __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_TXEIC_MASK);
     exit_critical(cpu_stat);
 }
+
 static void I2C_SlaveReceive_RXNE(I2C_HandleTypeDef *hi2c)
 {
     uint32_t cpu_stat = enter_critical();
@@ -910,8 +955,10 @@ static void I2C_SlaveReceive_RXNE(I2C_HandleTypeDef *hi2c)
         hi2c->pBuffPtr++;
         hi2c->XferCount--;
     }
+    __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_RXNEIC_MASK);
     exit_critical(cpu_stat);
 }
+
 static void I2C_ADDR(I2C_HandleTypeDef *hi2c, uint32_t sr1itflags)
 { 
     __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_ADDRIC_MASK);
@@ -925,27 +972,9 @@ static void I2C_ADDR(I2C_HandleTypeDef *hi2c, uint32_t sr1itflags)
         {
             I2C_FIFO_TX(hi2c);
         }
-        else
-        {
-            volatile uint32_t itsources;
-            do
-            {
-                itsources  = hi2c->Instance->IFM;
-                // toggle_PB14(1);
-            } while (I2C_CHECK_IT_SOURCE(itsources, I2C_IT_TXE) == RESET);
-            __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_TXEIC_MASK); 
-            DELAY_US(i2c_hw_state_switch_delay_us[hi2c->Init.ClockSpeed]); // wait for S_HOLD state
-            uint32_t cpu_stat = enter_critical();
-            while (__HAL_I2C_GET_TXFLV(hi2c) < I2C_FIFO_DEPTH && hi2c->XferCount > 0)
-            {
-                hi2c->Instance->TXDR = (uint8_t)(*hi2c->pBuffPtr);
-                hi2c->pBuffPtr++;
-                hi2c->XferCount--;
-            }
-            exit_critical(cpu_stat);
-        }
     }
 }
+
 static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
 {
     HAL_I2C_StateTypeDef CurrentState = hi2c->State;
@@ -972,6 +1001,7 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
     }
     else
     {
+        __HAL_I2C_DISABLE(hi2c);
         if (CurrentState == HAL_I2C_STATE_BUSY_TX)
         {
             if (hi2c->Mode == HAL_I2C_MODE_MASTER)
@@ -999,6 +1029,7 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
         hi2c->State = HAL_I2C_STATE_READY;
     }
 }
+
 static void I2C_ITError(I2C_HandleTypeDef *hi2c)
 {
     /* Handle last data if any */
@@ -1010,10 +1041,12 @@ static void I2C_ITError(I2C_HandleTypeDef *hi2c)
         }
     }
     hi2c->State = HAL_I2C_STATE_READY;
+    __HAL_I2C_DISABLE(hi2c);
     HAL_I2C_ErrorCallback(hi2c);
     HAL_I2C_hw_Init(hi2c); // workaround xxx
     hi2c->ErrorCode = HAL_I2C_ERROR_NONE;
 }
+
 static HAL_StatusTypeDef I2C_MasterRequestRead_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Timeout, uint32_t Tickstart, bool Read)
 {
     uint32_t cr2_rd_wrn_mask = 0;
@@ -1040,11 +1073,13 @@ static HAL_StatusTypeDef I2C_MasterRequestRead_Write(I2C_HandleTypeDef *hi2c, ui
     }
     return HAL_OK;
 }
+
 static bool i2c_flag_rxfifo_full_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
     return __HAL_I2C_GET_RXFLV(hi2c) == I2C_FIFO_DEPTH ? true : false;
 }
+
 static bool i2c_flag_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
@@ -1052,6 +1087,7 @@ static bool i2c_flag_poll(va_list va)
     uint32_t Status = va_arg(va,uint32_t);
     return __HAL_I2C_GET_FLAG(hi2c, flag) != Status ? true : false;
 }
+
 static bool i2c_itsource_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
@@ -1059,6 +1095,7 @@ static bool i2c_itsource_poll(va_list va)
     uint32_t Status = va_arg(va,uint32_t);
     return __HAL_I2C_GET_IT_RIF(hi2c, itsource) != Status ? true : false;
 }
+
 static HAL_StatusTypeDef I2C_WaitOnRxFifoFullUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
 {
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
@@ -1078,6 +1115,7 @@ static HAL_StatusTypeDef I2C_WaitOnRxFifoFullUntilTimeout(I2C_HandleTypeDef *hi2
     }
     return HAL_OK;
 }
+
 static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart)
 {
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
@@ -1097,6 +1135,7 @@ static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uin
     }
     return HAL_OK;
 }
+
 static HAL_StatusTypeDef I2C_WaitOnItSourceUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t ItSource, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart)
 {
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
@@ -1116,12 +1155,14 @@ static HAL_StatusTypeDef I2C_WaitOnItSourceUntilTimeout(I2C_HandleTypeDef *hi2c,
     }
     return HAL_OK;
 }
+
 static bool i2c_CR2flag_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
     uint32_t flag = va_arg(va,uint32_t);
     return __HAL_I2C_GET_CR2_FLAG(hi2c, flag) == RESET ? true : false;
 }
+
 static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, uint32_t Timeout, uint32_t Tickstart)
 {
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
@@ -1151,6 +1192,7 @@ static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeD
     }   
    return HAL_OK;
 }
+
 static bool i2c_check_stop_return_berr(I2C_HandleTypeDef *hi2c)
 {
     if (__HAL_I2C_GET_IT_RIF(hi2c, I2C_RIF_STOPRI_MASK) == SET)
@@ -1162,6 +1204,7 @@ static bool i2c_check_stop_return_berr(I2C_HandleTypeDef *hi2c)
     }
     return false;
 }
+
 static bool i2c_rxflvnzandstop_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
@@ -1180,6 +1223,7 @@ static bool i2c_rxflvnzandstop_poll(va_list va)
         return false;
     }
 }
+
 static bool i2c_txflveandstop_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
@@ -1196,6 +1240,7 @@ static bool i2c_txflveandstop_poll(va_list va)
         }
     }
 }
+
 static bool i2c_txflvnfandstop_poll(va_list va)
 {
     I2C_HandleTypeDef *hi2c = va_arg(va,I2C_HandleTypeDef *);
@@ -1212,6 +1257,7 @@ static bool i2c_txflvnfandstop_poll(va_list va)
         }
     }
 }
+
 static HAL_StatusTypeDef I2C_WaitOnFLVUntilTimeout(bool (*poll)(va_list), ...)
 {
     va_list va;
