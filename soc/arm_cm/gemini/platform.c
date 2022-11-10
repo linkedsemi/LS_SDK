@@ -109,7 +109,7 @@ void sys_init_none()
 
 void platform_reset(uint32_t error)
 {
-
+    REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_RST_FROM_SFT, 1);
 }
 
 void XIP_BANNED_FUNC(sync_for_xip_stop,)
