@@ -27,7 +27,7 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__data_start__ = .;
-		*(.xip_banned.cpu_recover_asm)
+		*(.xip_banned.sleep_recover_asm)
 		*(.xip_banned*)
 		*(.data*)
 		__data_end__ = ALIGN(4);

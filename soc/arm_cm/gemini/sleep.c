@@ -71,7 +71,7 @@ void sleep_wakeup_config()
                           |FIELD_BUILD(V33_RG_SRAM_DS_PU_EN,1)
                           |FIELD_BUILD(V33_RG_RCO_BIAS_FC,0)
                           |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1)
-                          |FIELD_BUILD(V33_RG_PD_GPIO_SEL,0);
+                          |FIELD_BUILD(V33_RG_PD_GPIO_SEL,SYSC_AWO->DBG_ACK);
 
     V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x3f)
                         |FIELD_BUILD(V33_RG_SWD_IO_WKUP_EN,1)
