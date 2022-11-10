@@ -127,7 +127,7 @@ HAL_StatusTypeDef HAL_SM4_Encrypt_IT(const uint8_t *data, uint8_t *result, uint3
 {
     sm4_data_length_inout_config(data, length, result);
     REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,0);
-    MODIFY_REG(LSSM4->INTR_MSK, SM4_INTR_DATA_MASK | SM4_INTR_DATA_MASK, 1 << SM4_INTR_DATA_POS | 1 << SM4_INTR_END_POS);
+    MODIFY_REG(LSSM4->INTR_MSK, SM4_INTR_DATA_MASK | SM4_INTR_END_MASK, 1 << SM4_INTR_DATA_POS | 1 << SM4_INTR_END_POS);
     LSSM4->SM4_START = SM4_CALC_START_MASK;
     return HAL_OK;
 }
@@ -136,7 +136,7 @@ HAL_StatusTypeDef HAL_SM4_Decrypt_IT(const uint8_t *data, uint8_t *result, uint3
 {
     sm4_data_length_inout_config(data, length, result);
     REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,1);
-    MODIFY_REG(LSSM4->INTR_MSK, SM4_INTR_DATA_MASK | SM4_INTR_DATA_MASK, 1 << SM4_INTR_DATA_POS | 1 << SM4_INTR_END_POS);
+    MODIFY_REG(LSSM4->INTR_MSK, SM4_INTR_DATA_MASK | SM4_INTR_END_MASK, 1 << SM4_INTR_DATA_POS | 1 << SM4_INTR_END_POS);
     LSSM4->SM4_START = SM4_CALC_START_MASK;
     return HAL_OK;
 }
