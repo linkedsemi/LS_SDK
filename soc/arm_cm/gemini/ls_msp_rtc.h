@@ -1,6 +1,6 @@
 #ifndef LS_MSP_RTC_H_
 #define LS_MSP_RTC_H_
-#include "reg_rtc_type.h"
+#include "reg_rtcv2_type.h"
 #include "reg_base_addr.h"
 
 #ifdef LSRTC_BASE_ADDR
