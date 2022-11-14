@@ -14,10 +14,10 @@ DMA_RAM_ATTR uint16_t Loop_adc_value[ADC_CHANNLE_NUM];
 
 static void pinmux_adc_init(void)
 {
-    pinmux_adc0_in4_init();// PA00
-    pinmux_adc0_in5_init();// PA01
-    pinmux_adc0_in6_init();// PA02
-    pinmux_adc0_in7_init();// PA03
+    pinmux_adc1_in4_init();// PA00
+    pinmux_adc1_in5_init();// PA01
+    pinmux_adc1_in6_init();// PA02
+    pinmux_adc1_in7_init();// PA03
 }
 
 void Error_Handler(void)
@@ -31,7 +31,7 @@ void ADC_Init_Func(void)
     ADCx_Hdl.Env.DMA.DMA_Channel        = 0;
     ADCx_Hdl.DMAC_Instance              = &dmac1_inst;
 
-    ADCx_Hdl.Instance                   = LSADC2;
+    ADCx_Hdl.Instance                   = LSADC1;
     ADCx_Hdl.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
     ADCx_Hdl.Init.ContinuousConvMode    = DISABLE;
     ADCx_Hdl.Init.NbrOfConversion       = 0;
