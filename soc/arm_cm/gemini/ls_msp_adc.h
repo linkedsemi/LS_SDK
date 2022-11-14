@@ -44,7 +44,7 @@
    (((((__HANDLE__)->Instance->MISC_CTRL & ADC_ADC_EN_MASK) == ADC_ADC_EN_MASK)) ? SET : RESET)
 
 
-#define IS_ADC_ALL_INSTANCE(Instance) (((Instance) == LSADC) || ((Instance) == LSADC2))
+#define IS_ADC_ALL_INSTANCE(Instance) (((Instance) == LSADC1) || ((Instance) == LSADC2))
 
 #define IS_ADC_DATA_ALIGN(ALIGN) (((ALIGN) == ADC_DATAALIGN_RIGHT) || \
                                   ((ALIGN) == ADC_DATAALIGN_LEFT))
@@ -90,9 +90,9 @@
                                   ((TIME) == ADC_SAMPLETIME_4CYCLES) || \
                                   ((TIME) == ADC_SAMPLETIME_15CYCLES)  )
                                   
-/// LSADC Macro for Register Access
-#ifdef LSADC_BASE_ADDR
-#define LSADC ((reg_adc_t *)LSADC_BASE_ADDR)
+/// LSADC1 Macro for Register Access
+#ifdef LSADC1_BASE_ADDR
+#define LSADC1 ((reg_adc_t *)LSADC1_BASE_ADDR)
 #endif
 #ifdef LSADC2_BASE_ADDR
 #define LSADC2 ((reg_adc_t *)LSADC2_BASE_ADDR)
@@ -101,6 +101,8 @@
 struct __ADC_HandleTypeDef;
 void HAL_ADC_MSP_Init(struct __ADC_HandleTypeDef *inst);
 void HAL_ADC_MSP_DeInit(struct __ADC_HandleTypeDef *inst);
+void HAL_AMIC_MSP_Init();
+void HAL_AMIC_MSP_DeInit();
 void HAL_ADC_MSP_Busy_Set(struct __ADC_HandleTypeDef *inst);
 void HAL_ADC_MSP_Idle_Set(struct __ADC_HandleTypeDef *inst);
 

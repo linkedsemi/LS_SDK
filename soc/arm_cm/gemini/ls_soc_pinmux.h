@@ -806,86 +806,6 @@ void pinmux_usb_init(uint8_t dp,uint8_t dm);
 void pinmux_usb_deinit(void);
 
 /**
-  * @brief Set mux function of pin gadc0 of in0
-  */
-void pinmux_adc0_in0_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in0
-  */
-void pinmux_adc0_in0_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in1
-  */
-void pinmux_adc0_in1_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in1
-  */
-void pinmux_adc0_in1_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in2
-  */
-void pinmux_adc0_in2_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in2
-  */
-void pinmux_adc0_in2_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in3
-  */
-void pinmux_adc0_in3_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in3
-  */
-void pinmux_adc0_in3_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in4
-  */
-void pinmux_adc0_in4_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in4
-  */
-void pinmux_adc0_in4_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in5
-  */
-void pinmux_adc0_in5_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in5
-  */
-void pinmux_adc0_in5_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in6
-  */
-void pinmux_adc0_in6_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in6
-  */
-void pinmux_adc0_in6_deinit(void);
-
-/**
-  * @brief Set mux function of pin gadc0 of in7
-  */
-void pinmux_adc0_in7_init(void);
-
-/**
-  * @brief clear mux function of pin gadc0 of in7
-  */
-void pinmux_adc0_in7_deinit(void);
-
-/**
   * @brief Set mux function of pin gadc1 of in0
   */
 void pinmux_adc1_in0_init(void);
@@ -964,6 +884,96 @@ void pinmux_adc1_in7_init(void);
   * @brief clear mux function of pin gadc1 of in7
   */
 void pinmux_adc1_in7_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in0
+  */
+void pinmux_adc2_in0_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in0
+  */
+void pinmux_adc2_in0_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in1
+  */
+void pinmux_adc2_in1_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in1
+  */
+void pinmux_adc2_in1_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in2
+  */
+void pinmux_adc2_in2_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in2
+  */
+void pinmux_adc2_in2_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in3
+  */
+void pinmux_adc2_in3_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in3
+  */
+void pinmux_adc2_in3_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in4
+  */
+void pinmux_adc2_in4_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in4
+  */
+void pinmux_adc2_in4_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in5
+  */
+void pinmux_adc2_in5_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in5
+  */
+void pinmux_adc2_in5_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in6
+  */
+void pinmux_adc2_in6_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in6
+  */
+void pinmux_adc2_in6_deinit(void);
+
+/**
+  * @brief Set mux function of pin gadc2 of in7
+  */
+void pinmux_adc2_in7_init(void);
+
+/**
+  * @brief clear mux function of pin gadc2 of in7
+  */
+void pinmux_adc2_in7_deinit(void);
+
+/**
+  * @brief Set mux function of pin amic
+  */
+void pinmux_amic_init(void);
+
+/**
+  * @brief clear mux function of pin amic
+  */
+void pinmux_amic_deinit(void);
 
 /**
   * @brief       configure gpio pin as touchkey cmod

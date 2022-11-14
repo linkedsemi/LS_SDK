@@ -9,9 +9,9 @@ static ADC_HandleTypeDef ADCx_Hdl;
 
 static void pinmux_adc_init(void)
 {
-    pinmux_adc0_in5_init();// PA01
-    pinmux_adc0_in6_init();// PA02
-    pinmux_adc0_in7_init();// PA03
+    pinmux_adc1_in5_init();// PA01
+    pinmux_adc1_in6_init();// PA02
+    pinmux_adc1_in7_init();// PA03
 }
 
 void Error_Handler(void)
@@ -21,7 +21,7 @@ void Error_Handler(void)
 
 void ADC_Init_Func(void)
 {
-    ADCx_Hdl.Instance                   = LSADC;
+    ADCx_Hdl.Instance                   = LSADC1;
     ADCx_Hdl.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
     ADCx_Hdl.Init.ContinuousConvMode    = ENABLE;
     ADCx_Hdl.Init.NbrOfConversion       = 3;

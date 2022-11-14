@@ -36,7 +36,7 @@ static bool adc_flag_poll(va_list va)
       }
 }
 
-HAL_StatusTypeDef HAL_ADC_VrefType_SetConfig(reg_adc_t *ADCx,  enum ADC_Vref_TypeDef Vtype)
+HAL_StatusTypeDef HAL_ADC_VrefType_SetConfig(ADC_HandleTypeDef *hadc,  enum ADC_Vref_TypeDef Vtype)
 {
     uint32_t tmp_adr = 0;
 
@@ -60,15 +60,14 @@ HAL_StatusTypeDef HAL_ADC_VrefType_SetConfig(reg_adc_t *ADCx,  enum ADC_Vref_Typ
     break;
     }
 
-    if(READ_BIT(tmp_adr,ADC_ADR_BP_POS))
+    if(hadc->Init.AdcDriveType == BINBUF_DIRECT_DRIVE_ADC)
     {
         tmp_adr |= FIELD_BUILD(ADC_ADR_EN_INBUF_A,0)|FIELD_BUILD(ADC_ADR_EN_INBUF_B,0);
-    }else
-    {
+    }else{
         tmp_adr |= FIELD_BUILD(ADC_ADR_EN_INBUF_A,1)|FIELD_BUILD(ADC_ADR_EN_INBUF_B,1);
     }
 
-    MODIFY_REG(ADCx->ADR, 
+    MODIFY_REG(hadc->Instance->ADR, 
                ADC_ADC_MSB_CAL_MASK|ADC_ADR_LP_CTL_MASK|ADC_ADR_G_CAL_MASK|ADC_ADR_OS_CAL_MASK,
                tmp_adr);
 
@@ -121,7 +120,7 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
                ADC_ADC_DIV_MASK|ADC_ADC_EN_MASK|ADC_DATA_ALIGN_MASK|ADC_DMA_EN_MASK,
                tmp_misc_ctrl);
 
-    HAL_ADC_VrefType_SetConfig(hadc->Instance,hadc->Init.Vref);
+    HAL_ADC_VrefType_SetConfig(hadc,hadc->Init.Vref);
 
     HAL_ADC_Capture_Sequence_Set(hadc->Instance,&hadc->Init);
 
@@ -364,6 +363,10 @@ HAL_StatusTypeDef HAL_ADC_LoopConfigChannel(ADC_HandleTypeDef* hadc,ADC_LoopConf
         else if(sConfig->Channel == ADC1_CHANNEL_TEMPSENSOR)
         {
 
+        }
+        else if(sConfig->Channel == ADC2_CHANNEL_AMIC)
+        {
+            HAL_AMIC_MSP_Init();
         }
 
         HAL_ADC_Ch_cfg_Reg_SetConfig(hadc->Instance,sConfig->Channel);
@@ -625,7 +628,6 @@ HAL_StatusTypeDef HAL_ADCx_LoopStart_IT(ADC_HandleTypeDef *hadc)
     {
         REG_FIELD_WR(hadc->Instance->TRIG,ADC_FIF_TRIG,1);
     }
-    
 
     return status;
 }
