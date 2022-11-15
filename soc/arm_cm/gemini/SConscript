@@ -50,6 +50,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/gemini/ls_msp_touchkey.c',
         'arm_cm/gemini/ls_msp_dmacv2.c',
         'arm_cm/gemini/ls_msp_adc.c',
+        'arm_cm/gemini/ls_msp_wwdg.c',
         'arm_cm/gemini/sleep.c',
         'arm_cm/gemini/ls_msp_uart.c',
         'arm_cm/gemini/sys_stat.c',
@@ -93,6 +94,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'src/ls_hal_ecc.c',
         'src/ls_hal_crc.c',
         'src/ls_hal_sha.c',
+        'src/ls_hal_wwdg.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',
