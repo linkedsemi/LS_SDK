@@ -41,24 +41,9 @@ enum
     rxing,
     rxover,
 };
-#if CURRENT_ROLE == I2C_MASTER_ROLE
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint16_t, uint8_t*, uint8_t, uint32_t);
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint16_t, uint8_t*, uint8_t, uint32_t);
-#else
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint8_t*, uint8_t, uint32_t);
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint8_t*, uint8_t, uint32_t);
-#endif
 static I2C_HandleTypeDef I2cHandle;
 static uint8_t aRxBuffer[BUFFER_LEN]; //Buffer used for reception 
 static uint8_t aTxBuffer[BUFFER_LEN];
-
-#if CURRENT_ROLE == I2C_MASTER_ROLE
-static iic_tx_rx_func tx_func = HAL_I2C_Master_Transmit;
-static iic_tx_rx_func rx_func = HAL_I2C_Master_Receive;
-#else
-static iic_tx_rx_func tx_func = HAL_I2C_Slave_Transmit;
-static iic_tx_rx_func rx_func = HAL_I2C_Slave_Receive;
-#endif
 
 #if SIMU_IRQ_EN == 1
 static void simu_timer_init(void);
@@ -155,7 +140,7 @@ static void iic_tx_rx_test_polling_run(uint8_t len)
         extra_data_len = rand() % (255 - len);
     }
     
-    uint8_t result = tx_func(&I2cHandle, (uint16_t)I2C_ADDRESS, aTxBuffer, len + extra_data_len, I2C_POLLING_TIMEOUT_MS);
+    uint8_t result = HAL_I2C_Master_Transmit(&I2cHandle, (uint16_t)I2C_ADDRESS, aTxBuffer, len + extra_data_len, I2C_POLLING_TIMEOUT_MS);
     if (extra_data_len != 0) 
     {
         toggle_debug_IO(10);
@@ -177,7 +162,7 @@ static void iic_tx_rx_test_polling_run(uint8_t len)
     
     DELAY_US(1200);
 
-    result = rx_func(&I2cHandle, (uint16_t)I2C_ADDRESS, aRxBuffer, len, I2C_POLLING_TIMEOUT_MS);
+    result = HAL_I2C_Master_Receive(&I2cHandle, (uint16_t)I2C_ADDRESS, aRxBuffer, len, I2C_POLLING_TIMEOUT_MS);
     if (result != HAL_OK)
     {
         Error_Handler();
@@ -186,10 +171,10 @@ static void iic_tx_rx_test_polling_run(uint8_t len)
     HAL_StatusTypeDef status = HAL_OK;
     do
     {
-        status = rx_func(&I2cHandle, aRxBuffer, len, I2C_POLLING_TIMEOUT_MS);
+        status = HAL_I2C_Slave_Receive(&I2cHandle, aRxBuffer, len, I2C_POLLING_TIMEOUT_MS);
     } while (status != HAL_OK);
     
-    tx_func(&I2cHandle, aRxBuffer, len, I2C_POLLING_TIMEOUT_MS); // transmit the data just received
+    HAL_I2C_Slave_Transmit(&I2cHandle, aRxBuffer, len, I2C_POLLING_TIMEOUT_MS); // transmit the data just received
 #endif
 }
 

@@ -38,25 +38,10 @@ enum
     rxing,
     rxover,
 };
-#if CURRENT_ROLE == I2C_MASTER_ROLE
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint16_t, uint8_t*, uint8_t);
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint16_t, uint8_t*, uint8_t);
-#else
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint8_t*, uint8_t);
-typedef HAL_StatusTypeDef (*iic_tx_rx_func)(I2C_HandleTypeDef *, uint8_t*, uint8_t);
-#endif
 static volatile uint8_t Com_Sta = start;
 static I2C_HandleTypeDef I2cHandle;
 static uint8_t aRxBuffer[BUFFER_LEN]; //Buffer used for reception 
 static uint8_t aTxBuffer[BUFFER_LEN];
-
-#if CURRENT_ROLE == I2C_MASTER_ROLE
-static iic_tx_rx_func tx_func = HAL_I2C_Master_Transmit_IT;
-static iic_tx_rx_func rx_func = HAL_I2C_Master_Receive_IT;
-#else
-static iic_tx_rx_func tx_func = HAL_I2C_Slave_Transmit_IT;
-static iic_tx_rx_func rx_func = HAL_I2C_Slave_Receive_IT;
-#endif
 
 #if SIMU_IRQ_EN == 1
 static void simu_timer_init(void);
@@ -199,7 +184,7 @@ static void iic_tx_rx_test_it_run(uint8_t len)
     }
     
     Com_Sta = txing;
-    tx_func(&I2cHandle, (uint16_t)I2C_ADDRESS, aTxBuffer, len + extra_data_len);
+    HAL_I2C_Master_Transmit_IT(&I2cHandle, (uint16_t)I2C_ADDRESS, aTxBuffer, len + extra_data_len);
     while (Com_Sta == txing);
     if (extra_data_len != 0)
     {
@@ -213,7 +198,7 @@ static void iic_tx_rx_test_it_run(uint8_t len)
     DELAY_US(1200);
 
     Com_Sta = rxing;
-    rx_func(&I2cHandle, (uint16_t)I2C_ADDRESS, aRxBuffer, len);
+    HAL_I2C_Master_Receive_IT(&I2cHandle, (uint16_t)I2C_ADDRESS, aRxBuffer, len);
     while (Com_Sta == rxing);
     if (I2cHandle.XferCount != 0)
     {
@@ -223,11 +208,11 @@ static void iic_tx_rx_test_it_run(uint8_t len)
     
 #else
     Com_Sta = rxing;
-    rx_func(&I2cHandle, aRxBuffer, len);
+    HAL_I2C_Slave_Receive_IT(&I2cHandle, aRxBuffer, len);
     while (Com_Sta == rxing);
 
     Com_Sta = txing;
-    tx_func(&I2cHandle, aRxBuffer, len); // transmit the data just received
+    HAL_I2C_Slave_Transmit_IT(&I2cHandle, aRxBuffer, len); // transmit the data just received
     while (Com_Sta == txing);    
 #endif
 }
