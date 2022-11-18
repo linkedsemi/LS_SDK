@@ -32,7 +32,7 @@ struct i2c_speed_config_t
     uint32_t sclh     : 8;
     uint32_t sdadel   : 4;
     uint32_t scldel   : 4;
-    uint32_t reserved : 4;
+    uint32_t role : 4;
     uint32_t presc    : 4;
 };
 static const uint8_t i2c_hw_state_switch_delay_us[I2C_SPEED_MAX] = {10, 3, 1};
@@ -58,75 +58,100 @@ static bool i2c_txflveandstop_poll(va_list va);
 static bool i2c_flag_poll(va_list va);
 // extern void toggle_debug_IO(uint16_t);
 
-static bool I2C_speed_config_calc(uint8_t speed, struct i2c_speed_config_t *speed_config)
+static bool I2C_speed_config_calc_master_dft(uint8_t speed, struct i2c_speed_config_t *speed_config)
 {
-    uint32_t speed_array[I2C_SPEED_MAX] = {100*1000, 400*1000, 1000*1000};
-    uint16_t cycle_count = I2C_CLOCK / speed_array[speed];
-    int16_t scll, sclh, scldel, sdadel;
-    uint8_t prescaler = 0;
-    if (cycle_count > 256)
+    /* When calculating master speed config, it should be in init state */
+    if (0 == speed_config->role)
     {
-        for (uint8_t i = 1; prescaler < 16; i++)
+        uint32_t speed_array[I2C_SPEED_MAX] = {100*1000, 400*1000, 1000*1000};
+        uint16_t cycle_count = I2C_CLOCK / speed_array[speed];
+        int16_t scll, sclh, scldel, sdadel;
+        uint8_t prescaler = 0;
+        if (cycle_count > 256)
         {
-            /* For easier calculating, just set prescaler to an odd number. */
-            prescaler = 2 * i - 1;
-            cycle_count = (I2C_CLOCK / speed_array[speed]) / (prescaler + 1);
-            if (cycle_count <= 256)
+            for (uint8_t i = 1; prescaler < 16; i++)
             {
-                break;
+                /* For easier calculating, just set prescaler to an odd number. */
+                prescaler = 2 * i - 1;
+                cycle_count = (I2C_CLOCK / speed_array[speed]) / (prescaler + 1);
+                if (cycle_count <= 256)
+                {
+                    break;
+                }
+            }
+            if (prescaler >= 16)
+            {
+                return false;
             }
         }
-        if (prescaler >= 16)
+        if (cycle_count < 16)
         {
             return false;
         }
+        /* Set SCL dutycycle to about 30% */
+        scll = (cycle_count * 2) / 3;
+        sclh = cycle_count / 3 - 1 - 4;
+        if (scll < 1)
+        {
+            scll = 1;
+        }
+        if (sclh < 0)
+        {
+            sclh = 0;
+        }
+        scldel = scll / 3;
+        if (scldel > 15)
+        {
+            scldel = 15;
+        }
+        else if (scldel < 5)
+        {
+            /* SCLDEL should not bee too small to keep campatible with different resistance */
+            scldel = 5;
+        }
+        sdadel = scldel - 4;
+        if (sdadel > 4)
+        {
+            /* We should set a ceiling for SDADEL. This is unnecessary, and will reduce compatibility if we are IIC slave */
+            sdadel = 4;
+        }
+        else if (sdadel < 1)
+        {
+            sdadel = 1;
+        }
+        /* HW design requires that SCLDEL should be no less than SDADEL + 5 */
+        if (scldel <= sdadel + 5)
+        {
+            scldel = sdadel + 5;
+        }
+        speed_config->presc = prescaler;
+        speed_config->scll = scll;
+        speed_config->sclh = sclh;
+        speed_config->scldel = scldel;
+        speed_config->sdadel = sdadel;
+        speed_config->role = 1;
     }
-    if (cycle_count < 16)
-    {
-        return false;
-    }
-    /* Set SCL dutycycle to about 30% */
-    scll = (cycle_count * 2) / 3;
-    sclh = cycle_count / 3 - 1 - 4;
-    if (scll < 1)
-    {
-        scll = 1;
-    }
-    if (sclh < 0)
-    {
-        sclh = 0;
-    }
-    scldel = scll / 3;
-    if (scldel > 15)
-    {
-        scldel = 15;
-    }
-    else if (scldel < 5)
-    {
-        /* SCLDEL should not bee too small to keep campatible with different resistance */
-        scldel = 5;
-    }
-    sdadel = scldel - 4;
-    if (sdadel > 4)
-    {
-        /* We should set a ceiling for SDADEL. This is unnecessary, and will reduce compatibility if we are IIC slave */
-        sdadel = 4;
-    }
-    else if (sdadel < 1)
-    {
-        sdadel = 1;
-    }
-    /* HW design requires that SCLDEL should be no less than SDADEL + 5 */
-    if (scldel <= sdadel + 5)
-    {
-        scldel = sdadel + 5;
-    }
-    speed_config->presc = prescaler;
-    speed_config->scll = scll;
-    speed_config->sclh = sclh;
-    speed_config->scldel = scldel;
-    speed_config->sdadel = sdadel;
     return true;
+}
+
+static void I2C_speed_config_calc_slave(I2C_HandleTypeDef *hi2c)
+{
+    /* When calculating slave speed config, it should NOT be in init state */
+    LS_ASSERT(speed_config.role > 0);
+    /* Only in master mode should we re-calculate config for slave */
+    if (1 == speed_config.role)
+    {
+        /* Switch scll with sclh for slave. */
+        uint8_t scll = speed_config.sclh + 5;
+        speed_config.sclh = speed_config.scll - 5;
+        speed_config.scll = scll;
+        speed_config.role = 2;
+        __HAL_I2C_DISABLE(hi2c);
+        MODIFY_REG(hi2c->Instance->TIMINGR, (I2C_TIMINGR_SCLH_MASK | I2C_TIMINGR_SCLL_MASK), 
+                                            (speed_config.sclh<<I2C_TIMINGR_SCLH_POS\
+                                            |speed_config.scll<<I2C_TIMINGR_SCLL_POS));
+    }
+    // __HAL_I2C_ENABLE(hi2c);
 }
 
 static void HAL_I2C_hw_Init(I2C_HandleTypeDef *hi2c)
@@ -136,12 +161,10 @@ static void HAL_I2C_hw_Init(I2C_HandleTypeDef *hi2c)
     bool re_enable = (hi2c->Instance->CR1 & I2C_CR1_PE_MASK) == I2C_CR1_PE_MASK;
 
     __HAL_I2C_DISABLE(hi2c);
-    if (speed_config.reserved == 0)
-    {
-        bool config_result = I2C_speed_config_calc(hi2c->Init.ClockSpeed, &speed_config);
-        LS_ASSERT(config_result);
-        speed_config.reserved = 1;
-    }
+
+    bool config_result = I2C_speed_config_calc_master_dft(hi2c->Init.ClockSpeed, &speed_config);
+    LS_ASSERT(config_result);
+
     MODIFY_REG(hi2c->Instance->TIMINGR, I2C_TIMINGR_PRESC_MASK, speed_config.presc << I2C_TIMINGR_PRESC_POS); 
     MODIFY_REG(hi2c->Instance->TIMINGR, (I2C_TIMINGR_SCLH_MASK | I2C_TIMINGR_SCLL_MASK | I2C_TIMINGR_SDADEL_MASK | I2C_TIMINGR_SCLDEL_MASK), 
                                         (speed_config.sclh<<I2C_TIMINGR_SCLH_POS\
@@ -218,6 +241,7 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
 
     HAL_I2C_MSP_DeInit(hi2c);
     HAL_I2C_MSP_Idle_Set(hi2c);
+    speed_config.role = 0;
 
     hi2c->ErrorCode     = HAL_I2C_ERROR_NONE;
     hi2c->State         = HAL_I2C_STATE_RESET;
@@ -495,6 +519,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
         {
             return HAL_ERROR;
         }
+        I2C_speed_config_calc_slave(hi2c);
         __HAL_I2C_ENABLE(hi2c);
 
         hi2c->State = HAL_I2C_STATE_BUSY_TX;
@@ -540,6 +565,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
         {
             return HAL_ERROR;
         }
+        I2C_speed_config_calc_slave(hi2c);
         /* Don't check busy flag here. The slave might be in working(addr matched) status. */
         /* The slave can't ensure the function is being excuted when address is matched. */
         /* So the app may need to call this function periodically to check addr matched event while
@@ -630,6 +656,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pDa
         {
             return HAL_ERROR;
         }
+        I2C_speed_config_calc_slave(hi2c);
         __HAL_I2C_ENABLE(hi2c);
 
         hi2c->State = HAL_I2C_STATE_BUSY_RX;
@@ -670,6 +697,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData,
         {
             return HAL_INVALIAD_PARAM;
         }
+        I2C_speed_config_calc_slave(hi2c);
         /* Don't check busy flag here. The reason is similar with HAL_I2C_Slave_Transmit */
         // if (I2C_WaitOnFlagUntilTimeout(hi2c, I2C_FLAG_BUSY, SET, I2C_TIMEOUT_BUSY_FLAG, tickstart) != HAL_OK)
         // {
