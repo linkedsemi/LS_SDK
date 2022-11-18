@@ -1,5 +1,4 @@
 #include "ls_hal_rtcv2.h"
-#include "reg_v33_rg_type.h"
 #include "ls_soc_gpio.h"
 #include "platform.h"
 #include "log.h"

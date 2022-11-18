@@ -10,7 +10,7 @@
             "name": "GEMINI Debug RTC_TEST",
             "device": "GEMINI",
             "interface": "swd",
-            "preAttachCommands":[
+            "preLaunchCommands":[
                 "monitor flash breakpoints = 0",
                 //"add-symbol-file stack/build/le501x/fw.elf",  
             ]
