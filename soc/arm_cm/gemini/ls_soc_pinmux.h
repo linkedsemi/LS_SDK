@@ -1146,17 +1146,6 @@ void pinmux_touchkey_ch15_init();
 void pinmux_touchkey_ch15_deinit();
 
 /**
- * @brief         set pin mux function to comp0
- * @param dat     Specific GPIO pin
- */
-void pinmux_comp0_init(uint8_t dat);
-
-/**
- * @brief clear pin mux function of comp0
- */
-void pinmux_comp0_deinit(void);
-
-/**
  * @brief         set pin mux function to comp1
  * @param dat     Specific GPIO pin
  */
@@ -1177,4 +1166,15 @@ void pinmux_comp2_init(uint8_t dat);
  * @brief clear pin mux function of comp2
  */
 void pinmux_comp2_deinit(void);
+
+/**
+ * @brief         set pin mux function to comp3
+ * @param dat     Specific GPIO pin
+ */
+void pinmux_comp3_init(uint8_t dat);
+
+/**
+ * @brief clear pin mux function of comp3
+ */
+void pinmux_comp3_deinit(void);
 #endif

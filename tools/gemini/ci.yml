@@ -453,7 +453,7 @@ gemini_rtc_keil_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/rtcv2/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_multi_channel_dma.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/rtcv2/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b rtcv2.uvprojx -o UVBuild/build.txt -j0
 
 gemini_iwdg_build:
   stage: build
@@ -478,4 +478,15 @@ gemini_wwdg_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/wdg/wwdg/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b wwdg.uvprojx -o UVBuild/build.txt -j0
-    
+
+gemini_comp_build:
+  stage: build
+  script:
+    - cd examples/peripheral/comp && scons ic=gemini
+
+gemini_comp_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/comp/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b comp.uvprojx -o UVBuild/build.txt -j0

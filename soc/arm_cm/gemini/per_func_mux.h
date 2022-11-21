@@ -82,9 +82,9 @@ enum per_func
     BXCAN_RXD,
     USB_DP,
     USB_DM,
-    COMP0_DAT,
     COMP1_DAT,
     COMP2_DAT,
+    COMP3_DAT,
 };
 
 
