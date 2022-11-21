@@ -32,6 +32,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/gemini/cpu.c',
         'arm_cm/gemini/ls_msp_qspiv2.c',
         'arm_cm/gemini/ls_msp_crc.c',
+        'arm_cm/gemini/ls_msp_comp.c',
         'arm_cm/gemini/ls_msp_i2c.c',
         'arm_cm/gemini/ls_msp_iwdg.c',
         'arm_cm/gemini/ls_msp_pdm.c',
@@ -95,6 +96,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'src/ls_hal_crc.c',
         'src/ls_hal_sha.c',
         'src/ls_hal_wwdg.c',
+        'src/ls_hal_comp.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',

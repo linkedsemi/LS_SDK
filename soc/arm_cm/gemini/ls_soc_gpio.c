@@ -95,9 +95,9 @@ static gpio_pin_t bxcan_txd;
 static gpio_pin_t bxcan_rxd;
 static gpio_pin_t usb_dp;
 static gpio_pin_t usb_dm;
-static gpio_pin_t comp0_dat;
 static gpio_pin_t comp1_dat;
 static gpio_pin_t comp2_dat;
+static gpio_pin_t comp3_dat;
 
 __attribute__((weak)) void io_exti_callback(uint8_t pin,exti_edge_t edge){}
 
@@ -1863,18 +1863,6 @@ static void  comp_io_cfg(uint8_t dat)
     io_cfg_output(dat);
 }
 
-void pinmux_comp0_init(uint8_t dat)
-{
-    *(uint8_t *)&comp0_dat = dat;
-    comp_io_cfg(dat);
-    per_func_enable(pin2func_io((gpio_pin_t *)&dat),COMP0_DAT);
-}
-
-void pinmux_comp0_deinit(void)
-{
-    per_func_disable(pin2func_io((gpio_pin_t *)&comp0_dat));
-}
-
 void pinmux_comp1_init(uint8_t dat)
 {
     *(uint8_t *)&comp1_dat = dat;
@@ -1897,6 +1885,18 @@ void pinmux_comp2_init(uint8_t dat)
 void pinmux_comp2_deinit(void)
 {
     per_func_disable(pin2func_io((gpio_pin_t *)&comp2_dat));
+}
+
+void pinmux_comp3_init(uint8_t dat)
+{
+    *(uint8_t *)&comp3_dat = dat;
+    comp_io_cfg(dat);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dat),COMP3_DAT);
+}
+
+void pinmux_comp3_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_pin_t *)&comp3_dat));
 }
 
 void pinmux_uart2_init(uint8_t txd,uint8_t rxd);
