@@ -13,7 +13,7 @@ static void COMP_Handler(void)
         edge = (comp_stat >> (COMP_STAT_COMP1_RINTR_POS + 2 * i)) & 0x3;
         if (edge != 0)
         {
-            HAL_COMP_IRQHandler(COMP_inst_env[i], edge);
+            HAL_COMP_IRQHandler(COMP_inst_env[i], edge, (comp_stat >> (COMP_STAT_COMP1_OUT_POS + i)) & 0x1);
         }
     }
 }
