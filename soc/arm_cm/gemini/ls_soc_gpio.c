@@ -199,6 +199,7 @@ void io_init(void)
 {
     SYSC_AWO->IO[0].IEN_OD = 0x9fff0000;
     SYSC_AWO->IO[0].OE_DOT= 0;
+    SYSC_AWO->IO[0].PUPD = 0x60000000;
     SYSC_AWO->IO[1].IEN_OD = 0xffff0000;
     SYSC_AWO->IO[1].OE_DOT = 0;
     SYSC_AWO->IO[2].IEN_OD = 0xffff0000;
