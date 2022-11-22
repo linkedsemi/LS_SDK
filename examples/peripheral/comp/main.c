@@ -25,7 +25,8 @@ static void test_comp1()
     param.vrefctl = 2;          // internal reference voltage select: 0.6V
     param.hysteresis = 3;       // hysteresis select: HS:15.6mV
     param.clk_mode = HighSpeed; // speed mode select ( LS/MS/HS )
-    HAL_COMP_Start(&COMP_Config, &param);
+    HAL_COMP_Config(&COMP_Config, &param);
+    HAL_COMP_Start(&COMP_Config);
 }
 
 int main(void)
@@ -38,7 +39,7 @@ int main(void)
     }
 }
 
-void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge)
+void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool status)
 {
     uint8_t comp = 0;
     switch ((uint32_t)hcomp->COMP)
@@ -56,13 +57,13 @@ void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge)
     switch (edge)
     {
     case EDGE_RISING:
-        LOG_I("trigger : COMP%d--Rising   edge", comp);
+        LOG_I("trigger : COMP%d--Rising   edge--%d", comp, status);
         break;
     case EDGE_FALLING:
-        LOG_I("trigger : COMP%d--Falling  edge", comp);
+        LOG_I("trigger : COMP%d--Falling  edge--%d", comp, status);
         break;
     case EDGE_BOTH:
-        LOG_I("trigger : COMP%d--Both     edge", comp);
+        LOG_I("trigger : COMP%d--Both     edge--%d", comp, status);
         break;
     }
 }
