@@ -28,7 +28,7 @@ HAL_StatusTypeDef HAL_COMP_Config(COMP_HandleTypeDef *hcomp, COMP_Param *param)
 
 HAL_StatusTypeDef HAL_COMP_Start(COMP_HandleTypeDef *hcomp)
 {
-    comp_intr_clr(hcomp, EDGE_BOTH);
+    comp_intr_clr(hcomp, COMP_EDGE_BOTH);
     REG_FIELD_WR(hcomp->COMP->COMP_CTRL, COMP_CTRL_EN, 1);
     return HAL_OK;
 }

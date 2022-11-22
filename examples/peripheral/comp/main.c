@@ -56,13 +56,13 @@ void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool
     }
     switch (edge)
     {
-    case EDGE_RISING:
+    case COMP_EDGE_RISING:
         LOG_I("trigger : COMP%d--Rising   edge--%d", comp, status);
         break;
-    case EDGE_FALLING:
+    case COMP_EDGE_FALLING:
         LOG_I("trigger : COMP%d--Falling  edge--%d", comp, status);
         break;
-    case EDGE_BOTH:
+    case COMP_EDGE_BOTH:
         LOG_I("trigger : COMP%d--Both     edge--%d", comp, status);
         break;
     }

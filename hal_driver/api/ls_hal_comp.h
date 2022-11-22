@@ -14,9 +14,9 @@ enum SpeedMode
 
 enum comp_intr_edge
 {
-  EDGE_RISING = 0x1,
-  EDGE_FALLING = 0x2,
-  EDGE_BOTH = (EDGE_FALLING | EDGE_RISING),
+  COMP_EDGE_RISING = 0x1,
+  COMP_EDGE_FALLING = 0x2,
+  COMP_EDGE_BOTH = (COMP_EDGE_FALLING | COMP_EDGE_RISING),
 };
 
 typedef struct
