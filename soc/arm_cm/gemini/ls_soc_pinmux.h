@@ -976,6 +976,26 @@ void pinmux_amic_init(void);
 void pinmux_amic_deinit(void);
 
 /**
+  * @brief Set mux function of pin dac1
+  */
+void pinmux_dac1_init(void);
+
+/**
+  * @brief clear mux function of pin dac1
+  */
+void pinmux_dac1_deinit(void);
+
+/**
+  * @brief Set mux function of pin dac2
+  */
+void pinmux_dac2_init(void);
+
+/**
+  * @brief clear mux function of pin dac2
+  */
+void pinmux_dac2_deinit(void);
+
+/**
   * @brief       configure gpio pin as touchkey cmod
   */
 void pinmux_touchkey_cmod_init();
