@@ -77,4 +77,6 @@
 
 #define LSSYSC_PER_BASE_ADDR (0x4008D000)
 
+#define LSDAC_BASE_ADDR (0x4008D400)
+
 #endif

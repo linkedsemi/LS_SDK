@@ -443,6 +443,78 @@ gemini_adc_dma_keil_build:
   script:
     - cd examples/peripheral/adcv2/adc_multi_channel_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_multi_channel_dma.uvprojx -o UVBuild/build.txt -j0
 
+gemini_dual_dac_channel_dma_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage && scons ic=gemini
+
+gemini_dual_dac_channel_dma_voltage_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b dual_dac_channel_dma_voltage.uvprojx -o UVBuild/build.txt -j0
+
+gemini_dual_dac_channel_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_voltage && scons ic=gemini
+
+gemini_dual_dac_channel_voltage_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_voltage/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b dual_dac_channel_voltage.uvprojx -o UVBuild/build.txt -j0
+
+gemini_dual_dac_channel_wave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_wave && scons ic=gemini
+
+gemini_dual_dac_channel_wave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_wave/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b dual_dac_channel_wave.uvprojx -o UVBuild/build.txt -j0
+
+gemini_single_dac_channel_dma_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_dma_voltage && scons ic=gemini
+
+gemini_single_dac_channel_dma_voltage_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_dma_voltage/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_dma_voltage.uvprojx -o UVBuild/build.txt -j0
+
+gemini_single_dac_channel_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_voltage && scons ic=gemini
+
+gemini_single_dac_channel_voltage_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_voltage/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_voltage.uvprojx -o UVBuild/build.txt -j0
+
+gemini_single_dac_channel_wave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_wave && scons ic=gemini
+
+gemini_single_dac_channel_wave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_wave/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_wave.uvprojx -o UVBuild/build.txt -j0
+
 gemini_rtc_build:
   stage: build
   script:
