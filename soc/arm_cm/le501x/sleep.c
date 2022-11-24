@@ -311,14 +311,12 @@ void deep_sleep()
     systick_stop();
     lvd33_disable();
     cpu_flash_deep_sleep_and_recover();
-    rco_freq_counting_config();
     wkup_ble();
     lvd33_enable();
     irq_reinit();
     ble_wkup_status_set(true);
     ble_radio_en_sync();
     systick_start();
-    rco_freq_counting_start();
 }
 
 void uart_log_pause(void);
