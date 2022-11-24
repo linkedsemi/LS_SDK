@@ -29,7 +29,8 @@
 #include "ls_hal_timer.h"
 #include "reg_lptim.h"
 #include "sw_timer.h"
-#include "ls_hal_ecc.h"
+#include "ls_sys.h"
+#include "sys_stat.h"
 #define XTAL_STB_VAL 20
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
@@ -38,7 +39,7 @@
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
-DEF_BUILTIN_TIMER_ENV(SDK_SW_TIMER_MAX);
+DEF_BUILTIN_TIMER_ENV(SDK_BUILTIN_TIMER_MAX);
 
 void stack_var_ptr_init(void);
 
@@ -175,26 +176,11 @@ static void mac_init()
 }
 
 #if SDK_LSI_USED
+static void *lsi_counting_timer;
 static uint16_t lsi_cnt_val;
-static uint16_t lsi_dummy_cnt;
+static bool lsi_counting_valid;
 
-static void GPTIM_IRQ_Handler_For_LSI_Counting()
-{
-    LSGPTIMB->ICR = TIMER_ICR_UIE_MASK;         // Clear interrupt
-    lsi_dummy_cnt = LSGPTIMB->CCR1;
-    __NVIC_DisableIRQ(GPTIMB1_IRQn);
-}
-
-void rco_freq_counting_init()
-{
-    REG_FIELD_WR(RCC->CFG,RCC_LPTIM_CLKS,0);
-    REG_FIELD_WR(RCC->APB2EN,RCC_LPTIM,1);
-    REG_FIELD_WR(RCC->APB1EN,RCC_GPTIMB1,1);
-    arm_cm_set_int_isr(GPTIMB1_IRQn,GPTIM_IRQ_Handler_For_LSI_Counting);
-    DELAY_US(200);
-}
-
-void rco_freq_counting_config()
+void rco_freq_counting_start()
 {
     HAL_PIS_Config(7,LPTIM_TRGO,GPTIMB1_ITR0,PIS_SYNC_SRC_LEVEL,PIS_EDGE_NONE);
 //GPTIMC Config
@@ -212,14 +198,62 @@ void rco_freq_counting_config()
     LPTIM->ARR   = LSI_CNT_CYCLES-1;
     LPTIM->CON1  = 1;
     LPTIM->CON0 |= 1<<22;
-}
-
-void rco_freq_counting_start()
-{
-    __NVIC_ClearPendingIRQ(GPTIMB1_IRQn);
-    __NVIC_EnableIRQ(GPTIMB1_IRQn);
     while(LPTIM->SYNCSTAT&2);
     LPTIM->CON1 |= 4;
+
+    gptimerb1_status_set(true);
+    lsi_counting_valid = false;
+    __NVIC_ClearPendingIRQ(GPTIMB1_IRQn);
+    __NVIC_EnableIRQ(GPTIMB1_IRQn);
+}
+
+static void lsi_counting_timer_callback(void *param)
+{
+    rco_freq_counting_start();
+}
+
+void lsi_counting_timer_create()
+{
+    lsi_counting_timer = builtin_timer_create(lsi_counting_timer_callback);
+}
+
+__attribute__((weak)) void builtin_timer_start(void *timer,uint32_t timeout,void *param){}
+__attribute__((weak)) void func_post(void (*func)(void *),void *param){}
+
+static void lsi_counting_timer_start(void *param)
+{
+    builtin_timer_start(lsi_counting_timer,LSI_RECOUNT_PERIOD_MS,lsi_counting_timer);
+}
+
+static void GPTIM_IRQ_Handler_For_LSI_Counting()
+{
+    LSGPTIMB->ICR = TIMER_ICR_UIE_MASK;         // Clear interrupt
+    if(lsi_counting_valid)
+    {
+        lsi_cnt_val = LSGPTIMB->CCR1;
+        __NVIC_DisableIRQ(GPTIMB1_IRQn);
+        gptimerb1_status_set(false);
+        REG_FIELD_WR(RCC->APB2RST,RCC_LPTIM,1);
+        REG_FIELD_WR(RCC->APB2RST,RCC_LPTIM,0);
+        REG_FIELD_WR(RCC->APB1RST,RCC_GPTIMB1,1);
+        REG_FIELD_WR(RCC->APB1RST,RCC_GPTIMB1,0);
+        if(lsi_counting_timer)
+        {
+            func_post(lsi_counting_timer_start,NULL);
+        }
+    }else
+    {
+        lsi_counting_valid = true;
+    }
+}
+
+void rco_freq_counting_init()
+{
+    REG_FIELD_WR(RCC->CFG,RCC_LPTIM_CLKS,0);
+    REG_FIELD_WR(RCC->APB2EN,RCC_LPTIM,1);
+    REG_FIELD_WR(RCC->APB1EN,RCC_GPTIMB1,1);
+    arm_cm_set_int_isr(GPTIMB1_IRQn,GPTIM_IRQ_Handler_For_LSI_Counting);
+    DELAY_US(200);
 }
 
 uint64_t lpcycles_to_hus(uint32_t lpcycles)
@@ -243,15 +277,6 @@ uint16_t get_lsi_cnt_val(void)
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
 {
     LS_ASSERT(hs_cnt);
-    if((NVIC->ISER[0U]&1<<GPTIMB1_IRQn)==0)
-    {
-        uint16_t ccr = LSGPTIMB->CCR1;
-        if(ccr!=lsi_dummy_cnt)
-        {
-            lsi_cnt_val = ccr;
-            //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
-        }
-    }
     LS_ASSERT(lsi_cnt_val);
     uint64_t lpcycles = LSI_CNT_CYCLES*625*(uint64_t)hs_cnt;
     __div64_32(&lpcycles,2*lsi_cnt_val);
@@ -259,28 +284,20 @@ uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
     return lpcycles;
 }
 
-void rco_freq_counting_sync()
-{
-    while((NVIC->ISER[0U]&1<<GPTIMB1_IRQn));
-    while(LSGPTIMB->CCR1==lsi_dummy_cnt);
-    lsi_cnt_val = LSGPTIMB->CCR1;
-}
-
 void lse_init(){}
 #else
 void rco_freq_counting_init(){}
-void rco_freq_counting_config(){}
 void rco_freq_counting_start(){}
 uint64_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
 uint32_t us_to_lpcycles(uint32_t us){return 0;}
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt){return 0;}
-void rco_freq_counting_sync(){}
 void lse_init()
 {
     REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_LDO_LP_TRIM,7);
     RCC->CK |= RCC_LSE_EN_MASK;
     DELAY_US(100000);
 }
+void lsi_counting_timer_create(){}
 #endif
 
 uint8_t get_reset_source()
@@ -325,10 +342,11 @@ uint32_t get_trng_value()
 static void module_init()
 {
     io_init();
-    rco_freq_counting_init();
     LOG_INIT();
     LOG_I("sys init");
     INIT_BUILTIN_TIMER_ENV();
+    rco_freq_counting_init();
+    lsi_counting_timer_create();
     HAL_PIS_Init();
 
     srand(get_trng_value());
@@ -338,17 +356,10 @@ static void module_init()
     modem_rf_init();
     irq_init();
     systick_start();
-    rco_freq_counting_config();
     rco_freq_counting_start();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
-    rco_freq_counting_sync();
-}
-
-static void rco_val_init()
-{
-    SYSCFG->PMU_ANALOG = 0;
 }
 
 void XIP_BANNED_FUNC(LVD33_Handler,)
@@ -375,6 +386,18 @@ void lvd33_disable()
     REG_FIELD_WR(SYSCFG->ANACFG0,SYSCFG_LVD_EN,0);
 }
 
+static void lsi_calib()
+{
+    MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_RCO_MODE_SEL_MASK|SYSCFG_RCO_CAL_START_MASK|SYSCFG_EN_RCO_DIG_PWR_MASK,
+        0<<SYSCFG_RCO_MODE_SEL_POS|1<<SYSCFG_RCO_CAL_START_POS|1<<SYSCFG_EN_RCO_DIG_PWR_POS);
+    while(REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_DONE)==0)
+    {
+        uint16_t cal_code = REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_CODE);
+        SYSCFG->PMU_ANALOG = cal_code;
+    }
+    MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_RCO_CAL_START_MASK|SYSCFG_EN_RCO_DIG_PWR_MASK,0);
+}
+
 static void analog_init()
 {
     dcdc_on();
@@ -383,9 +406,8 @@ static void analog_init()
         clk_switch();
     }
     lse_init();
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
+    lsi_calib();
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
-    rco_val_init();
     arm_cm_set_int_isr(LVD33_IRQn,LVD33_Handler);
 }
 
@@ -416,7 +438,6 @@ void sys_init_app()
 void sys_init_none()
 {
     analog_init();
-    rco_freq_counting_init();
     HAL_PIS_Init();
     hal_flash_drv_var_init(true,false);
     cpu_sleep_recover_init();
@@ -426,10 +447,8 @@ void sys_init_none()
     irq_init();
     systick_start();
     LOG_INIT();
-    rco_freq_counting_config();
     rco_freq_counting_start();
     sw_timer_module_init();
-    rco_freq_counting_sync();
 }
 
 void sys_init_24g(void)
@@ -453,7 +472,6 @@ void sys_init_ll()
     analog_init();
     ll_var_init();
     io_init();
-    rco_freq_counting_init();
     LOG_INIT();
     HAL_PIS_Init();
     calc_acc_init();
@@ -462,8 +480,6 @@ void sys_init_ll()
     modem_rf_init();
     irq_init();
     systick_start();
-    rco_freq_counting_config();
-    rco_freq_counting_start();
 }
 
 void platform_reset(uint32_t error)
