@@ -73,7 +73,7 @@ void sleep_wakeup_config()
                           |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1)
                           |FIELD_BUILD(V33_RG_PD_GPIO_SEL,SYSC_AWO->DBG_ACK);
 
-    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x3f)
+    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x3d)
                         |FIELD_BUILD(V33_RG_SWD_IO_WKUP_EN,1)
                         |FIELD_BUILD(V33_RG_WKUP0_SYNC_SEL,0)
                         |FIELD_BUILD(V33_RG_WKUP1_SYNC_SEL,0);
