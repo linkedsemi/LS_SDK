@@ -7,6 +7,7 @@
 #include "sys_stat.h"
 #include "ls_hal_i2c.h"
 #include <stddef.h>
+#include "dmac_config.h"
 
 static I2C_HandleTypeDef *i2c_inst_env[3];
 
@@ -100,6 +101,45 @@ void HAL_I2C_MSP_Idle_Set(I2C_HandleTypeDef *inst)
     i2c_status_set(inst, false);
 }
 
+uint8_t HAL_I2C_TX_DMA_Handshake_Get(I2C_HandleTypeDef *inst)
+{
+    uint8_t handshake = 0;
+    switch ((uint32_t)inst->Instance)
+    {
+    case (uint32_t)I2C1:
+        handshake = CH_I2C1_TX;
+    break;
+    case (uint32_t)I2C2:
+        handshake = CH_I2C2_TX;
+    break;
+    case (uint32_t)I2C3:
+        handshake = CH_I2C3_TX;
+    break;
+    default:
+        LS_ASSERT(0);
+    }
+    return handshake;
+}
+
+uint8_t HAL_I2C_RX_DMA_Handshake_Get(I2C_HandleTypeDef *inst)
+{
+    uint8_t handshake = 0;
+    switch ((uint32_t)inst->Instance)
+    {
+    case (uint32_t)I2C1:
+        handshake = CH_I2C1_RX;
+    break;
+    case (uint32_t)I2C2:
+        handshake = CH_I2C2_RX;
+    break;
+    case (uint32_t)I2C3:
+        handshake = CH_I2C3_RX;
+    break;
+    default:
+        LS_ASSERT(0);
+    }
+    return handshake;
+}
 
 __attribute__((weak)) void LL_I2C1_IRQHandler(void) {}
 

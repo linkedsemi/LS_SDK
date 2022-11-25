@@ -70,6 +70,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'src/ls_hal_cache.c',
         'src/ls_hal_crypt.c',
         'src/ls_hal_i2c.c',
+        'src/ls_hal_i2c_dma.c',
         'src/ls_hal_iwdg.c',
         'src/ls_hal_wwdg.c',
         'src/ls_hal_pdm_dma.c',
