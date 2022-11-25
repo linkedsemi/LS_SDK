@@ -786,3 +786,28 @@ le501x_wwdg_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/wdg/wwdg/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b wwdg.uvprojx -o UVBuild/build.txt -j0
+
+le501x_iap_bootloader_build:
+  stage: build
+  script:
+    - cd examples/peripheral/iap/iap_bootloader && scons
+
+le501x_iap_bootloader_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/iap/iap_bootloader/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iap_bootloader.uvprojx -o UVBuild/build.txt -j0
+
+le501x_iap_application_build:
+  stage: build
+  script:
+    - cd examples/peripheral/iap/iap_application && scons
+
+le501x_iap_application_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/iap/iap_application/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iap_application.uvprojx -o UVBuild/build.txt -j0
+  
