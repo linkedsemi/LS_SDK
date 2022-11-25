@@ -107,10 +107,10 @@ gemini_i2c_it_keil_build:
     - cd examples/peripheral/i2c/i2c_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_it.uvprojx -o UVBuild/build.txt -j0
 
 
-gemini_i2c_it_build:
+gemini_ll_i2c_it_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_it && scons ic=gemini
+    - cd examples/peripheral/i2c/ll_i2c_it && scons ic=gemini
 
 gemini_ll_i2c_it_keil_build:
   stage: build
@@ -130,6 +130,18 @@ gemini_i2c_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/i2c/i2c_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_polling.uvprojx -o UVBuild/build.txt -j0
+
+gemini_i2c_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_dma && scons ic=gemini
+
+gemini_i2c_dma_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_dma.uvprojx -o UVBuild/build.txt -j0
 
 # gemini_pdm_build:
 #   stage: build
