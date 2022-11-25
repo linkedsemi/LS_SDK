@@ -5,6 +5,7 @@
 #include "systick.h"
 #include "platform.h"
 #include "cpu.h"
+#include "ls_ll_i2c.h"
 
 #define I2C_FIFO_DEPTH 8
 #define I2C_TIMEOUT_FLAG          35U         /*!< Timeout 35 ms             */
@@ -12,7 +13,7 @@
 
 #define __HAL_I2C_GET_TXFLV(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, I2C_SR_TXFLV))
 #define __HAL_I2C_GET_RXFLV(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, I2C_SR_RXFLV))
-#define __HAL_I2C_CLR_TXDR(__HANDLE__) (((__HANDLE__)->Instance->SR) |= (1 << 0))
+// #define __HAL_I2C_CLR_TXDR(__HANDLE__) (((__HANDLE__)->Instance->SR) |= (1 << 0))
 
 #define I2C_FIFO_TX(__HANDLE__) while (__HAL_I2C_GET_TXFLV(__HANDLE__) < I2C_FIFO_DEPTH && (__HANDLE__)->XferCount > 0)           \
                                 {                                                                                                 \
@@ -1006,20 +1007,28 @@ static void I2C_ADDR(I2C_HandleTypeDef *hi2c, uint32_t sr1itflags)
 static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
 {
     HAL_I2C_StateTypeDef CurrentState = hi2c->State;
+    HAL_I2C_ModeTypeDef CurrentMode = hi2c->Mode;
     __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR);
     __HAL_I2C_CLEAR_STOPFLAG(hi2c);
-    if (CurrentState == HAL_I2C_STATE_BUSY_RX)
-    {
-        I2C_FIFO_RX(hi2c);
-    }
-    else if (CurrentState == HAL_I2C_STATE_BUSY_TX)
-    {
-        hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
-    }
 
-    if (hi2c->XferCount != 0U)
+    bool tx_dma_en = LL_I2C_IsEnabledDMAReq_TX(hi2c->Instance);
+    bool rx_dma_en = LL_I2C_IsEnabledDMAReq_RX(hi2c->Instance);
+
+    if (!tx_dma_en && !rx_dma_en)
     {
-        hi2c->ErrorCode |= HAL_I2C_ERROR_SIZE;
+        if (CurrentState == HAL_I2C_STATE_BUSY_RX)
+        {
+            I2C_FIFO_RX(hi2c);
+        }
+        else if (CurrentState == HAL_I2C_STATE_BUSY_TX)
+        {
+            hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+        }
+
+        if (hi2c->XferCount != 0U)
+        {
+            hi2c->ErrorCode |= HAL_I2C_ERROR_SIZE;
+        }
     }
 
     if (hi2c->ErrorCode != HAL_I2C_ERROR_NONE)
@@ -1030,11 +1039,22 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
     else
     {
         __HAL_I2C_DISABLE(hi2c);
+        HAL_I2C_hw_Init(hi2c); // workaround xxx
+        hi2c->Mode = HAL_I2C_MODE_NONE;
+        hi2c->State = HAL_I2C_STATE_READY;
         if (CurrentState == HAL_I2C_STATE_BUSY_TX)
         {
-            if (hi2c->Mode == HAL_I2C_MODE_MASTER)
+            if (CurrentMode == HAL_I2C_MODE_MASTER)
             {
-                HAL_I2C_MasterTxCpltCallback(hi2c);
+                if (tx_dma_en)
+                {
+                    REG_FIELD_WR(hi2c->Instance->CR1, I2C_CR1_TXDMAEN, 0);
+                    HAL_I2C_DMA_TxCpltCallback(hi2c);
+                }
+                else
+                {
+                    HAL_I2C_MasterTxCpltCallback(hi2c);
+                }
             }
             else
             {
@@ -1043,18 +1063,26 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
         }
         else if (CurrentState == HAL_I2C_STATE_BUSY_RX)
         {
-            if (hi2c->Mode == HAL_I2C_MODE_MASTER)
+            if (CurrentMode == HAL_I2C_MODE_MASTER)
             {
-                HAL_I2C_MasterRxCpltCallback(hi2c);
+                if (rx_dma_en)
+                {
+                    REG_FIELD_WR(hi2c->Instance->CR1, I2C_CR1_RXDMAEN, 0);
+                    HAL_I2C_DMA_RxCpltCallback(hi2c);
+                }
+                else
+                {
+                    HAL_I2C_MasterRxCpltCallback(hi2c);
+                }
             }
             else
             {
                 HAL_I2C_SlaveRxCpltCallback(hi2c);
             }
         }
-        HAL_I2C_hw_Init(hi2c); // workaround xxx
-        hi2c->Mode = HAL_I2C_MODE_NONE;
-        hi2c->State = HAL_I2C_STATE_READY;
+        // HAL_I2C_hw_Init(hi2c); // workaround xxx
+        // hi2c->Mode = HAL_I2C_MODE_NONE;
+        // hi2c->State = HAL_I2C_STATE_READY;
     }
 }
 
@@ -1070,8 +1098,9 @@ static void I2C_ITError(I2C_HandleTypeDef *hi2c)
     }
     hi2c->State = HAL_I2C_STATE_READY;
     __HAL_I2C_DISABLE(hi2c);
-    HAL_I2C_ErrorCallback(hi2c);
     HAL_I2C_hw_Init(hi2c); // workaround xxx
+    HAL_I2C_ErrorCallback(hi2c);
+    // HAL_I2C_hw_Init(hi2c); // workaround xxx
     hi2c->ErrorCode = HAL_I2C_ERROR_NONE;
 }
 

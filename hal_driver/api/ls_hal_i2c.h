@@ -61,6 +61,7 @@
 #define I2C_MEMADD_SIZE_8BIT            0x00000001U
 #define I2C_MEMADD_SIZE_16BIT           0x00000010U
 
+#define __HAL_I2C_CLR_TXDR(__HANDLE__) (((__HANDLE__)->Instance->SR) |= (1 << 0))
 
  /**
   * @brief  I2C Configuration Structure definition
@@ -263,6 +264,32 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
 HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size);
 /**
   ****************************************************************************************
+  * @brief  Transmit in master mode an amount of data in DMA mode
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *              the configuration information for the specified I2C.
+  * @param  DevAddress Target device address: The device 7 bits address value
+  *                    in datasheet must be shifted to the left before calling the interface
+  * @param  pData Pointer to data buffer
+  * @param  Size Amount of data to be sent
+  * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
+  ****************************************************************************************
+  */
+HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
+/**
+  ****************************************************************************************
+  * @brief  Receive in master mode an amount of data in DMA mode
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @param  DevAddress Target device address: The device 7 bits address value
+  *         in datasheet must be shifted to the left before calling the interface
+  * @param  pData Pointer to data buffer
+  * @param  Size Amount of data to be sent
+  * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
+  ****************************************************************************************
+  */
+HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
+/**
+  ****************************************************************************************
   * @brief  This function handles I2C event interrupt request.
   * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
   *              the configuration information for the specified I2C.
@@ -320,6 +347,22 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
   ****************************************************************************************
   */
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
+/**
+  * @brief  DMA I2C Tx Transfer completed callbacks.
+  * @note   This function needs to be implemented when the callback is needed,
+           the HAL_I2C_DMA_TxCpltCallback could be implemented in the user file
+  * @param  hi2c  Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C module.
+  */
+void HAL_I2C_DMA_TxCpltCallback(I2C_HandleTypeDef *hi2c);
+/**
+  * @brief  DMA I2C Rx Transfer completed callbacks.
+  * @note  This function needs to be implemented when the callback is needed,
+           the HAL_I2C_DMA_RxCpltCallback could be implemented in the user file
+  * @param  hi2c  Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C module.
+  */
+void HAL_I2C_DMA_RxCpltCallback(I2C_HandleTypeDef *hi2c);
 /**
   ****************************************************************************************
   * @brief  Return the I2C handle state.
