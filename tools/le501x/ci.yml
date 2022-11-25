@@ -435,11 +435,10 @@ le501x_i2c_it_keil_build:
   script:
     - cd examples/peripheral/i2c/i2c_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
-
-le501x_i2c_it_build:
+le501x_ll_i2c_it_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_it && scons
+    - cd examples/peripheral/i2c/ll_i2c_it && scons
 
 le501x_ll_i2c_it_keil_build:
   stage: build
@@ -459,6 +458,18 @@ le501x_i2c_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/i2c/i2c_polling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_i2c_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_dma && scons
+
+le501x_i2c_dma_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_dma/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_dma.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
 le501x_pdm_build:
   stage: build
