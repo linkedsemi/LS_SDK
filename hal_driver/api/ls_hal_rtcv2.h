@@ -55,24 +55,16 @@ HAL_StatusTypeDef HAL_RTC_DeInit(void);
 
 /**
  ****************************************************************************************
- * \brief RTC de-initialization function
+ * \brief RTC param set 
  * 
  * \param[in]  cyc_1hz         Add one second for every [cyc_1hz] clock cycles
  * \param[in]  calib_cyc       60 seconds extra wait 1 minute for calib_cyc clock cycles
  * \param[in]  calib_en        Enable the sub-calibration function
  *
- ****************************************************************************************
- */
-void rtc_Cycle_Config(uint32_t cyc_1hz, uint32_t calib_cyc, bool calib_en);
-
-/**
- ****************************************************************************************
- * \brief RTC Cycle config function
- *
  * \return status            0: success | others: error
  ****************************************************************************************
  */
-HAL_StatusTypeDef HAL_RTC_Cycle_Config(void);
+HAL_StatusTypeDef HAL_RTC_Cycle_Set(uint32_t cyc_1hz, uint32_t calib_cyc, bool calib_en);
 
 /**
  ****************************************************************************************

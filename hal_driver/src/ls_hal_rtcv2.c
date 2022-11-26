@@ -3,23 +3,17 @@
 #include "sdk_default_config.h"
 #include <stdint.h>
 
-void rtc_Cycle_Config(uint32_t cyc_1hz, uint32_t calib_cyc, bool calib_en)
+HAL_StatusTypeDef HAL_RTC_Cycle_Set(uint32_t cyc_1hz, uint32_t calib_cyc, bool calib_en)
 {
     RTC->CALIB = FIELD_BUILD(RTC_CALIB_CYC1HZ, cyc_1hz - 1) | FIELD_BUILD(RTC_CALIB_CYC, calib_cyc);
     REG_FIELD_WR(RTC->CTRL, RTC_CTRL_CALIB, calib_en);
-}
-
-__attribute__((weak)) HAL_StatusTypeDef HAL_RTC_Cycle_Config(void)
-{
-    rtc_Cycle_Config(SDK_LCLK_HZ, 0, false);
     return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_RTC_Init(void)
 {
     HAL_MSP_RTC_Init();
-    HAL_RTC_Cycle_Config();
-    REG_FIELD_WR(RTC->CTRL, RTC_CTRL_RTCEN, 1);
+    HAL_RTC_Cycle_Set(SDK_LCLK_HZ, 0, false);
     return HAL_OK;
 }
 
