@@ -70,6 +70,7 @@ int main(void)
     sys_init_none();
     DELAY_US(2000 * 1000);// Delay 2s : LSE starts up for a long time and waits for stability!!!
     HAL_RTC_Init();
+    // HAL_RTC_Cycle_Set(SDK_LCLK_HZ, 0, false); /* If you want to modify the modification cycle or calibration */
     rtc_test_calendar_set();
     rtc_test_alarm_set();
     while(1)
