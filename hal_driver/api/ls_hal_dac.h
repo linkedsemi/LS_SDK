@@ -157,7 +157,7 @@ uint32_t HAL_DAC_GetValue(DAC_HandleTypeDef *hdac);
  * @param Callback function pointer.
  * @return HAL status
  */
-HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, uint32_t* pData, uint32_t Length,void (*Callback)(DAC_HandleTypeDef* hdac));
+HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, const uint32_t* pData, uint32_t Length,void (*Callback)(DAC_HandleTypeDef* hdac));
 
 /**
  * @brief 

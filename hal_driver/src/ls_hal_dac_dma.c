@@ -21,7 +21,7 @@ void DAC2_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
     hdac->Env.DMA.Callback(hdac);
 }
 
-void dac_dma_cfg(DAC_HandleTypeDef *hdac, uint32_t *pData, uint32_t Length, void (*Callback)(DAC_HandleTypeDef *hdac))
+void dac_dma_cfg(DAC_HandleTypeDef *hdac, const uint32_t *pData, uint32_t Length, void (*Callback)(DAC_HandleTypeDef *hdac))
 {
     hdac->Env.DMA.Callback = Callback;
     cfg.ctrl.channel_en = 1;
@@ -46,7 +46,7 @@ void dac_dma_cfg(DAC_HandleTypeDef *hdac, uint32_t *pData, uint32_t Length, void
     cfg.dummy = 0;
 }
 
-HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, uint32_t* pData, uint32_t Length,void (*Callback)(DAC_HandleTypeDef* hdac))
+HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, const uint32_t* pData, uint32_t Length,void (*Callback)(DAC_HandleTypeDef* hdac))
 {
     HAL_StatusTypeDef status = HAL_OK;
     dac_dma_cfg(hdac,pData,Length,Callback);
