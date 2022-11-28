@@ -163,11 +163,14 @@ void deep_sleep_no_ble()
     uint32_t cpu_stat = enter_critical();
     SCB->SCR |= (1<<2);
     systick_stop();
+    uint32_t NVIC_EN[CEILING(IRQn_Max,32)];
+    memcpy32(NVIC_EN,(uint32_t *)NVIC->ISER,sizeof(NVIC_EN));
     uint32_t NVIC_IP[CEILING(IRQn_Max,4)];
-    memcpy32(NVIC_IP,(uint32_t *)NVIC->IP,CEILING(IRQn_Max,4));
+    memcpy32(NVIC_IP,(uint32_t *)NVIC->IP,sizeof(NVIC_IP));
     cpu_flash_deep_sleep_and_recover();
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
-    memcpy32((uint32_t *)NVIC->IP,NVIC_IP,CEILING(IRQn_Max,4));
+    memcpy32((uint32_t *)NVIC->IP,NVIC_IP,sizeof(NVIC_IP));
+    memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,sizeof(NVIC_EN));
     io_irq_enable();
     systick_start();
     SCB->SCR &= ~(1<<2);
