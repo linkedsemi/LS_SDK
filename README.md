@@ -57,6 +57,7 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/dac/dual_dac_channel_voltage                                   |        |  √     |
 | peripheral/dac/dual_dac_channel_wave                                      |        |  √     |
 | peripheral/dac/single_dac_channel_dma_voltage                             |        |  √     |
+| peripheral/dac/single_dac_channel_sine_wave                               |        |  √     |
 | peripheral/dac/single_dac_channel_voltage                                 |        |  √     |
 | peripheral/dac/single_dac_channel_wave                                    |        |  √     |
 | peripheral/gpio                                                           |  √     |  √     |
