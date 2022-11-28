@@ -503,6 +503,18 @@ gemini_single_dac_channel_dma_voltage_keil_build:
   script:
     - cd examples/peripheral/dac/single_dac_channel_dma_voltage/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_dma_voltage.uvprojx -o UVBuild/build.txt -j0
 
+gemini_single_dac_channel_sine_wave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_sine_wave && scons ic=gemini
+
+gemini_single_dac_channel_sine_wave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_sine_wave/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_sine_wave.uvprojx -o UVBuild/build.txt -j0
+
 gemini_single_dac_channel_voltage_build:
   stage: build
   script:
