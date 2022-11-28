@@ -536,37 +536,61 @@ le501x_spi_dma_build:
   script:
     - cd examples/peripheral/spi/spi_dma && scons
 
-le501x_spi_dma_keil_build:
+le501x_spi_dma_slave_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_dma/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+    - cd examples/peripheral/spi/spi_dma_slave/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_slave.uvprojx -o UVBuild/build.txt -j0
 
-le501x_spi_it_build:
+le501x_spi_it_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_it && scons
+    - cd examples/peripheral/spi/spi_it_master && scons
 
-le501x_spi_it_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/spi/spi_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
-
-le501x_spi_polling_build:
-  stage: build
-  script:
-    - cd examples/peripheral/spi/spi_polling && scons
-
-le501x_spi_polling_keil_build:
+le501x_spi_it_master_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_polling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+    - cd examples/peripheral/spi/spi_it_master/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_master.uvprojx -o UVBuild/build.txt -j0
 
+le501x_spi_it_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_it_slave && scons
+
+le501x_spi_it_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_it_slave/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_slave.uvprojx -o UVBuild/build.txt -j0
+
+le501x_spi_polling_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_polling_master && scons
+
+le501x_spi_polling_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_polling_master/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_master.uvprojx -o UVBuild/build.txt -j0
+
+le501x_spi_polling_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_polling_slave && scons
+
+le501x_spi_polling_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_polling_slave/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_slave.uvprojx -o UVBuild/build.txt -j0
+    
 le501x_ll_ssi_it_build:
   stage: build
   script:

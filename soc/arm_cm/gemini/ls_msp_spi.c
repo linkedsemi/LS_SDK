@@ -82,28 +82,36 @@ void HAL_SPI_MSP_Idle_Set(SPI_HandleTypeDef *inst)
 
 uint8_t HAL_SPI_TX_DMA_Handshake_Get(SPI_HandleTypeDef *hspi)
 {
+    uint8_t handshake = 0;
     switch ((uint32_t)hspi->Instance)
     {
     case (uint32_t)SPI2:
-        return CH_SPI2_TX;
+        handshake = CH_SPI2_TX;
         break;
     case (uint32_t)SPI3:
-        return CH_SPI3_TX;
+        handshake = CH_SPI3_TX;
         break;
+    default :
+       LS_ASSERT(0);
     }
+    return handshake;
 }
 
 uint8_t HAL_SPI_RX_DMA_Handshake_Get(SPI_HandleTypeDef *hspi)
 {
+    uint8_t handshake = 0;
     switch ((uint32_t)hspi->Instance)
     {
     case (uint32_t)SPI2:
-        return CH_SPI2_RX;
+        handshake = CH_SPI2_RX ;
         break;
     case (uint32_t)SPI3:
-        return CH_SPI3_RX;
+        handshake = CH_SPI3_RX;
         break;
+    default:
+        LS_ASSERT(0);
     }
+    return handshake;
 }
 
 __attribute__((weak)) void LL_SPI2_IRQHandler(){}

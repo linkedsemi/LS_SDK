@@ -141,7 +141,8 @@ void pinmux_hal_flash_quad_deinit(void){}
 
 static void spi_master_clk_io_cfg(uint8_t clk)
 {
-    io_set_pin(clk);
+    io_clr_pin(clk);
+    io_pull_write(clk,IO_PULL_DOWN);
     io_cfg_output(clk);
 }
 

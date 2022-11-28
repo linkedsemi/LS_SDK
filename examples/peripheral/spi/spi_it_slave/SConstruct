@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('spi_it',src,inc,ble = False)
+env.app_build('spi_it_slave',src,inc,ble = False)
