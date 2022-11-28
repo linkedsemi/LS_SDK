@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('spi_polling',src,inc,ble = False)
+env.app_build('spi_polling_master',src,inc,ble = False)

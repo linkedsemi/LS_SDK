@@ -203,41 +203,53 @@ gemini_ll_spi_polling_keil_build:
   script:
     - cd examples/peripheral/spi/ll_spi_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_polling.uvprojx -o UVBuild/build.txt -j0
 
-# gemini_spi_dma_build:
-#   stage: build
-#   script:
-#     - cd examples/peripheral/spi/spi_dma && scons ic=gemini
-
-# gemini_spi_dma_keil_build:
-#   stage: build
-#   rules:
-#     - !reference [.release_rule, rules]
-#   script:
-#     - cd examples/peripheral/spi/spi_dma/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma.uvprojx -o UVBuild/build.txt -j0
-
-gemini_spi_it_build:
+gemini_spi_it_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_it && scons ic=gemini
+    - cd examples/peripheral/spi/spi_it_master && scons ic=gemini
 
-gemini_spi_it_keil_build:
+gemini_spi_it_master_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_it/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi/spi_it_master/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_master.uvprojx -o UVBuild/build.txt -j0
 
-gemini_spi_polling_build:
+gemini_spi_it_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_polling && scons ic=gemini
+    - cd examples/peripheral/spi/spi_it_slave && scons ic=gemini
 
-gemini_spi_polling_keil_build:
+gemini_spi_it_slave_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi/spi_it_slave/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_slave.uvprojx -o UVBuild/build.txt -j0
+
+gemini_spi_polling_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_polling_master && scons ic=gemini
+
+gemini_spi_polling_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_polling_master/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_master.uvprojx -o UVBuild/build.txt -j0
+
+gemini_spi_polling_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_polling_slave && scons ic=gemini
+
+gemini_spi_polling_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_polling_slave/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_slave.uvprojx -o UVBuild/build.txt -j0
 
 gemini_ll_ssi_it_build:
   stage: build

@@ -10,7 +10,7 @@ __attribute__((weak)) void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi){
 static void spi_enable(SPI_HandleTypeDef *hspi)
 {
     /* Enable SPI peripheral */
-    __HAL_SPI_ENABLE(hspi);    
+    SET_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
 }
 void spi_tx_empty_dma_isr(SPI_HandleTypeDef *hspi)
 {
@@ -200,7 +200,6 @@ HAL_StatusTypeDef HAL_SPI_Transmit_DMA(SPI_HandleTypeDef *hspi,void *Data,uint16
 HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef *hspi,void *Data,uint16_t Count)
 {
     spi_dma_config(hspi,NULL,Data,Count);
-    //MODIFY_REG(hspi->Instance->CR2,SPI_CR2_RXFTH_MASK,7);
     MODIFY_REG(hspi->Instance->CR2, SPI_CR2_RXDMAEN_MASK, SPI_CR2_RXDMAEN_MASK);
     spi_enable(hspi);
     return HAL_OK;
