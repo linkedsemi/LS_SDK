@@ -80,12 +80,8 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
 #include "ls_hal_dmac.h"
 static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
-    uint8_t *pTxData, *pRxData; 
-    pTxData = TX_Data? TX_Data: &hspi->Tx_Env.DMA.dummy;
-    pRxData = RX_Data? RX_Data: &hspi->Rx_Env.DMA.dummy;
-
-    uint32_t tx_data_end_ptr = (uint32_t)pTxData;
-    uint32_t rx_data_end_ptr = (uint32_t)pRxData;
+    uint32_t tx_data_end_ptr = (uint32_t)TX_Data;
+    uint32_t rx_data_end_ptr = (uint32_t)RX_Data;
     uint8_t data_size;
     uint8_t inc;
 
@@ -106,7 +102,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
    
     struct DMA_Channel_Config prim;
     /* Tx parameter initialize*/
-    prim.src_data_end_ptr = tx_data_end_ptr;
+    prim.src_data_end_ptr = TX_Data? tx_data_end_ptr: (uint32_t)&hspi->Tx_Env.DMA.dummy;
     prim.dst_data_end_ptr = (uint32_t)&hspi->Instance->DR;
     prim.ctrl_data.cycle_ctrl = DMA_Cycle_Basic,
     prim.ctrl_data.next_useburst = 0;
@@ -115,7 +111,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     prim.ctrl_data.src_prot_ctrl = 0;
     prim.ctrl_data.dst_prot_ctrl = 0;
     prim.ctrl_data.src_size = data_size;
-    prim.ctrl_data.src_inc = inc;
+    prim.ctrl_data.src_inc = TX_Data? inc: DMA_INC_NONE;
     prim.ctrl_data.dst_size = data_size;
     prim.ctrl_data.dst_inc = DMA_INC_NONE;
     prim.dummy = (uint32_t)SPI_Transmit_DMA_Callback;
@@ -124,9 +120,9 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
 
     /* Rx parameter initialize*/
     prim.src_data_end_ptr = (uint32_t)&hspi->Instance->DR;
-    prim.dst_data_end_ptr = rx_data_end_ptr;
+    prim.dst_data_end_ptr = RX_Data? rx_data_end_ptr: (uint32_t)&hspi->Rx_Env.DMA.dummy;
     prim.ctrl_data.src_inc = DMA_INC_NONE;
-    prim.ctrl_data.dst_inc = inc;
+    prim.ctrl_data.dst_inc = RX_Data? inc: DMA_INC_NONE;
     prim.dummy = (uint32_t)SPI_Receive_DMA_Callback;
     HAL_DMA_Channel_Config_Set(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,false,&prim);
     HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,CH_SPI2_RX,(uint32_t)hspi);
