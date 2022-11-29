@@ -53,16 +53,23 @@ typedef struct
   */
 
 /**
+  * @brief  SPI Interrupt Environment
+  */
+struct Interrupt_Env
+{
+  uint8_t                    *pBuffPtr;                     /*!< Pointer to SPI transfer Buffer */
+  uint16_t              	 Count;                         /*!< SPI Transfer Counter           */
+  void (*transfer_Fun)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Rx_Fun     */
+};
+
+/**
   * @brief  SPI DMA Environment
   */
 struct SPI_DMA_Env
 {
     uint8_t DMA_Channel;
-    bool DMA_EN;
+    uint8_t dummy;
 };
-/**
-  * @}
-  */
 
 /**
   * @brief  SPI handle Structure definition
@@ -71,19 +78,15 @@ typedef struct __SPI_HandleTypeDef
 {
   reg_spi_t               	 *Instance;      /*!< SPI registers base address               */
   SPI_InitTypeDef            Init;           /*!< SPI communication parameters             */
-  uint8_t                    *pTxBuffPtr;    /*!< Pointer to SPI Tx transfer Buffer        */
-  uint16_t              	 TxXferCount;    /*!< SPI Tx Transfer Counter                  */
-  uint8_t                    *pRxBuffPtr;    /*!< Pointer to SPI Rx transfer Buffer        */
-  uint16_t              	 RxXferCount;    /*!< SPI Rx Transfer Counter                  */
-  void (*Rx_Fun)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Rx_Fun      */
-  void (*Tx_Fun)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Tx_Fun      */
   void                       *DMAC_Instance;
   union{
+        struct Interrupt_Env Interrupt;
         struct SPI_DMA_Env      DMA;
   }Tx_Env,Rx_Env;
-  uint32_t                   ErrorCode;      /*!< SPI Error code                           */
-
 } SPI_HandleTypeDef;
+/**
+  * @}
+  */
 
 /** @defgroup SPI_Error_Code SPI Error Code
   * @{
@@ -325,28 +328,12 @@ void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi);
 void HAL_SPI_CpltCallback(SPI_HandleTypeDef *hspi);
 
 /**
-  * @brief  Tx Transfer completed callback in DMA.
+  * @brief  Transfer completed callback in DMA.
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
   *               the configuration information for SPI module.
   * @retval None
   */
-void HAL_SPI_TxDMACpltCallback(SPI_HandleTypeDef *hspi);
-
-/**
-  * @brief  Rx Transfer completed callback in DMA.
-  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
-  *               the configuration information for SPI module.
-  * @retval None
-  */
-void HAL_SPI_RxDMACpltCallback(SPI_HandleTypeDef *hspi);
-
-/**
-  * @brief  Tx and Rx Transfer completed callback in DMA.
-  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
-  *               the configuration information for SPI module.
-  * @retval None
-  */
-void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi);
+void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi);
 
 #endif
 

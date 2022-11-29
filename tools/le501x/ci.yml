@@ -531,10 +531,22 @@ le501x_ll_spi_it_keil_build:
   script:
     - cd examples/peripheral/spi/ll_spi_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_it.uvprojx -o UVBuild/build.txt -j0
 
-le501x_spi_dma_build:
+le501x_spi_dma_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_dma && scons
+    - cd examples/peripheral/spi/spi_dma_master && scons
+
+le501x_spi_dma_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_dma_master/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_master.uvprojx -o UVBuild/build.txt -j0
+
+le501x_spi_dma_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_dma_slave && scons
 
 le501x_spi_dma_slave_keil_build:
   stage: build
@@ -845,4 +857,3 @@ le501x_iap_application_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/iap/iap_application/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iap_application.uvprojx -o UVBuild/build.txt -j0
-  

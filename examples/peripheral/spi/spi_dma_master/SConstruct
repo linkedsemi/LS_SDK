@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('spi_dma',src,inc,ble = False)
+env.app_build('spi_dma_master',src,inc,ble = False)

@@ -58,7 +58,7 @@ static void spi_init(void)
 {
     /* Configure the GPIO AF */
     /* CLK-------------PB12 */	
-    /* SSN-------------PB13 */	
+    /* CS--------------PB13 */	
     /* MOSI------------PB14 */	
     /* MISO------------PB15 */	
   
