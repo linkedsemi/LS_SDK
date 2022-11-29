@@ -203,6 +203,30 @@ gemini_ll_spi_polling_keil_build:
   script:
     - cd examples/peripheral/spi/ll_spi_polling/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_polling.uvprojx -o UVBuild/build.txt -j0
 
+gemini_spi_dma_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_dma_master && scons ic=gemini
+
+gemini_spi_dma_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_dma_master/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_master.uvprojx -o UVBuild/build.txt -j0
+
+gemini_spi_dma_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi/spi_dma_slave && scons ic=gemini
+
+gemini_spi_dma_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi/spi_dma_slave/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_slave.uvprojx -o UVBuild/build.txt -j0
+
 gemini_spi_it_master_build:
   stage: build
   script:
@@ -622,4 +646,3 @@ gemini_iap_application_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/iap/iap_application/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iap_application.uvprojx -o UVBuild/build.txt -j0
-  

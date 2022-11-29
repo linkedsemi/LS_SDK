@@ -35,19 +35,12 @@
 #include "ls_hal_dmac.h"
 #endif
 
-
-/* Uncomment this line to use the board as master, if not it is used as slave */
-#define MASTER_BOARD
-
 #define LED_IO PA01
 
 #define SPI_CLK_PIN        PB12 
 #define SPI_CS_PIN         PB13 
 #define SPI_MOSI_PIN       PB14 
 #define SPI_MISO_PIN       PB15 
-
-#define SPI_CS_LOW()      io_write_pin(SPI_CS_PIN,0);
-#define SPI_CS_HIGH()     io_write_pin(SPI_CS_PIN,1);
 
 /* Size of buffer */
 #define BUFFERSIZE              20
@@ -74,7 +67,6 @@ static void spi_dma_channel_init(void)
     SpiHandle.Rx_Env.DMA.DMA_Channel = 1;
 }
 
-
 /* transfer state */
 volatile uint32_t ComState = COM_WAIT;
 
@@ -86,20 +78,13 @@ static void spi_init(void)
 {
     /* Configure the GPIO AF */
     /* CLK-------------PB12 */	
-    /* SSN-------------PB13 */	
+    /* CS--------------PB13 */	
     /* MOSI------------PB14 */	
     /* MISO------------PB15 */	
-	#ifdef 	MASTER_BOARD
-    pinmux_spi2_master_clk_init(SPI_CLK_PIN);
-    pinmux_spi2_master_nss_init(SPI_CS_PIN);
-    pinmux_spi2_master_mosi_init(SPI_MOSI_PIN); 
-    pinmux_spi2_master_miso_init(SPI_MISO_PIN);
-    #else
     pinmux_spi2_slave_clk_init(SPI_CLK_PIN);
     pinmux_spi2_slave_nss_init(SPI_CS_PIN);
     pinmux_spi2_slave_mosi_init(SPI_MOSI_PIN);
     pinmux_spi2_slave_miso_init(SPI_MISO_PIN);
-    #endif
 
     /* Set the SPI parameters */
     SpiHandle.Instance               = SPI2;
@@ -109,11 +94,7 @@ static void spi_init(void)
     SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
     SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
     SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
-    #ifdef MASTER_BOARD
-    SpiHandle.Init.Mode 						 = SPI_MODE_MASTER;
-    #else
-    SpiHandle.Init.Mode							 = SPI_MODE_SLAVE;
-    #endif /* MASTER_BOARD */
+    SpiHandle.Init.Mode				 = SPI_MODE_SLAVE;
 
     if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
     {
@@ -150,9 +131,6 @@ int main(void)
     for (uint8_t i = 0; i < 10; i++)
     {
         ComState = COM_WAIT;
-        #ifdef MASTER_BOARD
-        SPI_CS_LOW();
-        #endif
         // if(HAL_SPI_Transmit_DMA(&SpiHandle, (uint8_t *)aTxBuffer, BUFFERSIZE) != HAL_OK)
         // if(HAL_SPI_Receive_DMA(&SpiHandle, (uint8_t *)aRxBuffer, BUFFERSIZE) != HAL_OK)
         if(HAL_SPI_TransmitReceive_DMA(&SpiHandle,(uint8_t *)aTxBuffer, (uint8_t *)aRxBuffer,BUFFERSIZE))
@@ -176,9 +154,6 @@ int main(void)
             Error_Handler();
             break;
         }
-        #ifdef MASTER_BOARD
-        DELAY_US(100*1000);
-        #endif
     }
 
     /* Infinite loop */
@@ -211,31 +186,8 @@ static void Error_Handler(void)
     }
 }
 
-void HAL_SPI_TxDMACpltCallback(SPI_HandleTypeDef *hspi)
+void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi) 
 {
-    #ifdef MASTER_BOARD
-    SPI_CS_HIGH();
-    #endif
-    /* Turn LED on: Transfer in transmission/reception process is correct */
-    io_set_pin(LED_IO);
-    ComState = COM_COMPLETE;
-}
-
-void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi) 
-{
-    #ifdef MASTER_BOARD
-    SPI_CS_HIGH();
-    #endif
-    /* Turn LED on: Transfer in transmission/reception process is correct */
-    io_set_pin(LED_IO);
-    ComState = COM_COMPLETE;
-}
-
-void HAL_SPI_RxDMACpltCallback(SPI_HandleTypeDef *hspi) 
-{
-    #ifdef MASTER_BOARD
-    SPI_CS_HIGH();
-    #endif
     /* Turn LED on: Transfer in transmission/reception process is correct */
     io_set_pin(LED_IO);
     ComState = COM_COMPLETE;

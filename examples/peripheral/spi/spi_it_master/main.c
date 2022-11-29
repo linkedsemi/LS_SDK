@@ -77,9 +77,9 @@ static void spi_init(void)
 {
     /* Configure the GPIO AF */
     /* CLK-------------PB12 */	
+    /* CS--------------PB13 */	
     /* MOSI------------PB14 */	
-    /* MISO------------PB15 */
-    /* CS-------------PB13 */		
+    /* MISO------------PB15 */	
 	
     pinmux_spi2_master_clk_init(SPI_CLK_PIN);
     pinmux_spi2_master_mosi_init(SPI_MOSI_PIN); 
