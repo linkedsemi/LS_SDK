@@ -57,7 +57,7 @@ void DAC_Init_Func(void)
 
 void HAL_DAC_ConvCpltCallback(DAC_HandleTypeDef *hdac) 
 {
-
+    HAL_DAC_Start_DMA(&DACx_Hdl,DAC2_ALIGN_12B_R,sin_wave,sizeof(sin_wave),HAL_DAC_ConvCpltCallback);
 }
 
 int main(void)
@@ -66,8 +66,8 @@ int main(void)
     pinmux_dac_init();
     Basic_Timer_Cfg();
     DAC_Init_Func();
+    HAL_DAC_Start_DMA(&DACx_Hdl,DAC2_ALIGN_12B_R,sin_wave,sizeof(sin_wave),HAL_DAC_ConvCpltCallback);
     while (1)
     {
-        HAL_DAC_Start_DMA(&DACx_Hdl,DAC2_ALIGN_12B_R,sin_wave,sizeof(sin_wave),HAL_DAC_ConvCpltCallback);
     }
 }

@@ -25,7 +25,7 @@ void dac_dma_cfg(DAC_HandleTypeDef *hdac, const uint32_t *pData, uint32_t Length
 {
     hdac->Env.DMA.Callback = Callback;
     cfg.ctrl.channel_en = 1;
-    cfg.ctrl.circular_mode_en = 0;
+    cfg.ctrl.circular_mode_en = 1;
     cfg.ctrl.peripheral_flow_ctrl = 0;
     cfg.ctrl.direct_mode_en = 0;
     cfg.ctrl.dma_mode_sel = Mem2Peri;
@@ -39,7 +39,7 @@ void dac_dma_cfg(DAC_HandleTypeDef *hdac, const uint32_t *pData, uint32_t Length
     cfg.ctrl.dst_witdh = DMA_SIZE_WORD;
     cfg.ctrl.dst_burst = 0;
     cfg.ctrl.dst_inc_offset = 0;
-    cfg.ctrl.rsvd1 = 0;
+     cfg.ctrl.rsvd1 = 0;
     cfg.src_addr = (uint32_t)pData;
     cfg.dst_addr = (uint32_t)hdac->Instance;
     cfg.byte_count = Length;
