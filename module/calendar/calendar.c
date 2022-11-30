@@ -3,11 +3,7 @@
 #include "sw_timer_port.h"
 #include "common.h"
 #include "cpu.h"
-#ifdef LE501X
 #define SW_CALENDAR_BASE_TIMER_PERIOD_MS ((uint64_t)11*3600*1000)
-#else
-#define SW_CALENDAR_BASE_TIMER_PERIOD_MS (134*1000)
-#endif
 
 static struct sw_timer_env calendar_base_timer;
 static struct sw_timer_env recent_alarm_timer;

@@ -2,7 +2,7 @@
 #define REG_LSTIM_TYPE_H_
 #include <stdint.h>
 
-#define LSTIM ((reg_tim_t *)0x4000f000)
+#define LSTIM ((reg_tim_t *)0x4000f100)
 
 typedef struct
 {
