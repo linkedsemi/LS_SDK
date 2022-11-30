@@ -6,6 +6,28 @@
 
 typedef struct
 {
+    volatile uint32_t TIR;
+    volatile uint32_t TDTR;
+    volatile uint32_t TDLR;
+    volatile uint32_t TDHR;
+} CAN_TxMailBox_TypeDef;
+
+typedef struct
+{
+    volatile uint32_t RIR;
+    volatile uint32_t RDTR;
+    volatile uint32_t RDLR;
+    volatile uint32_t RDHR;
+} CAN_FIFOMailBox_TypeDef;
+
+typedef struct
+{
+    volatile uint32_t FR1;
+    volatile uint32_t FR2;
+}CAN_FilterRegister_TypeDef;
+
+typedef struct
+{
     volatile uint32_t CAN_MCR; //0x0
     volatile uint32_t CAN_MSR; //0x4
     volatile uint32_t CAN_TSR; //0x8
@@ -15,26 +37,8 @@ typedef struct
     volatile uint32_t CAN_ESR; //0x18
     volatile uint32_t CAN_BTR; //0x1c
     volatile uint32_t RESERVED0[88];
-    volatile uint32_t CAN_TI0R; //0x180
-    volatile uint32_t CAN_TDT0R; //0x184
-    volatile uint32_t CAN_TDL0R; //0x188
-    volatile uint32_t CAN_TDH0R; //0x18c
-    volatile uint32_t CAN_TI1R; //0x190
-    volatile uint32_t CAN_TDT1R; //0x194
-    volatile uint32_t CAN_TDL1R; //0x198
-    volatile uint32_t CAN_TDH1R; //0x19c
-    volatile uint32_t CAN_TI2R; //0x1a0
-    volatile uint32_t CAN_TDT2R; //0x1a4
-    volatile uint32_t CAN_TDL2R; //0x1a8
-    volatile uint32_t CAN_TDH2R; //0x1ac
-    volatile uint32_t CAN_RI0R; //0x1b0
-    volatile uint32_t CAN_RDT0R; //0x1b4
-    volatile uint32_t CAN_RDL0R; //0x1b8
-    volatile uint32_t CAN_RDH0R; //0x1bc
-    volatile uint32_t CAN_RI1R; //0x1c0
-    volatile uint32_t CAN_RDT1R; //0x1c4
-    volatile uint32_t CAN_RDL1R; //0x1c8
-    volatile uint32_t CAN_RDH1R; //0x1cc
+    CAN_TxMailBox_TypeDef sTxMailBox[3];
+    CAN_FIFOMailBox_TypeDef sFIFOMailBox[2];
     volatile uint32_t RESERVED1[12];
     volatile uint32_t CAN_FMR; //0x200
     volatile uint32_t CAN_FM1R; //0x204
@@ -45,34 +49,7 @@ typedef struct
     volatile uint32_t RESERVED4[1];
     volatile uint32_t CAN_FA1R; //0x21c
     volatile uint32_t RESERVED5[8];
-    volatile uint32_t CAN_F0R1; //0x240
-    volatile uint32_t CAN_F0R2; //0x244
-    volatile uint32_t CAN_F1R1; //0x248
-    volatile uint32_t CAN_F1R2; //0x24c
-    volatile uint32_t CAN_F2R1; //0x250
-    volatile uint32_t CAN_F2R2; //0x254
-    volatile uint32_t CAN_F3R1; //0x258
-    volatile uint32_t CAN_F3R2; //0x25c
-    volatile uint32_t CAN_F4R1; //0x260
-    volatile uint32_t CAN_F4R2; //0x264
-    volatile uint32_t CAN_F5R1; //0x268
-    volatile uint32_t CAN_F5R2; //0x26c
-    volatile uint32_t CAN_F6R1; //0x270
-    volatile uint32_t CAN_F6R2; //0x274
-    volatile uint32_t CAN_F7R1; //0x278
-    volatile uint32_t CAN_F7R2; //0x27c
-    volatile uint32_t CAN_F8R1; //0x280
-    volatile uint32_t CAN_F8R2; //0x284
-    volatile uint32_t CAN_F9R1; //0x288
-    volatile uint32_t CAN_F9R2; //0x28c
-    volatile uint32_t CAN_F10R1; //0x290
-    volatile uint32_t CAN_F10R2; //0x294
-    volatile uint32_t CAN_F11R1; //0x298
-    volatile uint32_t CAN_F11R2; //0x29c
-    volatile uint32_t CAN_F12R1; //0x2a0
-    volatile uint32_t CAN_F12R2; //0x2a4
-    volatile uint32_t CAN_F13R1; //0x2a8
-    volatile uint32_t CAN_F13R2; //0x2ac
+    CAN_FilterRegister_TypeDef sFilterRegister[14];
 }reg_bxcan_t;
 
 enum BXCAN_REG_CAN_MCR_FIELD
@@ -233,6 +210,9 @@ enum BXCAN_REG_CAN_ESR_FIELD
     BXCAN_TEC_POS = 16,
     BXCAN_LEC_MASK = (int)0x70,
     BXCAN_LEC_POS = 4,
+    BXCAN_LEC_0 = 1 << BXCAN_LEC_POS,
+    BXCAN_LEC_1 = 2 << BXCAN_LEC_POS,
+    BXCAN_LEC_2 = 4 << BXCAN_LEC_POS,
     BXCAN_BOFF_MASK = (int)0x4,
     BXCAN_BOFF_POS = 2,
     BXCAN_EPVF_MASK = (int)0x2,
@@ -251,8 +231,15 @@ enum BXCAN_REG_CAN_BTR_FIELD
     BXCAN_SJW_POS = 24,
     BXCAN_TS2_MASK = (int)0x700000,
     BXCAN_TS2_POS = 20,
+    BXCAN_TS2_0 = 1 << BXCAN_TS2_POS,
+    BXCAN_TS2_1 = 2 << BXCAN_TS2_POS,
+    BXCAN_TS2_2 = 4 << BXCAN_TS2_POS,
     BXCAN_TS1_MASK = (int)0xf0000,
     BXCAN_TS1_POS = 16,
+    BXCAN_TS1_0 = 1 << BXCAN_TS1_POS,
+    BXCAN_TS1_1 = 2 << BXCAN_TS1_POS,
+    BXCAN_TS1_2 = 4 << BXCAN_TS1_POS,
+    BXCAN_TS1_3 = 8 << BXCAN_TS1_POS,
     BXCAN_BRP_MASK = (int)0x3ff,
     BXCAN_BRP_POS = 0,
 };
@@ -279,6 +266,30 @@ enum BXCAN_REG_CAN_TDT0R_FIELD
     BXCAN_T0TGT_POS = 8,
     BXCAN_T0DLC_MASK = (int)0xf,
     BXCAN_T0DLC_POS = 0,
+};
+
+enum BXCAN_REG_CAN_TDLR_FIELD
+{
+    CAN_TDLR_DATA3_MASK = (int)0xff000000,
+    CAN_TDLR_DATA3_POS = 24,
+    CAN_TDLR_DATA2_MASK = (int)0xff0000,
+    CAN_TDLR_DATA2_POS = 16,
+    CAN_TDLR_DATA1_MASK = (int)0xff00,
+    CAN_TDLR_DATA1_POS = 8,
+    CAN_TDLR_DATA0_MASK = (int)0xff,
+    CAN_TDLR_DATA0_POS = 0,
+};
+
+enum BXCAN_REG_CAN_TDHR_FIELD
+{
+    CAN_TDHR_DATA3_MASK = (int)0xff000000,
+    CAN_TDHR_DATA3_POS = 24,
+    CAN_TDHR_DATA2_MASK = (int)0xff0000,
+    CAN_TDHR_DATA2_POS = 16,
+    CAN_TDHR_DATA1_MASK = (int)0xff00,
+    CAN_TDHR_DATA1_POS = 8,
+    CAN_TDHR_DATA0_MASK = (int)0xff,
+    CAN_TDHR_DATA0_POS = 0,
 };
 
 enum BXCAN_REG_CAN_TI1R_FIELD
