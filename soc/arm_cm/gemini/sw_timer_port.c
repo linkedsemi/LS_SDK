@@ -2,6 +2,7 @@
 #include "reg_lstim_type.h"
 #include "field_manipulate.h"
 #include "platform.h"
+#include "reg_v33_rg_type.h"
 
 sw_timer_time_t timer_time_add(sw_timer_time_t a,sw_timer_time_t b)
 {
@@ -43,6 +44,7 @@ void timer_irq_clr()
 void timer_setup(void (*isr)())
 {
     arm_cm_set_int_isr(LSTIM_IRQn,isr);
+    V33_RG->CLKG_SRST = V33_RG_CLKG_SET_TIM_MASK;
     LSTIM->TIM_CTRL = TIM_TIM_EN_MASK|TIM_TIM_INTR_EN_MASK;
 }
 
