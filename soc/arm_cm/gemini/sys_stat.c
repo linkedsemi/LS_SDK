@@ -30,6 +30,7 @@
 #define ECC_STAT_BIT 25
 #define TK_STAT_BIT 26
 #define SHA_STAT_BIT 27
+#define BXCAN_STAT_BIT 28
 
 uint32_t peri_stat;
 
@@ -163,6 +164,11 @@ void touchkey_status_set(bool stat)
 void sha_status_set(bool stat)
 {
     *SRAM_BIT_BAND_ADDR(&peri_stat,SHA_STAT_BIT) = stat;
+}
+
+void bxcan_status_set(bool stat)
+{
+    *SRAM_BIT_BAND_ADDR(&peri_stat,BXCAN_STAT_BIT) = stat;
 }
 
 bool peri_status_busy()

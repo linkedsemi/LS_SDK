@@ -98,6 +98,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/uart/uart_polling                                              |  √     |  √     |
 | peripheral/wdg/iwdg                                                       |  √     |  √     |
 | peripheral/wdg/wwdg                                                       |  √     |  √     |
+| peripheral/can/CAN_LoopBack                                               |        |  √     |
+| peripheral/can/CAN_Normal                                                 |        |  √     |
 | prop_24g/ls_prop_24g                                                      |  √     |        |
 | prop_24g/ls_prop_24g_freertos                                             |  √     |        |
 | utility/coremark                                                          |  √     |  √     |
