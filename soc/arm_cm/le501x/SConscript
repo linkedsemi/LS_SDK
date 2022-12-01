@@ -157,21 +157,31 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
             rtos_adapt,
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
-    if mesh:
-        self.Append(LIBS = [File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
-        self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
-        self['APP_IMAGE_BASE'] = 0x18056000
-        if self.get('LINKSCRIPT') is None:
+    if self.get('STACK_LIB') is None:
+        if mesh:
+            self['STACK_LIB'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))
+        elif ble:
+            self['STACK_LIB'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))
+    if not self.get('STACK_LIB') is None:
+        self.Append(LIBS = [self['STACK_LIB']])
+    if self.get('STACK_HEX') is None:
+        if mesh:
+            self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
+        elif ble:
+            self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+    if self.get('APP_IMAGE_BASE') is None:
+        if mesh:
+            self['APP_IMAGE_BASE'] = 0x18056000
+        elif ble:
+            self['APP_IMAGE_BASE'] = 0x18034000
+        else:
+            self['APP_IMAGE_BASE'] = 0x18002000
+    if self.get('LINKSCRIPT') is None:
+        if mesh:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mesh.ld"))
-    elif ble:
-        self.Append(LIBS = [File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))])
-        self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
-        self['APP_IMAGE_BASE'] = 0x18034000
-        if self.get('LINKSCRIPT') is None:
+        elif ble:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/ble.ld"))
-    else:
-        self['APP_IMAGE_BASE'] = 0x18002000
-        if self.get('LINKSCRIPT') is None:
+        else:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mcu.ld"))
     self.Append(LIBPATH = [self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/")])
     self.Append(CPPPATH = self.inc_dirs(inc_list))
