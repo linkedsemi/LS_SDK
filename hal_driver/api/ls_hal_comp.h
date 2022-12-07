@@ -25,9 +25,25 @@ typedef struct
       comp_en : 1,        // COMP enable
       clk_mode : 3,       // COMP speed mode
       hysteresis : 2,     // COMP hysteresis select
+                          // HS mode:0: 0mV     1: 8.2mV   2: 15.6mV   3: 21.9mV
+                          // MS mode:0: 0mV     1: 5.4mV   2: 10.1mV   3: 14.2mV
+                          // LS mode:0: 1.3mV   1: 5.2mV   2: 8.8mV    3: 12.0mV
       vrefctl : 2,        // COMP internal reference voltage select
+                          // 0: 0.3V   1: 0.6V   2: 0.9V   3: 1.2V
       vrefsel : 3,        // COMP reference source select
+                          // 0: IOVIM[0] COMP1: PC01 COMP2: PC03 COMP3: PA03
+                          // 1: IOVIM[1] COMP1: PC13 COMP2: PA02 COMP3: PA06
+                          // 2: IOVIM[2] ----
+                          // 3: IOVIM[3] ----
+                          // 4: internal reference defined by VREFCTL
+                          // 5: DAC
+                          // 6: bandgap
+                          // 7: GND
       input : 2,          // COMP input select
+                          // 0: IOVIP[0] COMP1: PC00 COMP2: PA00 COMP3: PA04
+                          // 1: IOVIP[1] COMP1: PC02 COMP2: PA01 COMP3: PA05
+                          // 2: IOVIP[2] COMP1: PC13 COMP2: PA02 COMP3: PA06
+                          // 3: IOVIP[3] ----
       reserved1 : 3,      // reserved 3 bit
       flt_prd : 2,        // the filter period in MSI clock
       flt_byp : 1,        // filter bypass
