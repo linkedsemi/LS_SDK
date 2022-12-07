@@ -82,7 +82,7 @@ int main(void)
     {
         if (sleep_flag)
         {
-            deep_sleep_no_ble();
+            low_power_mode_sched();
         }
     }
 }

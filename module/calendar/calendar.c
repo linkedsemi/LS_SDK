@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "calendar.h"
 #include "sw_timer_port.h"
+#include "sw_timer_int.h"
 #include "common.h"
 #include "cpu.h"
 #define SW_CALENDAR_BASE_TIMER_PERIOD_MS ((uint64_t)11*3600*1000)

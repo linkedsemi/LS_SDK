@@ -36,6 +36,6 @@ int main()
     sw_calendar_set_alarm(&alarm,&calendar_time);
     while(1)
     {
-        deep_sleep_no_ble();
+        low_power_mode_sched();
     }
 }
