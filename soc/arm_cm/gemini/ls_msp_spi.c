@@ -26,6 +26,9 @@ void HAL_SPI_MSP_Init(SPI_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)SPI2:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI2_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_SPI2_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_SPI2_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI2_MASK;
         arm_cm_set_int_isr(SPI2_IRQn, SPI2_Handler);
         spi_inst_env[0] = inst;
@@ -33,6 +36,9 @@ void HAL_SPI_MSP_Init(SPI_HandleTypeDef *inst)
         __NVIC_EnableIRQ(SPI2_IRQn);
         break;
     case (uint32_t)SPI3:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI3_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_SPI3_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_SPI3_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI3_MASK;
         arm_cm_set_int_isr(SPI3_IRQn, SPI3_Handler);
         spi_inst_env[1] = inst;

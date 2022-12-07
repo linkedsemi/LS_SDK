@@ -31,6 +31,9 @@ void HAL_I2C_MSP_Init(I2C_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)I2C1:
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_I2C1_MASK;
+        SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_CLR_I2C1_N_MASK;
+        SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_SET_I2C1_N_MASK;       
         SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_I2C1_MASK;
         arm_cm_set_int_isr(I2C1_IRQn, I2C1_Handler);
         i2c_inst_env[0] = inst;
@@ -38,6 +41,9 @@ void HAL_I2C_MSP_Init(I2C_HandleTypeDef *inst)
         __NVIC_EnableIRQ(I2C1_IRQn);
         break;
     case (uint32_t)I2C2:
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_I2C2_MASK;
+        SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_CLR_I2C2_N_MASK;
+        SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_SET_I2C2_N_MASK;       
         SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_I2C2_MASK;
         arm_cm_set_int_isr(I2C2_IRQn, I2C2_Handler);
         i2c_inst_env[1] = inst;
@@ -46,6 +52,9 @@ void HAL_I2C_MSP_Init(I2C_HandleTypeDef *inst)
 
         break;
     case (uint32_t)I2C3:
+        SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_I2C3_MASK;
+        SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_CLR_I2C3_N_MASK;
+        SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_SET_I2C3_N_MASK;        
         SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_I2C3_MASK;
         arm_cm_set_int_isr(I2C3_IRQn, I2C3_Handler);
         i2c_inst_env[2] = inst;

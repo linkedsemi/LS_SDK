@@ -40,6 +40,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
     switch ((uint32_t)inst->UARTX)
     {
     case (uint32_t)UART1:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART1_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART1_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART1_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
         arm_cm_set_int_isr(UART1_IRQn, UART1_Handler);
         UART_inst_env[0] = inst;
@@ -48,6 +51,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
 
         break;
     case (uint32_t)UART2:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART2_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART2_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART2_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
         arm_cm_set_int_isr(UART2_IRQn, UART2_Handler);
         UART_inst_env[1] = inst;
@@ -56,6 +62,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
 
         break;
     case (uint32_t)UART3:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART3_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART3_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART3_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART3_MASK;
         arm_cm_set_int_isr(UART3_IRQn, UART3_Handler);
         UART_inst_env[2] = inst;
@@ -64,6 +73,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
 
         break;
     case (uint32_t)UART4:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART4_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART4_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART4_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART4_MASK;
         arm_cm_set_int_isr(UART4_IRQn, UART4_Handler);
         UART_inst_env[3] = inst;
@@ -71,6 +83,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
         __NVIC_EnableIRQ(UART3_IRQn);
         break;
     case (uint32_t)UART5:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART5_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART5_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART5_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART5_MASK;
         arm_cm_set_int_isr(UART5_IRQn, UART5_Handler);
         UART_inst_env[4] = inst;

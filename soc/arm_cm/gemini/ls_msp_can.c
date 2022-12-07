@@ -17,6 +17,9 @@ void CAN_Handler(void)
 void HAL_BXCAN_MSP_Init(CAN_HandleTypeDef* inst)
 {
     can_inst_env = inst;
+    SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_CLR_BXCAN_MASK;
+    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_CLR_BXCAN_MASK;
+    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_SET_BXCAN_MASK;
     SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_BXCAN_MASK;
     arm_cm_set_int_isr(CAN_IRQn,CAN_Handler);
     __NVIC_ClearPendingIRQ(CAN_IRQn);
