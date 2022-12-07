@@ -15,6 +15,9 @@ static void SSI_Handler()
 
 void HAL_SSI_MSP_Init(SSI_HandleTypeDef *hssi)
 {
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI1_MASK;
+    SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_SPI1_N_MASK;
+    SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_SPI1_N_MASK;
     SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI1_MASK;
     arm_cm_set_int_isr(SPI1_IRQn, SSI_Handler);
     ssi_inst_env[0] = hssi;

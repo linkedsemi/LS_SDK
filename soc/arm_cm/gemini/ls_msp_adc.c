@@ -26,6 +26,9 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)LSADC1:
+        SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_ADC1_MASK;
+        SYSC_PER->PD_PER_SRST2 = SYSC_PER_SRST_CLR_ADC1_N_MASK;
+        SYSC_PER->PD_PER_SRST2 = SYSC_PER_SRST_SET_ADC1_N_MASK;
         SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_SET_ADC1_MASK;
         arm_cm_set_int_isr(ADC1_IRQn, ADC1_Handler);
         adc_inst_env[0] = inst;
@@ -33,7 +36,10 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
         __NVIC_EnableIRQ(ADC1_IRQn);
         break;
     case (uint32_t)LSADC2:
-         SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_SET_ADC2_MASK;
+        SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_ADC2_MASK;
+        SYSC_PER->PD_PER_SRST2 = SYSC_PER_SRST_CLR_ADC2_N_MASK;
+        SYSC_PER->PD_PER_SRST2 = SYSC_PER_SRST_SET_ADC2_N_MASK;
+        SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_SET_ADC2_MASK;
         arm_cm_set_int_isr(ADC2_IRQn, ADC2_Handler);
         adc_inst_env[1] = inst;
         __NVIC_ClearPendingIRQ(ADC2_IRQn);
