@@ -344,16 +344,19 @@ void sleep_process()
 }
 
 bool timer_sleep(void);
-void deep_sleep_no_ble()
+void low_power_mode_sched()
 {
-    uint32_t cpu_stat = enter_critical();
-    uart_log_pause();
-    if(timer_sleep())
+    if (!peri_status_busy() && !app_event_status_busy())
     {
-        deep_sleep();
+        uint32_t cpu_stat = enter_critical();
+        uart_log_pause();
+        if(timer_sleep())
+        {
+            deep_sleep();
+        }
+        uart_log_resume();
+        exit_critical(cpu_stat);
     }
-    uart_log_resume();
-    exit_critical(cpu_stat);
 }
 
 bool ble_wkup_status_get(void)

@@ -34,7 +34,7 @@ int main()
     sw_timer_start(&timer[1]);
     while(1)
     {
-        deep_sleep_no_ble();
+        low_power_mode_sched();
     }
 }
 

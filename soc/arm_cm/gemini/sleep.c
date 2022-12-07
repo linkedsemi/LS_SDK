@@ -158,7 +158,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
 
 void io_irq_enable(void);
 
-void deep_sleep_no_ble()
+static void deep_sleep_no_ble()
 {
     uint32_t cpu_stat = enter_critical();
     SCB->SCR |= (1<<2);

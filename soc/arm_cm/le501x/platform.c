@@ -447,6 +447,7 @@ void sys_init_none()
     irq_init();
     systick_start();
     LOG_INIT();
+    rco_freq_counting_init();
     rco_freq_counting_start();
     sw_timer_module_init();
 }
