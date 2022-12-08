@@ -6,8 +6,8 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/comp/build/gemini/comp.elf",
-            "name": "GEMINI Debug COMP_TEST",
+            "executable": "examples/peripheral/comp/comp_dac/build/gemini/comp_dac.elf",
+            "name": "GEMINI Debug COMP_DAC_TEST",
             "device": "GEMINI",
             "interface": "swd",
             "preLaunchCommands":[
@@ -20,8 +20,8 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/comp/build/gemini/comp.elf",
-            "name": "GEMINI Attach COMP_TEST",
+            "executable": "examples/peripheral/comp/comp_dac/build/gemini/comp_dac.elf",
+            "name": "GEMINI Attach COMP_DAC_TEST",
             "device": "GEMINI",
             "interface": "swd",
             "preAttachCommands":[

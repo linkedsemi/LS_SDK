@@ -39,10 +39,10 @@ HAL_StatusTypeDef HAL_COMP_Stop(COMP_HandleTypeDef *hcomp)
     return HAL_OK;
 }
 
-__attribute__((weak)) void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool status) {}
+__attribute__((weak)) void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool output){}
 
-void HAL_COMP_IRQHandler(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool status)
+void HAL_COMP_IRQHandler(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool output)
 {
     comp_intr_clr(hcomp, edge);
-    HAL_COMP_Callback(hcomp, edge, status);
+    HAL_COMP_Callback(hcomp, edge, output);
 }

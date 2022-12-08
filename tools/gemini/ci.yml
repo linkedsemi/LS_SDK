@@ -635,17 +635,29 @@ gemini_wwdg_keil_build:
   script:
     - cd examples/peripheral/wdg/wwdg/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b wwdg.uvprojx -o UVBuild/build.txt -j0
 
-gemini_comp_build:
+gemini_comp_internal_build:
   stage: build
   script:
-    - cd examples/peripheral/comp && scons ic=gemini
+    - cd examples/peripheral/comp/comp_internal && scons ic=gemini
 
-gemini_comp_keil_build:
+gemini_comp_internal_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/comp/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b comp.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/comp/comp_internal/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b comp_internal.uvprojx -o UVBuild/build.txt -j0
+    
+gemini_comp_dac_build:
+  stage: build
+  script:
+    - cd examples/peripheral/comp/comp_dac && scons ic=gemini
+
+gemini_comp_dac_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/comp/comp_dac/gemini/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b comp_dac.uvprojx -o UVBuild/build.txt -j0
 
 gemini_iap_bootloader_build:
   stage: build
