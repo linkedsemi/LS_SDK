@@ -1434,7 +1434,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
 				break;
 		case PRF_BASS:
 		{
-				struct hid_db_cfg db_cfg;
+				struct hid_db_cfg db_cfg = {0};
 				db_cfg.hids_nb = 1;
 				db_cfg.cfg[0].svc_features = HID_PROTO_MODE;
 				db_cfg.cfg[0].report_nb = 3;
