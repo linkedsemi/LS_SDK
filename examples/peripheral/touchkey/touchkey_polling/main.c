@@ -24,13 +24,13 @@ static void tk_init(void)
     pinmux_touchkey_ch6_init();
     pinmux_touchkey_ch7_init();
     /*-------touchKey config params---------*/
-    tkParam.clk_hprd = 0xf;
-    tkParam.clk_lprd = 0xf;
-    tkParam.scam_disch_prd = 0x7;
-    tkParam.scan_channel_en = 0xf0;
-    tkParam.scan_flt_prd = 0x3;
-    tkParam.scan_iter = 0xf;
-    tkParam.scan_mtim = 0xfff;
+    tkParam.clk_hprd            = 0xf;
+    tkParam.clk_lprd            = 0xf;
+    tkParam.scam_disch_prd      = 0x7;
+    tkParam.scan_channel_en     = 0xf0;
+    tkParam.scan_flt_prd        = 0x3;
+    tkParam.scan_iter           = 0xf;
+    tkParam.scan_mtim           = 0xfff;
     tkParam.touchkey_cp_vctl = TOUCHKEY_VCTRL_1800mV;
     HAL_TOUCHKEY_SetParam(&tkParam);
 }
@@ -56,7 +56,6 @@ static void SelfCalibration(uint8_t count, uint32_t sum[16])
 
 int main(void)
 {
-
     sys_init_none();
     tk_init();
     SelfCalibration(50, chn_avg);
@@ -65,11 +64,10 @@ int main(void)
         HAL_TOUCHKEY_StartScan(data);
         for (uint8_t i = 0; i < 16; i++)
         {
-            if ((tkParam.scan_channel_en & CO_BIT(i) && data[i] < chn_avg[i] * 0.6 && data[i] > chn_avg[i] * 0.1))
+            if ((tkParam.scan_channel_en & CO_BIT(i)) && (data[i] < chn_avg[i] * 6 / 10) && (data[i] > chn_avg[i] / 10))
             {
                 LOG_I("trigger CHANNEL:---%d---%d", i, data[i]);
             }
         }
-        // DELAY_US(500*1000);//sleep 500ms
     }
 }
