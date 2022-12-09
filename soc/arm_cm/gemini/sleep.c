@@ -72,9 +72,15 @@ void sleep_wakeup_config()
                           |FIELD_BUILD(V33_RG_RCO_BIAS_FC,0)
                           |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1)
                           |FIELD_BUILD(V33_RG_PD_GPIO_SEL,SYSC_AWO->DBG_ACK);
-
-    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x3d)
-                        |FIELD_BUILD(V33_RG_SWD_IO_WKUP_EN,1)
+    V33_RG->MISC_CTRL1 = FIELD_BUILD(V33_RG_LATCH_GPIO,0)
+                          |FIELD_BUILD(V33_RG_PD_GPIO,0)
+                          |FIELD_BUILD(V33_RG_PD_ADC12,1)
+                          |FIELD_BUILD(V33_RG_PD_AMIC,1)
+                          |FIELD_BUILD(V33_RG_PD_TK,1)
+                          |FIELD_BUILD(V33_RG_PD_DAC12,1)
+                          |FIELD_BUILD(V33_RG_BAT_DTCT_EN,0);
+    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x8)
+                        |FIELD_BUILD(V33_RG_SWD_IO_WKUP_EN,0)
                         |FIELD_BUILD(V33_RG_WKUP0_SYNC_SEL,0)
                         |FIELD_BUILD(V33_RG_WKUP1_SYNC_SEL,0);
 
@@ -196,16 +202,36 @@ void low_power_mode_sched()
     }
 }
 
-void lvl2_lvl3_mode_prepare(void)
+static void lvl2_lvl3_mode_prepare(bool lp2_mode)
 {
+    V33_RG->SFT_CTRL03 &= 0x00ffffff;
     systick_stop();
     SCB->SCR |= (1<<2);
     MODIFY_REG(V33_RG->PWR_CTRL,V33_RG_PD_GPIO_SEL_MASK|V33_RG_LPLDO_PD_EN_MASK,1<<V33_RG_LPLDO_PD_EN_POS|1<<V33_RG_PD_GPIO_SEL_POS);
+    V33_RG->PWR_CTRL = FIELD_BUILD(V33_RG_LPLDO_PD_EN,0)
+                          |FIELD_BUILD(V33_RG_HPLDO_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_MSI_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_BG_PD_EN,0)
+                          |FIELD_BUILD(V33_RG_BGIB_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_LSI_PD_EN,lp2_mode?(!SDK_LSI_USED):0)
+                          |FIELD_BUILD(V33_RG_HSE_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_SRAM_DS_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_LSE_PD_EN,lp2_mode?SDK_LSI_USED:0)
+                          |FIELD_BUILD(V33_RG_HSI_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_HSE_PU_EN,SDK_HSE_USED)
+                          |FIELD_BUILD(V33_RG_LSE_PU_EN,!SDK_LSI_USED)
+                          |FIELD_BUILD(V33_RG_SRAM1_PD_EN,SDK_SRAM1_PWR_DOWN)
+                          |FIELD_BUILD(V33_RG_SRAM2_PD_EN,SDK_SRAM2_PWR_DOWN)
+                          |FIELD_BUILD(V33_RG_SRAM3_PD_EN,SDK_SRAM3_PWR_DOWN)
+                          |FIELD_BUILD(V33_RG_SRAM4_PD_EN,SDK_SRAM4_PWR_DOWN)
+                          |FIELD_BUILD(V33_RG_SRAM_DS_PU_EN,1)
+                          |FIELD_BUILD(V33_RG_RCO_BIAS_FC,0)
+                          |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1);
 }
 
-void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,)
+void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,bool lp2_mode)
 {
-    lvl2_lvl3_mode_prepare();
+    lvl2_lvl3_mode_prepare(lp2_mode);
     while(1)
     {
         uint32_t cpu_stat = enter_critical();

@@ -5,7 +5,7 @@
 #define QSPI_CS_INTERVAL 4
 #define QSPI_CS_HOLD 2
 #define QSPI_CS_SETUP 2
-#define QSPI_CAPTURE_DELAY 1
-#define QSPI_CAPTURE_NEG 0
+#define QSPI_CAPTURE_DELAY 2
+#define QSPI_CAPTURE_NEG 1
 #endif
 
