@@ -48,6 +48,14 @@ struct hid_info
     uint8_t bCountryCode;/**< Hardware target country */
     uint8_t flags;/**< Flags ::hid_info_flag */
 };
+
+/// External Report Reference
+struct hid_ext_ref
+{
+    uint16_t inc_svc_hdl;/**<External Report Reference - Included Service*/
+    uint16_t rep_ref_uuid;/**<External Report Reference - Characteristic UUID*/
+};
+
 ///HID configuration structure
 struct hids_cfg
 {
@@ -56,6 +64,7 @@ struct hids_cfg
     uint8_t report_cfg[HID_NB_REPORT_MAX];/**< Features supported by each of the Report Characteristics in the HID Service ::hid_report_cfg */
     uint8_t report_id[HID_NB_REPORT_MAX];/**< Report id number for a given report type, The Report ID is defined in the Report Map */
     struct hid_info info; /**< Value of the HID Information Characteristic ::hid_info */
+    struct hid_ext_ref ext_ref; /**< Value of the External Report Reference ::hid_ext_ref */
 };
 ///HID database configuration structure
 struct hid_db_cfg
@@ -95,6 +104,9 @@ struct hid_write_report_req_evt
 {
     uint16_t length;/**< The length of the data to be sent */
     uint8_t* value;/**< Point to the data address to send */
+    uint8_t  hid_idx;/**< HIDS Instance */
+    uint8_t  type;/**< type of report ::app_hogpd_report_type */
+    uint8_t  idx;/**< Report Instance - 0 for boot reports and report map */
     uint8_t con_idx;/**< Connect id */
 };
 ///Structure for the Report configuration events
