@@ -62,7 +62,7 @@ uint32_t PRGDATA_StartMarker;
  *                    fnc:  Function Code (1 - Erase, 2 - Program, 3 - Verify)
  *    Return Value:   0 - OK,  1 - Failed
  */
-#ifdef GEMINI
+#ifdef LM3050
 static void io_pull_up_cfg()
 {
     io_pull_write(PD14,IO_PULL_UP);

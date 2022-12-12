@@ -57,7 +57,7 @@ void lsqspiv2_stg_read_register(uint8_t opcode,uint8_t *data,uint8_t length);
 
 void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
 
-#if defined(GEMINI) && defined(FLASH_PROG_ALGO)
+#if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *);
 __attribute__((long_call)) void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
 #endif

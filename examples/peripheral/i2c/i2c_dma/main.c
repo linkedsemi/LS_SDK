@@ -21,7 +21,7 @@
 // Set PB14 as debug IO
 #define DEBUG_IO_HIGH (*(volatile uint32_t*)0x48000404 |= 1 << 0xE)
 #define DEBUG_IO_LOW (*(volatile uint32_t*)0x48000404 &= ~(1 << 0xE))
-#elif defined GEMINI
+#elif defined LM3050
 #define LED_IO PB06
 // Set PA15 as debug IO
 #define DEBUG_IO_HIGH (*(volatile uint32_t*)0x4000d064 |= 1 << 15)
@@ -166,7 +166,7 @@ static void toggle_debug_IO_init(void)
 {
 #ifdef LE501X
     *(volatile uint32_t*)0x48000418 |= 1 << 0xE; // Set PB14 as debug IO
-#elif defined GEMINI
+#elif defined LM3050
     *(volatile uint32_t*)0x4000d064 |= 1 << 31; // Set PA15 as debug IO
 #else
 #error "Error config for platform!"
@@ -179,7 +179,7 @@ void XIP_BANNED_FUNC(toggle_debug_IO, uint16_t num)
     #ifdef LE501X
         DEBUG_IO_HIGH;
         DEBUG_IO_LOW;
-    #elif defined GEMINI
+    #elif defined LM3050
         DEBUG_IO_HIGH;
         DEBUG_IO_LOW;
     #else

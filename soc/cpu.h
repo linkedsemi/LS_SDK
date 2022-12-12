@@ -31,7 +31,7 @@ extern void (*exit_critical_fn)(uint32_t);
 #define EXIT_CRITICAL exit_critical
 #endif
 
-#if defined(GEMINI) && defined(FLASH_PROG_ALGO)
+#if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) uint32_t enter_critical(void);
 __attribute__((long_call)) void exit_critical(uint32_t);
 #endif

@@ -9,7 +9,7 @@ stages:
 
 include: 
   - 'tools/le501x/ci.yml'
-  - 'tools/gemini/ci.yml'
+  - 'tools/lm3050/ci.yml'
 
 doxygen:
   stage: build

@@ -22,7 +22,7 @@
 #define SUSPEND_WORKAROUND PUYA_FLASH_WORKAROUND
 #endif
 #endif
-#if defined(GEMINI)
+#if defined(LM3050)
 #define DUAL_CONTINUOUS_MODE_OFF 1
 #else
 #define DUAL_CONTINUOUS_MODE_OFF 0

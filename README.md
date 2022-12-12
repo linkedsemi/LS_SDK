@@ -9,7 +9,7 @@ For detailed information, please visit [Linkedsemi Documentation Center](http://
 SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 
 
-| Examples                                                                  | LE501X | GEMINI |
+| Examples                                                                  | LE501X | LM3050 |
 | ------------------------------------------------------------------------- | ------ | ------ |
 | ble/ble_advertiser                                                        |  √     |        |
 | ble/ble_ancs                                                              |  √     |        |

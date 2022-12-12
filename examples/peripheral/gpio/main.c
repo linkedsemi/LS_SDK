@@ -57,7 +57,7 @@ int main(void)
         }
         if(lp3_flag)
         {
-            #if defined(GEMINI)
+            #if defined(LM3050)
             bool lp2=false;
             enter_deep_sleep_mode_lvl2_lvl3(lp2);
             #else

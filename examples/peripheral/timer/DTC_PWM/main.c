@@ -6,7 +6,7 @@
 
 #if defined(LE501X)
 #define DTC_PWM_TIMER LSADTIM
-#elif defined(GEMINI)
+#elif defined(LM3050)
 #define DTC_PWM_TIMER LSADTIM1
 #endif
 

@@ -1,0 +1,19 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../')
+env['IC'] = 'lm3050'
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    'boot_ram.c'
+]
+inc = [
+    './'
+]
+env['LINKSCRIPT'] = File(env.subst('$SDK_ROOT/bootloader/boot_ram/lm3050/bram.ld'))
+target = env.image_build('boot_ram',src,inc,with_startup=False)
+env.Append(CPPDEFINES = ['BOOT_RAM=1','GLOBAL_OUTPUT_LVL=0','NDEBUG'])
+env.Append(LINKFLAGS = ' -nostartfiles')
+bram_bin = env.Command('build/$IC/bram.bin',target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
+env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+env.Install('$SDK_ROOT/soc/arm_cm/lm3050/bin',bram_bin)
+env.Alias('install', '$SDK_ROOT/soc/arm_cm/lm3050/bin')
