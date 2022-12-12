@@ -1,7 +1,7 @@
 #ifndef LS_LL_OPAMP_H_
 #define LS_LL_OPAMP_H_
 #include <stdbool.h>
-#ifdef GEMINI
+#ifdef LM3050
 #include "reg_v33_rg_type.h"
 #include "field_manipulate.h"
 

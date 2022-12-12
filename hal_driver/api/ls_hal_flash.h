@@ -189,7 +189,7 @@ void hal_flash_xip_func_ptr_dummy(void);
 
 void hal_flash_xip_func_ptr_init(void);
 
-#if defined(GEMINI) && defined(FLASH_PROG_ALGO)
+#if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void hal_flash_drv_var_init(bool,bool);
 __attribute__((long_call)) void hal_flash_init();
 __attribute__((long_call)) void hal_flash_software_reset();

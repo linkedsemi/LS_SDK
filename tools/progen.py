@@ -46,9 +46,9 @@ def progen(target,source,env):
             },
             'template': env['SDK_ROOT'].abspath+'/tools/iar.ewp',}
     }
-    if env['IDE'] == 'uvision5' and env['IC'] == 'gemini':
-        project_data['common']['sources']['soc'] += [os.path.relpath(os.path.join(env['SDK_ROOT'].abspath,'soc/arm_cm/gemini/__info_array.c'),os.getcwd())]
-        project_data['tool_specific']['uvision5']['misc']['ld_flags'].append(os.path.join(root_relpath,'soc/arm_cm/gemini/compiler/armcc/rom_sym.txt'))
+    if env['IDE'] == 'uvision5' and env['IC'] == 'lm3050':
+        project_data['common']['sources']['soc'] += [os.path.relpath(os.path.join(env['SDK_ROOT'].abspath,'soc/arm_cm/lm3050/__info_array.c'),os.getcwd())]
+        project_data['tool_specific']['uvision5']['misc']['ld_flags'].append(os.path.join(root_relpath,'soc/arm_cm/lm3050/compiler/armcc/rom_sym.txt'))
     project_settings = ProjectSettings()
     project_settings.update({
         'export_dir':[os.path.join(env['IC'],env['IDE'])]
@@ -80,7 +80,7 @@ def progen(target,source,env):
                 et.getroot().find('Targets').append(stack_hex_et.getroot())
             user_action1.text = "{} @L {} {} {}".format(root_relpath +'\\tools\\'+env['IC']+'\\after_build.bat',root_relpath,env['APP_IMAGE_BASE'],stack_path)
             shutil.copy(env['SDK_ROOT'].abspath+'/tools/prog/LinkedSemi/LE501X.jlinkscript',os.path.join(os.path.join(env['IC'],env['IDE']),"JLinkSettings.jlinkscript"))
-        elif env['IC'] == 'gemini':
+        elif env['IC'] == 'lm3050':
             before_make = et.getroot().find('Targets').find('Target').find('TargetOption').find('TargetCommonOption').find('BeforeMake').find('UserProg1Name')
             before_make.text = root_relpath +'\\tools\\'+env['IC']+'\\before_make.bat ' + root_relpath
         et.write(file,xml_declaration=True,short_empty_elements=False)

@@ -6,13 +6,13 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/i2c/ll_i2c_polling/build/gemini/ll_i2c_polling.elf",
-            "name": "GEMINI Debug LL_I2C_POLLING",
-            "device": "GEMINI",
+            "executable": "examples/peripheral/i2c/ll_i2c_polling/build/lm3050/ll_i2c_polling.elf",
+            "name": "LM3050 Debug LL_I2C_POLLING",
+            "device": "LM3050",
             "interface": "swd",
             "preLaunchCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file stack/build/gemini/fw.elf",  
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
         {
@@ -20,13 +20,13 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/i2c/ll_i2c_polling/build/gemini/ll_i2c_polling.elf",
-            "name": "GEMINI Attach LL_I2C_POLLING",
-            "device": "GEMINI",
+            "executable": "examples/peripheral/i2c/ll_i2c_polling/build/lm3050/ll_i2c_polling.elf",
+            "name": "LM3050 Attach LL_I2C_POLLING",
+            "device": "LM3050",
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file stack/build/gemini/fw.elf",  
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
     ]

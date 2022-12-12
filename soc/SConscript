@@ -3,7 +3,7 @@ import os
 Import('env')
 plf = {
     'le501x': 'arm_cm',
-    'gemini': 'arm_cm',
+    'lm3050': 'arm_cm',
 }
 if env.get('IC') is None:
     env['IC'] = ARGUMENTS.get('ic','le501x')

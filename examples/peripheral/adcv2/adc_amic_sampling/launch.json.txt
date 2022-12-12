@@ -6,13 +6,13 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/adcv2/adc_amic_sampling/build/gemini/adc_amic_sampling.elf",
-            "name": "GEMINI Debug ADC_AMIC_SAMPLING",
-            "device": "GEMINI",
+            "executable": "examples/peripheral/adcv2/adc_amic_sampling/build/lm3050/adc_amic_sampling.elf",
+            "name": "LM3050 Debug ADC_AMIC_SAMPLING",
+            "device": "LM3050",
             "interface": "swd",
             "preLaunchCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file stack/build/gemini/fw.elf",
+                //"add-symbol-file stack/build/lm3050/fw.elf",
             ]
         },
         {
@@ -20,13 +20,13 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/adcv2/adc_amic_sampling/build/gemini/adc_amic_sampling.elf",
-            "name": "GEMINI Attach ADC_AMIC_SAMPLING",
-            "device": "GEMINI",
+            "executable": "examples/peripheral/adcv2/adc_amic_sampling/build/lm3050/adc_amic_sampling.elf",
+            "name": "LM3050 Attach ADC_AMIC_SAMPLING",
+            "device": "LM3050",
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file stack/build/gemini/fw.elf",
+                //"add-symbol-file stack/build/lm3050/fw.elf",
             ]
         },
     ]

@@ -6,13 +6,13 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/uart/ll_uart_it/build/gemini/ll_uart_it.elf",
-            "name": "GEMINI Debug LL_UART_IT",
-            "device": "GEMINI",
+            "executable": "examples/peripheral/uart/ll_uart_it/build/lm3050/ll_uart_it.elf",
+            "name": "LM3050 Debug LL_UART_IT",
+            "device": "LM3050",
             "interface": "swd",
             "preLaunchCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file stack/build/gemini/fw.elf",  
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
         {
@@ -20,13 +20,13 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/uart/ll_uart_it/build/gemini/ll_ll_uart_it.elf",
-            "name": "GEMINI Attach LL_UART_IT",
-            "device": "GEMINI",
+            "executable": "examples/peripheral/uart/ll_uart_it/build/lm3050/ll_ll_uart_it.elf",
+            "name": "LM3050 Attach LL_UART_IT",
+            "device": "LM3050",
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file stack/build/gemini/fw.elf",  
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
     ]

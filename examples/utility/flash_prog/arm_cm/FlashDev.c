@@ -28,8 +28,8 @@
 #define LS_FLASH_DEV_NAME "LE501X SPI NOR FLASH"
 #elif defined(SAGI)
 #define LS_FLASH_DEV_NAME "SAGI SPI NOR FLASH"
-#elif defined(GEMINI)
-#define LS_FLASH_DEV_NAME "GEMINI SPI NOR FLASH"
+#elif defined(LM3050)
+#define LS_FLASH_DEV_NAME "LM3050 SPI NOR FLASH"
 #endif
 
 struct FlashDevice const FlashDevice  __attribute__ ((section ("DevDscr")))  =  {
