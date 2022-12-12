@@ -4,7 +4,7 @@
 #include "HAL_def.h"
 #include "sdk_config.h"
 #include "field_manipulate.h"
-#include "ls_msp_spi.h"
+#include "ls_msp_spi_i2s.h"
 
 /** \addtogroup PERIPHERAL
  *  @{

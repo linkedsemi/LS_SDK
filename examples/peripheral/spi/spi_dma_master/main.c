@@ -28,7 +28,7 @@
 #include "co_math.h"
 #include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
-#include "ls_hal_spi.h"
+#include "ls_hal_spi_i2s.h"
 #if DMACV2
 #include "ls_hal_dmacv2.h"
 #else
@@ -66,8 +66,8 @@ static void spi_dma_channel_init(void)
 {
     DMA_CONTROLLER_INIT(dmac1_inst);
     SpiHandle.DMAC_Instance = &dmac1_inst;
-    SpiHandle.Tx_Env.DMA.DMA_Channel = 0;
-    SpiHandle.Rx_Env.DMA.DMA_Channel = 1;
+    SpiHandle.DMATx.DMA_Channel = 0;
+    SpiHandle.DMARx.DMA_Channel = 1;
 }
 
 

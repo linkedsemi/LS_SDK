@@ -20,7 +20,7 @@
 #include "co_math.h"
 #include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
-#include "ls_hal_spi.h"
+#include "ls_hal_spi_i2s.h"
 #include "ls_hal_ssi.h"
 
 /* Private function prototypes -----------------------------------------------*/

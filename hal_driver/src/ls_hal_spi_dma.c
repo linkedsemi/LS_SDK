@@ -1,7 +1,7 @@
 #include <stddef.h>
-#include "ls_msp_spi.h"
+#include "ls_msp_spi_i2s.h"
 #include "field_manipulate.h"
-#include "ls_hal_spi.h"
+#include "ls_hal_spi_i2s.h"
 
 __attribute__((weak)) void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi){}
 
@@ -26,8 +26,8 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
 {
     uint8_t data_width;
     uint8_t *pTxData, *pRxData; 
-    pTxData = TX_Data? TX_Data: &hspi->Tx_Env.DMA.dummy;
-    pRxData = RX_Data? RX_Data: &hspi->Rx_Env.DMA.dummy;
+    pTxData = TX_Data? TX_Data: &hspi->DMATx.dummy;
+    pRxData = RX_Data? RX_Data: &hspi->DMARx.dummy;
 
     if(hspi->Init.DataSize == SPI_DATASIZE_16BIT)
     {
@@ -62,7 +62,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     cfg.dst_addr = (uint32_t)&hspi->Instance->DR;
     cfg.byte_count = Count;
     cfg.dummy = 0;
-    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Tx_Env.DMA.DMA_Channel,&cfg,(void *)SPI_Transmit_DMA_Callback,(uint32_t)hspi);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->DMATx.DMA_Channel,&cfg,(void *)SPI_Transmit_DMA_Callback,(uint32_t)hspi);
 
     /* Rx parameter initialize*/
     cfg.ctrl.dma_mode_sel = Peri2Mem;
@@ -71,7 +71,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     cfg.ctrl.dst_inc = RX_Data? 1: 0;
     cfg.src_addr = (uint32_t)&hspi->Instance->DR;
     cfg.dst_addr = (uint32_t)pRxData;
-    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,&cfg,(void *)SPI_Receive_DMA_Callback,(uint32_t)hspi);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->DMARx.DMA_Channel,&cfg,(void *)SPI_Receive_DMA_Callback,(uint32_t)hspi);
 
     MODIFY_REG(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
     SET_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
@@ -102,7 +102,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
    
     struct DMA_Channel_Config prim;
     /* Tx parameter initialize*/
-    prim.src_data_end_ptr = TX_Data? tx_data_end_ptr: (uint32_t)&hspi->Tx_Env.DMA.dummy;
+    prim.src_data_end_ptr = TX_Data? tx_data_end_ptr: (uint32_t)&hspi->DMATx.dummy;
     prim.dst_data_end_ptr = (uint32_t)&hspi->Instance->DR;
     prim.ctrl_data.cycle_ctrl = DMA_Cycle_Basic,
     prim.ctrl_data.next_useburst = 0;
@@ -115,17 +115,17 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     prim.ctrl_data.dst_size = data_size;
     prim.ctrl_data.dst_inc = DMA_INC_NONE;
     prim.dummy = (uint32_t)SPI_Transmit_DMA_Callback;
-    HAL_DMA_Channel_Config_Set(hspi->DMAC_Instance,hspi->Tx_Env.DMA.DMA_Channel,false,&prim);
-    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Tx_Env.DMA.DMA_Channel,CH_SPI2_TX,(uint32_t)hspi);
+    HAL_DMA_Channel_Config_Set(hspi->DMAC_Instance,hspi->DMATx.DMA_Channel,false,&prim);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->DMATx.DMA_Channel,CH_SPI2_TX,(uint32_t)hspi);
 
     /* Rx parameter initialize*/
     prim.src_data_end_ptr = (uint32_t)&hspi->Instance->DR;
-    prim.dst_data_end_ptr = RX_Data? rx_data_end_ptr: (uint32_t)&hspi->Rx_Env.DMA.dummy;
+    prim.dst_data_end_ptr = RX_Data? rx_data_end_ptr: (uint32_t)&hspi->DMARx.dummy;
     prim.ctrl_data.src_inc = DMA_INC_NONE;
     prim.ctrl_data.dst_inc = RX_Data? inc: DMA_INC_NONE;
     prim.dummy = (uint32_t)SPI_Receive_DMA_Callback;
-    HAL_DMA_Channel_Config_Set(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,false,&prim);
-    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,CH_SPI2_RX,(uint32_t)hspi);
+    HAL_DMA_Channel_Config_Set(hspi->DMAC_Instance,hspi->DMARx.DMA_Channel,false,&prim);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->DMARx.DMA_Channel,CH_SPI2_RX,(uint32_t)hspi);
 
     MODIFY_REG(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
     SET_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);

@@ -82,6 +82,14 @@ static gpio_pin_t spi3_clk;
 static gpio_pin_t spi3_nss;
 static gpio_pin_t spi3_mosi;
 static gpio_pin_t spi3_miso;
+static gpio_pin_t i2s2_ck;
+static gpio_pin_t i2s2_ws;
+static gpio_pin_t i2s2_sd;
+static gpio_pin_t i2s2_mck;
+static gpio_pin_t i2s3_ck;
+static gpio_pin_t i2s3_ws;
+static gpio_pin_t i2s3_sd;
+static gpio_pin_t i2s3_mck;
 /* ssi io init */
 static gpio_pin_t ssi_clk;
 static gpio_pin_t ssi_nss0;
@@ -1217,6 +1225,69 @@ static void spi_slave_miso_io_cfg(uint8_t miso)
     io_cfg_output(miso);
 }
 
+static void iis_master_ck_io_cfg(uint8_t ck)
+{
+    io_clr_pin(ck);
+    io_pull_write(ck,IO_PULL_DOWN);
+    io_cfg_output(ck);
+}
+
+static void iis_master_ws_io_cfg(uint8_t ws)
+{
+    io_set_pin(ws);
+    io_pull_write(ws,IO_PULL_UP);
+    io_cfg_output(ws);
+}
+
+static void iis_master_sd_io_cfg(uint8_t sd, uint8_t mode)
+{
+    if (mode)
+    {
+        io_set_pin(sd);
+        io_cfg_output(sd);
+    }
+    else 
+    {
+        io_cfg_input(sd);
+    }
+}
+
+static void iis_master_mck_io_cfg(uint8_t mck)
+{
+    io_clr_pin(mck);
+    io_pull_write(mck,IO_PULL_DOWN);
+    io_cfg_output(mck);
+}
+
+static void iis_slave_ck_io_cfg(uint8_t ck)
+{
+    io_cfg_input(ck);
+}
+
+static void iis_slave_ws_io_cfg(uint8_t ws)
+{
+    io_pull_write(ws,IO_PULL_UP);
+    io_cfg_input(ws);
+}
+
+static void iis_slave_sd_io_cfg(uint8_t sd, uint8_t mode)
+{
+    if (mode)
+    {
+        io_set_pin(sd);
+        io_cfg_output(sd);
+    }
+    else 
+    {
+        io_cfg_input(sd);
+    }
+}
+
+static void iis_slave_mck_io_cfg(uint8_t mck)
+{
+    io_cfg_input(mck);
+}
+
 void pinmux_spi2_master_clk_init(uint8_t clk)
 {
     *(uint8_t *)&spi2_clk = clk;
@@ -1369,6 +1440,160 @@ void pinmux_spi3_mosi_deinit(void)
 void pinmux_spi3_miso_deinit(void)
 {
     set_gpio_mode((gpio_pin_t *)&spi3_miso);
+}
+
+void pinmux_iis2_master_ck_init(uint8_t ck)
+{
+    *(uint8_t *)&i2s2_ck = ck;
+    iis_master_ck_io_cfg(ck);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ck),SPI2_SCK);
+}
+
+void pinmux_iis2_master_ws_init(uint8_t ws)
+{
+    *(uint8_t *)&i2s2_ws = ws;
+    iis_master_ws_io_cfg(ws);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ws),SPI2_NSS);    
+}
+
+void pinmux_iis2_master_sd_init(uint8_t sd, uint8_t mode)
+{
+    *(uint8_t *)&i2s2_sd = sd;
+    iis_master_sd_io_cfg(sd, mode);
+    per_func_enable(pin2func_io((gpio_pin_t *)&sd),SPI2_MOSI);
+}
+
+void pinmux_iis2_master_mck_init(uint8_t mck)
+{
+    *(uint8_t *)&i2s2_mck = mck;
+    iis_master_mck_io_cfg( mck);    
+    per_func_enable(pin2func_io((gpio_pin_t *)&mck),SPI2_IIS);
+}
+
+void pinmux_iis2_slave_ck_init(uint8_t ck)
+{
+    *(uint8_t *)&i2s2_ck = ck;
+    iis_slave_ck_io_cfg(ck);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ck),SPI2_SCK);
+}
+
+void pinmux_iis2_slave_ws_init(uint8_t ws)
+{
+    *(uint8_t *)&i2s2_ws = ws;
+    iis_slave_ws_io_cfg(ws);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ws),SPI2_NSS);    
+}
+
+void pinmux_iis2_slave_sd_init(uint8_t sd, uint8_t mode)
+{
+    *(uint8_t *)&i2s2_sd = sd;
+    iis_slave_sd_io_cfg(sd, mode);
+    per_func_enable(pin2func_io((gpio_pin_t *)&sd),SPI2_MOSI);
+}
+
+void pinmux_iis2_slave_mck_init(uint8_t mck)
+{
+    *(uint8_t *)&i2s2_mck = mck;
+    iis_slave_mck_io_cfg( mck);    
+    per_func_enable(pin2func_io((gpio_pin_t *)&mck),SPI2_IIS);
+}
+
+void pinmux_iis2_ck_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&i2s2_ck);
+}
+
+void pinmux_iis2_ws_deinit(void)
+{
+    io_pull_write(*(uint8_t *)&i2s2_ws,IO_PULL_DISABLE);
+    set_gpio_mode((gpio_pin_t *)&i2s2_ws);
+}
+
+void pinmux_iis2_sd_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&i2s2_sd);
+}
+
+void pinmux_iis2_mck_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&i2s2_mck);
+}
+
+void pinmux_iis3_master_ck_init(uint8_t ck)
+{
+    *(uint8_t *)&i2s3_ck = ck;
+    iis_master_ck_io_cfg(ck);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ck),SPI3_SCK);
+}
+
+void pinmux_iis3_master_ws_init(uint8_t ws)
+{
+    *(uint8_t *)&i2s3_ws = ws;
+    iis_master_ws_io_cfg(ws);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ws),SPI3_NSS);  
+}
+
+void pinmux_iis3_master_sd_init(uint8_t sd, uint8_t mode)
+{
+    *(uint8_t *)&i2s3_sd = sd;
+    iis_master_sd_io_cfg(sd, mode);
+    per_func_enable(pin2func_io((gpio_pin_t *)&sd),SPI3_MOSI);
+}
+
+void pinmux_iis3_master_mck_init(uint8_t mck)
+{
+    *(uint8_t *)&i2s3_mck = mck;
+    iis_master_mck_io_cfg( mck);    
+    per_func_enable(pin2func_io((gpio_pin_t *)&mck),SPI3_IIS);
+}
+
+void pinmux_iis3_slave_ck_init(uint8_t ck)
+{
+    *(uint8_t *)&i2s3_ck = ck;
+    iis_slave_ck_io_cfg(ck);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ck),SPI3_SCK);
+}
+
+void pinmux_iis3_slave_ws_init(uint8_t ws)
+{
+    *(uint8_t *)&i2s3_ws = ws;
+    iis_slave_ws_io_cfg(ws);
+    per_func_enable(pin2func_io((gpio_pin_t *)&ws),SPI3_NSS);  
+}
+
+void pinmux_iis3_slave_sd_init(uint8_t sd, uint8_t mode)
+{
+    *(uint8_t *)&i2s3_sd = sd;
+    iis_slave_sd_io_cfg(sd, mode);
+    per_func_enable(pin2func_io((gpio_pin_t *)&sd),SPI3_MOSI);
+}
+
+void pinmux_iis3_slave_mck_init(uint8_t mck)
+{
+    *(uint8_t *)&i2s3_mck = mck;
+    iis_slave_mck_io_cfg( mck);    
+    per_func_enable(pin2func_io((gpio_pin_t *)&mck),SPI3_IIS);
+}
+
+void pinmux_iis3_ck_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&i2s3_ck);
+}
+
+void pinmux_iis3_ws_deinit(void)
+{
+    io_pull_write(*(uint8_t *)&i2s3_ws,IO_PULL_DISABLE);
+    set_gpio_mode((gpio_pin_t *)&i2s3_ws);
+}
+
+void pinmux_iis3_sd_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&i2s3_sd);
+}
+
+void pinmux_iis3_mck_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&i2s3_mck);
 }
 
 void pinmux_ssi_clk_init(uint8_t clk) 

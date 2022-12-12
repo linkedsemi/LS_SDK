@@ -133,6 +133,76 @@ void pinmux_spi2_mosi_deinit(void);
 void pinmux_spi2_miso_deinit(void);
 
 /**
+  * @brief  Set pin mux function to iis2 master ck
+  * @param  ck   Specific GPIO pin
+  */
+void pinmux_iis2_master_ck_init(uint8_t ck);
+
+/**
+  * @brief   Set pin mux function to iis2 master ws
+  * @param   ws  Specific GPIO pin
+  */
+void pinmux_iis2_master_ws_init(uint8_t ws);
+
+/**
+  * @brief   Set pin mux function to iis2 master sd
+  * @param   sd   Specific GPIO pin
+  * @param   mode GPIO input/output mode
+  */
+void pinmux_iis2_master_sd_init(uint8_t sd, uint8_t mode);
+
+/**
+  * @brief    Set pin mux function to iis2 master mck
+  * @param    mck   Specific GPIO pin
+  */
+void pinmux_iis2_master_mck_init(uint8_t mck);
+
+/**
+  * @brief  Set pin mux function to iis2 slave ck
+  * @param  ck   Specific GPIO pin
+  */
+void pinmux_iis2_slave_ck_init(uint8_t ck);
+
+/**
+  * @brief   Set pin mux function to iis2 slave ws
+  * @param   ws  Specific GPIO pin
+  */
+void pinmux_iis2_slave_ws_init(uint8_t ws);
+
+/**
+  * @brief   Set pin mux function to iis2 slave sd
+  * @param   sd   Specific GPIO pin
+  * @param   mode GPIO input/output mode
+  */
+void pinmux_iis2_slave_sd_init(uint8_t sd, uint8_t mode);
+
+/**
+  * @brief    Set pin mux function to iis2 slave mck
+  * @param    mck   Specific GPIO pin
+  */
+void pinmux_iis2_slave_mck_init(uint8_t mck);
+
+/**
+  * @brief  clear pin mux function of iis2_clk
+  */
+void pinmux_iis2_ck_deinit(void);
+
+/**
+  * @brief  clear pin mux functions of iis2_ws
+  */
+void pinmux_iis2_ws_deinit(void);
+
+/**
+  * @brief   clear pin mux function of iis2_sd
+  */
+void pinmux_iis2_sd_deinit(void);
+
+/**
+  * @brief   clear pin mux function of iis2_mck
+  */
+void pinmux_iis2_mck_deinit(void);
+
+/**
   * @brief       Set pin mux function as iic1_io_init
   * @param  scl  Specific GPIO pin 
   * @param  sda  Specific GPIO pin 

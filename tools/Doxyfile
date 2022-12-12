@@ -10,7 +10,7 @@ INPUT                  = hal_driver/api/ls_hal_flash.h \
                          hal_driver/api/ls_hal_pdm.h \
                          hal_driver/api/ls_hal_rtc.h \
                          hal_driver/api/ls_hal_uart.h \
-                         hal_driver/api/ls_hal_spi.h \
+                         hal_driver/api/ls_hal_spi_i2s.h \
                          hal_driver/api/ls_hal_i2c.h \
                          hal_driver/api/ls_hal_trng.h \
                          hal_driver/api/ls_hal_iwdg.h \
