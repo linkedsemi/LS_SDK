@@ -3,7 +3,7 @@
 
 #if defined(__CC_ARM)
 #define SVCALL(number, return_type, signature) return_type __svc(number) signature
-#else
+#elif defined(__GNUC__)
 #define SVCALL(number, return_type, signature)          \
   _Pragma("GCC diagnostic push")                        \
   _Pragma("GCC diagnostic ignored \"-Wreturn-type\"")   \
@@ -17,6 +17,11 @@
     );                                                  \
   }                                                     \
   _Pragma("GCC diagnostic pop")
+#elif defined(__ICCARM__)
+#define PRAGMA(x) _Pragma(#x)
+#define SVCALL(number, return_type, signature)          \
+  PRAGMA(swi_number = (number))                        \
+  __swi return_type signature;
 #endif
 
 enum svcall_num_enum

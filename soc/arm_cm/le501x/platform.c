@@ -80,7 +80,7 @@ __attribute__((weak)) uint32_t __mesh_stack_bss_size__;
 __attribute__((weak)) uint32_t __mesh_stack_data_lma__;
 __attribute__((weak)) uint32_t __mesh_stack_data_start__;
 __attribute__((weak)) uint32_t __mesh_stack_data_size__;
-#elif defined(__GNUC__)
+#else
 extern uint32_t __stack_bss_start__;
 extern uint32_t __stack_bss_size__;
 extern uint32_t __stack_data_lma__;
@@ -638,10 +638,23 @@ __attribute__((weak)) uint64_t __aeabi_uidivmod(uint32_t r0,uint32_t r1)
     return idiv_acc(r0,r1,false);    
 }
 
+
+#if __ICCARM__
+__attribute__((weak)) __value_in_regs div_t __aeabi_idivmod(int32_t r0,int32_t r1)
+{
+    int64_t val = idiv_acc(r0,r1,true);
+    div_t res = {
+        .quot = val,
+        .rem = val>>32,
+    };
+    return res;
+}
+#else
 __attribute__((weak)) int64_t __aeabi_idivmod(int32_t r0,int32_t r1)
 {
     return (int64_t)idiv_acc(r0,r1,true);
 }
+#endif
 
 void aos_swint_init(void (*isr)())
 {

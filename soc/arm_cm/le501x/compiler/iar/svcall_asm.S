@@ -1,10 +1,9 @@
-    PRESERVE8
+    MODULE svcall_asm
+    PUBLIC SVC_Handler
+    EXTERN SVC_Handler_C
+    SECTION `.text.SVC_Handler`:CODE
     THUMB
-    AREA    |.text.SVC_Handler|, CODE, READONLY
-    FRAME UNWIND ON
-SVC_Handler PROC
-    EXPORT SVC_Handler
-    IMPORT SVC_Handler_C
+SVC_Handler
     MOVS R0,#4
     MOV R1,LR
     TST R0,R1
@@ -16,7 +15,5 @@ stacking_used_MSP
 SVC_C_Routine
     LDR R1,=SVC_Handler_C
     BX R1
-    ALIGN
-    ENDP
-    
+
     END

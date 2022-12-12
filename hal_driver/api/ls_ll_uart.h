@@ -727,7 +727,7 @@ static inline uint32_t LL_UART_IsEnabledDMAEN(reg_uart_t *UARTx)
  * @param  UARTx UART Instance
  * @retval Address of data register
  */
-static __inline uint32_t LL_UART_DMA_GetTransmitRegAddr(reg_uart_t *UARTx)
+static inline uint32_t LL_UART_DMA_GetTransmitRegAddr(reg_uart_t *UARTx)
 {
     /* return address of DR register */
     return ((uint32_t) & (UARTx->TBR));
@@ -737,7 +737,7 @@ static __inline uint32_t LL_UART_DMA_GetTransmitRegAddr(reg_uart_t *UARTx)
  * @param  UARTx UART Instance
  * @retval Address of data register
  */
-static __inline uint32_t LL_UART_DMA_GetReceiveRegAddr(reg_uart_t *UARTx)
+static inline uint32_t LL_UART_DMA_GetReceiveRegAddr(reg_uart_t *UARTx)
 {
     /* return address of DR register */
     return ((uint32_t) & (UARTx->RBR));
