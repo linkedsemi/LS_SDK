@@ -10,6 +10,12 @@ def le501x_keil_proj_gen(path):
     process.wait()
     os.chdir(root_path)
 
+def le501x_iar_proj_gen(path):
+    os.chdir(path)
+    process = subprocess.Popen(['scons','tool=progen','ide=iar'],shell=True)
+    process.wait()
+    os.chdir(root_path)
+
 le501x_keil_proj_gen('examples/ble/ble_advertiser')
 le501x_keil_proj_gen('examples/ble/ble_ancs')
 le501x_keil_proj_gen('examples/ble/ble_at_proj')

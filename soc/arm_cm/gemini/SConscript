@@ -114,7 +114,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         #'crc/crc16.c',
         'debug/log.c',
         'debug/ls_dbg.c',
-        'debug/$BASE_ARCH/$COMPILER/ls_dbg_asm.S',
         'debug/RTT/SEGGER_RTT.c',
         #'static_buffer/linked_buffer.c',
         #'static_buffer/fifo.c',

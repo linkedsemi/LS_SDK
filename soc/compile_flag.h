@@ -34,6 +34,10 @@ extern uint32_t reset_retain_start;
 #define RESET_RETAIN_BASE   (&(reset_retain_start))
 extern uint32_t reset_retain_end;
 #define RESET_RETAIN_END   (&(reset_retain_end))
+#elif defined(__ICCARM__)
+#pragma section="RESET_RETAIN"
+#define RESET_RETAIN_BASE __section_begin("RESET_RETAIN")
+#define RESET_RETAIN_END __section_end("RESET_RETAIN")
 #endif
 
 #endif
