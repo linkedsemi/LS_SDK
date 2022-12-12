@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "ls_hal_spi.h"
+#include "ls_hal_spi_i2s.h"
 #include "log.h"
 #include "systick.h"
 

@@ -1,7 +1,7 @@
-#include "ls_msp_spi.h"
+#include "ls_msp_spi_i2s.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
-#include "ls_hal_spi.h"
+#include "ls_hal_spi_i2s.h"
 #include "le501x.h"
 #include "HAL_def.h"
 #include "sys_stat.h"
@@ -81,6 +81,77 @@ void HAL_SPI_MSP_Busy_Set(SPI_HandleTypeDef *inst)
 void HAL_SPI_MSP_Idle_Set(SPI_HandleTypeDef *inst)
 {
     spi_status_set(inst,0);
+}
+
+static void *i2s_inst_env;
+
+void I2S2_Handler(void)
+{
+    HAL_I2S_IRQHandler(i2s_inst_env);   
+}
+__attribute__((weak)) void csi_i2s_isr(void *inst){}
+
+void CSI_I2S_Handler()
+{
+    csi_i2s_isr(i2s_inst_env);
+}
+
+static void i2s_msp_init(void *inst,void (*handler)())
+{
+    REG_FIELD_WR(RCC->APB1RST, RCC_SPI2, 1);
+    REG_FIELD_WR(RCC->APB1RST, RCC_SPI2, 0);
+    arm_cm_set_int_isr(SPI2_IRQn,handler);
+    i2s_inst_env = inst;
+    NVIC_ClearPendingIRQ(SPI2_IRQn);
+    NVIC_EnableIRQ(SPI2_IRQn);
+    REG_FIELD_WR(RCC->APB1EN, RCC_SPI2, 1);
+}
+
+void i2s_msp_deinit()
+{
+    REG_FIELD_WR(RCC->APB1EN, RCC_SPI2, 0);
+    NVIC_DisableIRQ(SPI2_IRQn);
+}
+
+uint32_t CSI_I2S_MSP_Init(void *inst,uint32_t idx)
+{
+    i2s_msp_init(inst,CSI_I2S_Handler);
+    return SPI2_BASE_ADDR;
+}
+
+void CSI_I2S_MSP_DeInit(uint32_t idx)
+{
+    i2s_msp_deinit();
+}
+
+void HAL_I2S_MSP_Init(I2S_HandleTypeDef *inst)
+{
+    i2s_msp_init(inst,I2S2_Handler);
+}
+
+void HAL_I2S_MSP_DeInit(I2S_HandleTypeDef *inst)
+{
+    i2s_msp_deinit();
+}
+
+static void i2s_status_set(I2S_HandleTypeDef *inst,bool status)
+{
+    switch((uint32_t)inst->Instance)
+    {
+    case (uint32_t)SPI2:
+        spi2_status_set(status);
+    break;
+    }
+}
+
+void HAL_I2S_MSP_Busy_Set(I2S_HandleTypeDef *inst)
+{
+    i2s_status_set(inst,1);
+}
+
+void HAL_I2S_MSP_Idle_Set(I2S_HandleTypeDef *inst)
+{
+    i2s_status_set(inst,0);
 }
 
 __attribute__((weak)) void LL_SPI_IRQHandler(){}
