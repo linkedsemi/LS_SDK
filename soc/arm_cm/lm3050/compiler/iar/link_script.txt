@@ -5,8 +5,8 @@ define region RAM = mem: [from 0x20000000 size 0x2000];
 define region FLASH = mem: [from 0x800200 size 0x80000];
 define symbol __data_start__ = 0x20000148;
 
-place at address mem:0x800000 {section .rodata object __info_array.o};
-keep {section .rodata object __info_array.o};
+place at address mem:0x800000 {symbol __info_array};
+keep {symbol __info_array};
 initialize by copy with packing = none {section .intvec,readwrite,section .xip_banned*};
 place at start of RAM {section .intvec};
 place at start of FLASH {section .intvec_init};
