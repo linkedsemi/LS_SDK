@@ -18,19 +18,19 @@ __attribute__((weak)) void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart
    */
 }
 
-static void UART_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+static void UART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
     huart->UARTX->IER = UART_IT_TXS;
 }
 
-static void UART_Recevie_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+static void UART_Recevie_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     HAL_UART_DMA_RxCpltCallback((UART_HandleTypeDef *)param);
 }
 
-#if DMACV2
-#include "ls_hal_dmacv2.h"
 HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
     huart->UARTX->ICR = UART_IT_TC | UART_IT_TXS;
@@ -59,7 +59,7 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pDat
         .byte_count = Size,
         .dummy = 0,
     };
-    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, huart->Tx_Env.DMA.DMA_Channel, &prim, (void *)UART_Transmit_DMA_Callback, (uint32_t)huart);
+    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, huart->Tx_Env.DMA.DMA_Channel, &prim, UART_Transmit_DMA_Callback, (uint32_t)huart);
     return HAL_OK;
 }
 
@@ -91,12 +91,23 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
         .byte_count = Size,
         .dummy = 0,
     };
-    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, huart->Rx_Env.DMA.DMA_Channel, &prim, (void *)UART_Recevie_DMA_Callback, (uint32_t)huart);
+    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, huart->Rx_Env.DMA.DMA_Channel, &prim, UART_Recevie_DMA_Callback, (uint32_t)huart);
     return HAL_OK;
 }
 
 #else
 #include "ls_hal_dmac.h"
+static void UART_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
+    huart->UARTX->IER = UART_IT_TXS;
+}
+
+static void UART_Recevie_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    HAL_UART_DMA_RxCpltCallback((UART_HandleTypeDef *)param);
+}
+
 HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
     huart->UARTX->ICR = UART_IT_TC| UART_IT_TXS;

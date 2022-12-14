@@ -10,7 +10,7 @@
   * @param  hdma: pointer to DMA handle.
   * @retval None
   */
-void ADC_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+void ADC_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     ADC_HandleTypeDef *hadc = (ADC_HandleTypeDef *)param;
     CLEAR_BIT(hadc->Instance->MISC_CTRL,ADC_DMA_EN_MASK);
@@ -56,7 +56,7 @@ HAL_StatusTypeDef HAL_ADC_LoopChannel_Start_DMA(ADC_HandleTypeDef* hadc, uint16_
     cfg.byte_count = Length;
     cfg.dummy = 0;
 
-    HAL_DMA_Channel_Start_IT(hadc->DMAC_Instance,hadc->Env.DMA.DMA_Channel,&cfg,(void *)ADC_DMA_Callback,(uint32_t)hadc);
+    HAL_DMA_Channel_Start_IT(hadc->DMAC_Instance,hadc->Env.DMA.DMA_Channel,&cfg,ADC_DMA_Callback,(uint32_t)hadc);
 
     if(hadc->Init.TrigType == ADC_SOFTWARE_TRIGT)
     {

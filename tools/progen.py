@@ -46,9 +46,10 @@ def progen(target,source,env):
             },
             'template': env['SDK_ROOT'].abspath+'/tools/iar.ewp',}
     }
-    if env['IDE'] == 'uvision5' and env['IC'] == 'lm3050':
+    if env['IC'] == 'lm3050':
         project_data['common']['sources']['soc'] += [os.path.relpath(os.path.join(env['SDK_ROOT'].abspath,'soc/arm_cm/lm3050/__info_array.c'),os.getcwd())]
-        project_data['tool_specific']['uvision5']['misc']['ld_flags'].append(os.path.join(root_relpath,'soc/arm_cm/lm3050/compiler/armcc/rom_sym.txt'))
+        if env['IDE'] == 'uvision5':
+            project_data['tool_specific']['uvision5']['misc']['ld_flags'].append(os.path.join(root_relpath,'soc/arm_cm/lm3050/compiler/armcc/rom_sym.txt'))
     project_settings = ProjectSettings()
     project_settings.update({
         'export_dir':[os.path.join(env['IC'],env['IDE'])]
@@ -91,6 +92,8 @@ def progen(target,source,env):
             if setting.find('name').text == 'BUILDACTION':
                 if env['IC'] == 'le501x':
                     setting.find('data').find('postbuild').text = "{} {} {} {} $PROJ_DIR$ {}".format('$PROJ_DIR$\\'+root_relpath +'\\tools\\'+env['IC']+'\\postbuild_iar.bat',name,'$PROJ_DIR$\\'+root_relpath,env['APP_IMAGE_BASE'],stack_path)
+                if env['IC'] == 'lm3050':
+                    setting.find('data').find('prebuild').text = '{} {} {}'.format('$PROJ_DIR$\\'+root_relpath +'\\tools\\'+env['IC']+'\\prebuild_iar.bat','$PROJ_DIR$\\'+root_relpath,'$PROJ_DIR$')
             if setting.find('name').text == 'ILINK':
                 for opt in setting.find('data').findall('option'):
                     if opt.find('name').text == 'IlinkOutputFile':

@@ -20,21 +20,31 @@ void ssi_tx_empty_dma_isr(SSI_HandleTypeDef *hssi)
     ssi_tx_done(hssi,HAL_SSI_TxDMACpltCallback);
 }
 
-static void SSI_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+static void ssi_tx_dma_cb(SSI_HandleTypeDef *hssi)
 {
-    SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
     hssi->REG->TXFTLR = 0;
     REG_FIELD_WR(hssi->REG->IMR, SSI_TXEIM,1);
 }
 
-static void SSI_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+static void ssi_rx_dma_cb(SSI_HandleTypeDef *hssi)
 {
-    SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
     ssi_rx_done(hssi,HAL_SSI_RxDMACpltCallback,HAL_SSI_TxRxDMACpltCallback,HAL_SSI_TxRxHalfDuplexDMACpltCallback);
 }
 
 #if DMACV2
 #include "ls_hal_dmacv2.h"
+static void SSI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+{
+    SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
+    ssi_tx_dma_cb(hssi);
+}
+
+static void SSI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+{
+    SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
+    ssi_rx_dma_cb(hssi);
+}
+
 static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t TX_Count,uint16_t RX_Count)
 {
     hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|
@@ -80,7 +90,7 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         cfg.dst_addr = (uint32_t)RX_Data;
         cfg.byte_count = RX_Count;
         cfg.dummy = 0;
-        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Rx_Env.DMA.DMA_Channel,&cfg,(void *)SSI_Receive_DMA_Callback,(uint32_t)hssi);
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Rx_Env.DMA.DMA_Channel,&cfg,SSI_Receive_DMA_Callback,(uint32_t)hssi);
     }
     hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
     if(TX_Data)
@@ -107,11 +117,23 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         cfg.dst_addr = (uint32_t)hssi->DR_REG;
         cfg.byte_count = TX_Count;
         cfg.dummy = 0;
-        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,&cfg,(void *)SSI_Transmit_DMA_Callback,(uint32_t)hssi);
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,&cfg,SSI_Transmit_DMA_Callback,(uint32_t)hssi);
     }
 }
 #else
 #include "ls_hal_dmac.h"
+static void SSI_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
+    ssi_tx_dma_cb(hssi);
+}
+
+static void SSI_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
+    ssi_rx_dma_cb(hssi);
+}
+
 static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t TX_Count,uint16_t RX_Count)
 {
     hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|

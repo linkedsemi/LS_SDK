@@ -5,7 +5,7 @@
 
 struct DMA_Channel_Config cfg;
 
-void DAC1_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+void DAC1_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     DAC_HandleTypeDef *hdac = (DAC_HandleTypeDef *)param;
     CLEAR_BIT(hdac->Instance->DAC_CR,DAC_DMAEN2_MASK);
@@ -13,7 +13,7 @@ void DAC1_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
     hdac->Env.DMA.Callback(hdac);
 }
 
-void DAC2_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+void DAC2_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     DAC_HandleTypeDef *hdac = (DAC_HandleTypeDef *)param;
     CLEAR_BIT(hdac->Instance->DAC_CR,DAC_DMAEN2_MASK);
@@ -61,7 +61,7 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
             cfg.dst_addr += DAC_DHR12R1_ALIGNMENT(Alignment);
         }
         WRITE_REG(hdac->Instance->DAC_SWTRIGR,DAC_SWTRIG1_MASK);
-        HAL_DMA_Channel_Start_IT(hdac->DMAC_Instance, hdac->Env.DMA.DMA_Channel, &cfg, (void *)DAC1_DMA_Callback, (uint32_t)hdac);  
+        HAL_DMA_Channel_Start_IT(hdac->DMAC_Instance, hdac->Env.DMA.DMA_Channel, &cfg, DAC1_DMA_Callback, (uint32_t)hdac);  
     }
 
     if(READ_BIT(hdac->Instance->DAC_ANA,DAC_EN_DAC2_MASK))
@@ -77,7 +77,7 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
         }
         
         WRITE_REG(hdac->Instance->DAC_SWTRIGR,DAC_SWTRIG2_MASK);
-        HAL_DMA_Channel_Start_IT(hdac->DMAC_Instance, hdac->Env.DMA.DMA_Channel, &cfg, (void *)DAC2_DMA_Callback, (uint32_t)hdac);
+        HAL_DMA_Channel_Start_IT(hdac->DMAC_Instance, hdac->Env.DMA.DMA_Channel, &cfg, DAC2_DMA_Callback, (uint32_t)hdac);
     }
     return status;
 }
