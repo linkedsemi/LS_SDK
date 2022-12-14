@@ -154,6 +154,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
             rtos_adapt = 'arm_cm/le501x/freertos_adapt_mcu.c'
         rtos_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
             'arm_cm/le501x/compiler/$COMPILER/port.c',
+            'arm_cm/le501x/compiler/$COMPILER/portasm.S',
             rtos_adapt,
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
