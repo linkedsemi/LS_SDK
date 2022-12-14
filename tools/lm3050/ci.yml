@@ -29,6 +29,13 @@ lm3050_ecb_cbc_polling_keil_build:
   script:
     - cd examples/peripheral/crypt/ecb_cbc_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecb_cbc_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+lm3050_ecb_cbc_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_cbc_polling.ewp -build * -log all
+
 lm3050_ecb_it_padding_build:
   stage: build
   script:
@@ -40,6 +47,51 @@ lm3050_ecb_it_padding_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/crypt/ecb_it_padding/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecb_it_padding.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_ecb_it_padding_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/ecb_it_padding/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_it_padding.ewp -build * -log all
+
+lm3050_sha_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sha/sha_polling && scons ic=lm3050
+
+lm3050_sha_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sha/sha_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sha_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_sha_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sha/sha_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sha_polling.ewp -build * -log all
+
+lm3050_sha_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sha/sha_it && scons ic=lm3050
+
+lm3050_sha_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sha/sha_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sha_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_sha_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sha/sha_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sha_it.ewp -build * -log all
 
 lm3050_sm4_polling_build:
   stage: build
@@ -53,6 +105,13 @@ lm3050_sm4_polling_keil_build:
   script:
     - cd examples/peripheral/sm4/sm4_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sm4_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+lm3050_sm4_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sm4/sm4_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sm4_polling.ewp -build * -log all
+
 lm3050_sm4_it_build:
   stage: build
   script:
@@ -64,6 +123,13 @@ lm3050_sm4_it_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/sm4/sm4_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sm4_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_sm4_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/sm4/sm4_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sm4_it.ewp -build * -log all
 
 lm3050_touchkey_polling_build:
   stage: build
@@ -77,6 +143,13 @@ lm3050_touchkey_polling_keil_build:
   script:
     - cd examples/peripheral/touchkey/touchkey_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b touchkey_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+lm3050_touchkey_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/touchkey/touchkey_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe touchkey_polling.ewp -build * -log all
+
 lm3050_touchkey_it_build:
   stage: build
   script:
@@ -88,6 +161,13 @@ lm3050_touchkey_it_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/touchkey/touchkey_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b touchkey_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_touchkey_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/touchkey/touchkey_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe touchkey_it.ewp -build * -log all
 
 lm3050_gpio_build:
   stage: build
@@ -101,6 +181,13 @@ lm3050_gpio_keil_build:
   script:
     - cd examples/peripheral/gpio/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b gpio.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+lm3050_gpio_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/gpio/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe gpio.ewp -build * -log all    
+
 lm3050_i2c_it_build:
   stage: build
   script:
@@ -113,6 +200,12 @@ lm3050_i2c_it_keil_build:
   script:
     - cd examples/peripheral/i2c/i2c_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_it.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_i2c_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_it.ewp -build * -log all    
 
 lm3050_ll_i2c_it_build:
   stage: build
@@ -126,6 +219,32 @@ lm3050_ll_i2c_it_keil_build:
   script:
     - cd examples/peripheral/i2c/ll_i2c_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_it.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_ll_i2c_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_i2c_it.ewp -build * -log all    
+
+lm3050_ll_i2c_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_polling && scons ic=lm3050
+
+lm3050_ll_i2c_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_polling.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_ll_i2c_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_i2c_polling.ewp -build * -log all    
+
 lm3050_i2c_polling_build:
   stage: build
   script:
@@ -137,6 +256,13 @@ lm3050_i2c_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/i2c/i2c_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_polling.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2c_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_polling.ewp -build * -log all    
 
 lm3050_i2c_dma_build:
   stage: build
@@ -150,17 +276,12 @@ lm3050_i2c_dma_keil_build:
   script:
     - cd examples/peripheral/i2c/i2c_dma/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_dma.uvprojx -o UVBuild/build.txt -j0
 
-# lm3050_pdm_build:
-#   stage: build
-#   script:
-#     - cd examples/peripheral/pdm && scons ic=lm3050
-
-# lm3050_pdm_keil_build:
-#   stage: build
-#   rules:
-#     - !reference [.release_rule, rules]
-#   script:
-#     - cd examples/peripheral/pdm/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b pdm.uvprojx -o UVBuild/build.txt -j0
+lm3050_i2c_dma_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/i2c/i2c_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_dma.ewp -build * -log all    
 
 lm3050_software_calendar_build:
   stage: build
@@ -174,6 +295,13 @@ lm3050_software_calendar_keil_build:
   script:
     - cd examples/peripheral/software_calendar/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b software_calendar.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
 
+lm3050_software_calendar_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/software_calendar/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe software_calendar.ewp -build * -log all    
+
 lm3050_software_timers_build:
   stage: build
   script:
@@ -185,6 +313,13 @@ lm3050_software_timers_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/software_timers/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b software_timers.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_software_timers_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/software_timers/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe software_timers.ewp -build * -log all    
 
 lm3050_ll_spi_it_build:
   stage: build
@@ -198,6 +333,13 @@ lm3050_ll_spi_it_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/ll_spi_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_it.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_ll_spi_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/ll_spi_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_spi_it.ewp -build * -log all    
+
 lm3050_ll_spi_polling_build:
   stage: build
   script:
@@ -209,6 +351,13 @@ lm3050_ll_spi_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/ll_spi_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_polling.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_ll_spi_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/ll_spi_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_spi_polling.ewp -build * -log all    
 
 lm3050_spi_dma_master_build:
   stage: build
@@ -222,6 +371,13 @@ lm3050_spi_dma_master_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/spi_dma_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_master.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_spi_dma_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/spi_dma_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_dma_master.ewp -build * -log all    
+
 lm3050_spi_dma_slave_build:
   stage: build
   script:
@@ -233,6 +389,13 @@ lm3050_spi_dma_slave_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/spi_dma_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_spi_dma_slave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/spi_dma_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_dma_slave.ewp -build * -log all    
 
 lm3050_spi_it_master_build:
   stage: build
@@ -246,6 +409,13 @@ lm3050_spi_it_master_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/spi_it_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_master.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_spi_it_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/spi_it_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_it_master.ewp -build * -log all    
+
 lm3050_spi_it_slave_build:
   stage: build
   script:
@@ -257,6 +427,13 @@ lm3050_spi_it_slave_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/spi_it_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_spi_it_slave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/spi_it_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_it_slave.ewp -build * -log all    
 
 lm3050_spi_polling_master_build:
   stage: build
@@ -270,6 +447,13 @@ lm3050_spi_polling_master_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/spi_polling_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_master.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_spi_polling_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/spi_polling_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_polling_master.ewp -build * -log all    
+
 lm3050_spi_polling_slave_build:
   stage: build
   script:
@@ -281,6 +465,13 @@ lm3050_spi_polling_slave_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/spi_polling_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_spi_polling_slave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/spi_polling_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_polling_slave.ewp -build * -log all    
 
 lm3050_i2s_dma_master_build:
   stage: build
@@ -294,6 +485,13 @@ lm3050_i2s_dma_master_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/i2s_dma_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_dma_master.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_i2s_dma_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_dma_master.ewp -build * -log all    
+
 lm3050_i2s_dma_slave_build:
   stage: build
   script:
@@ -305,6 +503,13 @@ lm3050_i2s_dma_slave_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/i2s_dma_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_dma_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_dma_slave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_dma_slave.ewp -build * -log all    
 
 lm3050_i2s_it_master_build:
   stage: build
@@ -318,6 +523,13 @@ lm3050_i2s_it_master_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/i2s_it_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_it_master.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_i2s_it_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_it_master.ewp -build * -log all    
+
 lm3050_i2s_it_slave_build:
   stage: build
   script:
@@ -329,6 +541,13 @@ lm3050_i2s_it_slave_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/i2s_it_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_it_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_it_slave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_it_slave.ewp -build * -log all    
 
 lm3050_i2s_polling_master_build:
   stage: build
@@ -342,6 +561,13 @@ lm3050_i2s_polling_master_keil_build:
   script:
     - cd examples/peripheral/spi_i2s/i2s_polling_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_polling_master.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_i2s_polling_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_polling_master.ewp -build * -log all    
+
 lm3050_i2s_polling_slave_build:
   stage: build
   script:
@@ -353,6 +579,13 @@ lm3050_i2s_polling_slave_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/spi_i2s/i2s_polling_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_polling_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_polling_slave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_polling_slave.ewp -build * -log all    
 
 lm3050_ll_ssi_it_build:
   stage: build
@@ -366,6 +599,13 @@ lm3050_ll_ssi_it_keil_build:
   script:
     - cd examples/peripheral/ssi/ll_ssi_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_ssi_it.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_ll_ssi_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ssi/ll_ssi_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_ssi_it.ewp -build * -log all    
+
 lm3050_ssi_dma_build:
   stage: build
   script:
@@ -377,6 +617,13 @@ lm3050_ssi_dma_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/ssi/ssi_dma/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ssi_dma.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_ssi_dma_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ssi/ssi_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ssi_dma.ewp -build * -log all    
 
 lm3050_ssi_it_build:
   stage: build
@@ -390,6 +637,13 @@ lm3050_ssi_it_keil_build:
   script:
     - cd examples/peripheral/ssi/ssi_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ssi_it.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_ssi_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ssi/ssi_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ssi_it.ewp -build * -log all    
+
 lm3050_Basic_PWM_build:
   stage: build
   script:
@@ -401,6 +655,13 @@ lm3050_Basic_PWM_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/timer/Basic_PWM/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b Basic_PWM.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_Basic_PWM_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Basic_PWM/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe Basic_PWM.ewp -build * -log all    
 
 lm3050_Basic_TIM_build:
   stage: build
@@ -414,6 +675,13 @@ lm3050_Basic_TIM_keil_build:
   script:
     - cd examples/peripheral/timer/Basic_TIM/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b Basic_TIM.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_Basic_TIM_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Basic_TIM/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe Basic_TIM.ewp -build * -log all    
+
 lm3050_DTC_PWM_build:
   stage: build
   script:
@@ -425,6 +693,13 @@ lm3050_DTC_PWM_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/timer/DTC_PWM/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b DTC_PWM.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_DTC_PWM_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/DTC_PWM/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe DTC_PWM.ewp -build * -log all    
 
 lm3050_input_Capture_build:
   stage: build
@@ -438,6 +713,13 @@ lm3050_input_Capture_keil_build:
   script:
     - cd examples/peripheral/timer/input_Capture/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b input_Capture.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_input_Capture_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/input_Capture/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe input_Capture.ewp -build * -log all    
+
 lm3050_uart_dma_build:
   stage: build
   script:
@@ -449,6 +731,13 @@ lm3050_uart_dma_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/uart/uart_dma/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_dma.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_uart_dma_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/uart_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_dma.ewp -build * -log all    
 
 lm3050_uart_it_build:
   stage: build
@@ -462,6 +751,13 @@ lm3050_uart_it_keil_build:
   script:
     - cd examples/peripheral/uart/uart_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_it.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_uart_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/uart_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_it.ewp -build * -log all    
+
 lm3050_ll_uart_it_build:
   stage: build
   script:
@@ -473,6 +769,13 @@ lm3050_ll_uart_it_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/uart/ll_uart_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_uart_it.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_ll_uart_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/ll_uart_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_uart_it.ewp -build * -log all    
 
 lm3050_ll_uart_polling_build:
   stage: build
@@ -486,6 +789,13 @@ lm3050_ll_uart_polling_keil_build:
   script:
     - cd examples/peripheral/uart/ll_uart_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_uart_polling.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_ll_uart_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/ll_uart_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_uart_polling.ewp -build * -log all    
+
 lm3050_uart_polling_build:
   stage: build
   script:
@@ -497,6 +807,13 @@ lm3050_uart_polling_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/uart/uart_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b uart_polling.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_uart_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/uart/uart_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_polling.ewp -build * -log all    
 
 lm3050_adc_amic_sampling_build:
   stage: build
@@ -510,41 +827,69 @@ lm3050_adc_amic_sampling_keil_build:
   script:
     - cd examples/peripheral/adcv2/adc_amic_sampling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_amic_sampling.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_adc_polling_build:
+lm3050_adc_amic_sampling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_amic_sampling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_amic_sampling.ewp -build * -log all    
+
+lm3050_adc_blocking_sampling_build:
   stage: build
   script:
     - cd examples/peripheral/adcv2/adc_blocking_sampling && scons ic=lm3050
 
-lm3050_adc_polling_keil_build:
+lm3050_adc_blocking_sampling_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/adcv2/adc_blocking_sampling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_blocking_sampling.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_adc_single_build:
+lm3050_adc_blocking_sampling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_blocking_sampling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_blocking_sampling.ewp -build * -log all    
+
+lm3050_adc_single_channel_build:
   stage: build
   script:
     - cd examples/peripheral/adcv2/adc_single_channel && scons ic=lm3050
 
-lm3050_adc_single_keil_build:
+lm3050_adc_single_channel_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/adcv2/adc_single_channel/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_single_channel.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_adc_multi_build:
+lm3050_adc_single_channel_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_single_channel/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_single_channel.ewp -build * -log all    
+
+lm3050_adc_multi_channel_build:
   stage: build
   script:
     - cd examples/peripheral/adcv2/adc_multi_channel && scons ic=lm3050
 
-lm3050_adc_multi_keil_build:
+lm3050_adc_multi_channel_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/adcv2/adc_multi_channel/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_multi_channel.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_adc_multi_channel_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_multi_channel.ewp -build * -log all    
 
 lm3050_adc_analog_wdg_build:
   stage: build
@@ -558,17 +903,31 @@ lm3050_adc_analog_wdg_keil_build:
   script:
     - cd examples/peripheral/adcv2/adc_analog_wdg/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_analog_wdg.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_adc_dma_build:
+lm3050_adc_analog_wdg_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_analog_wdg/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_analog_wdg.ewp -build * -log all    
+
+lm3050_adc_multi_channel_dma_build:
   stage: build
   script:
     - cd examples/peripheral/adcv2/adc_multi_channel_dma && scons ic=lm3050
 
-lm3050_adc_dma_keil_build:
+lm3050_adc_multi_channel_dma_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/adcv2/adc_multi_channel_dma/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b adc_multi_channel_dma.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_adc_multi_channel_dma_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_multi_channel_dma.ewp -build * -log all    
 
 lm3050_dual_dac_channel_dma_voltage_build:
   stage: build
@@ -582,6 +941,13 @@ lm3050_dual_dac_channel_dma_voltage_keil_build:
   script:
     - cd examples/peripheral/dac/dual_dac_channel_dma_voltage/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b dual_dac_channel_dma_voltage.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_dual_dac_channel_dma_voltage_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe dual_dac_channel_dma_voltage.ewp -build * -log all    
+
 lm3050_dual_dac_channel_voltage_build:
   stage: build
   script:
@@ -593,6 +959,13 @@ lm3050_dual_dac_channel_voltage_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/dac/dual_dac_channel_voltage/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b dual_dac_channel_voltage.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_dual_dac_channel_voltage_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe dual_dac_channel_voltage.ewp -build * -log all    
 
 lm3050_dual_dac_channel_wave_build:
   stage: build
@@ -606,6 +979,13 @@ lm3050_dual_dac_channel_wave_keil_build:
   script:
     - cd examples/peripheral/dac/dual_dac_channel_wave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b dual_dac_channel_wave.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_dual_dac_channel_wave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_wave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe dual_dac_channel_wave.ewp -build * -log all    
+
 lm3050_single_dac_channel_dma_voltage_build:
   stage: build
   script:
@@ -617,6 +997,13 @@ lm3050_single_dac_channel_dma_voltage_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/dac/single_dac_channel_dma_voltage/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_dma_voltage.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_single_dac_channel_dma_voltage_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_dma_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_dma_voltage.ewp -build * -log all    
 
 lm3050_single_dac_channel_sine_wave_build:
   stage: build
@@ -630,6 +1017,13 @@ lm3050_single_dac_channel_sine_wave_keil_build:
   script:
     - cd examples/peripheral/dac/single_dac_channel_sine_wave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_sine_wave.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_single_dac_channel_sine_wave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_sine_wave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_sine_wave.ewp -build * -log all    
+
 lm3050_single_dac_channel_voltage_build:
   stage: build
   script:
@@ -641,6 +1035,13 @@ lm3050_single_dac_channel_voltage_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/dac/single_dac_channel_voltage/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_voltage.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_single_dac_channel_voltage_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_voltage.ewp -build * -log all    
 
 lm3050_single_dac_channel_wave_build:
   stage: build
@@ -654,17 +1055,31 @@ lm3050_single_dac_channel_wave_keil_build:
   script:
     - cd examples/peripheral/dac/single_dac_channel_wave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b single_dac_channel_wave.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_rtc_build:
+lm3050_single_dac_channel_wave_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_wave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_wave.ewp -build * -log all    
+
+lm3050_rtcv2_build:
   stage: build
   script:
     - cd examples/peripheral/rtcv2 && scons ic=lm3050
 
-lm3050_rtc_keil_build:
+lm3050_rtcv2_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/rtcv2/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b rtcv2.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_rtcv2_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/rtcv2/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe rtcv2.ewp -build * -log all    
 
 lm3050_can_loopback_build:
   stage: build
@@ -678,17 +1093,31 @@ lm3050_can_loopback_keil_build:
   script:
     - cd examples/peripheral/can/CAN_LoopBack/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b CAN_LoopBack.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_can_loopback_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/can/CAN_LoopBack/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe CAN_LoopBack.ewp -build * -log all    
+
 lm3050_can_normal_build:
   stage: build
   script:
     - cd examples/peripheral/can/CAN_Normal && scons ic=lm3050
 
-lm3050_can_loopback_keil_build:
+lm3050_can_normal_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/can/CAN_Normal/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b CAN_Normal.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_can_normal_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/can/CAN_Normal/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe CAN_Normal.ewp -build * -log all    
 
 lm3050_iwdg_build:
   stage: build
@@ -702,6 +1131,13 @@ lm3050_iwdg_keil_build:
   script:
     - cd examples/peripheral/wdg/iwdg/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iwdg.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_iwdg_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/wdg/iwdg/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iwdg.ewp -build * -log all    
+
 lm3050_wwdg_build:
   stage: build
   script:
@@ -714,6 +1150,13 @@ lm3050_wwdg_keil_build:
   script:
     - cd examples/peripheral/wdg/wwdg/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b wwdg.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_wwdg_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/wdg/wwdg/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe wwdg.ewp -build * -log all    
+
 lm3050_comp_internal_build:
   stage: build
   script:
@@ -725,6 +1168,13 @@ lm3050_comp_internal_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/comp/comp_internal/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b comp_internal.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_comp_internal_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/comp/comp_internal/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe comp_internal.ewp -build * -log all    
     
 lm3050_comp_dac_build:
   stage: build
@@ -738,6 +1188,13 @@ lm3050_comp_dac_keil_build:
   script:
     - cd examples/peripheral/comp/comp_dac/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b comp_dac.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_comp_dac_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/comp/comp_dac/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe comp_dac.ewp -build * -log all    
+
 lm3050_iap_bootloader_build:
   stage: build
   script:
@@ -750,6 +1207,13 @@ lm3050_iap_bootloader_keil_build:
   script:
     - cd examples/peripheral/iap/iap_bootloader/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iap_bootloader.uvprojx -o UVBuild/build.txt -j0
 
+lm3050_iap_bootloader_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/iap/iap_bootloader/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iap_bootloader.ewp -build * -log all    
+
 lm3050_iap_application_build:
   stage: build
   script:
@@ -761,3 +1225,11 @@ lm3050_iap_application_keil_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/iap/iap_application/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b iap_application.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_iap_application_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/iap/iap_application/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iap_application.ewp -build * -log all    
+   
