@@ -120,6 +120,40 @@ uint8_t HAL_SPI_RX_DMA_Handshake_Get(SPI_HandleTypeDef *hspi)
     return handshake;
 }
 
+uint8_t HAL_I2S_TX_DMA_Handshake_Get(I2S_HandleTypeDef *hi2s)
+{
+    uint8_t handshake = 0;
+    switch ((uint32_t)hi2s->Instance)
+    {
+    case (uint32_t)SPI2:
+        handshake = CH_SPI2_TX;
+        break;
+    case (uint32_t)SPI3:
+        handshake = CH_SPI3_TX;
+        break;
+    default :
+       LS_ASSERT(0);
+    }
+    return handshake;
+}
+
+uint8_t HAL_I2S_RX_DMA_Handshake_Get(I2S_HandleTypeDef *hi2s)
+{
+    uint8_t handshake = 0;
+    switch ((uint32_t)hi2s->Instance)
+    {
+    case (uint32_t)SPI2:
+        handshake = CH_SPI2_RX ;
+        break;
+    case (uint32_t)SPI3:
+        handshake = CH_SPI3_RX;
+        break;
+    default:
+        LS_ASSERT(0);
+    }
+    return handshake;
+}
+
 static I2S_HandleTypeDef *i2s_inst_env[2];
 
 void I2S2_Handler(void)

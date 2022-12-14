@@ -1,9 +1,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ls_hal_spi_i2s.h"
 
-#define SPI_TX_FIFO_DEPTH 16
-#define SPI_TX_FIFO_NOT_FULL(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_TXFLV) < SPI_TX_FIFO_DEPTH)
-#define SPI_RX_FIFO_NOT_EMPTY(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_RXFLV) > 0)
+#define SPI_I2S_TX_FIFO_DEPTH 16
+#define SPI_I2S_TX_FIFO_NOT_FULL(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_TXFLV) < SPI_I2S_TX_FIFO_DEPTH)
+#define SPI_I2S_RX_FIFO_NOT_EMPTY(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_RXFLV) > 0)
 
 static void SPI_Tx_ISR(SPI_HandleTypeDef *hspi);
 static void SPI_Rx_ISR(SPI_HandleTypeDef *hspi);
@@ -36,55 +36,62 @@ HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef *hspi)
 
 static void tx_para_init(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint16_t Size)
 {
-    hspi->pTxBuffPtr = (uint8_t *)pTxData;
-    hspi->TxXferCount = Size;
+    hspi->Tx_Env.Interrupt.pBuffPtr = (uint8_t *)pTxData;
+    hspi->Tx_Env.Interrupt.Count = Size;
 }
 
 static void rx_para_init(SPI_HandleTypeDef *hspi, uint8_t *pRxData,uint16_t Size)
 {
-    hspi->pRxBuffPtr = (uint8_t *)pRxData;
-    hspi->RxXferCount = Size;
+    hspi->Rx_Env.Interrupt.pBuffPtr = (uint8_t *)pRxData;
+    hspi->Rx_Env.Interrupt.Count = Size;
 }
 
 static void spi_tx_load_data_8bit(SPI_HandleTypeDef *hspi)
 {
-    *((uint8_t *)&hspi->Instance->DR) = *((uint8_t *)hspi->pTxBuffPtr);
-    hspi->pTxBuffPtr += sizeof(uint8_t);
-    hspi->TxXferCount--;
+    *((uint8_t *)&hspi->Instance->DR) = *((uint8_t *)hspi->Tx_Env.Interrupt.pBuffPtr);
+    hspi->Tx_Env.Interrupt.pBuffPtr += sizeof(uint8_t);
+    hspi->Tx_Env.Interrupt.Count--;
 }
 
 static void spi_tx_load_data_16bit(SPI_HandleTypeDef *hspi)
 {
-    hspi->Instance->DR = hspi->pTxBuffPtr[1]<<8|hspi->pTxBuffPtr[0];
-    hspi->pTxBuffPtr += sizeof(uint16_t);
-    hspi->TxXferCount--;
+    hspi->Instance->DR = hspi->Tx_Env.Interrupt.pBuffPtr[1]<<8|hspi->Tx_Env.Interrupt.pBuffPtr[0];
+    hspi->Tx_Env.Interrupt.pBuffPtr += sizeof(uint16_t);
+    hspi->Tx_Env.Interrupt.Count--;
 }
 
 static void spi_rx_load_data_8bit(SPI_HandleTypeDef *hspi)
 {
-    *((uint8_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
-    hspi->pRxBuffPtr += sizeof(uint8_t);
-    hspi->RxXferCount--;
+    *((uint8_t *)hspi->Rx_Env.Interrupt.pBuffPtr) = hspi->Instance->DR;
+    hspi->Rx_Env.Interrupt.pBuffPtr += sizeof(uint8_t);
+    hspi->Rx_Env.Interrupt.Count--;
 }
 
 static void spi_rx_load_data_16bit(SPI_HandleTypeDef *hspi)
 {
-    uint16_t rx = hspi->Instance->DR;
-    hspi->pRxBuffPtr[0] = rx;
-    hspi->pRxBuffPtr[1] = rx>>8;
-    hspi->pRxBuffPtr += sizeof(uint16_t); 
-    hspi->RxXferCount -= sizeof(uint16_t);
+    *((uint16_t *)hspi->Rx_Env.Interrupt.pBuffPtr) = (uint16_t)hspi->Instance->DR;
+    hspi->Rx_Env.Interrupt.pBuffPtr += sizeof(uint16_t);
+    hspi->Rx_Env.Interrupt.Count--;
 }
 
 #ifdef LE501X
+static void le501x_rx_load_data_16bit(SPI_HandleTypeDef *hspi)
+{
+    uint16_t rx = hspi->Instance->DR;
+    hspi->Rx_Env.Interrupt.pBuffPtr[0] = rx;
+    hspi->Rx_Env.Interrupt.pBuffPtr[1] = rx>>8;
+    hspi->Rx_Env.Interrupt.pBuffPtr += sizeof(uint16_t); 
+    hspi->Rx_Env.Interrupt.Count -= sizeof(uint16_t);
+}
+
 static void le501x_8bit_packing_mode_handle(SPI_HandleTypeDef *hspi)
 {
     uint8_t i = REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV)/2;
     while (i--)
     {
-        spi_rx_load_data_16bit(hspi);
+        le501x_rx_load_data_16bit(hspi);
     }
-    if(hspi->RxXferCount == 1U)
+    if(hspi->Rx_Env.Interrupt.Count == 1U)
     {
         spi_rx_load_data_8bit(hspi);
     }
@@ -96,22 +103,22 @@ static void le501x_8bit_load_rx_dummy_data(SPI_HandleTypeDef *hspi)
     while (i--)
     {
         hspi->Instance->DR;
-        hspi->RxXferCount -= sizeof(uint16_t);
+        hspi->Rx_Env.Interrupt.Count -= sizeof(uint16_t);
     }
-    if(hspi->RxXferCount == 1U)
+    if(hspi->Rx_Env.Interrupt.Count == 1U)
     {
         hspi->Instance->DR;
-        hspi->RxXferCount--;
+        hspi->Rx_Env.Interrupt.Count--;
     }
 }
 #endif
 
 static void pre_load_data(SPI_HandleTypeDef *hspi)
 {
-    uint8_t i = hspi->TxXferCount > SPI_TX_FIFO_DEPTH? SPI_TX_FIFO_DEPTH: hspi->TxXferCount;
+    uint8_t i = hspi->Tx_Env.Interrupt.Count > SPI_I2S_TX_FIFO_DEPTH? SPI_I2S_TX_FIFO_DEPTH: hspi->Tx_Env.Interrupt.Count;
     while(i--)
     {
-        hspi->Tx_Fun(hspi);
+        hspi->Tx_Env.Interrupt.transfer_Fun(hspi);
     }
 }
 
@@ -124,29 +131,29 @@ static void spi_disable(SPI_HandleTypeDef *hspi)
 static void load_tx_dummy_data(SPI_HandleTypeDef *hspi)
 {
     *((uint8_t *)&hspi->Instance->DR) = 0;
-    hspi->TxXferCount--;
+    hspi->Tx_Env.Interrupt.Count--;
 }
 
 static void load_rx_dummy_data(SPI_HandleTypeDef *hspi)
 {
     hspi->Instance->DR;
-    hspi->RxXferCount--;
+    hspi->Rx_Env.Interrupt.Count--;
 }
 
 static void spi_config(SPI_HandleTypeDef *hspi, bool itmode)
 {
     if (hspi->Init.DataSize > SPI_DATASIZE_8BIT)
     {
-        hspi->Tx_Fun = hspi->pTxBuffPtr? spi_tx_load_data_16bit: load_tx_dummy_data;
-        hspi->Rx_Fun = hspi->pRxBuffPtr? spi_rx_load_data_16bit: load_rx_dummy_data;
+        hspi->Tx_Env.Interrupt.transfer_Fun = hspi->Tx_Env.Interrupt.pBuffPtr? spi_tx_load_data_16bit: load_tx_dummy_data;
+        hspi->Rx_Env.Interrupt.transfer_Fun = hspi->Rx_Env.Interrupt.pBuffPtr? spi_rx_load_data_16bit: load_rx_dummy_data;
     }
     else  // 8 Bit Mode
     {
-        hspi->Tx_Fun = hspi->pTxBuffPtr? spi_tx_load_data_8bit: load_tx_dummy_data;
+        hspi->Tx_Env.Interrupt.transfer_Fun = hspi->Tx_Env.Interrupt.pBuffPtr? spi_tx_load_data_8bit: load_tx_dummy_data;
         #ifdef LE501X
-        hspi->Rx_Fun = hspi->pRxBuffPtr? le501x_8bit_packing_mode_handle: le501x_8bit_load_rx_dummy_data;
+        hspi->Rx_Env.Interrupt.transfer_Fun = hspi->Rx_Env.Interrupt.pBuffPtr? le501x_8bit_packing_mode_handle: le501x_8bit_load_rx_dummy_data;
         #else 
-        hspi->Rx_Fun = hspi->pRxBuffPtr? spi_rx_load_data_8bit: load_rx_dummy_data;
+        hspi->Rx_Env.Interrupt.transfer_Fun = hspi->Rx_Env.Interrupt.pBuffPtr? spi_rx_load_data_8bit: load_rx_dummy_data;
         #endif
     }
     
@@ -175,15 +182,15 @@ static HAL_StatusTypeDef spi_timeout_handle(SPI_HandleTypeDef *hspi, uint32_t en
 
 static void spi_data_transfer(SPI_HandleTypeDef *hspi, uint32_t end_tick)
 {
-    while ((hspi->TxXferCount > 0U) || (hspi->RxXferCount > 0U))
+    while ((hspi->Tx_Env.Interrupt.Count > 0U) || (hspi->Rx_Env.Interrupt.Count > 0U))
     {
-        if (SPI_TX_FIFO_NOT_FULL(hspi) && (hspi->TxXferCount > 0U))
+        if (SPI_I2S_TX_FIFO_NOT_FULL(hspi) && (hspi->Tx_Env.Interrupt.Count > 0U))
         {
-            hspi->Tx_Fun(hspi);
+            hspi->Tx_Env.Interrupt.transfer_Fun(hspi);
         }
-        if ((SPI_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->RxXferCount> 0U))
+        if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->Rx_Env.Interrupt.Count> 0U))
         {
-            hspi->Rx_Fun(hspi);
+            hspi->Rx_Env.Interrupt.transfer_Fun(hspi);
         }
         spi_timeout_handle(hspi, end_tick);
     }
@@ -235,11 +242,11 @@ __attribute__((weak)) void HAL_SPI_CpltCallback(SPI_HandleTypeDef *hspi){}
 
 static void SPI_Tx_ISR(SPI_HandleTypeDef *hspi)
 {
-    while (SPI_TX_FIFO_NOT_FULL(hspi) && hspi->TxXferCount > 0U)
+    while (SPI_I2S_TX_FIFO_NOT_FULL(hspi) && hspi->Tx_Env.Interrupt.Count > 0U)
     {
-        hspi->Tx_Fun(hspi);
+        hspi->Tx_Env.Interrupt.transfer_Fun(hspi);
     }
-    if (hspi->TxXferCount == 0U)
+    if (hspi->Tx_Env.Interrupt.Count == 0U)
     {
         hspi->Instance->IDR = SPI_IT_TXE;
     }
@@ -247,7 +254,7 @@ static void SPI_Tx_ISR(SPI_HandleTypeDef *hspi)
 
 static void SPI_Close_ISR(SPI_HandleTypeDef *hspi)
 {
-    if(hspi->RxXferCount == 0U)
+    if(hspi->Rx_Env.Interrupt.Count == 0U)
     {
         hspi->Instance->IDR = SPI_IT_RXNE;
         spi_disable(hspi);
@@ -258,7 +265,7 @@ static void SPI_Close_ISR(SPI_HandleTypeDef *hspi)
 static void SPI_Rx_ISR(SPI_HandleTypeDef *hspi)
 {
     hspi->Instance->ICR = SPI_ICR_RXNEIC_MASK;
-    hspi->Rx_Fun(hspi);
+    hspi->Rx_Env.Interrupt.transfer_Fun(hspi);
     SPI_Close_ISR(hspi);
 }
 #else
@@ -267,7 +274,7 @@ static void SPI_Rx_ISR(SPI_HandleTypeDef *hspi)
     uint8_t i = REG_FIELD_RD(hspi->Instance->SR, SPI_SR_RXFLV);
     while (i--)
     {
-        hspi->Rx_Fun(hspi);
+        hspi->Rx_Env.Interrupt.transfer_Fun(hspi);
     }
     hspi->Instance->ICR = SPI_ICR_RXNEIC_MASK;
     SPI_Close_ISR(hspi);
@@ -368,16 +375,16 @@ HAL_StatusTypeDef HAL_I2S_DeInit(I2S_HandleTypeDef *hi2s)
 
 static void i2s_tx_load_data(I2S_HandleTypeDef *hi2s)
 {
-    hi2s->Instance->DR =(*hi2s->pTxBuffPtr);
-    hi2s->pTxBuffPtr++;
-    hi2s->TxXferCount--;
+    hi2s->Instance->DR =*((uint16_t *)hi2s->Tx_Env.Interrupt.pBuffPtr);
+    hi2s->Tx_Env.Interrupt.pBuffPtr += sizeof(uint16_t);
+    hi2s->Tx_Env.Interrupt.Count--;
 }
 
 static void i2s_rx_load_data(I2S_HandleTypeDef *hi2s)
 {
-    (*hi2s->pRxBuffPtr) = (uint16_t)hi2s->Instance->DR;
-    hi2s->pRxBuffPtr++;
-    hi2s->RxXferCount--;
+    *((uint16_t *)hi2s->Rx_Env.Interrupt.pBuffPtr) = (uint16_t)hi2s->Instance->DR;
+    hi2s->Rx_Env.Interrupt.pBuffPtr += sizeof(uint16_t);
+    hi2s->Rx_Env.Interrupt.Count--;
 }
 
 static HAL_StatusTypeDef i2s_timeout_handle(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
@@ -396,37 +403,37 @@ static HAL_StatusTypeDef i2s_timeout_handle(I2S_HandleTypeDef *hi2s, uint32_t en
 static void i2s_load_tx_dummy_data(I2S_HandleTypeDef *hi2s)
 {
     hi2s->Instance->DR = 0;
-    hi2s->TxXferCount--;
+    hi2s->Tx_Env.Interrupt.Count--;
 }
 
 static void i2s_pre_load_data(I2S_HandleTypeDef *hi2s)
 {
-    uint8_t i = hi2s->TxXferCount > SPI_TX_FIFO_DEPTH? SPI_TX_FIFO_DEPTH: hi2s->TxXferCount;
+    uint8_t i = hi2s->Tx_Env.Interrupt.Count > SPI_I2S_TX_FIFO_DEPTH? SPI_I2S_TX_FIFO_DEPTH: hi2s->Tx_Env.Interrupt.Count;
     while(i--)
     {
-        hi2s->Tx_Fun(hi2s);
+        hi2s->Tx_Env.Interrupt.i2s_transfer_Fun(hi2s);
     }
 }
 
 static void i2s_config(I2S_HandleTypeDef *hi2s, uint16_t *pTxData, uint16_t *pRxData, uint16_t Size, bool itmode)
 {
     uint32_t tmp_cfgr = hi2s->Instance->I2SCFGR & (SPI_I2SCFGR_DATLEN_MASK | SPI_I2SCFGR_CHLEN_MASK);
-    hi2s->pTxBuffPtr = pTxData;
-    hi2s->pRxBuffPtr = pRxData;
+    hi2s->Tx_Env.Interrupt.pBuffPtr = (uint8_t *)pTxData;
+    hi2s->Rx_Env.Interrupt.pBuffPtr = (uint8_t *)pRxData;
 
     if ((tmp_cfgr == I2S_DATAFORMAT_24BIT) || (tmp_cfgr == I2S_DATAFORMAT_32BIT))
     {
-        hi2s->TxXferCount  = (Size << 1U);
-        hi2s->RxXferCount  = (Size << 1U);
+        hi2s->Tx_Env.Interrupt.Count  = (Size << 1U);
+        hi2s->Rx_Env.Interrupt.Count  = (Size << 1U);
     }
     else
     {
-        hi2s->TxXferCount  = Size;
-        hi2s->RxXferCount  = Size;
+        hi2s->Tx_Env.Interrupt.Count  = Size;
+        hi2s->Rx_Env.Interrupt.Count  = Size;
     }
     
-    hi2s->Tx_Fun = hi2s->pTxBuffPtr? i2s_tx_load_data: i2s_load_tx_dummy_data;
-    hi2s->Rx_Fun = i2s_rx_load_data;
+    hi2s->Tx_Env.Interrupt.i2s_transfer_Fun = hi2s->Tx_Env.Interrupt.pBuffPtr? i2s_tx_load_data: i2s_load_tx_dummy_data;
+    hi2s->Rx_Env.Interrupt.i2s_transfer_Fun = i2s_rx_load_data;
     
     SET_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
     i2s_pre_load_data(hi2s);
@@ -439,11 +446,11 @@ static void i2s_config(I2S_HandleTypeDef *hi2s, uint16_t *pTxData, uint16_t *pRx
 
 static void i2s_tx_data(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
 {
-    while (hi2s->TxXferCount > 0U)
+    while (hi2s->Tx_Env.Interrupt.Count > 0U)
     {
-        if (SPI_TX_FIFO_NOT_FULL(hi2s))
+        if (SPI_I2S_TX_FIFO_NOT_FULL(hi2s))
         {
-            hi2s->Tx_Fun(hi2s);
+            hi2s->Tx_Env.Interrupt.i2s_transfer_Fun(hi2s);
         }
         i2s_timeout_handle(hi2s, end_tick);
     }
@@ -453,26 +460,26 @@ static void i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
 {
     if (hi2s->Init.Mode == I2S_MODE_MASTER_RX)
     {
-        while ((hi2s->TxXferCount > 0U) || (hi2s->RxXferCount > 0U))
+        while ((hi2s->Tx_Env.Interrupt.Count > 0U) || (hi2s->Rx_Env.Interrupt.Count > 0U))
         {
-            if (SPI_TX_FIFO_NOT_FULL(hi2s) && (hi2s->TxXferCount > 0U))
+            if (SPI_I2S_TX_FIFO_NOT_FULL(hi2s) && (hi2s->Tx_Env.Interrupt.Count > 0U))
             {
-                hi2s->Tx_Fun(hi2s);
+                hi2s->Tx_Env.Interrupt.i2s_transfer_Fun(hi2s);
             }
-            if ((SPI_RX_FIFO_NOT_EMPTY(hi2s)) && (hi2s->RxXferCount> 0U))
+            if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hi2s)) && (hi2s->Rx_Env.Interrupt.Count> 0U))
             {
-                hi2s->Rx_Fun(hi2s);
+                hi2s->Rx_Env.Interrupt.i2s_transfer_Fun(hi2s);
             }
             i2s_timeout_handle(hi2s, end_tick);
         }
     }
     else 
     {
-        while (hi2s->RxXferCount > 0U)
+        while (hi2s->Rx_Env.Interrupt.Count > 0U)
         {
-            if (SPI_RX_FIFO_NOT_EMPTY(hi2s))
+            if (SPI_I2S_RX_FIFO_NOT_EMPTY(hi2s))
             {
-                hi2s->Rx_Fun(hi2s);
+                hi2s->Rx_Env.Interrupt.i2s_transfer_Fun(hi2s);
             }
             i2s_timeout_handle(hi2s, end_tick);
         }
@@ -512,7 +519,7 @@ __attribute__((weak)) void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s){}
 
 static void I2S_Close_ISR(I2S_HandleTypeDef *hi2s)
 {
-    if (hi2s->RxXferCount == 0U)
+    if (hi2s->Rx_Env.Interrupt.Count == 0U)
     {
         hi2s->Instance->IDR = SPI_IT_RXNE;
         i2s_disable(hi2s);
@@ -522,12 +529,12 @@ static void I2S_Close_ISR(I2S_HandleTypeDef *hi2s)
 
 static void I2S_Tx_ISR(I2S_HandleTypeDef *hi2s)
 {
-    while ((SPI_TX_FIFO_NOT_FULL(hi2s)) && (hi2s->TxXferCount > 0U))
+    while ((SPI_I2S_TX_FIFO_NOT_FULL(hi2s)) && (hi2s->Tx_Env.Interrupt.Count > 0U))
     {
-        hi2s->Tx_Fun(hi2s);
+        hi2s->Tx_Env.Interrupt.i2s_transfer_Fun(hi2s);
     }
 
-    if (hi2s->TxXferCount == 0U)
+    if (hi2s->Tx_Env.Interrupt.Count == 0U)
     {
         hi2s->Instance->IDR = SPI_IT_TXE;
         i2s_disable(hi2s);
@@ -542,7 +549,7 @@ static void I2S_Rx_ISR(I2S_HandleTypeDef *hi2s)
     uint8_t i = REG_FIELD_RD(hi2s->Instance->SR, SPI_SR_RXFLV);
     while (i--)
     {
-        hi2s->Rx_Fun(hi2s);
+        hi2s->Rx_Env.Interrupt.i2s_transfer_Fun(hi2s);
     }
     I2S_Close_ISR(hi2s);
 }
@@ -552,7 +559,7 @@ static void I2S_Rx_ISR(I2S_HandleTypeDef *hi2s)
     uint8_t i = REG_FIELD_RD(hi2s->Instance->SR, SPI_SR_RXFLV);
     while (i--)
     {
-        hi2s->Rx_Fun(hi2s);
+        hi2s->Rx_Env.Interrupt.i2s_transfer_Fun(hi2s);
     }
     hi2s->Instance->ICR = SPI_ICR_RXNEIC_MASK;
     I2S_Close_ISR(hi2s);
