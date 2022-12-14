@@ -37,19 +37,22 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | mesh/sig_mesh/sig_mesh_provee_alexa                                       |  √     |        |
 | mesh/sig_mesh/sig_mesh_provee_auto_prov                                   |  √     |        |
 | mesh/sig_mesh/sig_mesh_provisioner                                        |  √     |        |
-| peripheral/adc/adc_amic_sampling                                          |        |  √     |
-| peripheral/adc/adc_analog_wdg                                             |        |  √     |
-| peripheral/adc/adc_blocking_sampling                                      |        |  √     |
-| peripheral/adc/adc_multi_channel                                          |        |  √     |
-| peripheral/adc/adc_multi_channel_dma                                      |        |  √     |
-| peripheral/adc/adc_single_channel                                         |        |  √     |
-| peripheral/adcv2/adc_amic_sampling                                        |  √     |        |
-| peripheral/adcv2/adc_analog_wdg                                           |  √     |        |
-| peripheral/adcv2/adc_blocking_sampling                                    |  √     |        |
-| peripheral/adcv2/adc_multi_channel                                        |  √     |        |
-| peripheral/adcv2/adc_multi_channel_dma                                    |  √     |        |
-| peripheral/adcv2/adc_single_channel                                       |  √     |        |
-| peripheral/comp                                                           |        |  √     |
+| peripheral/adc/adc_amic_sampling                                          |  √     |        |
+| peripheral/adc/adc_analog_wdg                                             |  √     |        |
+| peripheral/adc/adc_blocking_sampling                                      |  √     |        |
+| peripheral/adc/adc_multi_channel                                          |  √     |        |
+| peripheral/adc/adc_multi_channel_dma                                      |  √     |        |
+| peripheral/adc/adc_single_channel                                         |  √     |        |
+| peripheral/adcv2/adc_amic_sampling                                        |        |  √     |
+| peripheral/adcv2/adc_analog_wdg                                           |        |  √     |
+| peripheral/adcv2/adc_blocking_sampling                                    |        |  √     |
+| peripheral/adcv2/adc_multi_channel                                        |        |  √     |
+| peripheral/adcv2/adc_multi_channel_dma                                    |        |  √     |
+| peripheral/adcv2/adc_single_channel                                       |        |  √     |
+| peripheral/can/CAN_LoopBack                                               |        |  √     |
+| peripheral/can/CAN_Normal                                                 |        |  √     |
+| peripheral/comp/comp_dac                                                  |        |  √     |
+| peripheral/comp/comp_internal                                             |        |  √     |
 | peripheral/crypt/ecb_cbc_it                                               |  √     |  √     |
 | peripheral/crypt/ecb_cbc_polling                                          |  √     |  √     |
 | peripheral/crypt/ecb_it_padding                                           |  √     |  √     |
@@ -61,24 +64,36 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/dac/single_dac_channel_voltage                                 |        |  √     |
 | peripheral/dac/single_dac_channel_wave                                    |        |  √     |
 | peripheral/gpio                                                           |  √     |  √     |
+| peripheral/i2c/i2c_dma                                                    |  √     |  √     |
 | peripheral/i2c/i2c_it                                                     |  √     |  √     |
 | peripheral/i2c/i2c_polling                                                |  √     |  √     |
 | peripheral/i2c/ll_i2c_it                                                  |  √     |  √     |
 | peripheral/i2c/ll_i2c_polling                                             |  √     |  √     |
+| peripheral/iap/iap_application                                            |  √     |  √     |
+| peripheral/iap/iap_bootloader                                             |  √     |  √     |           
 | peripheral/pdm                                                            |  √     |        |
 | peripheral/rtc                                                            |  √     |        |
 | peripheral/rtcv2                                                          |        |  √     |
-| peripheral/sha/sha_it                                                     |  √     |  √     |
-| peripheral/sha/sha_polling                                                |  √     |  √     |
-| peripheral//sm4/sm4_it                                                    |  √     |  √     |
-| peripheral//sm4/sm4_polling                                               |  √     |  √     |
+| peripheral/sha/sha_it                                                     |        |  √     |
+| peripheral/sha/sha_polling                                                |        |  √     |
+| peripheral/sm4/sm4_it                                                     |        |  √     |
+| peripheral/sm4/sm4_polling                                                |        |  √     |
 | peripheral/software_calendar                                              |  √     |  √     |
 | peripheral/software_timers                                                |  √     |  √     |
-| peripheral/spi/ll_spi_it                                                  |  √     |  √     |
-| peripheral/spi/ll_spi_polling                                             |  √     |  √     |
-| peripheral/spi/spi_dma                                                    |  √     |  √     |
-| peripheral/spi/spi_it                                                     |  √     |  √     |
-| peripheral/spi/spi_polling                                                |  √     |  √     |
+| peripheral/spi_i2s/i2s_dma_master                                         |  √     |  √     |
+| peripheral/spi_i2s/i2s_dma_slave                                          |  √     |  √     |
+| peripheral/spi_i2s/i2s_it_master                                          |  √     |  √     |
+| peripheral/spi_i2s/i2s_it_slave                                           |  √     |  √     |
+| peripheral/spi_i2s/i2s_polling_master                                     |  √     |  √     |
+| peripheral/spi_i2s/i2s_polling_slave                                      |  √     |  √     |
+| peripheral/spi_i2s/ll_spi_it                                              |  √     |  √     |
+| peripheral/spi_i2s/ll_spi_polling                                         |  √     |  √     |
+| peripheral/spi_i2s/spi_dma_master                                         |  √     |  √     |
+| peripheral/spi_i2s/spi_dma_slave                                          |  √     |  √     |
+| peripheral/spi_i2s/spi_it_master                                          |  √     |  √     |
+| peripheral/spi_i2s/spi_it_slave                                           |  √     |  √     |
+| peripheral/spi_i2s/spi_polling_master                                     |  √     |  √     |
+| peripheral/spi_i2s/spi_polling_slave                                      |  √     |  √     |
 | peripheral/ssi/ll_ssi_it                                                  |  √     |  √     |
 | peripheral/ssi/ssi_dma                                                    |  √     |  √     |
 | peripheral/ssi/ssi_it                                                     |  √     |  √     |
@@ -98,8 +113,6 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/uart/uart_polling                                              |  √     |  √     |
 | peripheral/wdg/iwdg                                                       |  √     |  √     |
 | peripheral/wdg/wwdg                                                       |  √     |  √     |
-| peripheral/can/CAN_LoopBack                                               |        |  √     |
-| peripheral/can/CAN_Normal                                                 |        |  √     |
 | prop_24g/ls_prop_24g                                                      |  √     |        |
 | prop_24g/ls_prop_24g_freertos                                             |  √     |        |
 | utility/coremark                                                          |  √     |  √     |
