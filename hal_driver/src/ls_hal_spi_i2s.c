@@ -91,7 +91,7 @@ static void le501x_8bit_packing_mode_handle(SPI_HandleTypeDef *hspi)
     {
         le501x_rx_load_data_16bit(hspi);
     }
-    if(hspi->Rx_Env.Interrupt.Count == 1U)
+    if ((hspi->Rx_Env.Interrupt.Count == 1U) && (SPI_I2S_RX_FIFO_NOT_EMPTY(hspi)))
     {
         spi_rx_load_data_8bit(hspi);
     }
