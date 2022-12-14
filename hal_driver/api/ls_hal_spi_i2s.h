@@ -53,13 +53,24 @@ typedef struct
   */
 
 /**
-  * @brief  SPI DMA Environment
+  * @brief  Interrupt Environment
   */
-typedef struct
+struct Interrupt_Env
 {
-    uint8_t DMA_Channel;
-    uint8_t dummy;
-} SPI_DMA_Env,I2S_DMA_Env;
+  uint8_t                    *pBuffPtr;                         /*!< Pointer to transfer Buffer */
+  uint16_t              	 Count;                             /*!< SPI Transfer Counter */
+  void (*transfer_Fun)(struct __SPI_HandleTypeDef *hspi);       /*!< function pointer on transfer_Fun */
+  void (*i2s_transfer_Fun)(struct __I2S_HandleTypeDef *hi2s);   /*!< function pointer on transfer_Fun */
+};
+
+/**
+  * @brief  DMA Environment
+  */
+struct DMA_Env
+{
+  uint8_t DMA_Channel;
+  uint8_t dummy;
+};
 
 /**
   * @brief SPI handle Structure definition
@@ -70,23 +81,12 @@ typedef struct __SPI_HandleTypeDef
 
   SPI_InitTypeDef            Init;           /*!< SPI communication parameters             */
 
-  uint8_t                    *pTxBuffPtr;    /*!< Pointer to SPI Tx transfer Buffer        */
-
-  uint16_t                   TxXferCount;    /*!< SPI Tx Transfer Counter                  */
-
-  uint8_t                    *pRxBuffPtr;    /*!< Pointer to SPI Rx transfer Buffer        */
-
-  uint16_t                   RxXferCount;    /*!< SPI Rx Transfer Counter                  */
-
-  void (*Rx_Fun)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Rx_Fun      */
-
-  void (*Tx_Fun)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Tx_Fun      */
-
   void                       *DMAC_Instance;
 
-  SPI_DMA_Env                  DMATx;        /*!< SPI Tx DMA Handle parameters             */
-
-  SPI_DMA_Env                  DMARx;        /*!< SPI Rx DMA Handle parameters             */
+  union{
+        struct Interrupt_Env  Interrupt;         /*!< Interrupt Env  */
+        struct DMA_Env        DMA;               /*!< DMA Env  */
+  }Tx_Env,Rx_Env;                                /*!< Tx Rx Environment */
 
 } SPI_HandleTypeDef;
 /**
@@ -129,21 +129,12 @@ typedef struct __I2S_HandleTypeDef
 
   I2S_InitTypeDef            Init;         /*!< I2S communication parameters */
 
-  uint16_t                   *pTxBuffPtr;   /*!< Pointer to I2S Tx transfer buffer */
+  void                       *DMAC_Instance;    /*!< I2S DMA Instance  */
 
-  uint16_t                   TxXferCount;  /*!< I2S Tx transfer Counter     */
-
-  uint16_t                   *pRxBuffPtr;  /*!< Pointer to I2S Rx transfer buffer */
-
-  uint16_t                   RxXferCount;  /*!< I2S Rx transfer counter      */
-
-  void (*Rx_Fun)(struct __I2S_HandleTypeDef *hi2s);   /*!< function pointer on Rx_Fun      */
-
-  void (*Tx_Fun)(struct __I2S_HandleTypeDef *hi2s);   /*!< function pointer on Tx_Fun      */
-
-  I2S_DMA_Env                  DMATx;      /*!< I2S Tx DMA handle parameters */
-
-  I2S_DMA_Env                  DMARx;      /*!< I2S Rx DMA handle parameters */
+  union{
+        struct Interrupt_Env  Interrupt;         /*!< Interrupt Env  */
+        struct DMA_Env        DMA;               /*!< DMA Env  */
+  }Tx_Env,Rx_Env;                                /*!< Tx Rx Environment */
 
 } I2S_HandleTypeDef;
 
@@ -535,6 +526,26 @@ HAL_StatusTypeDef HAL_I2S_Transmit_IT(I2S_HandleTypeDef *hi2s, uint16_t *pTxData
 HAL_StatusTypeDef HAL_I2S_Receive_IT(I2S_HandleTypeDef *hi2s, uint16_t *pRxData, uint16_t Size);
 
 /**
+  * @brief  Transmit an amount of data in DMA mode.
+  * @param  hi2s pointer to a I2S_HandleTypeDef structure that contains.
+  *               the configuration information for I2S module.
+  * @param  Data pointer to data buffer.
+  * @param  Count amount of data to be sent
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_I2S_Transmit_DMA(I2S_HandleTypeDef *hi2s, void *Data, uint16_t Count);
+
+/**
+  * @brief  Receive an amount of data in DMA mode.
+  * @param  hi2s pointer to a I2S_HandleTypeDef structure that contains
+  *               the configuration information for I2S module.
+  * @param  Data pointer to data buffer.
+  * @param  Count amount of data to be received.
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_I2S_Receive_DMA(I2S_HandleTypeDef *hi2s, void *Data, uint16_t Count);
+
+/**
   * @brief  This function handles I2S interrupt request.
   * @param  hi2s: pointer to a I2S_HandleTypeDef structure that contains
   *         the configuration information for I2S module
@@ -557,6 +568,22 @@ void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s);
   * @retval None
   */
 void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s);
+
+/**
+  * @brief  Transfer completed callback in DMA.
+  * @param  hi2s pointer to a I2S_HandleTypeDef structure that contains
+  *               the configuration information for I2S module.
+  * @retval None
+  */
+void HAL_I2S_TxDMACpltCallback(I2S_HandleTypeDef *hi2s);
+
+/**
+  * @brief  Transfer completed callback in DMA.
+  * @param  hi2s pointer to a I2S_HandleTypeDef structure that contains
+  *               the configuration information for I2S module.
+  * @retval None
+  */
+void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s);
 
 #endif
 

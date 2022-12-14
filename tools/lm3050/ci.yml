@@ -189,98 +189,170 @@ lm3050_software_timers_keil_build:
 lm3050_ll_spi_it_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/ll_spi_it && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/ll_spi_it && scons ic=lm3050
 
 lm3050_ll_spi_it_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/ll_spi_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_it.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/ll_spi_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_it.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_ll_spi_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/ll_spi_polling && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/ll_spi_polling && scons ic=lm3050
 
 lm3050_ll_spi_polling_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/ll_spi_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_polling.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/ll_spi_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_spi_polling.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_spi_dma_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_dma_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_dma_master && scons ic=lm3050
 
 lm3050_spi_dma_master_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_dma_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_master.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/spi_dma_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_master.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_spi_dma_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_dma_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_dma_slave && scons ic=lm3050
 
 lm3050_spi_dma_slave_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_dma_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_slave.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/spi_dma_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_dma_slave.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_spi_it_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_it_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_it_master && scons ic=lm3050
 
 lm3050_spi_it_master_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_it_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_master.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/spi_it_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_master.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_spi_it_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_it_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_it_slave && scons ic=lm3050
 
 lm3050_spi_it_slave_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_it_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_slave.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/spi_it_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_it_slave.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_spi_polling_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_polling_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_polling_master && scons ic=lm3050
 
 lm3050_spi_polling_master_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_polling_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_master.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/spi_polling_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_master.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_spi_polling_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi/spi_polling_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_polling_slave && scons ic=lm3050
 
 lm3050_spi_polling_slave_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi/spi_polling_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_slave.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/spi_i2s/spi_polling_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b spi_polling_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_dma_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_master && scons ic=lm3050
+
+lm3050_i2s_dma_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_dma_master.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_dma_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave && scons ic=lm3050
+
+lm3050_i2s_dma_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_dma_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_it_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_master && scons ic=lm3050
+
+lm3050_i2s_it_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_it_master.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_it_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_slave && scons ic=lm3050
+
+lm3050_i2s_it_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_it_slave.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_polling_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_master && scons ic=lm3050
+
+lm3050_i2s_polling_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_master/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_polling_master.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_i2s_polling_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave && scons ic=lm3050
+
+lm3050_i2s_polling_slave_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2s_polling_slave.uvprojx -o UVBuild/build.txt -j0
 
 lm3050_ll_ssi_it_build:
   stage: build

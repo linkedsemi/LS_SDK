@@ -86,7 +86,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'src/ls_hal_rtcv2.c',
         # 'src/lsspi_dma.c',
         'src/ls_hal_spi_i2s.c',
-        'src/ls_hal_spi_dma.c',
+        'src/ls_hal_spi_i2s_dma.c',
         'src/ls_hal_ssi_dma.c',
         'src/ls_hal_ssi.c',
         'src/ls_hal_timer.c',
