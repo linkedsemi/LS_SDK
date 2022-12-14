@@ -12,7 +12,7 @@
  hal_flash_write_in_process                  =0x0000131d ;
  lsqspiv2_stg_send_command                   =0x000018f3 ;
  _hal_flash_dual_io_read                      =0x00001a81 ;
- pinmux_hal_flash_init                       =0x000022d9 ;
+ pinmux_hal_flash_deinit                     =0x000022d9 ;
  uECC_secp256r1                              =0x00000ea1 ;
  svcall_table                                =0x00001f1c ;
  _hal_flash_quad_io_read                      =0x00001a51 ;

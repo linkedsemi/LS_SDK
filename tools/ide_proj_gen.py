@@ -4,17 +4,23 @@ file_path = os.path.basename(__file__)
 root_path = os.path.realpath(os.path.join(file_path,'../'))
 os.chdir(root_path)
 
-def le501x_keil_proj_gen(path):
+def proj_gen(path,ic,ide):
     os.chdir(path)
-    process = subprocess.Popen(['scons','tool=progen'],shell=True)
+    process = subprocess.Popen(['scons','tool=progen','ide='+ide,'ic='+ic],shell=True)
     process.wait()
     os.chdir(root_path)
 
+def keil_proj_gen(path,ic):
+    proj_gen(path,ic,'uvision5')
+
+def iar_proj_gen(path,ic):
+    proj_gen(path,ic,'iar')
+
+def le501x_keil_proj_gen(path):
+    keil_proj_gen(path,'le501x')
+
 def le501x_iar_proj_gen(path):
-    os.chdir(path)
-    process = subprocess.Popen(['scons','tool=progen','ide=iar'],shell=True)
-    process.wait()
-    os.chdir(root_path)
+    iar_proj_gen(path,'le501x')
 
 le501x_keil_proj_gen('examples/ble/ble_advertiser')
 le501x_keil_proj_gen('examples/ble/ble_ancs')
