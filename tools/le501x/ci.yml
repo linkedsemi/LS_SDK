@@ -495,7 +495,7 @@ le501x_adc_analog_wdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/sig_mesh/adc_analog_wdg/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_analog_wdg.ewp -build * -log all
+    - cd examples/peripheral/adc/adc_analog_wdg/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_analog_wdg.ewp -build * -log all
 
 le501x_adc_amic_sampling_build:
   stage: build
