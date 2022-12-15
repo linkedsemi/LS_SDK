@@ -47,7 +47,7 @@ void main_task_app_init(void);
 
 void main_task_itf_init(void);
 
-__attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}
+__attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}    
 
 static void bb_mem_clr(void)
 {
@@ -180,6 +180,10 @@ static void *lsi_counting_timer;
 static uint16_t lsi_cnt_val;
 static bool lsi_counting_valid;
 
+__attribute__((weak)) void builtin_timer_start(void *timer,uint32_t timeout,void *param){}
+__attribute__((weak)) void *builtin_timer_create(void (*cb)(void *)){return NULL;}
+__attribute__((weak)) void func_post(void (*func)(void *),void *param){}
+
 void rco_freq_counting_start()
 {
     HAL_PIS_Config(7,LPTIM_TRGO,GPTIMB1_ITR0,PIS_SYNC_SRC_LEVEL,PIS_EDGE_NONE);
@@ -216,9 +220,6 @@ void lsi_counting_timer_create()
 {
     lsi_counting_timer = builtin_timer_create(lsi_counting_timer_callback);
 }
-
-__attribute__((weak)) void builtin_timer_start(void *timer,uint32_t timeout,void *param){}
-__attribute__((weak)) void func_post(void (*func)(void *),void *param){}
 
 static void lsi_counting_timer_start(void *param)
 {
