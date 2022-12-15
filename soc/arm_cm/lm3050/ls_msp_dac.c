@@ -20,17 +20,18 @@ void HAL_LSDAC_MSP_DeInit(void)
 
 uint8_t HAL_DAC_DMA_Handshake_Get(uint8_t DACx)
 {
+	  uint8_t val = 0;
     switch (DACx)
     {
     case (uint32_t)DAC1:
-        return CH_DAC_CH1;
+        val = CH_DAC_CH1;
         break;
     case (uint32_t)DAC2:
-        return CH_DAC_CH2;
+        val = CH_DAC_CH2;
         break;
     default:
         LS_ASSERT(0);
-        return 0;
         break;
     }
+		return val;
 }
