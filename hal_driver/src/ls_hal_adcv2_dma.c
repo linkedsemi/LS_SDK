@@ -56,7 +56,7 @@ HAL_StatusTypeDef HAL_ADC_LoopChannel_Start_DMA(ADC_HandleTypeDef* hadc, uint16_
     cfg.byte_count = Length;
     cfg.dummy = 0;
 
-    HAL_DMA_Channel_Start_IT(hadc->DMAC_Instance,hadc->Env.DMA.DMA_Channel,&cfg,ADC_DMA_Callback,(uint32_t)hadc);
+    HAL_DMA_Channel_Start_IT((DMA_Controller_HandleTypeDef *)hadc->DMAC_Instance,hadc->Env.DMA.DMA_Channel,&cfg,ADC_DMA_Callback,(uint32_t)hadc);
 
     if(hadc->Init.TrigType == ADC_SOFTWARE_TRIGT)
     {

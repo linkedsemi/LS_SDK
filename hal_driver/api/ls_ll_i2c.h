@@ -919,7 +919,7 @@ static inline void LL_I2C_SetClockPeriod(reg_i2c_t *I2Cx, uint32_t ClockSpeed)
     /* Configure I2Cx: Frequency range */
     if (ClockSpeed < I2C_MIN_FREQ)
     {
-        MODIFY_REG(I2Cx->TIMINGR, I2C_TIMINGR_PRESC_MASK, 32u << I2C_TIMINGR_PRESC_POS);
+        MODIFY_REG(I2Cx->TIMINGR, I2C_TIMINGR_PRESC_MASK, 4 << I2C_TIMINGR_PRESC_POS);
     }
     else
     {

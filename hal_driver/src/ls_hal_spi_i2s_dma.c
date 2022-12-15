@@ -2,16 +2,18 @@
 #include "ls_msp_spi_i2s.h"
 #include "field_manipulate.h"
 #include "ls_hal_spi_i2s.h"
+#include "ls_hal_dmacv2.h"
 
 __attribute__((weak)) void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi){}
 
-static void SPI_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+
+static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
     CLEAR_BIT(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK);
 }
 
-static void SPI_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
     CLEAR_BIT(hspi->Instance->CR2, SPI_CR2_RXDMAEN_MASK);
@@ -62,7 +64,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     cfg.dst_addr = (uint32_t)&hspi->Instance->DR;
     cfg.byte_count = Count;
     cfg.dummy = 0;
-    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Tx_Env.DMA.DMA_Channel,&cfg,(void *)SPI_Transmit_DMA_Callback,(uint32_t)hspi);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Tx_Env.DMA.DMA_Channel,&cfg,SPI_Transmit_DMA_Callback,(uint32_t)hspi);
 
     /* Rx parameter initialize*/
     cfg.ctrl.dma_mode_sel = Peri2Mem;
@@ -71,7 +73,7 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     cfg.ctrl.dst_inc = RX_Data? 1: 0;
     cfg.src_addr = (uint32_t)&hspi->Instance->DR;
     cfg.dst_addr = (uint32_t)pRxData;
-    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,&cfg,(void *)SPI_Receive_DMA_Callback,(uint32_t)hspi);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance,hspi->Rx_Env.DMA.DMA_Channel,&cfg,SPI_Receive_DMA_Callback,(uint32_t)hspi);
 
     MODIFY_REG(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
     SET_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
@@ -153,7 +155,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi,void *TX_D
 __attribute__((weak)) void HAL_I2S_TxDMACpltCallback(I2S_HandleTypeDef *hi2s){}
 __attribute__((weak)) void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s){}
 
-static void I2S_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+ void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
     CLEAR_BIT(hi2s->Instance->CR2, SPI_CR2_TXDMAEN_MASK);
@@ -162,7 +164,7 @@ static void I2S_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_chan
     HAL_I2S_TxDMACpltCallback(hi2s);
 }
 
-static void I2S_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+ void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
 {
     I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
     CLEAR_BIT(hi2s->Instance->CR2, SPI_CR2_RXDMAEN_MASK);
@@ -213,7 +215,7 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
     cfg.dst_addr = (uint32_t)&hi2s->Instance->DR;
     cfg.byte_count = Count;
     cfg.dummy = 0;
-    HAL_DMA_Channel_Start_IT(hi2s->DMAC_Instance,hi2s->Tx_Env.DMA.DMA_Channel,&cfg,(void *)I2S_Transmit_DMA_Callback,(uint32_t)hi2s);
+    HAL_DMA_Channel_Start_IT(hi2s->DMAC_Instance,hi2s->Tx_Env.DMA.DMA_Channel,&cfg,I2S_Transmit_DMA_Callback,(uint32_t)hi2s);
 
     /* Rx parameter initialize*/
     cfg.ctrl.dma_mode_sel = Peri2Mem;
@@ -222,7 +224,7 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
     cfg.ctrl.dst_inc = RX_Data? 1: 0;
     cfg.src_addr = (uint32_t)&hi2s->Instance->DR;
     cfg.dst_addr = (uint32_t)RX_Data;
-    HAL_DMA_Channel_Start_IT(hi2s->DMAC_Instance,hi2s->Rx_Env.DMA.DMA_Channel,&cfg,(void *)I2S_Receive_DMA_Callback,(uint32_t)hi2s);
+    HAL_DMA_Channel_Start_IT(hi2s->DMAC_Instance,hi2s->Rx_Env.DMA.DMA_Channel,&cfg,I2S_Receive_DMA_Callback,(uint32_t)hi2s);
 
     MODIFY_REG(hi2s->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
     SET_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
