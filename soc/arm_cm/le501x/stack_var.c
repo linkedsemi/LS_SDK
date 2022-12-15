@@ -17,12 +17,11 @@
 
 #endif
 
-
+extern int (*rand_fn) (void);
 
 __attribute((weak)) void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 __attribute((weak)) void (*app_init_fn)(void); 
 __attribute((weak)) void (*platform_reset_fn)(uint32_t);
-__attribute((weak)) int (*rand_fn) (void);
 __attribute((weak)) uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 __attribute((weak)) void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
 __attribute((weak)) void (*exit_critical_fn)(uint32_t);
