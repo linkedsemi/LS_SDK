@@ -10,4 +10,4 @@ define block HEAP with alignment = 4,size = 0x200 {};
 define block RESET_RETAIN with alignment = 4,size = 8 {};
 define block CSTACK with alignment = 4,size = 0x1000 {};
 place in RAM {block HEAP,block RESET_RETAIN, block CSTACK};
-"dmacs": place noload at end of RAM {section DMARAM, section DMACS};
+"dmacs": place noload at end of RAM {section DMARAM, section DMAC1};
