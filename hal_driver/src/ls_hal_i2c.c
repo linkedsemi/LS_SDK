@@ -256,7 +256,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
     uint32_t tickstart = systick_get_value();
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0 || Size > 255 || Timeout == 0)
+        if (pData == NULL || Size == 0  || Timeout == 0)
         {
             return HAL_INVALIAD_PARAM;
         }
@@ -341,7 +341,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
     uint32_t tickstart = systick_get_value();
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0 || Size > 255 || Timeout == 0)
+        if (pData == NULL || Size == 0 || Timeout == 0)
         {
             return HAL_INVALIAD_PARAM;
         }
@@ -411,7 +411,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t D
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0 || Size > 255)
+        if (pData == NULL || Size == 0)
         {
             return HAL_INVALIAD_PARAM;
         }
@@ -465,7 +465,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t De
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0 || Size > 255)
+        if (pData == NULL || Size == 0)
         {
             return HAL_INVALIAD_PARAM;
         }
@@ -516,7 +516,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pD
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0 || Size > 255)
+        if (pData == NULL || Size == 0)
         {
             return HAL_ERROR;
         }
@@ -562,7 +562,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData
     uint32_t tickstart = systick_get_value();
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0U || Size > 255 || 0 == Timeout)
+        if (pData == NULL || Size == 0U || 0 == Timeout)
         {
             return HAL_ERROR;
         }
@@ -653,7 +653,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pDa
 {
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0 || Size > 255)
+        if (pData == NULL || Size == 0)
         {
             return HAL_ERROR;
         }
@@ -694,7 +694,7 @@ HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData,
     uint32_t tickstart = systick_get_value();
     if (hi2c->State == HAL_I2C_STATE_READY)
     {
-        if (pData == NULL || Size == 0U || Size > 255 || 0 == Timeout)
+        if (pData == NULL || Size == 0U || 0 == Timeout)
         {
             return HAL_INVALIAD_PARAM;
         }
