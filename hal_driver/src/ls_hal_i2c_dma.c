@@ -210,7 +210,7 @@ static void I2C_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_chann
 
 HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size)
 {
-    if (pData == NULL || Size == 0 || Size > 255)
+    if (pData == NULL || Size == 0)
     {
         return HAL_INVALIAD_PARAM;
     }
@@ -252,7 +252,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t 
 
 HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size)
 {
-    if (pData == NULL || Size == 0 || Size > 255)
+    if (pData == NULL || Size == 0)
     {
         return HAL_INVALIAD_PARAM;
     }
