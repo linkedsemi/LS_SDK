@@ -4,16 +4,13 @@
 
 __attribute__((weak)) void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi){}
 
-
-static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+static void spi_tx_dma_cb(SPI_HandleTypeDef *hspi)
 {
-    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
     CLEAR_BIT(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK);
 }
 
-static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+static void spi_rx_dma_cb(SPI_HandleTypeDef *hspi)
 {
-    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
     CLEAR_BIT(hspi->Instance->CR2, SPI_CR2_RXDMAEN_MASK);
     while (REG_FIELD_RD(hspi->Instance->SR,SPI_SR_BSY) == 1U);
     CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
@@ -22,6 +19,18 @@ static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t
 
 #if  DMACV2
 #include "ls_hal_dmacv2.h"
+static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+{
+    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
+    spi_tx_dma_cb(hspi);
+}
+
+static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+{
+    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
+    spi_rx_dma_cb(hspi);
+}
+
 static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
     uint8_t data_width;
@@ -78,6 +87,18 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
 }
 #else
 #include "ls_hal_dmac.h"
+static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
+    spi_tx_dma_cb(hspi);
+}
+
+static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
+    spi_rx_dma_cb(hspi);
+}
+
 static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
     uint32_t tx_data_end_ptr = (uint32_t)TX_Data;
@@ -153,18 +174,16 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi,void *TX_D
 __attribute__((weak)) void HAL_I2S_TxDMACpltCallback(I2S_HandleTypeDef *hi2s){}
 __attribute__((weak)) void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s){}
 
- void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+static void i2s_tx_dma_cb(I2S_HandleTypeDef *hi2s)
 {
-    I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
     CLEAR_BIT(hi2s->Instance->CR2, SPI_CR2_TXDMAEN_MASK);
     while(REG_FIELD_RD(hi2s->Instance->SR,SPI_SR_BSY) == 1U);
     CLEAR_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
     HAL_I2S_TxDMACpltCallback(hi2s);
 }
 
- void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+static void i2s_rx_dma_cb(I2S_HandleTypeDef *hi2s)
 {
-    I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
     CLEAR_BIT(hi2s->Instance->CR2, SPI_CR2_RXDMAEN_MASK);
     while(REG_FIELD_RD(hi2s->Instance->SR,SPI_SR_BSY) == 1U);
     CLEAR_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
@@ -173,6 +192,18 @@ __attribute__((weak)) void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s){}
 
 #if  DMACV2
 #include "ls_hal_dmacv2.h"
+void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+{
+    I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
+    i2s_tx_dma_cb(hi2s);
+}
+
+void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
+{
+    I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
+    i2s_rx_dma_cb(hi2s);
+}
+
 static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,uint16_t Count)
 {
     uint8_t data_width;
@@ -229,6 +260,18 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
 }
 #else
 #include "ls_hal_dmac.h"
+void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
+    i2s_tx_dma_cb(hi2s);
+}
+
+void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
+{
+    I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
+    i2s_rx_dma_cb(hi2s);
+}
+
 static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,uint16_t Count)
 {
     uint32_t tx_data_end_ptr = (uint32_t)TX_Data;
