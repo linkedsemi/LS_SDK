@@ -41,7 +41,9 @@ enum
 static volatile uint8_t Com_Sta = start;
 static I2C_HandleTypeDef I2cHandle;
 static uint8_t aRxBuffer[BUFFER_LEN]; //Buffer used for reception 
+#if CURRENT_ROLE == I2C_MASTER_ROLE
 static uint8_t aTxBuffer[BUFFER_LEN];
+#endif
 
 #if SIMU_IRQ_EN == 1
 static void simu_timer_init(void);
@@ -167,7 +169,9 @@ static void iic_tx_rx_test_init(uint8_t len)
 {
     for (uint16_t i = 0; i < len; i++)
     {
+    #if CURRENT_ROLE == I2C_MASTER_ROLE
         aTxBuffer[i] = rand();
+    #endif
         aRxBuffer[i] = 0xff;
     }
 #if CURRENT_ROLE == I2C_MASTER_ROLE
