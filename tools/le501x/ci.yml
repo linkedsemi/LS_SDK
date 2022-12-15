@@ -20,7 +20,7 @@ le501x_ble_advertiser_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_advertiser/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_advertiser.ewp -build * -log all
+    - cd examples/ble/ble_advertiser/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_advertiser.ewp -build * -log all
 
 le501x_ble_ancs_build:
   stage: build
@@ -39,7 +39,7 @@ le501x_ble_ancs_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_ancs/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_ancs.ewp -build * -log all
+    - cd examples/ble/ble_ancs/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_ancs.ewp -build * -log all
 
 le501x_ble_at_proj_build:
   stage: build
@@ -58,7 +58,7 @@ le501x_ble_at_proj_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_at_proj/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_at_proj.ewp -build * -log all
+    - cd examples/ble/ble_at_proj/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_at_proj.ewp -build * -log all
 
 le501x_ble_dis_build:
   stage: build
@@ -77,7 +77,7 @@ le501x_ble_dis_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_dis/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_dis.ewp -build * -log all
+    - cd examples/ble/ble_dis/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_dis.ewp -build * -log all
 
 le501x_ble_dis_freertos_build:
   stage: build
@@ -96,7 +96,7 @@ le501x_ble_dis_freertos_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_dis_freertos/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_dis_freertos.ewp -build * -log all
+    - cd examples/ble/ble_dis_freertos/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_dis_freertos.ewp -build * -log all
 
 le501x_ble_fota_server_build:
   stage: build
@@ -115,7 +115,7 @@ le501x_ble_fota_server_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_fota_server/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_fota_server.ewp -build * -log all
+    - cd examples/ble/ble_fota_server/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_fota_server.ewp -build * -log all
 
 le501x_ble_hid_build:
   stage: build
@@ -134,7 +134,7 @@ le501x_ble_hid_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_hid/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_hid.ewp -build * -log all
+    - cd examples/ble/ble_hid/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_hid.ewp -build * -log all
 
 le501x_ble_hid_dmic_build:
   stage: build
@@ -153,7 +153,7 @@ le501x_ble_hid_dmic_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_hid_dmic/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_hid_dmic.ewp -build * -log all
+    - cd examples/ble/ble_hid_dmic/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_hid_dmic.ewp -build * -log all
 
 le501x_ble_mult_roles_build:
   stage: build
@@ -172,7 +172,7 @@ le501x_ble_mult_roles_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_mult_roles/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_mult_roles.ewp -build * -log all
+    - cd examples/ble/ble_mult_roles/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_mult_roles.ewp -build * -log all
 
 le501x_ble_single_role_build:
   stage: build
@@ -191,7 +191,7 @@ le501x_ble_single_role_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_single_role/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_single_role.ewp -build * -log all
+    - cd examples/ble/ble_single_role/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_single_role.ewp -build * -log all
 
 le501x_ble_pairing_master_role_build:
   stage: build
@@ -210,7 +210,7 @@ le501x_ble_pairing_master_role_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_pairing_master_role/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_pairing_master_role.ewp -build * -log all
+    - cd examples/ble/ble_pairing_master_role/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_pairing_master_role.ewp -build * -log all
 
 le501x_ble_pairing_slave_role_build:
   stage: build
@@ -229,7 +229,7 @@ le501x_ble_pairing_slave_role_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_pairing_slave_role/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_pairing_slave_role.ewp -build * -log all
+    - cd examples/ble/ble_pairing_slave_role/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_pairing_slave_role.ewp -build * -log all
 
 le501x_ble_uart_server_build:
   stage: build
@@ -248,7 +248,7 @@ le501x_ble_uart_server_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_uart_server/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_uart_server.ewp -build * -log all
+    - cd examples/ble/ble_uart_server/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_uart_server.ewp -build * -log all
 
 le501x_ble_uart_server_mult_link_build:
   stage: build
@@ -267,7 +267,7 @@ le501x_ble_uart_server_mult_link_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_uart_server_mult_link/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_uart_server_mult_link.ewp -build * -log all
+    - cd examples/ble/ble_uart_server_mult_link/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_uart_server_mult_link.ewp -build * -log all
 
 le501x_fota_build:
   stage: build
@@ -286,7 +286,7 @@ le501x_fota_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/fota/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe fota.ewp -build * -log all
+    - cd examples/ble/fota/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" fota.ewp -build * -log all
 
 le501x_host_test_build:
   stage: build
@@ -305,7 +305,7 @@ le501x_host_test_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/host_test/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe host_test.ewp -build * -log all
+    - cd examples/ble/host_test/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" host_test.ewp -build * -log all
 
 le501x_tmall_mesh_build:
   stage: build
@@ -324,7 +324,7 @@ le501x_tmall_mesh_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/genie_mesh/tmall_mesh/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tmall_mesh.ewp -build * -log all
+    - cd examples/mesh/genie_mesh/tmall_mesh/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tmall_mesh.ewp -build * -log all
 
 le501x_tmall_mesh_gatt_build:
   stage: build
@@ -343,7 +343,7 @@ le501x_tmall_mesh_gatt_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/genie_mesh/tmall_mesh_gatt/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tmall_mesh_gatt.ewp -build * -log all
+    - cd examples/mesh/genie_mesh/tmall_mesh_gatt/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tmall_mesh_gatt.ewp -build * -log all
 
 le501x_tmall_mesh_gatt_glp_build:
   stage: build
@@ -362,7 +362,7 @@ le501x_tmall_mesh_gatt_glp_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/genie_mesh/tmall_mesh_gatt_glp/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tmall_mesh_gatt_glp.ewp -build * -log all
+    - cd examples/mesh/genie_mesh/tmall_mesh_gatt_glp/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tmall_mesh_gatt_glp.ewp -build * -log all
 
 le501x_tmall_mesh_gatt_ls_ota_build:
   stage: build
@@ -381,7 +381,7 @@ le501x_tmall_mesh_gatt_ls_ota_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/genie_mesh/tmall_mesh_gatt_ls_ota/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tmall_mesh_gatt_ls_ota.ewp -build * -log all
+    - cd examples/mesh/genie_mesh/tmall_mesh_gatt_ls_ota/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tmall_mesh_gatt_ls_ota.ewp -build * -log all
 
 le501x_ls_mesh_build:
   stage: build
@@ -400,7 +400,7 @@ le501x_ls_mesh_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/ls_mesh/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ls_mesh.ewp -build * -log all
+    - cd examples/mesh/ls_mesh/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ls_mesh.ewp -build * -log all
 
 le501x_sig_mesh_provee_build:
   stage: build
@@ -419,7 +419,7 @@ le501x_sig_mesh_provee_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/sig_mesh/sig_mesh_provee/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sig_mesh_provee.ewp -build * -log all
+    - cd examples/mesh/sig_mesh/sig_mesh_provee/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sig_mesh_provee.ewp -build * -log all
 
 le501x_sig_mesh_provee_alexa_build:
   stage: build
@@ -438,7 +438,7 @@ le501x_sig_mesh_provee_alexa_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/sig_mesh/sig_mesh_provee_alexa/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sig_mesh_provee_alexa.ewp -build * -log all
+    - cd examples/mesh/sig_mesh/sig_mesh_provee_alexa/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sig_mesh_provee_alexa.ewp -build * -log all
 
 le501x_sig_mesh_provee_auto_prov_build:
   stage: build
@@ -457,7 +457,7 @@ le501x_sig_mesh_provee_auto_prov_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/sig_mesh/sig_mesh_provee_auto_prov/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sig_mesh_provee_auto_prov.ewp -build * -log all
+    - cd examples/mesh/sig_mesh/sig_mesh_provee_auto_prov/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sig_mesh_provee_auto_prov.ewp -build * -log all
 
 le501x_sig_mesh_provisioner_build:
   stage: build
@@ -476,7 +476,7 @@ le501x_sig_mesh_provisioner_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/sig_mesh/sig_mesh_provisioner/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sig_mesh_provisioner.ewp -build * -log all
+    - cd examples/mesh/sig_mesh/sig_mesh_provisioner/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sig_mesh_provisioner.ewp -build * -log all
 
 le501x_adc_analog_wdg_build:
   stage: build
@@ -495,7 +495,7 @@ le501x_adc_analog_wdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/mesh/sig_mesh/adc_analog_wdg/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_analog_wdg.ewp -build * -log all
+    - cd examples/mesh/sig_mesh/adc_analog_wdg/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_analog_wdg.ewp -build * -log all
 
 le501x_adc_amic_sampling_build:
   stage: build
@@ -514,7 +514,7 @@ le501x_adc_amic_sampling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adc/adc_amic_sampling/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_amic_sampling.ewp -build * -log all
+    - cd examples/peripheral/adc/adc_amic_sampling/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_amic_sampling.ewp -build * -log all
 
 le501x_adc_blocking_sampling_build:
   stage: build
@@ -533,7 +533,7 @@ le501x_adc_blocking_sampling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adc/adc_blocking_sampling/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_blocking_sampling.ewp -build * -log all
+    - cd examples/peripheral/adc/adc_blocking_sampling/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_blocking_sampling.ewp -build * -log all
 
 le501x_adc_multi_channel_build:
   stage: build
@@ -552,7 +552,7 @@ le501x_adc_multi_channel_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adc/adc_multi_channel/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_multi_channel.ewp -build * -log all
+    - cd examples/peripheral/adc/adc_multi_channel/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_multi_channel.ewp -build * -log all
 
 le501x_adc_multi_channel_dma_build:
   stage: build
@@ -571,7 +571,7 @@ le501x_adc_multi_channel_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adc/adc_multi_channel_dma/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_multi_channel_dma.ewp -build * -log all
+    - cd examples/peripheral/adc/adc_multi_channel_dma/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_multi_channel_dma.ewp -build * -log all
 
 le501x_adc_single_channel_build:
   stage: build
@@ -590,7 +590,7 @@ le501x_adc_single_channel_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adc/adc_single_channel/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_single_channel.ewp -build * -log all
+    - cd examples/peripheral/adc/adc_single_channel/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_single_channel.ewp -build * -log all
 
 le501x_ecb_cbc_it_build:
   stage: build
@@ -609,7 +609,7 @@ le501x_ecb_cbc_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/crypt/ecb_cbc_it/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_cbc_it.ewp -build * -log all
+    - cd examples/peripheral/crypt/ecb_cbc_it/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_cbc_it.ewp -build * -log all
 
 le501x_ecb_cbc_polling_build:
   stage: build
@@ -628,7 +628,7 @@ le501x_ecb_cbc_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/crypt/ecb_cbc_polling/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_cbc_polling.ewp -build * -log all
+    - cd examples/peripheral/crypt/ecb_cbc_polling/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_cbc_polling.ewp -build * -log all
 
 le501x_ecb_it_padding_build:
   stage: build
@@ -647,7 +647,7 @@ le501x_ecb_it_padding_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/crypt/ecb_it_padding/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_it_padding.ewp -build * -log all
+    - cd examples/peripheral/crypt/ecb_it_padding/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_it_padding.ewp -build * -log all
 
 le501x_gpio_build:
   stage: build
@@ -666,7 +666,7 @@ le501x_gpio_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/gpio/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe gpio.ewp -build * -log all
+    - cd examples/peripheral/gpio/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" gpio.ewp -build * -log all
 
 le501x_i2c_it_build:
   stage: build
@@ -685,7 +685,7 @@ le501x_i2c_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_it/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_it.ewp -build * -log all
+    - cd examples/peripheral/i2c/i2c_it/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_it.ewp -build * -log all
 
 le501x_ll_i2c_it_build:
   stage: build
@@ -704,7 +704,7 @@ le501x_ll_i2c_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_it/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_i2c_it.ewp -build * -log all
+    - cd examples/peripheral/i2c/ll_i2c_it/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_i2c_it.ewp -build * -log all
 
 
 
@@ -725,7 +725,7 @@ le501x_ll_i2c_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_polling/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_i2c_polling.ewp -build * -log all
+    - cd examples/peripheral/i2c/ll_i2c_polling/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_i2c_polling.ewp -build * -log all
 
 le501x_i2c_polling_build:
   stage: build
@@ -744,7 +744,7 @@ le501x_i2c_polling_keil_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_polling/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_polling.ewp -build * -log all
+    - cd examples/peripheral/i2c/i2c_polling/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_polling.ewp -build * -log all
 
 le501x_i2c_dma_build:
   stage: build
@@ -763,7 +763,7 @@ le501x_i2c_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_dma/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_dma.ewp -build * -log all
+    - cd examples/peripheral/i2c/i2c_dma/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_dma.ewp -build * -log all
 
 le501x_pdm_build:
   stage: build
@@ -782,7 +782,7 @@ le501x_pdm_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/pdm/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe pdm.ewp -build * -log all
+    - cd examples/peripheral/pdm/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" pdm.ewp -build * -log all
 
 le501x_rtc_build:
   stage: build
@@ -801,7 +801,7 @@ le501x_rtc_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/rtc/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe rtc.ewp -build * -log all
+    - cd examples/peripheral/rtc/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" rtc.ewp -build * -log all
 
 le501x_software_calendar_build:
   stage: build
@@ -820,7 +820,7 @@ le501x_software_calendar_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/software_calendar/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe software_calendar.ewp -build * -log all
+    - cd examples/peripheral/software_calendar/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" software_calendar.ewp -build * -log all
 
 le501x_software_timers_build:
   stage: build
@@ -839,7 +839,7 @@ le501x_software_timers_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/software_timers/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe software_timers.ewp -build * -log all
+    - cd examples/peripheral/software_timers/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" software_timers.ewp -build * -log all
 
 le501x_ll_spi_it_build:
   stage: build
@@ -858,7 +858,7 @@ le501x_ll_spi_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/ll_spi_it/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_spi_it.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/ll_spi_it/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_spi_it.ewp -build * -log all
 
 le501x_ll_spi_polling_build:
   stage: build
@@ -877,7 +877,7 @@ le501x_ll_spi_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/ll_spi_polling/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_spi_polling.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/ll_spi_polling/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_spi_polling.ewp -build * -log all
 
 le501x_spi_dma_master_build:
   stage: build
@@ -896,7 +896,7 @@ le501x_spi_dma_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_dma_master/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_dma_master.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/spi_dma_master/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_dma_master.ewp -build * -log all
 
 le501x_spi_dma_slave_build:
   stage: build
@@ -915,7 +915,7 @@ le501x_spi_dma_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_dma_slave/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_dma_slave.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/spi_dma_slave/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_dma_slave.ewp -build * -log all
 
 le501x_spi_it_master_build:
   stage: build
@@ -934,7 +934,7 @@ le501x_spi_it_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_it_master/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_it_master.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/spi_it_master/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_it_master.ewp -build * -log all
 
 le501x_spi_it_slave_build:
   stage: build
@@ -953,7 +953,7 @@ le501x_spi_it_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_it_slave/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_it_slave.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/spi_it_slave/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_it_slave.ewp -build * -log all
 
 le501x_spi_polling_master_build:
   stage: build
@@ -972,7 +972,7 @@ le501x_spi_polling_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_polling_master/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_polling_master.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/spi_polling_master/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_polling_master.ewp -build * -log all
 
 le501x_spi_polling_slave_build:
   stage: build
@@ -991,7 +991,7 @@ le501x_spi_polling_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_polling_slave/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_polling_slave.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/spi_polling_slave/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_polling_slave.ewp -build * -log all
 
 le501x_i2s_dma_master_build:
   stage: build
@@ -1010,7 +1010,7 @@ le501x_i2s_dma_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_dma_master/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_dma_master.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/i2s_dma_master/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_dma_master.ewp -build * -log all
 
 le501x_i2s_dma_slave_build:
   stage: build
@@ -1029,7 +1029,7 @@ le501x_i2s_dma_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_dma_slave/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_dma_slave.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_dma_slave.ewp -build * -log all
 
 le501x_i2s_it_master_build:
   stage: build
@@ -1048,7 +1048,7 @@ le501x_i2s_it_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_it_master/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_it_master.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/i2s_it_master/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_it_master.ewp -build * -log all
 
 le501x_i2s_it_slave_build:
   stage: build
@@ -1067,7 +1067,7 @@ le501x_i2s_it_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_it_slave/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_it_slave.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/i2s_it_slave/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_it_slave.ewp -build * -log all
 
 le501x_i2s_polling_master_build:
   stage: build
@@ -1086,7 +1086,7 @@ le501x_i2s_polling_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_polling_master/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_polling_master.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/i2s_polling_master/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_polling_master.ewp -build * -log all
 
 le501x_i2s_polling_slave_build:
   stage: build
@@ -1105,7 +1105,7 @@ le501x_i2s_polling_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_polling_slave/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_polling_slave.ewp -build * -log all
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_polling_slave.ewp -build * -log all
     
 le501x_ll_ssi_it_build:
   stage: build
@@ -1124,7 +1124,7 @@ le501x_ll_ssi_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/ssi/ll_ssi_it/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_ssi_it.ewp -build * -log all
+    - cd examples/peripheral/ssi/ll_ssi_it/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_ssi_it.ewp -build * -log all
 
 le501x_ssi_dma_build:
   stage: build
@@ -1143,7 +1143,7 @@ le501x_ssi_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/ssi/ssi_dma/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ssi_dma.ewp -build * -log all
+    - cd examples/peripheral/ssi/ssi_dma/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ssi_dma.ewp -build * -log all
 
 le501x_ssi_it_build:
   stage: build
@@ -1162,7 +1162,7 @@ le501x_ssi_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/ssi/ssi_it/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ssi_it.ewp -build * -log all
+    - cd examples/peripheral/ssi/ssi_it/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ssi_it.ewp -build * -log all
 
 le501x_Basic_PWM_build:
   stage: build
@@ -1181,7 +1181,7 @@ le501x_Basic_PWM_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/Basic_PWM/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe Basic_PWM.ewp -build * -log all
+    - cd examples/peripheral/timer/Basic_PWM/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Basic_PWM.ewp -build * -log all
 
 le501x_Basic_TIM_build:
   stage: build
@@ -1200,7 +1200,7 @@ le501x_Basic_TIM_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/Basic_TIM/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe Basic_TIM.ewp -build * -log all
+    - cd examples/peripheral/timer/Basic_TIM/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Basic_TIM.ewp -build * -log all
 
 le501x_DTC_PWM_build:
   stage: build
@@ -1219,7 +1219,7 @@ le501x_DTC_PWM_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/DTC_PWM/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe DTC_PWM.ewp -build * -log all
+    - cd examples/peripheral/timer/DTC_PWM/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" DTC_PWM.ewp -build * -log all
 
 le501x_input_Capture_build:
   stage: build
@@ -1238,7 +1238,7 @@ le501x_input_Capture_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/input_Capture/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe input_Capture.ewp -build * -log all
+    - cd examples/peripheral/timer/input_Capture/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" input_Capture.ewp -build * -log all
 
 le501x_uart_dma_build:
   stage: build
@@ -1257,7 +1257,7 @@ le501x_uart_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/uart_dma/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_dma.ewp -build * -log all
+    - cd examples/peripheral/uart/uart_dma/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_dma.ewp -build * -log all
 
 le501x_uart_it_build:
   stage: build
@@ -1276,7 +1276,7 @@ le501x_uart_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/uart_it/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_it.ewp -build * -log all   
+    - cd examples/peripheral/uart/uart_it/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_it.ewp -build * -log all   
 
 le501x_ll_uart_it_build:
   stage: build
@@ -1295,7 +1295,7 @@ le501x_ll_uart_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/ll_uart_it/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_uart_it.ewp -build * -log all
+    - cd examples/peripheral/uart/ll_uart_it/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_uart_it.ewp -build * -log all
 
 le501x_ll_uart_polling_build:
   stage: build
@@ -1314,7 +1314,7 @@ le501x_ll_uart_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/ll_uart_polling/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_uart_polling.ewp -build * -log all
+    - cd examples/peripheral/uart/ll_uart_polling/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_uart_polling.ewp -build * -log all
 
 le501x_uart_polling_build:
   stage: build
@@ -1333,7 +1333,7 @@ le501x_uart_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/uart_polling/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_polling.ewp -build * -log all
+    - cd examples/peripheral/uart/uart_polling/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_polling.ewp -build * -log all
 
 le501x_ls_prop_24g_build:
   stage: build
@@ -1352,7 +1352,7 @@ le501x_ls_prop_24g_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/prop_24g/ls_prop_24g/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ls_prop_24g.ewp -build * -log all
+    - cd examples/prop_24g/ls_prop_24g/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ls_prop_24g.ewp -build * -log all
 
 le501x_ls_prop_24g_freertos_build:
   stage: build
@@ -1371,7 +1371,7 @@ le501x_ls_prop_24g_freertos_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/prop_24g/ls_prop_24g_freertos/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ls_prop_24g_freertos.ewp -build * -log all
+    - cd examples/prop_24g/ls_prop_24g_freertos/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ls_prop_24g_freertos.ewp -build * -log all
 
 le501x_coremark_build:
   stage: build
@@ -1405,7 +1405,7 @@ le501x_ble_tk_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/ble/ble_tk/le501x/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ble_tk.ewp -build * -log all
+    - cd examples/ble/ble_tk/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_tk.ewp -build * -log all
 
 le501x_tk_it_dp_build:
   stage: build
@@ -1424,7 +1424,7 @@ le501x_tk_it_dp_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/tk/tk_it_dp/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tk_it_dp.ewp -build * -log all
+    - cd examples/peripheral/tk/tk_it_dp/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tk_it_dp.ewp -build * -log all
 
 le501x_tk_it_lp_build:
   stage: build
@@ -1443,7 +1443,7 @@ le501x_tk_it_lp_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/tk/tk_it_lp/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tk_it_lp.ewp -build * -log all
+    - cd examples/peripheral/tk/tk_it_lp/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tk_it_lp.ewp -build * -log all
 
 le501x_tk_polling_build:
   stage: build
@@ -1462,7 +1462,7 @@ le501x_tk_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/tk/tk_polling/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe tk_polling.ewp -build * -log all
+    - cd examples/peripheral/tk/tk_polling/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tk_polling.ewp -build * -log all
 
 le501x_iwdg_build:
   stage: build
@@ -1481,7 +1481,7 @@ le501x_iwdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/wdg/iwdg/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iwdg.ewp -build * -log all
+    - cd examples/peripheral/wdg/iwdg/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iwdg.ewp -build * -log all
 
 le501x_wwdg_build:
   stage: build
@@ -1500,7 +1500,7 @@ le501x_iwwdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/wdg/wwdg/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe wwdg.ewp -build * -log all
+    - cd examples/peripheral/wdg/wwdg/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" wwdg.ewp -build * -log all
 
 le501x_iap_bootloader_build:
   stage: build

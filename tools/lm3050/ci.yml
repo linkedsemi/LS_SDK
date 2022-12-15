@@ -15,7 +15,7 @@ lm3050_ecb_cbc_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/crypt/ecb_cbc_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_cbc_it.ewp -build * -log all
+    - cd examples/peripheral/crypt/ecb_cbc_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_cbc_it.ewp -build * -log all
 
 lm3050_ecb_cbc_polling_build:
   stage: build
@@ -34,7 +34,7 @@ lm3050_ecb_cbc_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/crypt/ecb_cbc_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_cbc_polling.ewp -build * -log all
+    - cd examples/peripheral/crypt/ecb_cbc_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_cbc_polling.ewp -build * -log all
 
 lm3050_ecb_it_padding_build:
   stage: build
@@ -53,7 +53,7 @@ lm3050_ecb_it_padding_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/crypt/ecb_it_padding/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ecb_it_padding.ewp -build * -log all
+    - cd examples/peripheral/crypt/ecb_it_padding/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_it_padding.ewp -build * -log all
 
 lm3050_sha_polling_build:
   stage: build
@@ -72,7 +72,7 @@ lm3050_sha_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/sha/sha_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sha_polling.ewp -build * -log all
+    - cd examples/peripheral/sha/sha_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sha_polling.ewp -build * -log all
 
 lm3050_sha_it_build:
   stage: build
@@ -91,7 +91,7 @@ lm3050_sha_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/sha/sha_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sha_it.ewp -build * -log all
+    - cd examples/peripheral/sha/sha_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sha_it.ewp -build * -log all
 
 lm3050_sm4_polling_build:
   stage: build
@@ -110,7 +110,7 @@ lm3050_sm4_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/sm4/sm4_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sm4_polling.ewp -build * -log all
+    - cd examples/peripheral/sm4/sm4_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sm4_polling.ewp -build * -log all
 
 lm3050_sm4_it_build:
   stage: build
@@ -129,7 +129,7 @@ lm3050_sm4_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/sm4/sm4_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe sm4_it.ewp -build * -log all
+    - cd examples/peripheral/sm4/sm4_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sm4_it.ewp -build * -log all
 
 lm3050_touchkey_polling_build:
   stage: build
@@ -148,7 +148,7 @@ lm3050_touchkey_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/touchkey/touchkey_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe touchkey_polling.ewp -build * -log all
+    - cd examples/peripheral/touchkey/touchkey_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" touchkey_polling.ewp -build * -log all
 
 lm3050_touchkey_it_build:
   stage: build
@@ -167,7 +167,7 @@ lm3050_touchkey_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/touchkey/touchkey_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe touchkey_it.ewp -build * -log all
+    - cd examples/peripheral/touchkey/touchkey_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" touchkey_it.ewp -build * -log all
 
 lm3050_gpio_build:
   stage: build
@@ -186,7 +186,7 @@ lm3050_gpio_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/gpio/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe gpio.ewp -build * -log all    
+    - cd examples/peripheral/gpio/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" gpio.ewp -build * -log all    
 
 lm3050_i2c_it_build:
   stage: build
@@ -205,7 +205,7 @@ lm3050_i2c_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_it.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_it.ewp -build * -log all    
 
 lm3050_ll_i2c_it_build:
   stage: build
@@ -224,7 +224,7 @@ lm3050_ll_i2c_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_i2c_it.ewp -build * -log all    
+    - cd examples/peripheral/i2c/ll_i2c_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_i2c_it.ewp -build * -log all    
 
 lm3050_ll_i2c_polling_build:
   stage: build
@@ -243,7 +243,7 @@ lm3050_ll_i2c_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_i2c_polling.ewp -build * -log all    
+    - cd examples/peripheral/i2c/ll_i2c_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_i2c_polling.ewp -build * -log all    
 
 lm3050_i2c_polling_build:
   stage: build
@@ -262,7 +262,7 @@ lm3050_i2c_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_polling.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_polling.ewp -build * -log all    
 
 lm3050_i2c_dma_build:
   stage: build
@@ -281,7 +281,7 @@ lm3050_i2c_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2c_dma.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_dma/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_dma.ewp -build * -log all    
 
 lm3050_software_calendar_build:
   stage: build
@@ -300,7 +300,7 @@ lm3050_software_calendar_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/software_calendar/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe software_calendar.ewp -build * -log all    
+    - cd examples/peripheral/software_calendar/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" software_calendar.ewp -build * -log all    
 
 lm3050_software_timers_build:
   stage: build
@@ -319,7 +319,7 @@ lm3050_software_timers_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/software_timers/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe software_timers.ewp -build * -log all    
+    - cd examples/peripheral/software_timers/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" software_timers.ewp -build * -log all    
 
 lm3050_ll_spi_it_build:
   stage: build
@@ -338,7 +338,7 @@ lm3050_ll_spi_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/ll_spi_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_spi_it.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/ll_spi_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_spi_it.ewp -build * -log all    
 
 lm3050_ll_spi_polling_build:
   stage: build
@@ -357,7 +357,7 @@ lm3050_ll_spi_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/ll_spi_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_spi_polling.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/ll_spi_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_spi_polling.ewp -build * -log all    
 
 lm3050_spi_dma_master_build:
   stage: build
@@ -376,7 +376,7 @@ lm3050_spi_dma_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_dma_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_dma_master.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/spi_dma_master/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_dma_master.ewp -build * -log all    
 
 lm3050_spi_dma_slave_build:
   stage: build
@@ -395,7 +395,7 @@ lm3050_spi_dma_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_dma_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_dma_slave.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/spi_dma_slave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_dma_slave.ewp -build * -log all    
 
 lm3050_spi_it_master_build:
   stage: build
@@ -414,7 +414,7 @@ lm3050_spi_it_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_it_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_it_master.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/spi_it_master/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_it_master.ewp -build * -log all    
 
 lm3050_spi_it_slave_build:
   stage: build
@@ -433,7 +433,7 @@ lm3050_spi_it_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_it_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_it_slave.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/spi_it_slave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_it_slave.ewp -build * -log all    
 
 lm3050_spi_polling_master_build:
   stage: build
@@ -452,7 +452,7 @@ lm3050_spi_polling_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_polling_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_polling_master.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/spi_polling_master/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_polling_master.ewp -build * -log all    
 
 lm3050_spi_polling_slave_build:
   stage: build
@@ -471,7 +471,7 @@ lm3050_spi_polling_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/spi_polling_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe spi_polling_slave.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/spi_polling_slave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" spi_polling_slave.ewp -build * -log all    
 
 lm3050_i2s_dma_master_build:
   stage: build
@@ -490,7 +490,7 @@ lm3050_i2s_dma_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_dma_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_dma_master.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/i2s_dma_master/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_dma_master.ewp -build * -log all    
 
 lm3050_i2s_dma_slave_build:
   stage: build
@@ -509,7 +509,7 @@ lm3050_i2s_dma_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_dma_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_dma_slave.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_dma_slave.ewp -build * -log all    
 
 lm3050_i2s_it_master_build:
   stage: build
@@ -528,7 +528,7 @@ lm3050_i2s_it_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_it_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_it_master.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/i2s_it_master/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_it_master.ewp -build * -log all    
 
 lm3050_i2s_it_slave_build:
   stage: build
@@ -547,7 +547,7 @@ lm3050_i2s_it_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_it_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_it_slave.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/i2s_it_slave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_it_slave.ewp -build * -log all    
 
 lm3050_i2s_polling_master_build:
   stage: build
@@ -566,7 +566,7 @@ lm3050_i2s_polling_master_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_polling_master/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_polling_master.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/i2s_polling_master/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_polling_master.ewp -build * -log all    
 
 lm3050_i2s_polling_slave_build:
   stage: build
@@ -585,7 +585,7 @@ lm3050_i2s_polling_slave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/spi_i2s/i2s_polling_slave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe i2s_polling_slave.ewp -build * -log all    
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2s_polling_slave.ewp -build * -log all    
 
 lm3050_ll_ssi_it_build:
   stage: build
@@ -604,7 +604,7 @@ lm3050_ll_ssi_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/ssi/ll_ssi_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_ssi_it.ewp -build * -log all    
+    - cd examples/peripheral/ssi/ll_ssi_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_ssi_it.ewp -build * -log all    
 
 lm3050_ssi_dma_build:
   stage: build
@@ -623,7 +623,7 @@ lm3050_ssi_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/ssi/ssi_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ssi_dma.ewp -build * -log all    
+    - cd examples/peripheral/ssi/ssi_dma/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ssi_dma.ewp -build * -log all    
 
 lm3050_ssi_it_build:
   stage: build
@@ -642,7 +642,7 @@ lm3050_ssi_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/ssi/ssi_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ssi_it.ewp -build * -log all    
+    - cd examples/peripheral/ssi/ssi_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ssi_it.ewp -build * -log all    
 
 lm3050_Basic_PWM_build:
   stage: build
@@ -661,7 +661,7 @@ lm3050_Basic_PWM_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/Basic_PWM/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe Basic_PWM.ewp -build * -log all    
+    - cd examples/peripheral/timer/Basic_PWM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Basic_PWM.ewp -build * -log all    
 
 lm3050_Basic_TIM_build:
   stage: build
@@ -680,7 +680,7 @@ lm3050_Basic_TIM_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/Basic_TIM/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe Basic_TIM.ewp -build * -log all    
+    - cd examples/peripheral/timer/Basic_TIM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Basic_TIM.ewp -build * -log all    
 
 lm3050_DTC_PWM_build:
   stage: build
@@ -699,7 +699,7 @@ lm3050_DTC_PWM_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/DTC_PWM/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe DTC_PWM.ewp -build * -log all    
+    - cd examples/peripheral/timer/DTC_PWM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" DTC_PWM.ewp -build * -log all    
 
 lm3050_input_Capture_build:
   stage: build
@@ -718,7 +718,7 @@ lm3050_input_Capture_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/timer/input_Capture/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe input_Capture.ewp -build * -log all    
+    - cd examples/peripheral/timer/input_Capture/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" input_Capture.ewp -build * -log all    
 
 lm3050_uart_dma_build:
   stage: build
@@ -737,7 +737,7 @@ lm3050_uart_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/uart_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_dma.ewp -build * -log all    
+    - cd examples/peripheral/uart/uart_dma/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_dma.ewp -build * -log all    
 
 lm3050_uart_it_build:
   stage: build
@@ -756,7 +756,7 @@ lm3050_uart_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/uart_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_it.ewp -build * -log all    
+    - cd examples/peripheral/uart/uart_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_it.ewp -build * -log all    
 
 lm3050_ll_uart_it_build:
   stage: build
@@ -775,7 +775,7 @@ lm3050_ll_uart_it_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/ll_uart_it/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_uart_it.ewp -build * -log all    
+    - cd examples/peripheral/uart/ll_uart_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_uart_it.ewp -build * -log all    
 
 lm3050_ll_uart_polling_build:
   stage: build
@@ -794,7 +794,7 @@ lm3050_ll_uart_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/ll_uart_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe ll_uart_polling.ewp -build * -log all    
+    - cd examples/peripheral/uart/ll_uart_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_uart_polling.ewp -build * -log all    
 
 lm3050_uart_polling_build:
   stage: build
@@ -813,7 +813,7 @@ lm3050_uart_polling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/uart/uart_polling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe uart_polling.ewp -build * -log all    
+    - cd examples/peripheral/uart/uart_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_polling.ewp -build * -log all    
 
 lm3050_adc_amic_sampling_build:
   stage: build
@@ -832,7 +832,7 @@ lm3050_adc_amic_sampling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adcv2/adc_amic_sampling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_amic_sampling.ewp -build * -log all    
+    - cd examples/peripheral/adcv2/adc_amic_sampling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_amic_sampling.ewp -build * -log all    
 
 lm3050_adc_blocking_sampling_build:
   stage: build
@@ -851,7 +851,7 @@ lm3050_adc_blocking_sampling_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adcv2/adc_blocking_sampling/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_blocking_sampling.ewp -build * -log all    
+    - cd examples/peripheral/adcv2/adc_blocking_sampling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_blocking_sampling.ewp -build * -log all    
 
 lm3050_adc_single_channel_build:
   stage: build
@@ -870,7 +870,7 @@ lm3050_adc_single_channel_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adcv2/adc_single_channel/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_single_channel.ewp -build * -log all    
+    - cd examples/peripheral/adcv2/adc_single_channel/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_single_channel.ewp -build * -log all    
 
 lm3050_adc_multi_channel_build:
   stage: build
@@ -889,7 +889,7 @@ lm3050_adc_multi_channel_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adcv2/adc_multi_channel/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_multi_channel.ewp -build * -log all    
+    - cd examples/peripheral/adcv2/adc_multi_channel/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_multi_channel.ewp -build * -log all    
 
 lm3050_adc_analog_wdg_build:
   stage: build
@@ -908,7 +908,7 @@ lm3050_adc_analog_wdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adcv2/adc_analog_wdg/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_analog_wdg.ewp -build * -log all    
+    - cd examples/peripheral/adcv2/adc_analog_wdg/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_analog_wdg.ewp -build * -log all    
 
 lm3050_adc_multi_channel_dma_build:
   stage: build
@@ -927,7 +927,7 @@ lm3050_adc_multi_channel_dma_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/adcv2/adc_multi_channel_dma/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe adc_multi_channel_dma.ewp -build * -log all    
+    - cd examples/peripheral/adcv2/adc_multi_channel_dma/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" adc_multi_channel_dma.ewp -build * -log all    
 
 lm3050_dual_dac_channel_dma_voltage_build:
   stage: build
@@ -946,7 +946,7 @@ lm3050_dual_dac_channel_dma_voltage_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe dual_dac_channel_dma_voltage.ewp -build * -log all    
+    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" dual_dac_channel_dma_voltage.ewp -build * -log all    
 
 lm3050_dual_dac_channel_voltage_build:
   stage: build
@@ -965,7 +965,7 @@ lm3050_dual_dac_channel_voltage_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/dual_dac_channel_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe dual_dac_channel_voltage.ewp -build * -log all    
+    - cd examples/peripheral/dac/dual_dac_channel_voltage/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" dual_dac_channel_voltage.ewp -build * -log all    
 
 lm3050_dual_dac_channel_wave_build:
   stage: build
@@ -984,7 +984,7 @@ lm3050_dual_dac_channel_wave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/dual_dac_channel_wave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe dual_dac_channel_wave.ewp -build * -log all    
+    - cd examples/peripheral/dac/dual_dac_channel_wave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" dual_dac_channel_wave.ewp -build * -log all    
 
 lm3050_single_dac_channel_dma_voltage_build:
   stage: build
@@ -1003,7 +1003,7 @@ lm3050_single_dac_channel_dma_voltage_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/single_dac_channel_dma_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_dma_voltage.ewp -build * -log all    
+    - cd examples/peripheral/dac/single_dac_channel_dma_voltage/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" single_dac_channel_dma_voltage.ewp -build * -log all    
 
 lm3050_single_dac_channel_sine_wave_build:
   stage: build
@@ -1022,7 +1022,7 @@ lm3050_single_dac_channel_sine_wave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/single_dac_channel_sine_wave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_sine_wave.ewp -build * -log all    
+    - cd examples/peripheral/dac/single_dac_channel_sine_wave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" single_dac_channel_sine_wave.ewp -build * -log all    
 
 lm3050_single_dac_channel_voltage_build:
   stage: build
@@ -1041,7 +1041,7 @@ lm3050_single_dac_channel_voltage_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/single_dac_channel_voltage/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_voltage.ewp -build * -log all    
+    - cd examples/peripheral/dac/single_dac_channel_voltage/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" single_dac_channel_voltage.ewp -build * -log all    
 
 lm3050_single_dac_channel_wave_build:
   stage: build
@@ -1060,7 +1060,7 @@ lm3050_single_dac_channel_wave_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/dac/single_dac_channel_wave/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe single_dac_channel_wave.ewp -build * -log all    
+    - cd examples/peripheral/dac/single_dac_channel_wave/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" single_dac_channel_wave.ewp -build * -log all    
 
 lm3050_rtcv2_build:
   stage: build
@@ -1079,7 +1079,7 @@ lm3050_rtcv2_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/rtcv2/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe rtcv2.ewp -build * -log all    
+    - cd examples/peripheral/rtcv2/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" rtcv2.ewp -build * -log all    
 
 lm3050_can_loopback_build:
   stage: build
@@ -1098,7 +1098,7 @@ lm3050_can_loopback_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/can/CAN_LoopBack/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe CAN_LoopBack.ewp -build * -log all    
+    - cd examples/peripheral/can/CAN_LoopBack/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" CAN_LoopBack.ewp -build * -log all    
 
 lm3050_can_normal_build:
   stage: build
@@ -1117,7 +1117,7 @@ lm3050_can_normal_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/can/CAN_Normal/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe CAN_Normal.ewp -build * -log all    
+    - cd examples/peripheral/can/CAN_Normal/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" CAN_Normal.ewp -build * -log all    
 
 lm3050_iwdg_build:
   stage: build
@@ -1136,7 +1136,7 @@ lm3050_iwdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/wdg/iwdg/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iwdg.ewp -build * -log all    
+    - cd examples/peripheral/wdg/iwdg/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iwdg.ewp -build * -log all    
 
 lm3050_wwdg_build:
   stage: build
@@ -1155,7 +1155,7 @@ lm3050_wwdg_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/wdg/wwdg/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe wwdg.ewp -build * -log all    
+    - cd examples/peripheral/wdg/wwdg/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" wwdg.ewp -build * -log all    
 
 lm3050_comp_internal_build:
   stage: build
@@ -1174,7 +1174,7 @@ lm3050_comp_internal_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/comp/comp_internal/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe comp_internal.ewp -build * -log all    
+    - cd examples/peripheral/comp/comp_internal/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" comp_internal.ewp -build * -log all    
     
 lm3050_comp_dac_build:
   stage: build
@@ -1193,7 +1193,7 @@ lm3050_comp_dac_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/comp/comp_dac/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe comp_dac.ewp -build * -log all    
+    - cd examples/peripheral/comp/comp_dac/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" comp_dac.ewp -build * -log all    
 
 lm3050_iap_bootloader_build:
   stage: build
@@ -1212,7 +1212,7 @@ lm3050_iap_bootloader_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/iap/iap_bootloader/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iap_bootloader.ewp -build * -log all    
+    - cd examples/peripheral/iap/iap_bootloader/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iap_bootloader.ewp -build * -log all    
 
 lm3050_iap_application_build:
   stage: build
@@ -1231,5 +1231,5 @@ lm3050_iap_application_iar_build:
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/iap/iap_application/lm3050/iar/ && C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe iap_application.ewp -build * -log all    
+    - cd examples/peripheral/iap/iap_application/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iap_application.ewp -build * -log all    
    
