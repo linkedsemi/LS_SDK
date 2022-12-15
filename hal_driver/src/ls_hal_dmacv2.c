@@ -22,7 +22,7 @@ void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,
     hdma->Instance->CH[ch_idx].SAR = cfg->src_addr;
     hdma->Instance->CH[ch_idx].DAR = cfg->dst_addr;
     hdma->Instance->CH[ch_idx].BCR = cfg->byte_count;
-    uint32_t *csr = (void *)&cfg->ctrl;
+    uint32_t *csr = (uint32_t *)&cfg->ctrl;
     hdma->Instance->CH[ch_idx].CSR = *csr;
 }
 
