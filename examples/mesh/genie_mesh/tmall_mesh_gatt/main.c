@@ -21,7 +21,7 @@
 #include "../genie_ota/tmall_genie_ais.h"
 #include "../genie_ota/genie_triple.h"
 #include "prf_fotas.h"
-
+#include "cpu.h"
 
 #define TMALL_GATT_TIMEOUT 5000
 #define ALI_COMPANY_ID 0x01a8

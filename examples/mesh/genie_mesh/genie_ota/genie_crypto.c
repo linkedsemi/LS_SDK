@@ -34,7 +34,7 @@ static uint8_t g_ble_key[32];
     hextostring(p_genie_triple->key, key_str, GENIE_TRIPLE_KEY_SIZE);
     hextostring(random, rad_str, 16);
 
-    sprintf(static_str, "%08x,%s,%s,%s", p_genie_triple->pid, mac_str, key_str, rad_str);
+    sprintf(static_str, "%08lx,%s,%s,%s", p_genie_triple->pid, mac_str, key_str, rad_str);
 
 
     /* calculate the sha256 of oob info and
