@@ -132,22 +132,26 @@ void jump_to_app(void)
 {
     APP_FUNC jump2app;
     uint32_t app_addr;
-    uint32_t i;
 
-#if defined(LE501X)
-    // app_addr = (APP_DATA_ADDR_BASE + 0x2000);           //skip Info Page & Second Bootloader , 0x2000
-    app_addr = (APP_DATA_ADDR_BASE); // skip Info Page & Second Bootloader , 0x2000
-#else
-    app_addr = (0x00800000 + APP_DATA_ADDR_BASE + 512); // skip Info Page , 0x200
-#endif
+
 
     __disable_irq();
     systick_stop();
+#if defined(LE501X)
+    // app_addr = (APP_DATA_ADDR_BASE + 0x2000);           //skip Info Page & Second Bootloader , 0x2000
+    app_addr = (APP_DATA_ADDR_BASE); // skip Info Page & Second Bootloader , 0x2000
+    NVIC->ICER[0] = 0xFFFFFFFF;
+    NVIC->ICPR[0] = 0xFFFFFFFF;
+#else
+    app_addr = (0x00800000 + APP_DATA_ADDR_BASE + 512); // skip Info Page , 0x200
+    uint32_t i;
     for (i = 0; i < 8; i++)
     {
         NVIC->ICER[i] = 0xFFFFFFFF;
         NVIC->ICPR[i] = 0xFFFFFFFF;
     }
+#endif
+
     __enable_irq();
 
     // DELAY_US(500000);
