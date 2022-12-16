@@ -3,7 +3,7 @@
 #include "platform.h"
 #include <string.h>
 #include "ls_hal_uart.h"
-
+#include "systick.h"
 #include "uart_process.h"
 
 UART_HandleTypeDef UART_Config;

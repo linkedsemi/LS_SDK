@@ -6,7 +6,7 @@ src = [
     'uart_process.c',
     'upgrade_process.c',
     'main.c',
-    'sha256.c',
+    'iap_sha256.c',
 ]
 inc = [
     '.'

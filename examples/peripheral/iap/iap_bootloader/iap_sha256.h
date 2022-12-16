@@ -1,5 +1,5 @@
-#ifndef _SHA256_H
-#define _SHA256_H
+#ifndef _IAP_SHA256_H
+#define _IAP_SHA256_H
 
 #include <stdint.h>
 

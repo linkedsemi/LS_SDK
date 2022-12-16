@@ -4,9 +4,10 @@
 #include "upgrade_process.h"
 #include "common.h"
 #include "app_config.h"
+#include "systick.h"
 
 #if defined(LE501X)
-#include "sha256.h"
+#include "iap_sha256.h"
 #else
 #include "ls_hal_sha.h"
 #endif
@@ -21,9 +22,8 @@ void get_app_config(uint8_t *buffer)
 bool sign_app_code(uint8_t *p_data,uint16_t data_len)
 {
     app_config_t app_config;
-    uint32_t sha256_buffer[8];
     uint8_t sha256_code[32];
-    uint8_t i, j;
+    uint8_t i;
 
     hal_flash_fast_read(APP_CONFIG_ADDR_BASE, (uint8_t *)&app_config, 8);
 
@@ -32,8 +32,10 @@ bool sign_app_code(uint8_t *p_data,uint16_t data_len)
         return false;
     }
 #if defined(LE501X)
-    sha256_get(APP_DATA_ADDR_BASE, app_config.code_len, sha256_code);
+    sha256_get((uint8_t)APP_DATA_ADDR_BASE, app_config.code_len, sha256_code);
 #else
+    uint32_t sha256_buffer[8];
+    uint8_t j;
     HAL_LSSHA_Init();
     HAL_LSSHA_SHA256((const uint8_t *)(0x800000 + APP_DATA_ADDR_BASE), app_config.code_len, sha256_buffer);
     HAL_LSSHA_DeInit();

@@ -1,4 +1,5 @@
 #include "ls_hal_uart.h"
+#include "ls_hal_flash.h"
 #include "platform.h"
 #include "ls_soc_gpio.h"
 #include "app_config.h"
