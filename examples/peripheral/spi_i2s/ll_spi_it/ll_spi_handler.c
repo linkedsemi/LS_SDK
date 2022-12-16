@@ -33,10 +33,6 @@ void LL_SPI_IRQHandler(void)
     /* SPI in Error Treatment --------------------------------------------------*/
     if (((LL_SPI_IsActiveFlagIT(SPI2, SPI_ITRI_OVR) != RESET) || (LL_SPI_IsActiveFlagIT(SPI2, SPI_ITRI_MODF) != RESET)) && (LL_SPI_IsEnabledIT(SPI2, SPI_ITVS_OVR) != RESET))
     {
-        while(1)
-        {
-            ;
-        }
         LOG_I("ERROR\n");
         LL_SPI_ClearFlagIT(SPI2, SPI_ITIC_OVR);
         LL_SPI_DisableIT(SPI2, SPI_ITDEN_RXNE);

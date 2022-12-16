@@ -15,7 +15,7 @@
  Macro definition
  ******************************************************************************/
 /* Uncomment this line to use the board as master, if not it is used as slave */
-#define MASTER_BOARD 1
+#define MASTER_BOARD 0
 
 #define BUFFERSIZE COUNTOF(aTxBuffer)
 #define COUNTOF(__BUFFER__) (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))

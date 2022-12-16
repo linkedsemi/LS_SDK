@@ -353,17 +353,9 @@ void LL_I2C_MasterTCRCpltCallback(reg_i2c_t *I2Cx)
   // LL_I2C_ClearFlagIT_TCR(I2Cx);
   LL_I2C_ClearFlagIT(I2Cx, I2C_ITIC_TCR);
 
-  if (DataOfSize > 0xFF)
-  {
-    LL_I2C_SetNumberOfByte(I2Cx, 0xff);
-    LL_I2C_EnableRELOAD(I2Cx);
-  }
-  else
-  {
-    LL_I2C_SetNumberOfByte(I2Cx, DataOfSize);
-    LL_I2C_DisableRELOAD(I2Cx);
-    LL_I2C_EnableAutoEnd(I2Cx);
-  }
+  LL_I2C_SetNumberOfByte(I2Cx, DataOfSize);
+  LL_I2C_DisableRELOAD(I2Cx);
+  LL_I2C_EnableAutoEnd(I2Cx);
 }
 
 /**
