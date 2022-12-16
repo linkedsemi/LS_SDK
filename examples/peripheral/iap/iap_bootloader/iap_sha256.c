@@ -1,6 +1,7 @@
 
 #if defined(LE501X)
-#include "sha256.h"
+#include "iap_sha256.h"
+#include <string.h>
 
 // Signed variables are for wimps 
 #define uchar unsigned char // 8-bit byte
@@ -95,7 +96,7 @@ void sha256_init(SHA256_CTX *ctx)
 
 void sha256_update(SHA256_CTX *ctx, uchar data[], uint len)
 {  
-   uint t,i;
+   uint i;
    
    for (i=0; i < len; ++i) { 
       ctx->data[ctx->datalen] = data[i]; 

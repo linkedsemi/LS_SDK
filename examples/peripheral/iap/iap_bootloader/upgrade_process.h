@@ -20,5 +20,6 @@ void earse_app_code(uint8_t *p_data,uint16_t data_len);
 bool sign_app_code(uint8_t *p_data,uint16_t data_len);
 uint32_t write_app_code(uint8_t *p_data,uint16_t data_len);
 void jump_to_app(void);
+bool check_application(void);
 
 #endif
