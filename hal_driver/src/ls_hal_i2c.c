@@ -59,6 +59,20 @@ static bool i2c_txflveandstop_poll(va_list va);
 static bool i2c_flag_poll(va_list va);
 // extern void toggle_debug_IO(uint16_t);
 
+__attribute__((weak)) void HAL_I2C_DMA_TxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+  /* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_I2C_DMA_TxCpltCallback could be implemented in the user file
+   */
+}
+
+__attribute__((weak)) void HAL_I2C_DMA_RxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+  /* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_I2C_DMA_RxCpltCallback could be implemented in the user file
+   */
+}
+
 static bool I2C_speed_config_calc_master_dft(uint8_t speed, struct i2c_speed_config_t *speed_config)
 {
     /* When calculating master speed config, it should be in init state */

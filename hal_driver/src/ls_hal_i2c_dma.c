@@ -5,20 +5,6 @@
 #include "ls_msp_i2c.h"
 #include "field_manipulate.h"
 
-__attribute__((weak)) void HAL_I2C_DMA_TxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-  /* NOTE: This function should not be modified, when the callback is needed,
-           the HAL_I2C_DMA_TxCpltCallback could be implemented in the user file
-   */
-}
-
-__attribute__((weak)) void HAL_I2C_DMA_RxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-  /* NOTE: This function should not be modified, when the callback is needed,
-           the HAL_I2C_DMA_RxCpltCallback could be implemented in the user file
-   */
-}
-
 static void I2C_transmit_init(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t Size)
 {
     REG_FIELD_WR(hi2c->Instance->CR1, I2C_CR1_TXDMAEN, 1);
