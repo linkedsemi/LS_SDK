@@ -203,16 +203,8 @@ uint32_t LL_I2C_Master_Tx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
         if (LL_I2C_IsActiveFlag(I2Cx, I2C_SR_TCR))
         {
           TxCount = 0;
-          if (Size > 0xFF)
-          {
-            LL_I2C_EnableRELOAD(I2Cx);
-            LL_I2C_SetNumberOfByte(I2Cx, 0xff);
-          }
-          else
-          {
             LL_I2C_DisableRELOAD(I2Cx);
             LL_I2C_SetNumberOfByte(I2Cx, Size);
-          }
         }
       }
     }
