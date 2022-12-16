@@ -176,17 +176,8 @@ uint32_t LL_I2C_Master_Tx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
   LL_I2C_DisableAutoEnd(I2Cx);
   LL_I2C_DisableRELOAD(I2Cx);
   LL_I2C_SetNumberOfByte(I2Cx, 0);
-  if (DataOfSize > 0xFF)
-  {
-    LL_I2C_EnableRELOAD(I2Cx);
-
-    LL_I2C_SetNumberOfByte(I2Cx, 0xff);
-  }
-  else
-  {
-    LL_I2C_EnableAutoEnd(I2Cx);
-    LL_I2C_SetNumberOfByte(I2Cx, DataOfSize);
-  }
+  LL_I2C_EnableAutoEnd(I2Cx);
+  LL_I2C_SetNumberOfByte(I2Cx, DataOfSize);
 
   /* Send slave address */
   LL_I2C_SetAddressToSlave(I2Cx, DevAddress, 0, LL_I2C_OWNADDRESS1_7BIT);
@@ -203,10 +194,7 @@ uint32_t LL_I2C_Master_Tx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
   /* Enable EVT, TXE and ERR interrupt */
   LL_I2C_EnableIT(I2Cx, I2C_ITEN_ADDR | I2C_ITEN_NACK | I2C_ITEN_STOP | I2C_ITEN_TXE | I2C_ITEN_ERR);
   /*Disable the sending completion interrupt*/
-  if (DataOfSize > 0xFF)
-    LL_I2C_EnableIT(I2Cx, I2C_ITEN_TCR);
-  else
-    LL_I2C_EnableIT(I2Cx, I2C_ITEN_TC);
+  LL_I2C_EnableIT(I2Cx, I2C_ITEN_TC);
 
   /*Send 8bit data*/
   if ((DataOfSize > 0U) && (LL_I2C_IsActiveFlag(I2Cx, I2C_SR_TXE) == SET))
@@ -251,16 +239,8 @@ uint32_t LL_I2C_Master_Rx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
   LL_I2C_DisableAutoEnd(I2Cx);
   LL_I2C_DisableRELOAD(I2Cx);
   LL_I2C_SetNumberOfByte(I2Cx, 0);
-  if (DataOfSize > 0xFF)
-  {
-    LL_I2C_EnableRELOAD(I2Cx);
-    LL_I2C_SetNumberOfByte(I2Cx, 0xff);
-  }
-  else
-  {
-    LL_I2C_EnableAutoEnd(I2Cx);
-    LL_I2C_SetNumberOfByte(I2Cx, DataOfSize);
-  }
+  LL_I2C_EnableAutoEnd(I2Cx);
+  LL_I2C_SetNumberOfByte(I2Cx, DataOfSize);
 
   /* Send slave address */
   LL_I2C_SetAddressToSlave(I2Cx, I2C_ADDRESS, 1, LL_I2C_OWNADDRESS1_7BIT);
@@ -272,10 +252,7 @@ uint32_t LL_I2C_Master_Rx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
   LL_I2C_ClearSR(I2Cx);
 
   /*Disable the sending completion interrupt*/
-  if (DataOfSize > 0xFF)
-    LL_I2C_EnableIT(I2Cx, I2C_ITEN_TCR);
-  else
-    LL_I2C_EnableIT(I2Cx, I2C_ITEN_TC);
+  LL_I2C_EnableIT(I2Cx, I2C_ITEN_TC);
 
   /* Clear interrupt Flag */
   LL_I2C_ClearFlagIT(I2Cx, I2C_ITIC_RXNE | I2C_ITIC_ADDR | I2C_ITIC_NACK | I2C_ITIC_STOP | I2C_ITIC_ERR);
