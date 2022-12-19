@@ -43,6 +43,7 @@ int main(void)
     sys_init_none();
     gpio_init();
     exti_test();
+    wkup_io_init();
     while (1)
     {
         if(lp0_flag)
