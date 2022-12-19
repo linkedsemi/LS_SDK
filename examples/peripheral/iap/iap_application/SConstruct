@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('iap_applicaton',src,inc,ble = False)
+env.app_build('iap_application',src,inc,ble = False)
