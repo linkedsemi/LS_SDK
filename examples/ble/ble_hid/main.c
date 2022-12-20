@@ -14,6 +14,7 @@
 #include "SEGGER_RTT.h"
 #include "tinyfs.h"
 #include "main.h"
+#include "rssi_smoothing_algo.h"
 
 #define LS_HID_ADV_NAME "LS HID"
 #define APP_HID_DEV_NAME (LS_HID_ADV_NAME)
@@ -372,6 +373,14 @@ static void prf_added_handler(struct profile_added_evt *evt)
     }
 }
 
+static bool hid_con_rssi_judge(int8_t con_rssi, const uint8_t *init_addr, uint8_t init_addr_type)
+{
+    LOG_I("con_rssi: %d, addr_type: %d", con_rssi, init_addr_type);
+    LOG_HEX(init_addr, BLE_ADDR_LEN);
+    // only accept con_req whose rssi is bigger than -70
+    return con_rssi > -70 ? true : false;
+}
+
 static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 {
     switch (type)
@@ -392,6 +401,8 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_get_identity_bdaddr(addr, &type);
         LOG_I("type:%d,addr:", type);
         LOG_HEX(addr, sizeof(addr));
+
+        con_rssi_thld_init(hid_con_rssi_judge);
         
         dev_manager_add_service((struct svc_decl *)&dis_server_svc);
         uptate_batt_timer_init();

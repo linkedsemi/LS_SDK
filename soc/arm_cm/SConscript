@@ -11,7 +11,7 @@ if tool == 'progen':
     env['COMPILER'] = ide_toolchain[env['IDE']]
 elif tool == 'arm-llvm':
     env['COMPILER'] = 'gnu'
-    env['CCFLAGS'] = ' --config $LLVM_CFG -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -faapcs-bitfield-width -fomit-frame-pointer -fno-common -Wall -Werror '
+    env['CCFLAGS'] = ' --config $LLVM_CFG -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -faapcs-bitfield-width -fomit-frame-pointer -fno-common -Wall '
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
     env['ASFLAGS'] = ' -c ${CCFLAGS} '
@@ -19,7 +19,7 @@ elif tool == 'arm-llvm':
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 else:
     env['COMPILER'] = 'gnu'
-    env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall -Werror '
+    env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
     env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '

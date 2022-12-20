@@ -8,7 +8,7 @@
 TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
 static struct light_state ls_mesh_light_state[3]={0};
-extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_cfg_idx );
+extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_indx);
 extern void app_generic_onoff_status_report(uint8_t onoff);
 
 #define APP_STATE_OFF                (0)
@@ -234,7 +234,7 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge) // override io_exti_callback
           light_lvl=0x12345678;
           button2_valid =true;
           button2.check_count = button2.count;
-          app_client_model_tx_message_handler(light_lvl,MESH_CMDL_CFG_IDX_GENC_LEVEL);
+          app_client_model_tx_message_handler(light_lvl,MODEL1_GENERIC_LEVEL_CLI);
        }       
     }    
     break;

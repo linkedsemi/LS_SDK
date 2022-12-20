@@ -8,7 +8,7 @@
 TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
 static struct light_state ls_mesh_light_state[3]={0};
-extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_cfg_idx );
+extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx);
 extern void app_generic_onoff_status_report(uint8_t onoff);
 
 #define APP_STATE_OFF                (0)

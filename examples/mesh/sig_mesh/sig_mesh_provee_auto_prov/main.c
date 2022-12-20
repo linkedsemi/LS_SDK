@@ -57,7 +57,7 @@ static uint8_t seqnum_offset=0;
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
 struct vendor_model_publish_message tx_msg_info;
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx, uint16_t model_cfg_idx);
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx);
 #if (AUTO_SIG_MESH_LP_MODE == 1)
 #define TIMER_100ms	  100
 static bool glp_tx_enable=false;
@@ -131,7 +131,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     
 }
 
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx, uint16_t model_cfg_idx)
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx)
 {
     struct model_cli_trans_info param;
         model_tid++;
