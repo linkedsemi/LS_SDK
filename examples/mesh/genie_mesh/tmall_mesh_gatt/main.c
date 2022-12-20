@@ -6,6 +6,7 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
+#include "cpu.h"
 #include "ls_hal_flash.h"
 #include "co_math.h"
 #include "tinyfs.h"
@@ -60,9 +61,9 @@ SIGMESH_NodeInfo_TypeDef Node_Proved_State = MESH_PROV_STARTED;
 SIGMESH_NodeInfo_TypeDef Node_Beacon_State = 0;
 
 static uint8_t ali_pid[TRIPLE_PID_LEN] = {0};
-uint32_t ali_pid_u32 = 10593197;
-uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x3c,0x5d,0x29,0x6b,0xc2,0xe4};
-uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0x67,0x2c,0x0c,0x8e,0xbf,0xc0,0x35,0x81,0x7f,0x73,0xa5,0xed,0xad,0xf9,0x51,0x82};
+uint32_t ali_pid_u32 = 10425386;
+uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x3c,0x5d,0x29,0x64,0x09,0xf1};
+uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0x91,0x4a,0x8a,0x15,0x4c,0xd4,0xbd,0xab,0xd2,0xec,0x23,0xae,0xbc,0x49,0x99,0x2b};
 static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0};
 
 uint8_t rsp_data_info[40] = {0};
@@ -630,8 +631,9 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         }
         model_env.app_key_lid = evt->sig_mdl_info.app_key_lid;
 
-        model_subscribe(model_env.info[0].model_lid, 0xC003); //group address 0xc003
-        model_subscribe(model_env.info[1].model_lid, 0xC003); //group address 0xc003
+        model_subscribe(model_env.info[0].model_lid, 0xCFFF); //all group address 0xcfff
+        model_subscribe(model_env.info[1].model_lid, 0xCFFF); //all group address 0xcfff
+        model_subscribe(model_env.info[2].model_lid, 0xCFFF); //group address 0xcfff
     
     }
     break;
@@ -735,6 +737,10 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         {
             tmall_mesh_recv_vendor_msg(&evt->rx_msg);
         }
+        else if (evt->rx_msg.ModelHandle == model_env.info[2].model_lid)
+        {
+             tmall_mesh_recv_scene_msg(&evt->rx_msg);
+        }     
     }
     break;
     case MESH_REPORT_TIMER_STATE:
@@ -822,11 +828,13 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
          {
            prf_ls_sig_mesh_callback_init(mesh_manager_callback);
 
-           model_env.nb_model = 2;
+           model_env.nb_model = 3;
            model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
            model_env.info[0].element_id = 0;
            model_env.info[1].model_id = VENDOR_TMALL_SERVER;
            model_env.info[1].element_id = 0;
+           model_env.info[2].model_id = SCENE_SERVER;
+           model_env.info[2].element_id = 0;
            ls_sig_mesh_init(&model_env);
            break;
          }

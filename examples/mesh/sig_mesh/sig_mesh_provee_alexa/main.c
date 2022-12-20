@@ -42,7 +42,7 @@ struct mesh_publish_info_ind mesh_publish_env[MAX_MESH_MODEL_NB];
 static uint16_t provisioner_unicast_addr;
 static uint8_t adv_obj_hdl;
 static bool mesh_node_prov_state = false;
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx, uint16_t model_cfg_idx);
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx);
 void app_generic_onoff_status_report(uint8_t onoff);
 void app_light_hsl_sat_status_report(void);
 void app_light_hsl_hue_status_report(void);
