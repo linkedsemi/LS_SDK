@@ -83,7 +83,7 @@ int main(void)
 {
     /* system init app     */
     sys_init_none();
-    /* init spi and GPIO   */
+    /* init I2S and GPIO   */
     i2s_init();
 
     for (uint8_t i = 0; i < BUFFERSIZE; i++)
