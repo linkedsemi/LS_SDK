@@ -178,7 +178,6 @@ static void i2s_tx_dma_cb(I2S_HandleTypeDef *hi2s)
 {
     CLEAR_BIT(hi2s->Instance->CR2, SPI_CR2_TXDMAEN_MASK);
     while(REG_FIELD_RD(hi2s->Instance->SR,SPI_SR_BSY) == 1U);
-    CLEAR_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
     HAL_I2S_TxDMACpltCallback(hi2s);
 }
 

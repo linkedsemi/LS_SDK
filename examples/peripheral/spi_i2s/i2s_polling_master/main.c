@@ -11,7 +11,7 @@
   ******************************************************************************
   * @file    I2S/Src/main.c
   * @author  MCD Application Team
-  * @brief   This sample code shows how to use SPI HAL API to transmit
+  * @brief   This sample code shows how to use I2S HAL API to transmit
   *          and receive a data buffer with a communication process based on
   *          Polling transfer.
   *          The communication is done using 2 Boards.

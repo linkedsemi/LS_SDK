@@ -9,11 +9,11 @@
 	********************************************************************************/
 /**
   ******************************************************************************
-  * @file    SPI/SPI_DMA/Src/main.c
+  * @file    I2S/main.c
   * @author  MCD Application Team
-  * @brief   This sample code shows how to use LE501x SPI HAL API to transmit
+  * @brief   This sample code shows how to use I2S HAL API to transmit
   *          and receive a data buffer with a communication process based on
-  *          DMA transfer.
+  *          dma transfer.
   *          The communication is done using 2 Boards.
   ******************************************************************************
   */
@@ -96,7 +96,7 @@ int main(void)
 {
     /* system init app     */
     sys_init_none();
-    /* init spi and GPIO   */
+    /* init I2S and GPIO   */
     i2s_init();
     i2s_dma_channel_init();
 

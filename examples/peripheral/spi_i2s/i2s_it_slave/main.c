@@ -41,7 +41,7 @@ enum {
 };
 
 #define     BUFFERSIZE        32
-/* SPI handler declaration */
+/* I2S handler declaration */
 static I2S_HandleTypeDef I2sHandle;
 
 /* Buffer used for transmission */
@@ -83,7 +83,7 @@ int main(void)
 {
     /* system init app     */
     sys_init_none();
-    /* init spi and GPIO   */
+    /* init I2S and GPIO   */
     i2s_init();
 
     for (uint8_t i = 0; i < 10; i++)
