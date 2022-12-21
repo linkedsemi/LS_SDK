@@ -765,6 +765,7 @@ enum gatt_evt_type
     CLIENT_RD_CHAR_VAL_BY_UUID_IND,    /*!< Read characteristic value by UUID indication for client*/
     CLIENT_WRITE_WITH_RSP_DONE,        /*!<  Write response indication for client*/
     CLIENT_WRITE_NO_RSP_DONE,          /*!<  Write with no response indication for client*/
+    CLIENT_DISC_OP_DONE,               /*!<  discovery operation done for client*/
 
     MTU_CHANGED_INDICATION,            /*!<  MTU exchange indication for client & server*/
     GATT_EVT_MAX
@@ -918,6 +919,15 @@ struct gatt_write_no_rsp
     uint8_t status;                               /*!< Status of write*/
 };
 /**
+  * @brief Send discovery operation done on GATT server.
+  */
+struct gatt_client_discovery_operation_done
+{
+    uint16_t transaction_id;                      /*!< Index of transaction*/
+    uint8_t status;                               /*!< Status of write*/
+};
+
+/**
   * @brief Union definition for GATT events.
   */
 union gatt_evt_u
@@ -934,6 +944,7 @@ union gatt_evt_u
     struct gatt_read_indicate client_read_indicate;                                      /*!< GATT client read indicate.*/
     struct gatt_write_rsp client_write_rsp;                                              /*!< GATT client write request response.*/
     struct gatt_write_no_rsp client_write_no_rsp;                                        /*!< GATT client write command response.*/
+    struct gatt_client_discovery_operation_done  client_discovery_operation_done;        /*!< GATT client discovery operation done.*/
 };
 
 /**
