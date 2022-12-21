@@ -546,6 +546,12 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
             LOG_I("write fail, status = %d", evt->client_write_rsp.status);
         }
         break;
+    case CLIENT_DISC_OP_DONE:
+        if(evt->client_discovery_operation_done.status != 0)
+        {
+            LOG_I("\r\nclient discory operation fail !!!");
+        }
+        break;
     default:
         LOG_I("Event not handled!");
         break;
