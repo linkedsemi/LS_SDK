@@ -113,7 +113,7 @@ void tmall_mesh_recv_light_hsl_msg(struct model_rx_info *msg)
 void  tmall_mesh_recv_scene_msg (struct model_rx_info *msg)
 {
     struct scene_register_staus_message  rsp_msg;
-    uint16_t t_index = 0;
+    int16_t t_index = 0;
     uint16_t t_len = 0;
     uint8_t t_status_code = 0;
     uint8_t scene_register_status_len=0;
@@ -126,49 +126,49 @@ void  tmall_mesh_recv_scene_msg (struct model_rx_info *msg)
             t_index = recall_msg->scene_number - RECORD_PRESET_SCENCE_BASE - 1;
             LOG_I("RECALL_SCENE_NUM , scene_num=0x%x",recall_msg->scene_number);
             if(t_index>=0 && t_index<9)
-			{
-				switch(t_index)
-				{
-					case 0:
-					LOG_I("==================open curatin");
-                    break;
-                   case 1:
-					LOG_I("==================close curatin"); 
-                    break;
-                   case 2:
-                    LOG_I("==================stop curatin"); 
-                    break;
-                   case 3: case 4: case 5: case 6: case 7: case 8:
-                   break;
-                }
+            {
+                switch(t_index)
+                {
+                case 0:
+                     LOG_I("==================open curatin");
+                break;
+                case 1:
+                     LOG_I("==================close curatin"); 
+                break;
+                case 2:
+                     LOG_I("==================stop curatin"); 
+                break;
+                case 3: case 4: case 5: case 6: case 7: case 8:
+                break;
+              }
             }
             else if(t_index>=0x64 && t_index<(0x64+24))
             {
-                t_index -=0x64;
-				t_len = sizeof(struct scene_store_message);
-				tinyfs_read(mesh_dir, recall_msg->scene_number, (uint8_t *)&Config_scence_msg[t_index], &t_len);
-                LOG_I("t_index= %d,type_curtainctrl=0X%X",t_index,Config_scence_msg[t_index].type_curtainctrl);
+               t_index -=0x64;
+               t_len = sizeof(struct scene_store_message);
+               tinyfs_read(mesh_dir, recall_msg->scene_number, (uint8_t *)&Config_scence_msg[t_index], &t_len);
+               LOG_I("t_index= %d,type_curtainctrl=0X%X",t_index,Config_scence_msg[t_index].type_curtainctrl);
             }        
         }          
-         break;
+        break;
         case SCENE_STORE:
         case SCENE_STORE_UNAK:
         {
             struct scene_store_message  *store_msg = (struct scene_store_message *)msg->info;
             t_index = store_msg->scene_number - RECORD_CONFIG_SCENCE_BASE - 1;
             if((t_index>=0) && t_index <RECORD_CONFIG_SCENCE_NUM)
-			{
-				memcpy(&Config_scence_msg[t_index],store_msg,sizeof(struct scene_store_message));
+            {
+                memcpy(&Config_scence_msg[t_index],store_msg,sizeof(struct scene_store_message));
                 tinyfs_write(mesh_dir, store_msg->scene_number, (uint8_t *)&Config_scence_msg[t_index], sizeof(struct scene_store_message));
                 t_status_code = SCENE_STATUS_CODE_SUCCESS;
             }
-			else
-			{    
+            else
+            {    
                 t_status_code = SCENE_STATUS_CODE_NOT_FOUND;
             }
             rsp_msg.status_code = t_status_code;
             rsp_msg.current_scene = store_msg->scene_number;
-			scene_register_status_len =3;
+            scene_register_status_len =3;
             dev_mesh_status_rsp(msg,SCENE_REGISTER_STATUS,(uint8_t *)&rsp_msg,scene_register_status_len);
         }
         break;
@@ -179,19 +179,19 @@ void  tmall_mesh_recv_scene_msg (struct model_rx_info *msg)
              t_index = delete_msg->scene_number - RECORD_CONFIG_SCENCE_BASE - 1;
              LOG_I("DELETE_SCENE_NUM , scene_num=0x%x",delete_msg->scene_number);
              if((t_index>=0) && t_index <RECORD_CONFIG_SCENCE_NUM)
-			{
-				memset(&Config_scence_msg[t_index],0,sizeof(struct scene_store_message));
-                tinyfs_write(mesh_dir, delete_msg->scene_number, (uint8_t *)&Config_scence_msg[t_index], sizeof(struct scene_store_message));
-                t_status_code = SCENE_STATUS_CODE_SUCCESS;
-			}
-			else
-			{
-              t_status_code = SCENE_STATUS_CODE_NOT_FOUND;     
-            } 
+             {
+                  memset(&Config_scence_msg[t_index],0,sizeof(struct scene_store_message));
+                  tinyfs_write(mesh_dir, delete_msg->scene_number, (uint8_t *)&Config_scence_msg[t_index], sizeof(struct scene_store_message));
+                  t_status_code = SCENE_STATUS_CODE_SUCCESS;
+             }
+             else
+             {
+               t_status_code = SCENE_STATUS_CODE_NOT_FOUND;     
+             } 
             rsp_msg.status_code = t_status_code;
             rsp_msg.current_scene = delete_msg->scene_number;
-			scene_register_status_len = 3;
-			dev_mesh_status_rsp(msg,SCENE_REGISTER_STATUS,(uint8_t *)&rsp_msg,scene_register_status_len);
+            scene_register_status_len = 3;
+            dev_mesh_status_rsp(msg,SCENE_REGISTER_STATUS,(uint8_t *)&rsp_msg,scene_register_status_len);
         }
         break;
         case SCENE_GET:
