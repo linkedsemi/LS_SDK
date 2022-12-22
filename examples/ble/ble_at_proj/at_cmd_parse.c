@@ -367,7 +367,7 @@ static void at_link_get_handler(uint8_t *p_cmd_parse)
     uart_write(msg_rsp,msg_len);
     if ( *p_cmd_parse == '?')
     {
-        for (uint8_t i=0; i < get_ble_con_num(); i++)
+        for (uint8_t i=0; i < SDK_MAX_CONN_NUM; i++)
         {
             if (get_con_status(i)==false)
             {

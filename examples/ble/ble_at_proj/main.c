@@ -735,6 +735,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_add_service(&ls_uart_server_svc);
         ls_uart_server_init(0xff);
         ls_uart_client_init(0xff);
+        at_init();
     }
     break;
     case SERVICE_ADDED:
@@ -791,7 +792,6 @@ int main()
 {
     sys_init_app();
     ble_init();
-    at_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
