@@ -55,12 +55,12 @@ static void ssi_test_init(void)
     io_cfg_output(PA01);
     io_write_pin(PA01, 1);
     pinmux_ssi_clk_init(PB09);		/* CLK-------------PB09 */	
-	pinmux_ssi_nss0_init(PB08);	/* SSN-------------PB08 */	
+	pinmux_ssi_nss0_init(PB08);	    /* SSN-------------PB08 */	
 	pinmux_ssi_dq0_init(PA07);		/* MOSI------------PA07 */	
 	pinmux_ssi_dq1_init(PA00);		/* MISO------------PA00 */	
 	
 	SsiHandle.REG = LSSSI;
-	SsiHandle.Init.clk_div = 64;
+	SsiHandle.Init.clk_div = 128;
 	SsiHandle.Init.rxsample_dly = 0;
 	SsiHandle.Init.ctrl.cph = SCLK_Toggle_In_Middle;
 	SsiHandle.Init.ctrl.cpol = Inactive_Low;
