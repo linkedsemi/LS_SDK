@@ -207,8 +207,7 @@ static void lvl2_lvl3_mode_prepare(bool lp2_mode)
     V33_RG->SFT_CTRL03 &= 0x00ffffff;
     systick_stop();
     SCB->SCR |= (1<<2);
-    MODIFY_REG(V33_RG->PWR_CTRL,V33_RG_PD_GPIO_SEL_MASK|V33_RG_LPLDO_PD_EN_MASK,1<<V33_RG_LPLDO_PD_EN_POS|1<<V33_RG_PD_GPIO_SEL_POS);
-    V33_RG->PWR_CTRL = FIELD_BUILD(V33_RG_LPLDO_PD_EN,0)
+    V33_RG->PWR_CTRL = FIELD_BUILD(V33_RG_LPLDO_PD_EN,1)
                           |FIELD_BUILD(V33_RG_HPLDO_PD_EN,1)
                           |FIELD_BUILD(V33_RG_MSI_PD_EN,1)
                           |FIELD_BUILD(V33_RG_BG_PD_EN,0)
@@ -226,7 +225,9 @@ static void lvl2_lvl3_mode_prepare(bool lp2_mode)
                           |FIELD_BUILD(V33_RG_SRAM4_PD_EN,SDK_SRAM4_PWR_DOWN)
                           |FIELD_BUILD(V33_RG_SRAM_DS_PU_EN,1)
                           |FIELD_BUILD(V33_RG_RCO_BIAS_FC,0)
-                          |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1);
+                          |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1)
+                          |FIELD_BUILD(V33_RG_PD_GPIO_SEL,1);
+    
 }
 
 void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,bool lp2_mode)
