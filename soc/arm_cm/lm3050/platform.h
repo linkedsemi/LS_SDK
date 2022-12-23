@@ -8,7 +8,7 @@
 #include "reg_sysc_awo_type.h"
 #include "field_manipulate.h"
 
-static inline void hclk_set(uint32_t mhz)
+__attribute__((always_inline)) static inline void hclk_set(uint32_t mhz)
 {
     switch(mhz)
     {
