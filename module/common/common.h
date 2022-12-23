@@ -22,7 +22,7 @@ extern const unsigned char one_bits[];
 
 #define CEILING(dividend,divisor) ((dividend)/(divisor) + (((dividend)%(divisor))?1:0))
 
-static inline int32_t time_diff(uint32_t time0,uint32_t time1)
+__attribute__((always_inline)) static inline int32_t time_diff(uint32_t time0,uint32_t time1)
 {
     int32_t diff = time0 - time1;
     return diff;
