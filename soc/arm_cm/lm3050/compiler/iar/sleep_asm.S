@@ -6,7 +6,7 @@
     EXTERN store_msp_psp_control
     EXTERN after_wfi
     EXTERN restore_msp_psp_control
-    SECTION `.xip_banned.sleep_recover_asm`:CODE:NOROOT
+    SECTION `__iar_init$$done.xip_banned.sleep_recover_asm`:CODE:NOROOT
     THUMB
 cpu_sleep_asm:
     mov r0, r8
