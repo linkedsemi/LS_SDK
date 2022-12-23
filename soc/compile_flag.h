@@ -7,6 +7,12 @@
 #define ROM_SYMBOL __attribute__((weak))
 #endif
 
+#if defined(__ICCARM__)
+#define __XIP_BANNED_LABEL "__iar_init$$done"
+#else
+#define __XIP_BANNED_LABEL ""
+#endif
+
 #if (ROM_CODE==1 || BOOT_RAM==1)
 #define XIP_BANNED_FUNC(__NAME,...) __NAME(__VA_ARGS__)
 #if defined(BOOT_ROM)
@@ -15,7 +21,7 @@
 #define LL_PKT_ISR __attribute((section(".ll_pkt_isr")))
 #endif
 #else
-#define XIP_BANNED_FUNC(__NAME,...) __attribute__((section(".xip_banned."#__NAME))) __NAME(__VA_ARGS__)
+#define XIP_BANNED_FUNC(__NAME,...) __attribute__((section(__XIP_BANNED_LABEL".xip_banned."#__NAME))) __NAME(__VA_ARGS__)
 #define LL_PKT_ISR 
 #endif
 

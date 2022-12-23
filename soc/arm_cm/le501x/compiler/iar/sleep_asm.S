@@ -6,7 +6,7 @@
     EXTERN store_psp_return_msp_and_addr
     EXTERN after_wfi
     EXTERN restore_psp
-    SECTION `.xip_banned.sleep_recover_asm`:CODE
+    SECTION `__iar_init$$done.xip_banned.sleep_recover_asm`:CODE
     THUMB
 cpu_sleep_asm
     mov r0, r8

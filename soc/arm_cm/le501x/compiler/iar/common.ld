@@ -1,10 +1,9 @@
 
-
-initialize by copy with packing = none {section .intvec,readwrite,section .xip_banned*};
+initialize by copy with packing = none {section .intvec,section __iar_init$$done.xip_banned*,rw};
 place at start of RAM {section .intvec};
+place at address mem:__data_start__ {rw};
 place at start of FLASH {section .intvec_init};
-place in FLASH {readonly,ro section .xip_banned*};
-place at address mem:__data_start__ {readwrite,section .xip_banned*};
+place in FLASH {ro};
 
 define block HEAP with alignment = 4,size = 0x200 {};
 define block RESET_RETAIN with alignment = 4,size = 8 {};

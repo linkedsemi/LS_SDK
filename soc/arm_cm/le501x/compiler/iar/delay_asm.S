@@ -1,6 +1,6 @@
     MODULE delay_asm
     PUBLIC arm_cm_delay_asm
-    SECTION `.xip_banned.arm_cm_delay_asm`:CODE
+    SECTION `__iar_init$$done.xip_banned.arm_cm_delay_asm`:CODE
     THUMB
 arm_cm_delay_asm
     SUBS r0,r0,#1

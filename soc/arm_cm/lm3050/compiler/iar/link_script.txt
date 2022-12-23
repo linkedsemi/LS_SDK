@@ -7,11 +7,11 @@ define symbol __data_start__ = 0x20000148;
 
 place at address mem:0x800000 {symbol __info_array};
 keep {symbol __info_array};
-initialize by copy with packing = none {section .intvec,readwrite,section .xip_banned*};
+initialize by copy with packing = none {section .intvec,rw,section __iar_init$$done.xip_banned*};
 place at start of RAM {section .intvec};
 place at start of FLASH {section .intvec_init};
-place in FLASH {readonly,ro section .xip_banned*};
-define block RW_BLK {first block First{section .xip_banned.sleep_recover_asm},readwrite,section .xip_banned*};
+place in FLASH {ro};
+define block RW_BLK {first block First{section __iar_init$$done.xip_banned.sleep_recover_asm},rw};
 place at address mem:__data_start__ {block RW_BLK};
 
 define block HEAP with alignment = 4,size = 0x200 {};
