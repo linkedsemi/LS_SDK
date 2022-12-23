@@ -24,18 +24,18 @@ void gpio_init(void)
 void wkup_io_init(void)
 {
     io_cfg_input(WKUP_IO);    //WKUP_IO config input  
-    io_pull_write(WKUP_IO, IO_PULL_UP);    //WKUP_IO config pullup
-    io_exti_config(WKUP_IO,INT_EDGE_FALLING);    //WKUP_IO interrupt falling edge
+    io_pull_write(WKUP_IO, IO_PULL_DOWN);    //WKUP_IO config pull down
+    io_exti_config(WKUP_IO,INT_EDGE_RISING);    //WKUP_IO interrupt Rising edge
 }
 
 void exti_test(void)
 {
     io_cfg_input(LOWPOWER_M0_BTN);    //LOWPOWER_M0_BTN config input  
-    io_pull_write(LOWPOWER_M0_BTN, IO_PULL_UP);    //LOWPOWER_M0_BTN config pullup
-    io_exti_config(LOWPOWER_M0_BTN,INT_EDGE_FALLING);    //LOWPOWER_M0_BTN interrupt falling edge
+    io_pull_write(LOWPOWER_M0_BTN, IO_PULL_DOWN);    //LOWPOWER_M0_BTN config pull down
+    io_exti_config(LOWPOWER_M0_BTN,INT_EDGE_RISING);    //LOWPOWER_M0_BTN interrupt Rising edge
     io_cfg_input(LOWPOWER_M3_BTN);    //LOWPOWER_M3_BTN config input  
-    io_pull_write(LOWPOWER_M3_BTN, IO_PULL_UP);    //LOWPOWER_M3_BTN config pullup
-    io_exti_config(LOWPOWER_M3_BTN,INT_EDGE_FALLING);    //LOWPOWER_M3_BTN interrupt falling edge
+    io_pull_write(LOWPOWER_M3_BTN, IO_PULL_DOWN);    //LOWPOWER_M3_BTN config pull down
+    io_exti_config(LOWPOWER_M3_BTN,INT_EDGE_RISING);    //LOWPOWER_M3_BTN interrupt Rising edge
 }
 
 int main(void)
