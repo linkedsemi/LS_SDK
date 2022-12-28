@@ -188,15 +188,7 @@ uint32_t LL_I2C_Master_Tx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
   /* Clear SR Flag */
   LL_I2C_ClearSR(I2Cx);
 
-  /* Clear interrupt Flag */
-  LL_I2C_ClearFlagIT(I2Cx, I2C_ITIC_TXE | I2C_ITIC_ADDR | I2C_ITIC_NACK | I2C_ITIC_STOP | I2C_ITIC_ERR);
-
-  /* Enable EVT, TXE and ERR interrupt */
-  LL_I2C_EnableIT(I2Cx, I2C_ITEN_ADDR | I2C_ITEN_NACK | I2C_ITEN_STOP | I2C_ITEN_TXE | I2C_ITEN_ERR);
-  /*Disable the sending completion interrupt*/
-  LL_I2C_EnableIT(I2Cx, I2C_ITEN_TC);
-
-  /*Send 8bit data*/
+    /*Send 8bit data*/
   if ((DataOfSize > 0U) && (LL_I2C_IsActiveFlag(I2Cx, I2C_SR_TXE) == SET))
   {
     /* Write data to TXDR */
@@ -208,6 +200,17 @@ uint32_t LL_I2C_Master_Tx(reg_i2c_t *I2Cx, uint16_t DevAddress, uint8_t *pData, 
     /* Update counter */
     DataOfSize--;
   }
+
+  /* Clear interrupt Flag */
+  LL_I2C_ClearFlagIT(I2Cx, I2C_ITIC_TXE | I2C_ITIC_ADDR | I2C_ITIC_NACK | I2C_ITIC_STOP | I2C_ITIC_ERR);
+
+  /* Enable EVT, TXE and ERR interrupt */
+  LL_I2C_EnableIT(I2Cx, I2C_ITEN_ADDR | I2C_ITEN_NACK | I2C_ITEN_STOP | I2C_ITEN_TXE | I2C_ITEN_ERR);
+  /*Disable the sending completion interrupt*/
+  LL_I2C_EnableIT(I2Cx, I2C_ITEN_TC);
+
+
+
   return SUCCESS;
 }
 
@@ -296,7 +299,7 @@ void LL_I2C_MasterTXECpltCallback(reg_i2c_t *I2Cx)
     LL_I2C_ClearFlagIT(I2Cx, I2C_ITIC_TXE | I2C_ITIC_TC | I2C_ITIC_TCR);
 
     /* Disable EVT, TXE and ERR interrupt */
-    LL_I2C_DisableIT(I2Cx, I2C_ITDEN_ADDR | I2C_ITDEN_NACK | I2C_ITDEN_STOP | I2C_ITDEN_TXE | I2C_ITDEN_ERR);
+    LL_I2C_DisableIT(I2Cx, I2C_ITDEN_ADDR | I2C_ITDEN_STOP | I2C_ITDEN_TXE | I2C_ITDEN_ERR | I2C_ITDEN_TC);
     if (Com_Sta == txing)
     {
       Com_Sta = txover;
@@ -346,6 +349,7 @@ void LL_I2C_MasterRXNECpltCallback(reg_i2c_t *I2Cx)
   {
     /* Read data from RXDR */
     *qBuf = LL_I2C_ReceiveData8(I2Cx);
+    DELAY_US(50);
 
     /* Increment Buffer pointer */
     qBuf++;
@@ -359,7 +363,7 @@ void LL_I2C_MasterRXNECpltCallback(reg_i2c_t *I2Cx)
     LL_I2C_ClearFlagIT(I2Cx, I2C_ITIC_RXNE);
 
     /* Disable EVT, II2C_ITDEN_RXNE and ERR interrupt */
-    LL_I2C_DisableIT(I2Cx, I2C_ITDEN_ADDR | I2C_ITDEN_NACK | I2C_ITDEN_STOP | I2C_ITDEN_TXE | I2C_ITDEN_RXNE | I2C_ITDEN_ERR | I2C_ITDEN_TC | I2C_ITDEN_TCR);
+    LL_I2C_DisableIT(I2Cx, I2C_ITDEN_ADDR | I2C_ITDEN_NACK | I2C_ITDEN_STOP  | I2C_ITDEN_RXNE | I2C_ITDEN_ERR | I2C_ITDEN_TC | I2C_ITDEN_TCR);
 
     Com_Sta = rxover;
   }

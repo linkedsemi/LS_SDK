@@ -6,7 +6,7 @@
 extern void LL_SPI_TxCpltCallback(void);
 extern void LL_SPI_RxCpltCallback(void);
 
-void LL_SPI_IRQHandler(void)
+void LL_SPI2_IRQHandler(void)
 {
     /* SPI in mode Receiver ----------------------------------------------------*/
     if ((LL_SPI_IsActiveFlagIT(SPI2, SPI_ITRI_RXNE) != RESET) && (LL_SPI_IsEnabledIT(SPI2, SPI_ITVS_RXNE) != RESET))

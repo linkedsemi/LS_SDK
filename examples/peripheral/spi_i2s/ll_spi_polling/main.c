@@ -74,10 +74,19 @@ static void spi_init(void)
   /* SSN-------------PA01 */
   /* MOSI------------PA02 */
   /* MISO------------PA03 */
+#if MASTER_BOARD
   pinmux_spi2_master_clk_init(PA00);
   pinmux_spi2_master_nss_init(PA01);
   pinmux_spi2_master_mosi_init(PA02);
   pinmux_spi2_master_miso_init(PA03);
+
+#else
+  pinmux_spi2_slave_clk_init(PB12);
+  pinmux_spi2_slave_nss_init(PB13);
+  pinmux_spi2_slave_mosi_init(PB14);
+  pinmux_spi2_slave_miso_init(PB15);
+
+#endif /* MASTER_BOARD */
 
   LL_SPI2_MSP_Init();
   /* Set the SPI parameters */

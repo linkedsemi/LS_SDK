@@ -36,13 +36,6 @@ void LL_I2C1_IRQHandler(void)
         LL_I2C_MasterTXECpltCallback(I2C1);
     }
 
-    /*  Check TCR flag -----------------------------------------------*/
-    if ((LL_I2C_IsActiveFlagIT(I2C1, I2C_ITRI_TCR) != RESET) && (LL_I2C_IsEnableIT(I2C1, I2C_ITVS_TCR) != RESET))
-    {
-        LL_I2C_ClearFlagIT(I2C1, I2C_ITIC_TCR);
-        LL_I2C_MasterTCRCpltCallback(I2C1);
-    }
-
     /* Check RXNE flag -----------------------------------------------*/
     if ((LL_I2C_IsActiveFlagIT(I2C1, I2C_ITRI_RXNE) != RESET) && (LL_I2C_IsEnableIT(I2C1, I2C_ITVS_RXNE) != RESET))
     {
