@@ -29,6 +29,7 @@ void LL_SPI_RxCpltCallback(void);
 uint32_t LL_SPI_Transmit_IT(reg_spi_t *SPIx, uint8_t *pData, uint16_t Size);
 uint32_t LL_SPI_Receive_IT(reg_spi_t *SPIx, uint8_t *pData, uint16_t Size);
 
+
 /******************************************************************************
  Global variable declaration
  ******************************************************************************/
@@ -52,6 +53,8 @@ uint8_t aRxBuffer[BUFFERSIZE];
 volatile uint8_t *qBuf;
 volatile uint8_t DataOfSize;
 
+#if MASTER_BOARD 
+#else
 /**
  * @brief Data comparison function
  * 
@@ -74,6 +77,7 @@ static uint16_t Buffercmp(uint8_t *pBuff1, uint8_t *pBuff2, uint16_t Length)
 
   return 0;
 }
+#endif /* MASTER_BOARD */
 
 /**
  * @brief spi Initialization function
@@ -86,10 +90,20 @@ static void spi_init(void)
   /* SSN-------------PA01 */
   /* MOSI------------PA02 */
   /* MISO------------PA03 */
+
+#if MASTER_BOARD
   pinmux_spi2_master_clk_init(PA00);
   pinmux_spi2_master_nss_init(PA01);
   pinmux_spi2_master_mosi_init(PA02);
   pinmux_spi2_master_miso_init(PA03);
+
+#else
+  pinmux_spi2_slave_clk_init(PB12);
+  pinmux_spi2_slave_nss_init(PB13);
+  pinmux_spi2_slave_mosi_init(PB14);
+  pinmux_spi2_slave_miso_init(PB15);
+
+#endif /* MASTER_BOARD */
 
   LL_SPI2_MSP_Init();
   clr_pending_irq(SPI2_IRQn);
@@ -143,10 +157,10 @@ int main(void)
   /* Configure User push-button button */
 
   /* Wait for User push-button press before starting the Communication */
-  while (io_read_pin(PB15))
-  {
-    LED_flicker();
-  }
+  // while (io_read_pin(PB15))
+  // {
+  //   LED_flicker();
+  // }
   io_write_pin(PA09, 1); // PA09 write high power
   /*##-2- Start the Full Duplex Communication process ########################*/
 
@@ -185,11 +199,12 @@ int main(void)
     Error_Handler();
     break;
   }
-#endif /* MASTER_BOARD */
-  for (int i = 0; i < BUFFERSIZE; i++)
+    for (int i = 0; i < BUFFERSIZE; i++)
   {
     LOG_I("%d", aRxBuffer[i]);
   }
+#endif /* MASTER_BOARD */
+
   /* Infinite loop */
   while (1)
   {
@@ -277,6 +292,9 @@ void LL_SPI_RxCpltCallback(void)
 {
   DataOfSize--;
   *qBuf = LL_SPI_ReceiveData8(SPI2);
+#if LM3050 
+  DELAY_US(50);
+#endif
   qBuf++;
   if (DataOfSize == 0)
   {

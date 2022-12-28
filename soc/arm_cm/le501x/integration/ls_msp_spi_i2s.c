@@ -155,12 +155,12 @@ void HAL_I2S_MSP_Idle_Set(I2S_HandleTypeDef *inst)
     i2s_status_set(inst,0);
 }
 
-__attribute__((weak)) void LL_SPI_IRQHandler(){}
+__attribute__((weak)) void LL_SPI2_IRQHandler(){}
 void LL_SPI2_MSP_Init(void)
 {
     REG_FIELD_WR(RCC->APB1RST, RCC_SPI2, 1);
     REG_FIELD_WR(RCC->APB1RST, RCC_SPI2, 0);
-    arm_cm_set_int_isr(SPI2_IRQn,LL_SPI_IRQHandler);
+    arm_cm_set_int_isr(SPI2_IRQn,LL_SPI2_IRQHandler);
     REG_FIELD_WR(RCC->APB1EN, RCC_SPI2, 1);
 }
 
