@@ -171,9 +171,11 @@ void ADC_LoopMode_Poll_GetValue(void)
     HAL_ADCx_LoopStart(&ADCx_Hdl);
     if (HAL_ADCx_LoopPollForConversion(&ADCx_Hdl, 1000) == HAL_OK)
     {
-        LOG_I("LoopMode:%d,%d,%d", HAL_ADCx_LoopGetValue(&ADCx_Hdl),
-                        HAL_ADCx_LoopGetValue(&ADCx_Hdl),
-                        HAL_ADCx_LoopGetValue(&ADCx_Hdl));
+        uint8_t fif_lvl_num = LOOP_MDOE_FIFO_LVL_NUM_GET(&ADCx_Hdl);
+        for(uint8_t i=0;i<fif_lvl_num;i++)
+        {
+            LOG_I("LOOPMode RANK%d:%d",i%3,HAL_ADCx_LoopGetValue(&ADCx_Hdl));
+        }
     }
     else
     {
