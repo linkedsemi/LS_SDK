@@ -501,6 +501,12 @@ HAL_StatusTypeDef HAL_ADCx_LoopStart(ADC_HandleTypeDef* hadc)
 {
     HAL_StatusTypeDef status = HAL_OK;
     ADC_Enable(hadc);
+
+    // FIFO Clear Enable
+    while(REG_FIELD_RD(hadc->Instance->FIFO_FLVL,ADC_FIFO_FLVL)!=0){
+        REG_FIELD_WR(hadc->Instance->FIF_CTRL0,ADC_FIFO_CLR,1);
+    }
+    
     if(IS_ADC_SOFTWARE_TRIGTYPE(hadc->Init.TrigType))
     {
         REG_FIELD_WR(hadc->Instance->TRIG,ADC_FIF_TRIG,1);
