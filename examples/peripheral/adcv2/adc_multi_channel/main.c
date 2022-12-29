@@ -151,7 +151,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADCx_Hdl.Instance)
     {
-        LOG_I(" :%d,%d,%d", HAL_ADCEx_InjectedGetValue(&ADCx_Hdl, ADC_REGULAR_RANK_1),
+        LOG_I("InjectMode:%d,%d,%d", HAL_ADCEx_InjectedGetValue(&ADCx_Hdl, ADC_REGULAR_RANK_1),
                           HAL_ADCEx_InjectedGetValue(&ADCx_Hdl, ADC_REGULAR_RANK_2),
                           HAL_ADCEx_InjectedGetValue(&ADCx_Hdl, ADC_REGULAR_RANK_3));
     }
