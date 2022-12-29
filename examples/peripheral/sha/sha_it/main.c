@@ -4,6 +4,13 @@
 #include "platform.h"
 #include "log.h"
 
+enum type
+{
+    SHA256_ENCRYPT,
+    SHA224_ENCRYPT,
+    SM3_ENCRYPT
+};
+
 static const uint8_t plaintext[32] = {
     0xA7, 0xFC, 0xFC, 0x6B, 0x52, 0x69, 0xBD, 0xCC, 0xE5, 0x71, 0x79, 0x8D, 0x61, 0x8E, 0xA2, 0x19,
     0xA6, 0x8B, 0x96, 0xCB, 0x87, 0xA0, 0xE2, 0x10, 0x80, 0xC2, 0xE7, 0x58, 0xD2, 0x3E, 0x4C, 0xE9};
@@ -21,6 +28,7 @@ uint8_t plainbuffer[64];
 uint32_t cipherbuffer_sha256[8];
 uint32_t cipherbuffer_sha224[7];
 uint32_t cipherbuffer_sm3[8];
+volatile enum type flag = SHA256_ENCRYPT;
 
 static void sha_init(void)
 {
@@ -30,8 +38,13 @@ static void sha_init(void)
 static void sha_crypt_test()
 {
     HAL_LSSHA_SHA256_IT(plaintext, sizeof(plaintext), cipherbuffer_sha256);
+    while (flag == SHA256_ENCRYPT);
+    
     HAL_LSSHA_SHA224_IT(plaintext, sizeof(plaintext), cipherbuffer_sha224);
+    while (flag == SHA224_ENCRYPT);
+
     HAL_LSSHA_SM3_IT(plaintext, sizeof(plaintext), cipherbuffer_sm3);
+    while (flag == SM3_ENCRYPT);
 }
 
 int main()
@@ -51,6 +64,7 @@ void HAL_LSSHA_SHA256_Complete_Callback()
     {
         LOG_I("SHA256_ENCRYPT_TEST_FAIL!");
     }
+    flag = SHA224_ENCRYPT;
 }
 
 void HAL_LSSHA_SHA224_Complete_Callback()
@@ -63,6 +77,7 @@ void HAL_LSSHA_SHA224_Complete_Callback()
     {
         LOG_I("SHA224_ENCRYPT_TEST_FAIL!");
     }
+    flag = SM3_ENCRYPT;
 }
 
 void HAL_LSSHA_SM3_Complete_Callback()
