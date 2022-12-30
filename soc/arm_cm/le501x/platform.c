@@ -177,7 +177,7 @@ static void mac_init()
 
 #if SDK_LSI_USED
 static void *lsi_counting_timer;
-static uint16_t lsi_cnt_val;
+static volatile uint16_t lsi_cnt_val;
 static bool lsi_counting_valid;
 
 __attribute__((weak)) void builtin_timer_start(void *timer,uint32_t timeout,void *param){}
@@ -450,6 +450,7 @@ void sys_init_none()
     LOG_INIT();
     rco_freq_counting_init();
     rco_freq_counting_start();
+    while (get_lsi_cnt_val() == 0);
     sw_timer_module_init();
 }
 
