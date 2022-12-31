@@ -209,6 +209,258 @@ enum ble_feature
 /// States byte 7
 #define BLE_STATES_BYTE7    0x0
 
+
+
+/******************************************************************************************/
+/* -----------------------   SUPPORTED HCI COMMANDS       --------------------------------*/
+/******************************************************************************************/
+/// BLE supported commands
+//byte0
+#define BLE_DISC_CMD                0x20
+//byte2
+#define BLE_RD_REM_VERS_CMD         0x80
+//byte5
+#define BLE_SET_EVT_MSK_CMD         0x40
+#define BLE_RESET_CMD               0x80
+//byte10
+#define BLE_RD_TX_PWR_CMD            0x04
+#define BLE_SET_CTRL_TO_HL_FCTRL_CMD 0x20
+#define BLE_HL_BUF_SIZE_CMD          0x40
+#define BLE_HL_NB_CMP_PKT_CMD        0x80
+//byte14
+#define BLE_RD_LOC_VERS_CMD         0x08
+#define BLE_RD_LOC_SUP_FEAT_CMD     0x20
+//byte15
+#define BLE_RD_BD_ADDR_CMD          0x02
+#define BLE_RD_RSSI_CMD             0x20
+//byte22
+#define BLE_SET_EVT_MSK_PG2_CMD     0x04
+//byte25
+#define BLE_LE_SET_EVT_MSK_CMD      0x01
+#define BLE_LE_RD_BUF_SIZE_CMD      0x02
+#define BLE_LE_RD_LOC_SUP_FEAT_CMD  0x04
+#define BLE_LE_SET_RAND_ADDR_CMD    0x10
+#define BLE_LE_SET_ADV_PARAM_CMD    0x20
+#define BLE_LE_RD_ADV_TX_PWR_CMD    0x40
+#define BLE_LE_SET_ADV_DATA_CMD     0x80
+//byte26
+#define BLE_LE_SET_SC_RSP_DATA_CMD  0x01
+#define BLE_LE_SET_ADV_EN_CMD       0x02
+#define BLE_LE_SET_SC_PARAM_CMD     0x04
+#define BLE_LE_SET_SC_EN_CMD        0x08
+#define BLE_LE_CREAT_CNX_CMD        0x10
+#define BLE_LE_CREAT_CNX_CNL_CMD    0x20
+#define BLE_LE_RD_WL_SIZE_CMD       0x40
+#define BLE_LE_CLEAR_WL_CMD         0x80
+//byte27
+#define BLE_LE_ADD_DEV_WL_CMD       0x01
+#define BLE_LE_REM_DEV_WL_CMD       0x02
+#define BLE_LE_CNX_UPDATE_CMD       0x04
+#define BLE_LE_SET_HL_CH_CLASS_CMD  0x08
+#define BLE_LE_RD_CH_MAP_CMD        0x10
+#define BLE_LE_RD_REM_FEAT_CMD      0x20
+#define BLE_LE_ENCRYPT_CMD          0x40
+#define BLE_LE_RAND_CMD             0x80
+//byte28
+#define BLE_LE_START_ENC_CMD        0x01
+#define BLE_LE_LTK_REQ_RPLY_CMD     0x02
+#define BLE_LE_LTK_REQ_NEG_RPLY_CMD 0x04
+#define BLE_LE_RD_SUPP_STATES_CMD   0x08
+#define BLE_LE_RX_TEST_V1_CMD       0x10
+#define BLE_LE_TX_TEST_V1_CMD       0x20
+#define BLE_LE_STOP_TEST_CMD        0x40
+
+//byte32
+#define BLE_RD_AUTH_PAYL_TO_CMD     0x10
+#define BLE_WR_AUTH_PAYL_TO_CMD     0x20
+
+
+//byte33
+#define BLE_LE_REM_CON_PARA_REQ_RPLY_CMD        0x10
+#define BLE_LE_REM_CON_PARA_REQ_NEG_RPLY_CMD    0x20
+#define BLE_LE_SET_DATA_LEN_CMD                 0x40
+#define BLE_LE_RD_SUGGTED_DFT_DATA_LEN_CMD      0x80
+
+//byte34
+#define BLE_LE_WR_SUGGTED_DFT_DATA_LEN_CMD      0x01
+#define BLE_LE_RD_LOC_P256_PUB_KEY_CMD          0x02
+#define BLE_LE_GEN_DHKEY_V1_CMD                 0x04
+#define BLE_LE_ADD_DEV_TO_RESOLV_LIST_CMD       0x08
+#define BLE_LE_REM_DEV_FROM_RESOLV_LIST_CMD     0x10
+#define BLE_LE_CLEAR_RESOLV_LIST_CMD            0x20
+#define BLE_LE_RD_RESOLV_LIST_SIZE_CMD          0x40
+#define BLE_LE_RD_PEER_RESOLV_ADDR_CMD          0x80
+
+//byte35
+#define BLE_LE_RD_LOCAL_RESOLV_ADDR_CMD         0x01
+#define BLE_LE_SET_ADDR_RESOL_CMD               0x02
+#define BLE_LE_SET_RESOLV_PRIV_ADDR_TO_CMD      0x04
+#define BLE_LE_RD_MAX_DATA_LEN_CMD              0x08
+#define BLE_LE_RD_PHY_CMD                       0x10
+#define BLE_LE_SET_DFT_PHY_CMD                  0x20
+#define BLE_LE_SET_PHY_CMD                      0x40
+#define BLE_LE_RX_TEST_V2_CMD                   0x80
+//byte36
+#define BLE_LE_TX_TEST_V2_CMD                   0x01
+#define BLE_LE_SET_ADV_SET_RAND_ADDR_CMD        0x02
+#define BLE_LE_SET_EXT_ADV_PARAM_CMD            0x04
+#define BLE_LE_SET_EXT_ADV_DATA_CMD             0x08
+#define BLE_LE_SET_EXT_SCAN_RSP_DATA_CMD        0x10
+#define BLE_LE_SET_EXT_ADV_EN_CMD               0x20
+#define BLE_LE_RD_MAX_ADV_DATA_LEN_CMD          0x40
+#define BLE_LE_RD_NB_SUPP_ADV_SETS_CMD          0x80
+//byte37
+#define BLE_LE_RMV_ADV_SET_CMD                  0x01
+#define BLE_LE_CLEAR_ADV_SETS_CMD               0x02
+#define BLE_LE_SET_PER_ADV_PARAM_CMD            0x04
+#define BLE_LE_SET_PER_ADV_DATA_CMD             0x08
+#define BLE_LE_SET_PER_ADV_EN_CMD               0x10
+#define BLE_LE_SET_EXT_SCAN_PARAM_CMD           0x20
+#define BLE_LE_SET_EXT_SCAN_EN_CMD              0x40
+#define BLE_LE_EXT_CREATE_CON_CMD               0x80
+//byte38
+#define BLE_LE_PER_ADV_CREATE_SYNC_CMD          0x01
+#define BLE_LE_PER_ADV_CREATE_SYNC_CANCEL_CMD   0x02
+#define BLE_LE_PER_ADV_TERM_SYNC_CMD            0x04
+#define BLE_LE_ADD_DEV_TO_PER_ADV_LIST_CMD      0x08
+#define BLE_LE_RMV_DEV_FROM_PER_ADV_LIST_CMD    0x10
+#define BLE_LE_CLEAR_PER_ADV_LIST_CMD           0x20
+#define BLE_LE_RD_PER_ADV_LIST_SIZE_CMD         0x40
+#define BLE_LE_RD_TX_PWR_CMD                    0x80
+//byte39
+#define BLE_LE_RD_RF_PATH_COMP_CMD              0x01
+#define BLE_LE_WR_RF_PATH_COMP_CMD              0x02
+#define BLE_LE_SET_PRIV_MODE_CMD                0x04
+#define BLE_LE_RX_TEST_V3_CMD                   0x08
+#define BLE_LE_TX_TEST_V3_CMD                   0x10
+#define BLE_LE_SET_CONLESS_CTE_TX_PARAM_CMD     0x20
+#define BLE_LE_SET_CONLESS_CTE_TX_EN_CMD        0x40
+#define BLE_LE_SET_CONLESS_IQ_SAMPL_EN_CMD      0x80
+//byte40
+#define BLE_LE_SET_CON_CTE_RX_PARAM_CMD         0x01
+#define BLE_LE_SET_CON_CTE_TX_PARAM_CMD         0x02
+#define BLE_LE_CON_CTE_REQ_EN_CMD               0x04
+#define BLE_LE_CON_CTE_RSP_EN_CMD               0x08
+#define BLE_LE_RD_ANTENNA_INF_CMD               0x10
+#define BLE_LE_SET_PER_ADV_RX_EN_CMD            0x20
+#define BLE_LE_PER_ADV_SYNC_TRANSF_CMD          0x40
+#define BLE_LE_PER_ADV_SET_INFO_TRANSF_CMD      0x80
+//byte41
+#define BLE_LE_SET_PER_ADV_SYNC_TRANSF_PARAM_CMD        0x01
+#define BLE_LE_SET_DFT_PER_ADV_SYNC_TRANSF_PARAM_CMD    0x02
+#define BLE_LE_GEN_DHKEY_V2_CMD                         0x04
+#define BLE_LE_MOD_SLP_CLK_ACC_CMD                      0x10
+
+//byte0
+#define BLE_CMDS_BYTE0      BLE_DISC_CMD
+//byte2
+#define BLE_CMDS_BYTE2      BLE_RD_REM_VERS_CMD
+//byte5
+#define BLE_CMDS_BYTE5      (BLE_SET_EVT_MSK_CMD | BLE_RESET_CMD)
+//byte10
+#define BLE_CMDS_BYTE10     (BLE_HL_NB_CMP_PKT_CMD | BLE_RD_TX_PWR_CMD\
+                            |BLE_HL_BUF_SIZE_CMD | BLE_SET_CTRL_TO_HL_FCTRL_CMD)
+//byte14
+#define BLE_CMDS_BYTE14     (BLE_RD_LOC_VERS_CMD | BLE_RD_LOC_SUP_FEAT_CMD)
+//byte15
+#define BLE_CMDS_BYTE15     (BLE_RD_BD_ADDR_CMD | BLE_RD_RSSI_CMD)
+//byte22
+#define BLE_CMDS_BYTE22     (BLE_SET_EVT_MSK_PG2_CMD)
+//byte25
+#define BLE_CMDS_BYTE25     (BLE_LE_SET_EVT_MSK_CMD | BLE_LE_RD_BUF_SIZE_CMD\
+                            |BLE_LE_RD_LOC_SUP_FEAT_CMD | BLE_LE_SET_RAND_ADDR_CMD\
+                            |BLE_LE_SET_ADV_PARAM_CMD | BLE_LE_RD_ADV_TX_PWR_CMD\
+                            |BLE_LE_SET_ADV_DATA_CMD)
+//byte26
+#define BLE_CMDS_BYTE26     (BLE_LE_SET_SC_RSP_DATA_CMD | BLE_LE_SET_ADV_EN_CMD\
+                            |BLE_LE_SET_SC_PARAM_CMD | BLE_LE_SET_SC_EN_CMD\
+                            |BLE_LE_CREAT_CNX_CMD | BLE_LE_CREAT_CNX_CNL_CMD\
+                            |BLE_LE_RD_WL_SIZE_CMD | BLE_LE_CLEAR_WL_CMD)
+//byte27
+#define BLE_CMDS_BYTE27     (BLE_LE_ADD_DEV_WL_CMD | BLE_LE_REM_DEV_WL_CMD\
+                            |BLE_LE_CNX_UPDATE_CMD | BLE_LE_SET_HL_CH_CLASS_CMD\
+                            |BLE_LE_RD_CH_MAP_CMD | BLE_LE_RD_REM_FEAT_CMD\
+                            |BLE_LE_ENCRYPT_CMD | BLE_LE_RAND_CMD)
+//byte28
+#define BLE_CMDS_BYTE28     (BLE_LE_START_ENC_CMD | BLE_LE_LTK_REQ_RPLY_CMD\
+                            |BLE_LE_LTK_REQ_NEG_RPLY_CMD | BLE_LE_RD_SUPP_STATES_CMD\
+                            |BLE_LE_RX_TEST_V1_CMD | BLE_LE_TX_TEST_V1_CMD\
+                            |BLE_LE_STOP_TEST_CMD)
+//byte32
+#define BLE_CMDS_BYTE32     (BLE_RD_AUTH_PAYL_TO_CMD | BLE_WR_AUTH_PAYL_TO_CMD)
+//byte33
+#define BLE_CMDS_BYTE33     (BLE_LE_REM_CON_PARA_REQ_RPLY_CMD | BLE_LE_REM_CON_PARA_REQ_NEG_RPLY_CMD\
+                            | BLE_LE_SET_DATA_LEN_CMD | BLE_LE_RD_SUGGTED_DFT_DATA_LEN_CMD)
+//byte34
+#define BLE_CMDS_BYTE34     (  BLE_LE_WR_SUGGTED_DFT_DATA_LEN_CMD   \
+                             | BLE_LE_RD_LOC_P256_PUB_KEY_CMD       \
+                             | BLE_LE_GEN_DHKEY_V1_CMD              \
+                             | BLE_LE_ADD_DEV_TO_RESOLV_LIST_CMD    \
+                             | BLE_LE_REM_DEV_FROM_RESOLV_LIST_CMD  \
+                             | BLE_LE_CLEAR_RESOLV_LIST_CMD         \
+                             | BLE_LE_RD_RESOLV_LIST_SIZE_CMD       \
+                             | BLE_LE_RD_PEER_RESOLV_ADDR_CMD        )
+//byte35
+#define BLE_CMDS_BYTE35     (  BLE_LE_RD_LOCAL_RESOLV_ADDR_CMD      \
+                             | BLE_LE_SET_ADDR_RESOL_CMD            \
+                             | BLE_LE_SET_RESOLV_PRIV_ADDR_TO_CMD   \
+                             | BLE_LE_RD_MAX_DATA_LEN_CMD           \
+                             | BLE_LE_RD_PHY_CMD                    \
+                             | BLE_LE_SET_DFT_PHY_CMD               \
+                             | BLE_LE_SET_PHY_CMD                   \
+                             | BLE_LE_RX_TEST_V2_CMD                 )
+//byte36
+#define BLE_CMDS_BYTE36     (  BLE_LE_TX_TEST_V2_CMD                \
+                             | BLE_LE_SET_ADV_SET_RAND_ADDR_CMD     \
+                             | BLE_LE_SET_EXT_ADV_PARAM_CMD         \
+                             | BLE_LE_SET_EXT_ADV_DATA_CMD          \
+                             | BLE_LE_SET_EXT_SCAN_RSP_DATA_CMD     \
+                             | BLE_LE_SET_EXT_ADV_EN_CMD            \
+                             | BLE_LE_RD_MAX_ADV_DATA_LEN_CMD       \
+                             | BLE_LE_RD_NB_SUPP_ADV_SETS_CMD        )
+//byte37
+#define BLE_CMDS_BYTE37     (  BLE_LE_RMV_ADV_SET_CMD               \
+                             | BLE_LE_CLEAR_ADV_SETS_CMD            \
+                             | BLE_LE_SET_PER_ADV_PARAM_CMD         \
+                             | BLE_LE_SET_PER_ADV_DATA_CMD          \
+                             | BLE_LE_SET_PER_ADV_EN_CMD            \
+                             | BLE_LE_SET_EXT_SCAN_PARAM_CMD        \
+                             | BLE_LE_SET_EXT_SCAN_EN_CMD           \
+                             | BLE_LE_EXT_CREATE_CON_CMD             )
+//byte38
+#define BLE_CMDS_BYTE38     (  BLE_LE_PER_ADV_CREATE_SYNC_CMD        \
+                             | BLE_LE_PER_ADV_CREATE_SYNC_CANCEL_CMD \
+                             | BLE_LE_PER_ADV_TERM_SYNC_CMD          \
+                             | BLE_LE_ADD_DEV_TO_PER_ADV_LIST_CMD    \
+                             | BLE_LE_RMV_DEV_FROM_PER_ADV_LIST_CMD  \
+                             | BLE_LE_CLEAR_PER_ADV_LIST_CMD         \
+                             | BLE_LE_RD_PER_ADV_LIST_SIZE_CMD       \
+                             | BLE_LE_RD_TX_PWR_CMD                   )
+//byte39
+#define BLE_CMDS_BYTE39     (  BLE_LE_RD_RF_PATH_COMP_CMD            \
+                             | BLE_LE_WR_RF_PATH_COMP_CMD            \
+                             | BLE_LE_SET_PRIV_MODE_CMD              \
+                             | BLE_LE_RX_TEST_V3_CMD                 \
+                             | BLE_LE_TX_TEST_V3_CMD                 \
+                             | BLE_LE_SET_CONLESS_CTE_TX_PARAM_CMD   \
+                             | BLE_LE_SET_CONLESS_CTE_TX_EN_CMD      \
+                             | BLE_LE_SET_CONLESS_IQ_SAMPL_EN_CMD     )
+//byte40
+#define BLE_CMDS_BYTE40     (  BLE_LE_SET_CON_CTE_RX_PARAM_CMD       \
+                             | BLE_LE_SET_CON_CTE_TX_PARAM_CMD       \
+                             | BLE_LE_CON_CTE_REQ_EN_CMD             \
+                             | BLE_LE_CON_CTE_RSP_EN_CMD             \
+                             | BLE_LE_RD_ANTENNA_INF_CMD             \
+                             | BLE_LE_SET_PER_ADV_RX_EN_CMD          \
+                             | BLE_LE_PER_ADV_SYNC_TRANSF_CMD        \
+                             | BLE_LE_PER_ADV_SET_INFO_TRANSF_CMD     )
+//byte41
+#define BLE_CMDS_BYTE41     (  BLE_LE_SET_PER_ADV_SYNC_TRANSF_PARAM_CMD        \
+                             | BLE_LE_SET_DFT_PER_ADV_SYNC_TRANSF_PARAM_CMD    \
+                             | BLE_LE_GEN_DHKEY_V2_CMD                         \
+                             | BLE_LE_MOD_SLP_CLK_ACC_CMD                       )
+
+
 struct aes_128_calc_env
 {
     struct co_list_hdr hdr;
@@ -226,6 +478,8 @@ void le_set_host_channel_classification(struct le_chnl_map *map);
 void get_le_supported_states(struct le_states *buf);
 
 void bt_set_evt_mask(const struct evt_mask *mask);
+
+void bt_get_local_supported_cmds(struct supp_cmds *buf);
 
 void le_set_rand_addr(struct bd_addr *addr);
 

@@ -9,6 +9,7 @@
 #define LE_FEATS_LEN 8
 #define LMP_FEATS_LEN 8
 #define LE_STATES_LEN 8
+#define SUPP_CMDS_LEN       0x40
 #define PRIV_KEY_256_LEN    32
 #define PUB_KEY_256_LEN     64
 #define EXT_ADV_DATA_MAX_LEN    229 // HCI:7.7.65.13
@@ -562,6 +563,12 @@ struct bd_addr
 {
     ///6-byte array address value
     uint8_t  addr[BLE_ADDR_LEN];
+}__attribute__((packed));
+
+struct supp_cmds
+{
+    ///64-byte array for supported commands
+    uint8_t cmds[SUPP_CMDS_LEN];
 }__attribute__((packed));
 
 struct hci_le_set_rand_addr_cmd
@@ -1568,6 +1575,14 @@ struct hci_rd_bd_addr_cmd_cmp_evt
     uint8_t             status;
     ///BD address
     struct bd_addr      local_addr;
+}__attribute__((packed));
+
+struct hci_rd_local_supp_cmds_cmd_cmp_evt
+{
+    /// Status of the command reception
+    uint8_t             status;
+    ///Supported Commands structure
+    struct supp_cmds    local_cmds;
 }__attribute__((packed));
 
 struct hci_rd_rssi_cmd_cmp_evt
