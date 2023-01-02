@@ -11,7 +11,7 @@
 #include "reg_syscfg.h"
 
 #define UART_BUFFER_SIZE (1024)
-#define VENDOT_EVENT_TIMER_TIMEOUT 100
+#define VENDOT_EVENT_TIMER_TIMEOUT 500
 #define VENDOT_EVENT_DATA_LEN      UART_BUFFER_SIZE
 #define DATA_LEN_LEN               4
 #define DEMO_UART 0
