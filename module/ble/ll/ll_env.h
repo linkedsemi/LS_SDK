@@ -358,14 +358,14 @@ enum ble_feature
 //byte5
 #define BLE_CMDS_BYTE5      (BLE_SET_EVT_MSK_CMD | BLE_RESET_CMD)
 //byte10
-#define BLE_CMDS_BYTE10     (BLE_HL_NB_CMP_PKT_CMD | BLE_RD_TX_PWR_CMD\
+#define BLE_CMDS_BYTE10     0//(BLE_HL_NB_CMP_PKT_CMD | BLE_RD_TX_PWR_CMD\
                             |BLE_HL_BUF_SIZE_CMD | BLE_SET_CTRL_TO_HL_FCTRL_CMD)
 //byte14
 #define BLE_CMDS_BYTE14     (BLE_RD_LOC_VERS_CMD | BLE_RD_LOC_SUP_FEAT_CMD)
 //byte15
 #define BLE_CMDS_BYTE15     (BLE_RD_BD_ADDR_CMD | BLE_RD_RSSI_CMD)
 //byte22
-#define BLE_CMDS_BYTE22     (BLE_SET_EVT_MSK_PG2_CMD)
+#define BLE_CMDS_BYTE22     0//(BLE_SET_EVT_MSK_PG2_CMD)
 //byte25
 #define BLE_CMDS_BYTE25     (BLE_LE_SET_EVT_MSK_CMD | BLE_LE_RD_BUF_SIZE_CMD\
                             |BLE_LE_RD_LOC_SUP_FEAT_CMD | BLE_LE_SET_RAND_ADDR_CMD\
@@ -387,12 +387,17 @@ enum ble_feature
                             |BLE_LE_RX_TEST_V1_CMD | BLE_LE_TX_TEST_V1_CMD\
                             |BLE_LE_STOP_TEST_CMD)
 //byte32
-#define BLE_CMDS_BYTE32     (BLE_RD_AUTH_PAYL_TO_CMD | BLE_WR_AUTH_PAYL_TO_CMD)
+#define BLE_CMDS_BYTE32     0//(BLE_RD_AUTH_PAYL_TO_CMD | BLE_WR_AUTH_PAYL_TO_CMD)
+
 //byte33
-#define BLE_CMDS_BYTE33     (BLE_LE_REM_CON_PARA_REQ_RPLY_CMD | BLE_LE_REM_CON_PARA_REQ_NEG_RPLY_CMD\
+#define BLE_CMDS_BYTE33     (BLE_LE_SET_DATA_LEN_CMD | BLE_LE_RD_SUGGTED_DFT_DATA_LEN_CMD) 
+                            //(BLE_LE_REM_CON_PARA_REQ_RPLY_CMD | BLE_LE_REM_CON_PARA_REQ_NEG_RPLY_CMD\
                             | BLE_LE_SET_DATA_LEN_CMD | BLE_LE_RD_SUGGTED_DFT_DATA_LEN_CMD)
 //byte34
 #define BLE_CMDS_BYTE34     (  BLE_LE_WR_SUGGTED_DFT_DATA_LEN_CMD   \
+                             | BLE_LE_RD_LOC_P256_PUB_KEY_CMD       \
+                             | BLE_LE_GEN_DHKEY_V1_CMD              )
+                            //(  BLE_LE_WR_SUGGTED_DFT_DATA_LEN_CMD   \
                              | BLE_LE_RD_LOC_P256_PUB_KEY_CMD       \
                              | BLE_LE_GEN_DHKEY_V1_CMD              \
                              | BLE_LE_ADD_DEV_TO_RESOLV_LIST_CMD    \
@@ -401,7 +406,12 @@ enum ble_feature
                              | BLE_LE_RD_RESOLV_LIST_SIZE_CMD       \
                              | BLE_LE_RD_PEER_RESOLV_ADDR_CMD        )
 //byte35
-#define BLE_CMDS_BYTE35     (  BLE_LE_RD_LOCAL_RESOLV_ADDR_CMD      \
+#define BLE_CMDS_BYTE35     (  BLE_LE_RD_MAX_DATA_LEN_CMD           \
+                             | BLE_LE_RD_PHY_CMD                    \
+                             | BLE_LE_SET_DFT_PHY_CMD               \
+                             | BLE_LE_SET_PHY_CMD                   \
+                             | BLE_LE_RX_TEST_V2_CMD                 )
+                            //(  BLE_LE_RD_LOCAL_RESOLV_ADDR_CMD      \
                              | BLE_LE_SET_ADDR_RESOL_CMD            \
                              | BLE_LE_SET_RESOLV_PRIV_ADDR_TO_CMD   \
                              | BLE_LE_RD_MAX_DATA_LEN_CMD           \
@@ -435,9 +445,11 @@ enum ble_feature
                              | BLE_LE_RMV_DEV_FROM_PER_ADV_LIST_CMD  \
                              | BLE_LE_CLEAR_PER_ADV_LIST_CMD         \
                              | BLE_LE_RD_PER_ADV_LIST_SIZE_CMD       \
-                             | BLE_LE_RD_TX_PWR_CMD                   )
+                             /*| BLE_LE_RD_TX_PWR_CMD*/                   )
 //byte39
-#define BLE_CMDS_BYTE39     (  BLE_LE_RD_RF_PATH_COMP_CMD            \
+#define BLE_CMDS_BYTE39      (  BLE_LE_RD_RF_PATH_COMP_CMD            \
+                              | BLE_LE_WR_RF_PATH_COMP_CMD            )
+                            //(  BLE_LE_RD_RF_PATH_COMP_CMD            \
                              | BLE_LE_WR_RF_PATH_COMP_CMD            \
                              | BLE_LE_SET_PRIV_MODE_CMD              \
                              | BLE_LE_RX_TEST_V3_CMD                 \
@@ -446,7 +458,7 @@ enum ble_feature
                              | BLE_LE_SET_CONLESS_CTE_TX_EN_CMD      \
                              | BLE_LE_SET_CONLESS_IQ_SAMPL_EN_CMD     )
 //byte40
-#define BLE_CMDS_BYTE40     (  BLE_LE_SET_CON_CTE_RX_PARAM_CMD       \
+#define BLE_CMDS_BYTE40     0//(  BLE_LE_SET_CON_CTE_RX_PARAM_CMD       \
                              | BLE_LE_SET_CON_CTE_TX_PARAM_CMD       \
                              | BLE_LE_CON_CTE_REQ_EN_CMD             \
                              | BLE_LE_CON_CTE_RSP_EN_CMD             \
@@ -455,7 +467,7 @@ enum ble_feature
                              | BLE_LE_PER_ADV_SYNC_TRANSF_CMD        \
                              | BLE_LE_PER_ADV_SET_INFO_TRANSF_CMD     )
 //byte41
-#define BLE_CMDS_BYTE41     (  BLE_LE_SET_PER_ADV_SYNC_TRANSF_PARAM_CMD        \
+#define BLE_CMDS_BYTE41     0//(  BLE_LE_SET_PER_ADV_SYNC_TRANSF_PARAM_CMD        \
                              | BLE_LE_SET_DFT_PER_ADV_SYNC_TRANSF_PARAM_CMD    \
                              | BLE_LE_GEN_DHKEY_V2_CMD                         \
                              | BLE_LE_MOD_SLP_CLK_ACC_CMD                       )
