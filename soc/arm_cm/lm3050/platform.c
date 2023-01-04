@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "platform.h"
 #include "lm3050.h"
+#include "sw_timer.h"
 #include "field_manipulate.h"
 #include "ls_soc_gpio.h"
 #include "ls_hal_flash.h"
@@ -106,6 +107,7 @@ void sys_init_none()
     io_init();
     low_power_init();
     systick_start();
+    sw_timer_module_init();
 }
 
 void platform_reset(uint32_t error)
