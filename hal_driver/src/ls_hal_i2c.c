@@ -157,9 +157,9 @@ static void I2C_speed_config_calc_slave(I2C_HandleTypeDef *hi2c)
     if (1 == speed_config.role)
     {
         /* Switch scll with sclh for slave. */
-        uint8_t scll = speed_config.sclh + 5;
-        speed_config.sclh = speed_config.scll - 5;
-        speed_config.scll = scll;
+        uint16_t half_sclk = ((uint16_t)speed_config.sclh + (uint16_t)speed_config.scll + 5) / 2;
+        speed_config.sclh = (uint8_t)half_sclk - 5;
+        speed_config.scll = (uint8_t)half_sclk;
         speed_config.role = 2;
         __HAL_I2C_DISABLE(hi2c);
         MODIFY_REG(hi2c->Instance->TIMINGR, (I2C_TIMINGR_SCLH_MASK | I2C_TIMINGR_SCLL_MASK), 
