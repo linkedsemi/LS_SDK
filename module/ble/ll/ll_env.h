@@ -491,6 +491,8 @@ void get_le_supported_states(struct le_states *buf);
 
 void bt_set_evt_mask(const struct evt_mask *mask);
 
+void bt_set_evt_mask_page_2(const struct evt_mask *mask);
+
 void bt_get_local_supported_cmds(struct supp_cmds *buf);
 
 void le_set_rand_addr(struct bd_addr *addr);
