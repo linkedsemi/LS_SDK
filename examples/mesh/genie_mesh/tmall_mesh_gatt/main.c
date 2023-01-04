@@ -6,7 +6,9 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "spi_flash.h"
+#include "cpu.h"
+#include "ls_hal_flash.h"
+#include "co_math.h"
 #include "tinyfs.h"
 #include "tinycrypt/sha256.h"
 #include "tinycrypt/constants.h"
@@ -17,9 +19,11 @@
 #include "tmall_light_cfg.h"
 #include "tmall_ais_cfg.h"
 #include "builtin_timer.h"
+#include "../genie_ota/tmall_genie_ais.h"
+#include "../genie_ota/genie_triple.h"
+#include "prf_fotas.h"
+#include "cpu.h"
 
-static struct builtin_timer *tmall_gatt_timer_inst = NULL;
-static void ls_tmall_gatt_timer_cb(void *param);
 #define TMALL_GATT_TIMEOUT 5000
 #define ALI_COMPANY_ID 0x01a8
 #define COMPA_DATA_PAGES 1
@@ -35,6 +39,8 @@ static void ls_tmall_gatt_timer_cb(void *param);
 #define TMALL_GATT_SRC_ADDR_INVALID (0xffff)
 #define UPADTE_TMALL_GATT_SRC_ADDR_TYPE  (0xff)
 #define TMALL_GATT_MESH_MODEL_INDEX_INVALID  (0xff)
+#define PROXY_CON_INTERVAL_MS 1000  //100ms
+#define GATT_CON_INTERVAL_SLOT  160 //160*625us=100ms
 
 
 bool sent_adv_ready=true;
@@ -42,20 +48,22 @@ bool sent_adv_ready=true;
 uint8_t vendor_tid = 0;
 #define RECORD_KEY1 1
 #define RECORD_KEY2 2
+#define RECORD_PRJ_FW_VERSION 3
+#define CON_IDX_INVALID_VAL 0xff
 
 tinyfs_dir_t mesh_dir;
 struct mesh_model_info model_env;
 static uint8_t gatt_mesh_model_indx=TMALL_GATT_MESH_MODEL_INDEX_INVALID;
 static uint16_t gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
 
-SIGMESH_NodeInfo_TypeDef Node_Get_Proved_State = 0;
-SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
+SIGMESH_NodeInfo_TypeDef Node_Get_Proved_State = UNPROVISIONED_KO;
+SIGMESH_NodeInfo_TypeDef Node_Proved_State = MESH_PROV_STARTED;
 SIGMESH_NodeInfo_TypeDef Node_Beacon_State = 0;
 
 static uint8_t ali_pid[TRIPLE_PID_LEN] = {0};
-uint32_t ali_pid_u32 = 12449;
-uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x28,0xfa,0x7a,0x3a,0xfe,0xd7};
-uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xe3,0x89,0x92,0x38,0xfa,0xbe,0x3c,0xef,0x10,0x12,0x8d,0x18,0xb1,0x47,0xb4,0xe9};
+uint32_t ali_pid_u32 = 10425386;
+uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x3c,0x5d,0x29,0x64,0x09,0xf1};
+uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0x91,0x4a,0x8a,0x15,0x4c,0xd4,0xbd,0xab,0xd2,0xec,0x23,0xae,0xbc,0x49,0x99,0x2b};
 static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0};
 
 uint8_t rsp_data_info[40] = {0};
@@ -63,9 +71,14 @@ uint8_t tmall_ModelHandle = 0;
 
 static uint16_t provisioner_unicast_addr;
 void create_adv_obj(void);
-
+#define AIS_REBOOT_FLG 0xB8A9CADB
+#define INVAILD_FW_VERSION 0xFFFFFFFF
+#define DEFAULT_FW_VERSION 0x00010000
+uint32_t ais_prj_fw_verion=INVAILD_FW_VERSION;
 static struct gatt_svc_env tmall_aiots_svc_env;
-static uint8_t connect_id = 0xff; 
+static uint8_t connect_id = CON_IDX_INVALID_VAL; 
+uint32_t ais_reboot_req_flag= 0;
+uint8_t reboot_3s_dly=0;
 
 uint8_t adv_obj_hdl;
 uint8_t advertising_data[28];
@@ -80,12 +93,23 @@ static uint8_t scan_response_data[31];
 
 #define TMALL_AIOTS_STR_BLE_KEY_INPUT_LENGTH (((TMALL_AIOTS_SECRET_SIZE<<1)+1)+((TMALL_AIOTS_PID_SIZE<<1)+1)+((TMALL_AIOTS_MAC_SIZE<<1)+1)+(TMALL_AIOTS_STR_RANDOM_SIZE+1))  //4=3(",")+1("\0")
 
-#define TMALL_AIOTS_SVC_MAX_MTU  247
+#define TMALL_AIOTS_SVC_MAX_MTU  300
 #define TMALL_AIOTS_SVC_MTU_DFT  23
 #define TMALL_AIOTS_SVC_MAX_DATA_LEN (TMALL_AIOTS_SVC_MAX_MTU - 3)
 #define TMALL_AIOTS_SVC_RX_MAX_LEN (TMALL_AIOTS_SVC_MAX_MTU - 3)
 #define TMALL_AIOTS_TX_MAX_LEN (TMALL_AIOTS_SVC_MAX_MTU - 3)
-
+#define AIS_SVC_BUFFER_SIZE (1024)
+#define AIS_SERVER_TIMEOUT 50
+static struct builtin_timer *ls_genie_ais_timer_inst = NULL;
+static uint8_t ais_server_buf[AIS_SVC_BUFFER_SIZE];
+static uint16_t ais_server_rx_index = 0;
+static bool ais_server_ntf_done = false;
+static uint16_t transaction_id = 0;
+static struct builtin_timer *tmall_gatt_timer_inst = NULL;
+static void ls_tmall_gatt_timer_cb(void *param);
+static void ls_genie_ais_timer_init(void);
+static void ls_genie_ais_timer_cb(void *param);
+static void genie_ais_server_send_notification(void);
 /*
 *   Primary Service
 */
@@ -122,18 +146,21 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0, 
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_READ_VAL] = {
         .uuid = tmall_aiots_read_char_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_VAL] = {
@@ -141,12 +168,14 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.wr_req = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_IND_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_IND_VAL] = {
@@ -154,32 +183,38 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.ind_en = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_IND_CCC] = {
         .uuid = att_client_char_cfg_uuid,
         .s.max_len = 0,
+        .char_prop.ind_en =1,
         .char_prop.wr_req = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_CMD_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_WRITE_CMD_VAL] = {
         .uuid = tmall_aiots_write_cmd_char_uuid,
-        .s.max_len = 0,
+        .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.wr_cmd = 1,
         .char_prop.rd_en  = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_NTF_CHAR] = {
         .uuid = att_decl_char_array_uuid,
         .s.max_len = 0,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_NTF_VAL] = {
@@ -187,13 +222,16 @@ static const struct att_decl tmall_aiots_att_decl[TMALL_AIOTS_ATT_NUM] =
         .s.max_len = TMALL_AIOTS_SVC_MAX_DATA_LEN,
         .char_prop.ntf_en = 1,
         .char_prop.rd_en  = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
     [TMALL_AIOTS_NTF_CCC] = {
         .uuid = att_client_char_cfg_uuid,
         .s.max_len = 0,
         .char_prop.wr_req = 1,
+        .char_prop.ntf_en = 1,
         .char_prop.rd_en = 1,
+        .s.read_indication = 1,
         .s.uuid_len = UUID_LEN_16BIT,
     },
 };
@@ -255,7 +293,7 @@ static uint8_t gen_ali_authValue(void)
     uint8_t tmp_arry[ALI_AUTH_VALUE_LEN] = {0};
 
     uint8_t ali_trituple[ALI_TRIPLE_SUM_LEN] = {0};
-    spi_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
+    hal_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
     if ((ali_trituple[0] != 0xff) && (ali_trituple[1] != 0xff) && (ali_trituple[2] != 0xff))
     {
         ali_pid_u32 = (((uint32_t)ali_trituple[0]) << 24) | (((uint32_t)ali_trituple[1]) << 16) | (((uint32_t)ali_trituple[2]) << 8) | (((uint32_t)ali_trituple[3]));
@@ -293,11 +331,21 @@ static uint8_t gen_ali_authValue(void)
     return (1);
 }
 
+
+void ls_sig_mesh_set_proxy_con_interval(uint16_t *interval_ms)
+{
+    *interval_ms = PROXY_CON_INTERVAL_MS;
+}
+
+ void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot)  /**< 1slot=625us */
+ {
+    *interval_slot = GATT_CON_INTERVAL_SLOT;
+ }
+
 void auto_check_unbind(void)
 {
     uint16_t length = 1;
     uint8_t coutinu_power_up_num = 0;
-    tinyfs_mkdir(&mesh_dir, ROOT_DIR, 5);
     tinyfs_read(mesh_dir, RECORD_KEY1, &coutinu_power_up_num, &length);
     LOG_I("coutinu_power_up_num:%d", coutinu_power_up_num);
 
@@ -404,6 +452,93 @@ void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp
         *scan_rsp_data_len = tmp_scnrsp_data_len;
 }  
 
+void ls_genie_ais_fw_version_init(void)
+{
+    uint16_t length=4;
+    tinyfs_read(mesh_dir, RECORD_PRJ_FW_VERSION, (uint8_t *)&ais_prj_fw_verion, &length);
+    if (ais_prj_fw_verion !=DEFAULT_FW_VERSION)
+    {
+        ais_prj_fw_verion = DEFAULT_FW_VERSION;
+        tinyfs_write(mesh_dir, RECORD_PRJ_FW_VERSION, (uint8_t *)&ais_prj_fw_verion, sizeof(ais_prj_fw_verion));
+        tinyfs_write_through();
+    }
+}
+
+uint32_t ls_genie_ais_fw_version_get(void)
+{
+    uint16_t length=4;
+    tinyfs_read(mesh_dir, RECORD_PRJ_FW_VERSION, (uint8_t *)&ais_prj_fw_verion, &length);
+    return ais_prj_fw_verion;
+}
+
+void ls_genie_ais_timer_init(void)
+{
+    ls_genie_ais_timer_inst = builtin_timer_create(ls_genie_ais_timer_cb);
+    builtin_timer_start(ls_genie_ais_timer_inst, AIS_SERVER_TIMEOUT, NULL); 
+}
+
+static void ls_genie_ais_timer_cb(void *param)
+{
+     if(connect_id != 0xff)
+     {
+        uint32_t cpu_stat = enter_critical();
+        genie_ais_server_send_notification();
+        exit_critical(cpu_stat);
+    }
+
+    if (ais_reboot_req_flag ==AIS_REBOOT_FLG)
+    {
+        reboot_3s_dly++;
+        if (reboot_3s_dly >60) //50*60=3000ms
+        {
+            platform_reset(RESET_OTA_SUCCEED);
+        }
+    }
+    if(ls_genie_ais_timer_inst)
+    {
+      builtin_timer_start(ls_genie_ais_timer_inst, AIS_SERVER_TIMEOUT, NULL); 
+    }
+}
+
+int genie_ais_gatt_indicate( void *data, uint16_t len)
+{
+     uint16_t handle = gatt_manager_get_svc_att_handle(&tmall_aiots_svc_env, TMALL_AIOTS_IND_VAL);
+    gatt_manager_server_send_indication(connect_id,handle,data,len,&transaction_id);
+    transaction_id++;
+	return 0;
+}
+
+int genie_ais_gatt_notify_message(void *data, uint16_t len)
+{
+    if(ais_server_rx_index < AIS_SVC_BUFFER_SIZE)
+    {
+        memcpy(&ais_server_buf[ais_server_rx_index],(uint8_t *)data,len);
+        ais_server_rx_index += len;
+    }
+    else
+    {   
+        LOG_I("ais server rx buffer overflow!");
+    }
+    return 0;
+}
+
+static void genie_ais_server_send_notification(void)
+{
+    if(ais_server_rx_index > 0 && ais_server_ntf_done)
+    {
+       ais_server_ntf_done =false;
+       uint16_t handle = gatt_manager_get_svc_att_handle(&tmall_aiots_svc_env, TMALL_AIOTS_NTF_VAL);
+       uint16_t tx_len = ais_server_rx_index > co_min(TMALL_AIOTS_SVC_MAX_DATA_LEN, TMALL_AIOTS_TX_MAX_LEN) ? co_min(TMALL_AIOTS_SVC_MAX_DATA_LEN, TMALL_AIOTS_TX_MAX_LEN) : ais_server_rx_index;
+       ais_server_rx_index -= tx_len;
+       gatt_manager_server_send_notification(connect_id, handle, ais_server_buf, tx_len, NULL);
+       memcpy((void*)&ais_server_buf[0], (void*)&ais_server_buf[tx_len], ais_server_rx_index);
+    }    
+}
+
+void genie_ais_gap_disconnect(uint8_t reason)
+{
+    gap_manager_disconnect(connect_id,0x13);
+}
 
 static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx)
 {
@@ -412,11 +547,15 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
     case CONNECTED:
          connect_id = con_idx;
         LOG_I("connected!");
+        genie_ais_connect();
+        ais_server_ntf_done =true;
         break;
     case DISCONNECTED:
          LOG_I("DISCONNECTED!");
          LOG_I("disconnect_reason=%x",evt->disconnected.reason);
           gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
+          ais_server_ntf_done = false;
+          genie_ais_disconnect(evt->disconnected.reason);
         break;
     case CONN_PARAM_REQ:
          LOG_I("PARAM_REQ!");
@@ -440,8 +579,10 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     break;
     case SERVER_WRITE_REQ:
         LOG_I("SERVER_WRITE_REQ!");  
+         ais_server_write_req_handle((void *)evt->server_write_req.value, evt->server_write_req.length);  
     break;
     case SERVER_NOTIFICATION_DONE:
+        ais_server_ntf_done =true;
         LOG_I("SERVER_NOTIFICATION_DONE!");
     break;
     case MTU_CHANGED_INDICATION:
@@ -470,7 +611,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     switch (type)
     {
     case MESH_ACTIVE_ENABLE:
-    {       
+    {   
         gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
         TIMER_Set(2, 3000); //clear power up num
     }
@@ -490,11 +631,10 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         }
         model_env.app_key_lid = evt->sig_mdl_info.app_key_lid;
 
-        model_subscribe(model_env.info[0].model_lid, 0xC000); //group address 0xc000
-        model_subscribe(model_env.info[1].model_lid, 0xC000); //group address 0xc000
-        model_subscribe(model_env.info[2].model_lid, 0xC000); //group address 0xc000
-        model_subscribe(model_env.info[3].model_lid, 0xC000); //group address 0xc000
-        model_subscribe(model_env.info[4].model_lid, 0xC000); //group address 0xc000
+        model_subscribe(model_env.info[0].model_lid, 0xCFFF); //all group address 0xcfff
+        model_subscribe(model_env.info[1].model_lid, 0xCFFF); //all group address 0xcfff
+        model_subscribe(model_env.info[2].model_lid, 0xCFFF); //group address 0xcfff
+    
     }
     break;
     case MESH_ACTIVE_MODEL_GROUP_MEMBERS:
@@ -597,18 +737,10 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         {
             tmall_mesh_recv_vendor_msg(&evt->rx_msg);
         }
-        else if(evt->rx_msg.ModelHandle == model_env.info[2].model_lid)
+        else if (evt->rx_msg.ModelHandle == model_env.info[2].model_lid)
         {
-            tmall_mesh_recv_lightness_msg(&evt->rx_msg);
-        }
-        else if(evt->rx_msg.ModelHandle == model_env.info[3].model_lid)
-        {
-            tmall_mesh_recv_light_ctl_msg(&evt->rx_msg);
-        }
-        else if(evt->rx_msg.ModelHandle == model_env.info[4].model_lid)
-        {
-            tmall_mesh_recv_light_hsl_msg(&evt->rx_msg);
-        }    
+             tmall_mesh_recv_scene_msg(&evt->rx_msg);
+        }     
     }
     break;
     case MESH_REPORT_TIMER_STATE:
@@ -643,6 +775,20 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     }
 }
 
+static void ls_sig_mesh_add_profile(void)
+{
+    struct ls_sig_mesh_cfg feature = {
+            .MeshFeatures = EN_RELAY_NODE | EN_MSG_API | EN_PB_GATT | EN_PROXY_NODE,
+            .MeshCompanyID = ALI_COMPANY_ID,
+            .MeshProID = 0,
+            .MeshProVerID = 0,
+            .MeshLocDesc = 0,
+            .NbAddrReplay  = MAX_NB_ADDR_REPLAY,
+            .NbCompDataPage = COMPA_DATA_PAGES,
+        };
+
+        dev_manager_prf_ls_sig_mesh_add(NO_SEC, &feature);
+}
 
 static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 {
@@ -665,47 +811,36 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         uint8_t addr[6];
         bool type;
         dev_manager_get_identity_bdaddr(addr, &type);
-        dev_manager_add_service((struct svc_decl *)&tmall_aiots_server_svc); 
+        ls_genie_ais_timer_init();
+        dev_manager_add_service((struct svc_decl *)&tmall_aiots_server_svc);
     }
     break;
 
     case SERVICE_ADDED:
     {
         gatt_manager_svc_register(evt->service_added.start_hdl, TMALL_AIOTS_ATT_NUM, &tmall_aiots_svc_env);
-        
-        struct ls_sig_mesh_cfg feature = {
-            .MeshFeatures = EN_RELAY_NODE | EN_MSG_API | EN_PB_GATT | EN_PROXY_NODE,
-            .MeshCompanyID = ALI_COMPANY_ID,
-            .MeshProID = 0,
-            .MeshProVerID = 0,
-            .MeshLocDesc = 0,
-            .NbAddrReplay  = MAX_NB_ADDR_REPLAY,
-            .NbCompDataPage = COMPA_DATA_PAGES,
-        };
-
-        dev_manager_prf_ls_sig_mesh_add(NO_SEC, &feature);
+       ls_sig_mesh_add_profile();
     }
     break;
     case PROFILE_ADDED:
-    {
-        
-        prf_ls_sig_mesh_callback_init(mesh_manager_callback);
+    {         
+         if (evt->profile_added.id == PRF_MESH)
+         {
+           prf_ls_sig_mesh_callback_init(mesh_manager_callback);
 
-        model_env.nb_model = 5;
-        model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
-        model_env.info[0].element_id = 0;
-        model_env.info[1].model_id = VENDOR_TMALL_SERVER;
-        model_env.info[1].element_id = 0;
-        model_env.info[2].model_id = LIGHTNESS_SERVER;
-        model_env.info[2].element_id = 0;
-        model_env.info[3].model_id = LIGHTS_CTL_SERVER;
-        model_env.info[3].element_id = 0;
-        model_env.info[4].model_id = LIGHTS_HSL_SERVER;
-        model_env.info[4].element_id = 0;
-        ls_sig_mesh_init(&model_env);
+           model_env.nb_model = 3;
+           model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
+           model_env.info[0].element_id = 0;
+           model_env.info[1].model_id = VENDOR_TMALL_SERVER;
+           model_env.info[1].element_id = 0;
+           model_env.info[2].model_id = SCENE_SERVER;
+           model_env.info[2].element_id = 0;
+           ls_sig_mesh_init(&model_env);
+           break;
+         }
         
     }
-    break;
+
     default:
         break;
     }
@@ -714,11 +849,14 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tmall_light_init();
-    //exti_gpio_init();
     gen_ali_authValue();
+    genie_triple_init();
+    tinyfs_mkdir(&mesh_dir, ROOT_DIR, 5);
     ble_init();
     auto_check_unbind();
+    ls_genie_ais_fw_version_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);

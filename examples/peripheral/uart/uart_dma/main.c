@@ -1,10 +1,14 @@
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
-#include "lsdmac.h"
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#else
+#include "ls_hal_dmac.h"
+#endif
 
 #define BUF_SIZE 256
 #define DMA_UART
@@ -53,7 +57,7 @@ static void uart_init(void)
 int main()
 {
     sys_init_none();
-    uart1_io_init(PB00,PB01);
+    pinmux_uart1_init(PB00,PB01);
     io_pull_write(PB01, IO_PULL_UP);
     uart_init();
     uart_dma_channel_init();

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "main.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 
 enum
 {
@@ -32,6 +32,6 @@ void at_clr_uart_buff(void);
 void uart_write(uint8_t *value, uint16_t length);
 void uart_tx_it(uint8_t *value, uint16_t length);
 
-void wkup_io_init(void);
+void wkup_io_setup(void);
 
 #endif //_APP_AT_H

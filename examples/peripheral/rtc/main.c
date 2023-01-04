@@ -1,11 +1,11 @@
 #define LOG_TAG "RTC_DEMO"
-#include "lsrtc.h"
+#include "ls_hal_rtc.h"
 #include "le501x.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include "sleep.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "reg_syscfg.h"
 #include "log.h"
 
@@ -82,7 +82,7 @@ int main(void)
     {
         if (sleep_flag)
         {
-            deep_sleep_no_ble();
+            low_power_mode_sched();
         }
     }
 }

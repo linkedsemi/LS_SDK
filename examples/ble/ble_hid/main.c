@@ -6,14 +6,15 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
 #include "tinyfs.h"
 #include "main.h"
+#include "rssi_smoothing_algo.h"
 
 #define LS_HID_ADV_NAME "LS HID"
 #define APP_HID_DEV_NAME (LS_HID_ADV_NAME)
@@ -355,7 +356,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
     }break;
     case PRF_BASS:
     {
-        struct hid_db_cfg db_cfg;   
+        struct hid_db_cfg db_cfg = {0};   
         db_cfg.hids_nb = 1;
         db_cfg.cfg[0].svc_features = HID_KEYBOARD;
         db_cfg.cfg[0].report_nb = 1;
@@ -370,6 +371,14 @@ static void prf_added_handler(struct profile_added_evt *evt)
     default:
         break;
     }
+}
+
+static bool hid_con_rssi_judge(int8_t con_rssi, const uint8_t *init_addr, uint8_t init_addr_type)
+{
+    LOG_I("con_rssi: %d, addr_type: %d", con_rssi, init_addr_type);
+    LOG_HEX(init_addr, BLE_ADDR_LEN);
+    // only accept con_req whose rssi is bigger than -70
+    return con_rssi > -70 ? true : false;
 }
 
 static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
@@ -392,6 +401,8 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_get_identity_bdaddr(addr, &type);
         LOG_I("type:%d,addr:", type);
         LOG_HEX(addr, sizeof(addr));
+
+        con_rssi_thld_init(hid_con_rssi_judge);
         
         dev_manager_add_service((struct svc_decl *)&dis_server_svc);
         uptate_batt_timer_init();
@@ -431,22 +442,22 @@ void gpio_exit_init(void)
 {
     io_cfg_input(PA00);
     io_exti_config(PA00,INT_EDGE_RISING);
-    io_exti_enable(PA00,true);
+    
 
     io_cfg_input(PA07);
     io_exti_config(PA07,INT_EDGE_RISING);
-    io_exti_enable(PA07,true);
+    
 
     io_cfg_input(PB11);
     io_exti_config(PB11,INT_EDGE_RISING);
-    io_exti_enable(PB11,true);
+    
 
     io_cfg_input(PB15);
     io_exti_config(PB15,INT_EDGE_RISING);
-    io_exti_enable(PB15,true);
+    
 }
 
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch(pin)
     {

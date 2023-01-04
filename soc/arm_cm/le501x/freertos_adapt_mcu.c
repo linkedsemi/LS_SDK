@@ -11,7 +11,7 @@
 #include "ls_sys.h"
 #include "cpu.h"
 #include "ls_24g_common_freertos.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 #define LS_24G_VERSION_ADDR 0x50000004
 
@@ -271,8 +271,6 @@ static volatile uint32_t int_stat = 0;
 __attribute((weak)) void ls_24g_restore_in_wkup(void){}
 static void WKUP_Handler_For_mcu(void)
 {
-    ble_hclk_set();
-    clr_ble_wkup_req();
     while(*(volatile uint32_t*)LS_24G_VERSION_ADDR == 0);
     CNTL = 0x100;
     // INT_MASK = 0x2;
@@ -290,7 +288,7 @@ void clr_mcu_wkup_status(void)
 {
     wakeup_status = 0;
 }
-__attribute((weak)) XIP_BANNED void PROP_24g_Handler(uint32_t int_stat_24g){}
+__attribute((weak)) void XIP_BANNED_FUNC(PROP_24g_Handler,uint32_t int_stat_24g){}
 static void Mac_Handler_For_mcu()
 {
     static uint32_t error = 0;

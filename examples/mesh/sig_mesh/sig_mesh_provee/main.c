@@ -6,7 +6,7 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tinyfs.h"
 #include "tinycrypt/sha256.h"
 #include "tinycrypt/constants.h"
@@ -45,7 +45,7 @@ static uint8_t vendor_model_tid = 0;
 static uint16_t provisioner_unicast_addr;
 static uint8_t adv_obj_hdl;
 static bool mesh_node_prov_state = false;
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx, uint16_t model_cfg_idx);
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx);
 void app_generic_onoff_status_report(uint8_t onoff);
 
 void auto_check_unbind(void)
@@ -96,7 +96,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     
 }
 
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx, uint16_t model_cfg_idx)
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx)
 {
     struct model_cli_trans_info param;
     model_tid++;
@@ -447,6 +447,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
     ls_mesh_pwm_init();
     light_button_init();

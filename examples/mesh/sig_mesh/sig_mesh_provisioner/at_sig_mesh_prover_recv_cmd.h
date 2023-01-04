@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 
 enum
 {

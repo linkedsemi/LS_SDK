@@ -23,12 +23,12 @@
  */
 #include <stdbool.h> 
 #include "FlashOS.h"        // FlashOS Structures
-#include "spi_flash.h"
-#include "lsqspi_msp.h"
+#include "ls_hal_flash.h"
+#include "reg_base_addr.h"
 #include "cpu.h"
 #include "platform.h"
-#include "io_config.h"
-#include "platform.h"
+#include "ls_soc_gpio.h"
+
 /* 
    Mandatory Flash Programming Functions (Called by FlashOS):
                 int Init        (unsigned long adr,   // Initialize Flash
@@ -54,7 +54,7 @@
        - if EraseChip is not provided than EraseSector for all sectors is called
 */
 
-
+uint32_t PRGDATA_StartMarker;
 /*
  *  Initialize Flash Programming Functions
  *    Parameter:      adr:  Device Base Address
@@ -62,19 +62,32 @@
  *                    fnc:  Function Code (1 - Erase, 2 - Program, 3 - Verify)
  *    Return Value:   0 - OK,  1 - Failed
  */
+#ifdef LM3050
+static void io_pull_up_cfg()
+{
+    io_pull_write(PD14,IO_PULL_UP);
+    io_pull_write(PD15,IO_PULL_UP);
+}
+__attribute__((long_call)) void pinmux_hal_flash_quad_init(void);
+#else
+static void io_pull_up_cfg(){}
+#endif
 
 int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     disable_global_irq();
-    clk_switch();
-    qspi_flash_io_init();
-    spi_flash_drv_var_init(false,false);
-    spi_flash_init();
-    spi_flash_software_reset();
+    //clk_switch();
+    io_pull_up_cfg();
+    pinmux_hal_flash_quad_init();
+    hal_flash_drv_var_init(false,false);
+    hal_flash_dual_mode_set(false);
+    hal_flash_init();
+    hal_flash_xip_mode_reset();
+    hal_flash_software_reset();
     DELAY_US(500);
-    spi_flash_release_from_deep_power_down();
+    hal_flash_release_from_deep_power_down();
     DELAY_US(100);
-    spi_flash_qe_status_read_and_set();
-    spi_flash_xip_start();
+    hal_flash_qe_status_read_and_set();
+    hal_flash_xip_start();
     return (0);                                  // Finished without Errors
 }
 
@@ -87,7 +100,7 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
 
 int UnInit (unsigned long fnc) {
     disable_global_irq();
-    spi_flash_xip_stop();
+    hal_flash_xip_stop();
     return (0);                                  // Finished without Errors
 }
 
@@ -99,7 +112,7 @@ int UnInit (unsigned long fnc) {
 
 int EraseChip (void) {
     disable_global_irq();
-    spi_flash_chip_erase();
+    hal_flash_chip_erase();
     return (0);                                  // Finished without Errors
 }
 
@@ -112,7 +125,7 @@ int EraseChip (void) {
 
 int EraseSector (unsigned long adr) {
     disable_global_irq();
-    spi_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
+    hal_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
     return (0);                                  // Finished without Errors
 }
 
@@ -127,6 +140,6 @@ int EraseSector (unsigned long adr) {
 
 int ProgramPage (unsigned long adr, unsigned long sz, unsigned char *buf) {
     disable_global_irq();
-    spi_flash_quad_page_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz);
+    hal_flash_page_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz);
     return (0);                                  // Finished without Errors
 }

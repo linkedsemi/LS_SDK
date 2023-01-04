@@ -1,4 +1,4 @@
-#include "sw_timer_port.h"
+#include "sw_timer_int.h"
 #include "common.h"
 #include "cpu.h"
 #include "compile_flag.h"
@@ -116,7 +116,7 @@ ROM_SYMBOL struct sw_timer_env *sw_timer_list_pick()
 
 ROM_SYMBOL void sw_timer_module_init(void)
 {
-    timer_isr_func_set(sw_timer_isr);
+    timer_setup(sw_timer_isr);
 }
 
 ROM_SYMBOL void sw_timer_module_reset(void)

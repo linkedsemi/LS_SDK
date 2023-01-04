@@ -5,9 +5,9 @@
 #include "sleep.h"
 #include "sw_timer.h"
 #include "sys_stat.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "ls_dbg.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "ls_24g_common.h"
 #include "ls_24g.h"
 #include "app_user_24g.h"
@@ -81,7 +81,7 @@ _ISR static void app_user_24g_rx_cb(void *param)
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -93,7 +93,7 @@ static void ls_uart_init(void)
 }
 static void ls_uart_deinit(void)
 {
-    uart1_io_deinit();
+    pinmux_uart1_deinit();
     HAL_UART_DeInit(&UART_Config);
 }
 static void ls_uart_recv_restart(void)
@@ -159,7 +159,7 @@ static void app_user_24g_peri_init(void)
     io_pull_write(USER_TEST_IO, IO_PULL_UP);
     io_cfg_input(USER_TEST_IO);
     io_exti_config(USER_TEST_IO,INT_EDGE_FALLING);
-    io_exti_enable(USER_TEST_IO,true);
+    
 
     io_cfg_output(PA00);
     ls_uart_init();
@@ -179,12 +179,12 @@ static void app_user_24g_peri_deinit(void)
     ls_uart_deinit();
 }
 
-void io_exti_callback(uint8_t pin) 
+void io_exti_callback(uint8_t pin,exti_edge_t edge) 
 {
     switch (pin)
     {
     case USER_TEST_IO:
-        io_exti_enable(USER_TEST_IO,false);
+        io_exti_config(USER_TEST_IO,INT_EDGE_DISABLE);
         NVIC_DisableIRQ(EXTI_IRQn);
         sw_timer_start(&io_filter_timer);
         break;
@@ -225,7 +225,7 @@ static bool timer_cb(void *param)
                 timer_continue = false;
                 io_pull_write(USER_TEST_IO, IO_PULL_UP);
                 io_exti_config(USER_TEST_IO,INT_EDGE_FALLING);
-                io_exti_enable(USER_TEST_IO,true);
+                
                 NVIC_EnableIRQ(EXTI_IRQn);
                 gpio_filter_high_cnt = 0;
             }
@@ -242,7 +242,7 @@ static bool timer_cb(void *param)
                 timer_continue = false;
                 io_pull_write(USER_TEST_IO, IO_PULL_DOWN);
                 io_exti_config(USER_TEST_IO,INT_EDGE_RISING);
-                io_exti_enable(USER_TEST_IO,true);
+                
                 NVIC_EnableIRQ(EXTI_IRQn);
                 gpio_filter_low_cnt = 0;
             }

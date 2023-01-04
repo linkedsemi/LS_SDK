@@ -1,6 +1,6 @@
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include <string.h>
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "platform.h"
 #include "log.h"
 

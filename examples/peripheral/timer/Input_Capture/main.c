@@ -1,6 +1,6 @@
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include <string.h>
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "platform.h"
 #include "log.h"
 
@@ -29,7 +29,7 @@ uint16_t Frequency = 0;
 #endif
 static void PWM_Output_Config(void)
 {
-    gptima1_ch1_io_init(PA00,true,0);
+    pinmux_gptima1_ch1_init(PA00,true,0);
     TIM_OC_InitTypeDef  TIM_OCInitStructure = {0};  
 
     TIM_PWMOUTPUT_Handle.Instance = LSGPTIMA;
@@ -51,7 +51,7 @@ static void PWM_Output_Config(void)
 static void Input_Capture_Config(void)
 {
     TIM_IC_InitTypeDef TIM_ICInitStructure = {0};
-    gptimc1_ch1_io_init(PA07, false, 0);
+    pinmux_gptimc1_ch1_init(PA07, false, 0);
 
     TIM_Capture_Handle.Instance = LSGPTIMC;
     TIM_Capture_Handle.Init.Period = 0xFFFF;
@@ -67,6 +67,7 @@ static void Input_Capture_Config(void)
     HAL_TIM_IC_ConfigChannel(&TIM_Capture_Handle, &TIM_ICInitStructure, TIM_CHANNEL_1);
 
 #if (INPUT_CAPTURE_MODE == COMMON_INPUT_CAPTURE)
+    io_cfg_output(PA01); //Debug IO Config
     HAL_TIM_Base_Start_IT(&TIM_Capture_Handle);  
     HAL_TIM_IC_Start_IT(&TIM_Capture_Handle,TIM_CHANNEL_1);
 #else

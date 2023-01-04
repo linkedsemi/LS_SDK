@@ -5,19 +5,19 @@
 #include "prf_bass.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include "log.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"   
 #include "tinyfs.h"
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include "co_list.h"
 #include "adpcm.h"
-#include "lsdmac.h"
-#include "lspdm.h"
+#include "ls_hal_dmac.h"
+#include "ls_hal_pdm.h"
 #include "main.h"
 
 #define APP_HID_DEV_NAME ("BLE_HID_DIC_DEMO")
@@ -1434,7 +1434,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
 				break;
 		case PRF_BASS:
 		{
-				struct hid_db_cfg db_cfg;
+				struct hid_db_cfg db_cfg = {0};
 				db_cfg.hids_nb = 1;
 				db_cfg.cfg[0].svc_features = HID_PROTO_MODE;
 				db_cfg.cfg[0].report_nb = 3;
@@ -1682,7 +1682,7 @@ static void data_sender(void)
     }   
 }
 
-void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm, uint8_t buf_idx)
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t ch_idx,uint8_t buf_idx)
 {
     if (get_cur_connected_state())
     {
@@ -1718,8 +1718,8 @@ void dmic_pdm_dma_init(void)
 
 void dmic_pdm_init(void)
 {
-    pdm_clk_io_init(DMIC_CLK_IO);
-    pdm_data0_io_init(DMIC_DATA_IO);
+    pinmux_pdm_clk_init(DMIC_CLK_IO);
+    pinmux_pdm_data0_init(DMIC_DATA_IO);
     hdmic.Instance = LSPDM;
     PDM_Init_TypeDef Init = 
     {
@@ -1754,10 +1754,9 @@ void gpio_exit_init(void)
 {
     io_cfg_input(PB15);
     io_exti_config(PB15, INT_EDGE_RISING);
-    io_exti_enable(PB15, true);
 }
 
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch (pin)
     {

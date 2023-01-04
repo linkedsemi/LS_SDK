@@ -37,6 +37,10 @@
 #define VENDOR_ATTR_TYPE_holdingTemp		0x015b
 #define VENDOR_ATTR_TYPE_errorCode			0x0000
 
+#define RECORD_PRESET_SCENCE_BASE			0X2710		//10000
+#define RECORD_PRESET_SCENCE_NUM			9
+#define RECORD_CONFIG_SCENCE_BASE			0X2774		//10100
+#define RECORD_CONFIG_SCENCE_NUM			24
 extern uint16_t mesh_key_lid;
 
 // Generic OnOff Set
@@ -129,6 +133,46 @@ struct mesh_vendor_model_indication
     uint8_t *attr_parameter;
 }__attribute__((packed));
 
+struct scene_recall_messge
+{
+   uint16_t scene_number;
+   uint8_t tid;
+   uint8_t trans_time;
+   uint8_t delay;
+}__attribute__((packed));
+
+//Scene status message
+struct scene_staus_message
+{
+    uint8_t status_code;
+    uint16_t current_scene;
+    uint16_t target_scene;
+    uint8_t remaining_time;  
+}__attribute__((packed));;
+
+//Scene register status message
+struct scene_register_staus_message
+{
+    uint8_t status_code;
+    uint16_t current_scene;
+    uint8_t scenes[10];
+}__attribute__((packed));
+
+
+//Scene register status message
+struct scene_store_message
+{
+    uint16_t scene_number;
+    uint8_t vendor_model;
+	uint16_t type_curtainctrl;
+	uint8_t parameter_curtainctrl[6];
+}__attribute__((packed));
+
+//Scene register status message
+struct scene_delete_message
+{
+    uint16_t scene_number;
+};
 void mesh_send_custom_adv(uint16_t duration,uint8_t *adv_data,uint8_t adv_data_length);
 void tmall_mesh_recv_onoff_msg(struct model_rx_info *info);
 void tmall_mesh_recv_vendor_msg(struct model_rx_info *info);
@@ -136,4 +180,5 @@ void tmall_mesh_recv_lightness_msg(struct model_rx_info *info);
 void tmall_mesh_recv_light_ctl_msg(struct model_rx_info *msg);
 void tmall_mesh_recv_light_hsl_msg(struct model_rx_info *msg);
 void exti_gpio_init(void);
+void tmall_mesh_recv_scene_msg(struct model_rx_info *info);
 #endif

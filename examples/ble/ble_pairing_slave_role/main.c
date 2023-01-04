@@ -6,11 +6,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "ble_common_api.h"
 
 #define PAIR_ENCRYPT_ENABLE  0
@@ -248,7 +248,7 @@ static void ls_single_role_timer_cb(void *param)
 }
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -689,12 +689,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             connect_pattern_send_prepare(con_idx); 
 
 #if (PAIR_ENCRYPT_ENABLE == 1)
-        uint8_t peer_id_cont = gap_manager_get_bonding_peer_id(con_idx);
-        LOG_I("CONNECT Peer_id = %d", peer_id_cont);
-        if(peer_id_cont==0xff)
-        {
-            gap_manager_slave_security_req(con_idx, AUTH_SEC_CON);
-        }
+        gap_manager_slave_security_req(con_idx, AUTH_SEC_CON);
 #endif //PAIR_ENCRYPT_ENABLE
 
         }
@@ -723,7 +718,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         struct pair_feature feat_param={
             .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
             .oob = BLE_GAP_OOB_ENABLE,
-            .auth = AUTH_SEC_CON,
+            .auth = AUTH_SEC_CON | AUTH_BOND,
             .key_size = 16,
             .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
             .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,

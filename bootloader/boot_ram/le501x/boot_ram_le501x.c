@@ -1,12 +1,12 @@
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "le501x.h"
-#include "lscache.h"
+#include "ls_hal_cache.h"
 #include "compile_flag.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
 #include "sdk_config.h"
 #include "platform.h"
-#include "reg_lsgpio.h"
+#include "reg_gpio.h"
 #include "reg_syscfg.h"
 #include "reg_rf.h"
 #include "ls_ble.h"
@@ -16,8 +16,10 @@
 #include "systick.h"
 #include "prf_fotas.h"
 #include "cpu.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "reg_base_addr.h"
+#include "ota_settings.h"
+#include "sleep.h"
 #define TRIM_4202_BUF_SIZE (12)
 
 static void swd_pull_down()
@@ -29,7 +31,7 @@ uint16_t trim_head_load()
 {
     uint16_t head[8];
     uint16_t version;
-    spi_flash_read_security_area(1, 0,(void *)head, sizeof(head));
+    hal_flash_read_security_area(1, 0,(void *)head, sizeof(head));
     if(head[0]== (uint16_t)~head[1] && head[2]==(uint16_t)~head[3])
     {
         version = head[0];
@@ -44,7 +46,7 @@ uint16_t trim_head_load()
 void trim_version_4100_load()
 {
     uint16_t buf[10];
-    spi_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
+    hal_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
     uint8_t i;
     bool trim_valid = true;
     for(i=0;i<10;i+=2)
@@ -102,7 +104,7 @@ void trim_version_4100_load()
 void trim_version_4101_load()
 {
     uint16_t buf[10];
-    spi_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
+    hal_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
     uint8_t i;
     for(i=0;i<10;i+=2)
     {
@@ -164,7 +166,7 @@ static void io_toggle_for_clock(uint8_t pin)
 void trim_version_4202_load()
 {
     uint16_t buf[TRIM_4202_BUF_SIZE];
-    spi_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
+    hal_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
     uint8_t i;
     for(i=0;i<TRIM_4202_BUF_SIZE;i+=2)
     {
@@ -221,9 +223,15 @@ void trim_version_4202_load()
         io_toggle_for_clock(PB11);
     break;
     case 0x3202:
+    case 0x3211:
+    case 0x2401:
+    case 0x4831:
         io_toggle_for_clock(PB03);
     break;
+    case 0x2831:
+        io_toggle_for_clock(PA14);
     case 0x4803:
+    case 0x4811:
 
     break;
     }
@@ -254,14 +262,6 @@ void trim_val_load()
     }
 }
 
-static bool need_foreground_ota(void)
-{
-    uint32_t ota_status;
-    ota_status = READ_REG(SYSCFG->BKD[7]);
-    uint32_t ota_settings = ota_settings_read();
-    return ota_status == 0x5A5A3C3C || (ota_settings == SINGLE_FOREGROUND);   
-}
-
 static void boot_app(uint32_t base)
 {
     uint32_t *msp = (void *)base;
@@ -271,19 +271,18 @@ static void boot_app(uint32_t base)
     (*reset_handler)();
 }
 
-static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
+static void fw_copy(uint32_t src,uint32_t dst,uint32_t size)
 {
     static uint8_t fw_buf[FLASH_PAGE_SIZE];
     uint16_t i;
-    for(i=0;i<CEILING(ptr->size, FLASH_PAGE_SIZE);++i)
+    for(i=0;i<CEILING(size, FLASH_PAGE_SIZE);++i)
     {
         if ((i % (FLASH_SECTOR_SIZE/FLASH_PAGE_SIZE)) == 0)
         {
-            spi_flash_sector_erase(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE);
+            hal_flash_sector_erase(dst - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE);
         }
-        
-        spi_flash_quad_io_read(ptr->base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
-        spi_flash_quad_page_program(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
+        hal_flash_quad_io_read(src - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
+        hal_flash_quad_page_program(dst - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
     }
 }
 
@@ -294,12 +293,14 @@ void boot_ram_start(uint32_t exec_addr)
     clk_switch();
     uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     set_wakeup_source(wkup_stat);
-    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    MODIFY_REG(SYSCFG->PMU_WKUP,SYSCFG_SLP_LVL_MASK,
+        NORMAL_SLEEP<<SYSCFG_SLP_LVL_POS|SYSCFG_LP_WKUP_CLR_MASK);
     DELAY_US(200);
     SYSCFG->PMU_PWR = 0;
-    spi_flash_drv_var_init(false,false);
-    spi_flash_init();
-    spi_flash_xip_start();
+    hal_flash_drv_var_init(false,false);
+    hal_flash_init();
+    hal_flash_dual_mode_set(false);
+    hal_flash_xip_start();
     lscache_cache_enable(0);
     io_init();
     swd_pull_down();
@@ -308,17 +309,21 @@ void boot_ram_start(uint32_t exec_addr)
     lvd33_enable();
     DELAY_US(200);
     LVD33_Handler();
-    uint32_t image_base;
-    image_base = get_app_image_base();
-    struct fota_image_info image;
-    if(ota_copy_info_get(&image))
+    uint32_t image_base = get_app_image_base();
+    struct fota_copy_info info;
+    if(ota_copy_info_get(&info))
     {
-        fw_copy(&image,image_base);
-        ota_settings_erase();
+        fw_copy(info.fw_copy_src_addr,info.fw_copy_dst_addr,info.fw_copy_size);
+        ota_copy_done_set();
     }
-    if(need_foreground_ota())
+    uint32_t boot_addr;
+    if(ota_boot_addr_get(&boot_addr))
     {
-        image_base = get_fota_image_base();
+        image_base = boot_addr;
+    }
+    if(ota_settings_erase_req_get())
+    {
+        ota_settings_erase();
     }
     boot_app(image_base);
 }

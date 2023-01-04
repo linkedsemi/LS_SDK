@@ -1,0 +1,159 @@
+import os
+import sys
+Import('env')
+env['CPU'] = 'cortex-m4'
+env['LLVM_CFG'] = 'armv7em_hard_fpv4_sp_d16_nosys.cfg'
+if not 'DEFAULT_OPT_LVL' in env:
+    env['DEFAULT_OPT_LVL'] = '-Os'
+gcc_fpu_flag = ' -mfloat-abi=hard -mfpu=fpv4-sp-d16 '
+env.Append(CCFLAGS = gcc_fpu_flag)
+env.Append(LINKFLAGS = gcc_fpu_flag)
+def plf_postaction(self,target):
+    if 'progen' in self['TOOLS']:
+        return
+    self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+    target_path = str(target[0]).replace('.elf','')
+    app_hex = self.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+    info_sbl_bin = self.Command('build/$IC/info_sbl.bin','$SDK_ROOT/soc/arm_cm/lm3050/bin/bram.bin',Action(self.subst('python $SDK_ROOT/tools/lm3050/info_sbl_merge.py')+' $SOURCE $TARGET'))
+    info_array_c = self.Command('$SDK_ROOT/soc/arm_cm/lm3050/__info_array.c',info_sbl_bin,Action(self.subst('python $SDK_ROOT/tools/bin2c/bin2c.py')+ ' $SOURCE __info_array 80 4 > $TARGET'))
+    info_obj = self.Object(self.variant_dir_source(['$SDK_ROOT/soc/arm_cm/lm3050/__info_array.c']))
+    self.Depends(info_obj,[info_array_c])
+    self.Append(LIBS = [info_obj])
+
+
+def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
+    start_src = []
+    if with_startup:
+        start_src = ['$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/startup_asm.S']
+        start_src += ['$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/startup.c']
+
+    sdk_src = []
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+        'arm_cm/lm3050/cpu.c',
+        'arm_cm/lm3050/ls_msp_qspiv2.c',
+        'arm_cm/lm3050/ls_msp_crc.c',
+        'arm_cm/lm3050/ls_msp_comp.c',
+        'arm_cm/lm3050/ls_msp_i2c.c',
+        'arm_cm/lm3050/ls_msp_iwdg.c',
+        'arm_cm/lm3050/ls_msp_pdm.c',
+        'arm_cm/lm3050/ls_msp_pis.c',
+        'arm_cm/lm3050/ls_soc_gpio.c',
+        'arm_cm/lm3050/ls_msp_cache.c',
+        'arm_cm/lm3050/ls_msp_ecc.c',
+        'arm_cm/lm3050/ls_msp_rtc.c',
+        'arm_cm/lm3050/ls_msp_crypt.c',        
+        'arm_cm/lm3050/ls_msp_sm4.c',
+        'arm_cm/lm3050/platform.c',
+        'arm_cm/lm3050/ls_msp_sha.c',
+        'arm_cm/lm3050/ls_msp_spi_i2s.c',
+        'arm_cm/lm3050/ls_msp_ssi.c',
+        'arm_cm/lm3050/ls_msp_timer.c',
+        'arm_cm/lm3050/ls_msp_touchkey.c',
+        'arm_cm/lm3050/ls_msp_dmacv2.c',
+        'arm_cm/lm3050/ls_msp_adc.c',
+        'arm_cm/lm3050/ls_msp_dac.c',
+        'arm_cm/lm3050/ls_msp_wwdg.c',
+        'arm_cm/lm3050/ls_msp_can.c',
+        'arm_cm/lm3050/sleep.c',
+        'arm_cm/lm3050/ls_msp_uart.c',
+        'arm_cm/lm3050/sys_stat.c',
+        'arm_cm/lm3050/sw_timer_port.c',
+        'arm_cm/lm3050/rom_flash_api_wrapper.c',
+        'arm_cm/lm3050/compiler/$COMPILER/svcall_asm.S',
+        'arm_cm/lm3050/compiler/$COMPILER/delay_asm.S',
+        'arm_cm/lm3050/compiler/$COMPILER/sleep_asm.S',
+        'arm_cm/svcall.c',
+        'arm_cm/systick.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+        'src/ls_hal_flash_svcall.c',
+        'src/ls_hal_adcv2_dma.c',
+        # 'src/calc_div.c',
+        'src/ls_hal_dmacv2.c',
+        'src/ls_hal_adcv2.c',
+        'src/ls_hal_dac_dma.c',
+        'src/ls_hal_dac.c',
+        'src/ls_hal_cache.c',
+        'src/ls_hal_crypt.c',
+        'src/ls_hal_sm4.c',
+        'src/ls_hal_i2c.c',
+        'src/ls_hal_i2c_dma.c',
+        'src/ls_hal_iwdgv2.c',
+        # 'src/ls_hal_pdm_dma.c',
+        'src/ls_hal_pdm.c',
+        'src/ls_hal_pis.c',
+        # 'src/ls_hal_qspi.c',
+        'src/ls_hal_rtcv2.c',
+        # 'src/lsspi_dma.c',
+        'src/ls_hal_spi_i2s.c',
+        'src/ls_hal_spi_i2s_dma.c',
+        'src/ls_hal_ssi_dma.c',
+        'src/ls_hal_ssi.c',
+        'src/ls_hal_timer.c',
+        'src/ls_hal_touchkey.c',
+        # 'src/ls_hal_trng.c',
+        'src/ls_hal_qspiv2.c',
+        'src/ls_hal_flash_qspiv2.c',
+        'src/ls_hal_flash.c',
+        'src/ls_hal_uart_dma.c',
+        'src/ls_hal_uart.c',
+        'src/ls_hal_ecc.c',
+        'src/ls_hal_crc.c',
+        'src/ls_hal_sha.c',
+        'src/ls_hal_wwdg.c',
+        'src/ls_hal_can.c',
+        'src/ls_hal_comp.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
+        'common/common.c',
+        'common/circular_doubly_linked_list.c',
+        #'common/linked_async_framework.c',
+        #'common/async_call.c',
+        'common/sw_timer.c',
+        #'calendar/calendar.c',
+        #'crc/crc16.c',
+        'debug/log.c',
+        'debug/ls_dbg.c',
+        'debug/RTT/SEGGER_RTT.c',
+        #'static_buffer/linked_buffer.c',
+        #'static_buffer/fifo.c',
+        #'tinyfs/tinyfs_nvm.c',
+        #'tinyfs/tinyfs_write_cache.c',
+        #'tinyfs/tinyfs.c',
+        #'tinycrypt/lib/source/sha256.c',
+        #'tinycrypt/lib/source/utils.c',
+        #'adpcm/adpcm.c',
+        #'micro-ecc/uECC.c',
+    ]))
+    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),[
+        'hal_driver/inc',
+        'hal_driver/api',
+        'module/common',
+        #'module/calendar',
+        #'module/crc',
+        'module/debug',
+        'module/debug/RTT',
+        #'module/static_buffer',
+        #'module/tinyfs',
+        #'module/tinycrypt/lib/include',
+        #'module/micro-ecc',
+        #'module/adpcm',
+        #'module/ble',
+        # 'module/ble/prf',
+        'soc',
+        'soc/arm_cm',
+        'soc/arm_cm/cmsis',
+        'soc/arm_cm/lm3050',
+    ]))
+    rtos_src = []
+    if self.get('LINKSCRIPT') is None:
+        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/link_script.txt"))
+    self.Append(CPPPATH = self.inc_dirs(inc_list))
+    self.Append(LINKFLAGS = '-T $SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/rom_sym.txt')
+    target = self.Program('build/lm3050/'+name,self.variant_dir_source(sdk_src + start_src + app_src + rtos_src),OBJPREFIX = objprefix)
+    self.Depends(target,[self['LINKSCRIPT']])
+    return target
+
+env.AddMethod(plf_postaction)
+env.AddMethod(plf_build)
+

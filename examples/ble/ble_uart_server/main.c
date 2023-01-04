@@ -5,12 +5,13 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "prf_fotas.h"
+#include "ota_settings.h"
 #include "SEGGER_RTT.h"
 
 #define UART_SERVER_WITH_OTA 0
@@ -101,7 +102,6 @@ static bool uart_server_tx_busy;
 static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
 static struct builtin_timer *uart_server_timer_inst = NULL;
-static bool update_adv_intv_flag = false;
 static uint16_t cccd_config = 0;
 
 static uint8_t adv_obj_hdl;
@@ -131,39 +131,49 @@ bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signatur
 }
 #endif
 
-static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt,uint8_t con_idx)
+static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt)
 {
+    static uint32_t new_image_size_bytes = 0;
+    static uint16_t segment_data_max_length = 0;
     switch(type)
     {
     case FOTAS_START_REQ_EVT:
     {
-        // ota_settings_write(SINGLE_FOREGROUND); 
-        ota_settings_write(DOUBLE_FOREGROUND); 
         enum fota_start_cfm_status status;
         if(fw_signature_check(evt->fotas_start_req.digest, evt->fotas_start_req.signature))
         {
             status = FOTA_REQ_ACCEPTED;
+            new_image_size_bytes = evt->fotas_start_req.new_image->size;
+            segment_data_max_length = evt->fotas_start_req.segment_data_max_length;
         }else
         {
             status = FOTA_REQ_REJECTED;
         }
         prf_fotas_start_confirm(status);
     }break;
+    case FOTAS_PROGRESS_EVT:
+    {
+        uint32_t bytes_transfered = evt->fotas_progress.current_sector * 4096 + evt->fotas_progress.current_segment * segment_data_max_length;
+        uint8_t percentage =  bytes_transfered*100/new_image_size_bytes >= 100 ? 100 : bytes_transfered*100/new_image_size_bytes;
+        LOG_I("ota progress ---------> %d%%", percentage);
+    }
+    break;
     case FOTAS_FINISH_EVT:
-        if(evt->fotas_finish.integrity_checking_result)
+        if(evt->fotas_finish.status & FOTA_STATUS_MASK && evt->fotas_finish.status & FOTA_REBOOT_MASK)
         {
-            if(evt->fotas_finish.new_image->base != get_app_image_base())
+            if(evt->fotas_finish.boot_addr)
             {
-                ota_copy_info_set(evt->fotas_finish.new_image);
+                ota_boot_addr_set(evt->fotas_finish.boot_addr);
             }
-            else
+            if(evt->fotas_finish.status & FOTA_SETTINGS_ERASE_MASK)
             {
-                ota_settings_erase();
+                ota_settings_erase_req_set();
+            }
+            if(evt->fotas_finish.copy.fw_copy_size)
+            {
+                ota_copy_info_set(&evt->fotas_finish.copy);
             }
             platform_reset(RESET_OTA_SUCCEED);
-        }else
-        {
-            platform_reset(RESET_OTA_FAILED);
         }
     break;
     default:
@@ -178,15 +188,6 @@ static void ls_uart_server_init(void)
     builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
 }
 
-static void ls_uart_server_update_adv_interval(uint8_t input_intv)
-{
-    LOG_I("input_char: %d",input_intv);
-    uint32_t new_intv = (input_intv - '0')*160;
-    dev_manager_update_adv_interval(adv_obj_hdl, new_intv, new_intv);
-    dev_manager_stop_adv(adv_obj_hdl);
-    update_adv_intv_flag = true;
-}
-
 static void ls_uart_server_timer_cb(void *param)
 {
     if(connect_id != 0xff)
@@ -195,11 +196,6 @@ static void ls_uart_server_timer_cb(void *param)
         // LOG_I("uart timer out, length=%d", uart_server_rx_index);
         ls_uart_server_send_notification();
         exit_critical(cpu_stat);
-    }
-    uint8_t input_char = (uint8_t)SEGGER_RTT_GetKey();
-    if(connect_id == 0xff && input_char != 0xff && input_char > '0' && input_char <= '9')
-    {
-        ls_uart_server_update_adv_interval(input_char);
     }
     if(uart_server_timer_inst)
     {
@@ -224,7 +220,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -316,28 +312,35 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
 
 static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,uint8_t con_idx)
 {
-    switch (type)
+    if (connect_id != 0xff)
     {
-    case SERVER_READ_REQ:
-        LOG_I("read req");
-        ls_uart_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
-    break;
-    case SERVER_WRITE_REQ:
-        LOG_I("write req");
-        ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
-    break;
-    case SERVER_NOTIFICATION_DONE:
-        uart_server_ntf_done = true;
-        LOG_I("ntf done");
-    break;
-    case MTU_CHANGED_INDICATION:
-        uart_server_mtu = evt->mtu_changed_ind.mtu;
-        LOG_I("mtu: %d", uart_server_mtu);
-        ls_uart_server_data_length_update(con_idx);
-    break;
-    default:
-        LOG_I("Event not handled!");
+        switch (type)
+        {
+        case SERVER_READ_REQ:
+            LOG_I("read req");
+            ls_uart_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
         break;
+        case SERVER_WRITE_REQ:
+            LOG_I("write req");
+            ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
+        break;
+        case SERVER_NOTIFICATION_DONE:
+            uart_server_ntf_done = true;
+            LOG_I("ntf done");
+        break;
+        case MTU_CHANGED_INDICATION:
+            uart_server_mtu = evt->mtu_changed_ind.mtu;
+            LOG_I("mtu: %d", uart_server_mtu);
+            ls_uart_server_data_length_update(con_idx);
+        break;
+        default:
+            LOG_I("Event not handled!");
+            break;
+        }
+    }
+    else
+    {
+        LOG_I("receive gatt msg when disconnected!");
     }
 }
 
@@ -447,15 +450,11 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         adv_obj_hdl = evt->obj_created.handle;
         start_adv();
     break;
-    case ADV_STOPPED:
-        if (update_adv_intv_flag)
-        {
-            update_adv_intv_flag = false;
-            start_adv();
-        }    
+    case ADV_STARTED:
+        LOG_I("adv started");
     break;
-    case SCAN_STOPPED:
-    
+    case ADV_STOPPED:
+        LOG_I("adv stopped");
     break;
     default:
 

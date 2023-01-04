@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "lstk.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
@@ -102,7 +102,6 @@ static void Init_GPIO(void)
     io_cfg_input(PB15);
     io_pull_write(PB15, IO_PULL_UP);
     io_exti_config(PB15, INT_EDGE_FALLING);
-    io_exti_enable(PB15, true);
     /*LED io initial*/
     for (uint8_t i = 0; i < 8; i++)
     {
@@ -232,7 +231,7 @@ static void Error_TKHandle(void)
 /**
  * @brief  Key interrupt callback
  */
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch (pin)
     {

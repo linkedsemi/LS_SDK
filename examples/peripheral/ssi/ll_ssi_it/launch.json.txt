@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/ssi/ll_ssi_it/build/lm3050/ll_ssi_it.elf",
+            "name": "LM3050 Debug LL_SSI_IT",
+            "device": "LM3050",
+            "interface": "swd",
+            "preLaunchCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/ssi/ll_ssi_it/build/lm3050/ll_ssi_it.elf",
+            "name": "LM3050 Attach LL_SSI_IT",
+            "device": "LM3050",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
+            ]
+        },
+    ]
+}

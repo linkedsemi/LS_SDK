@@ -1,6 +1,6 @@
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include <string.h>
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "platform.h"
 #include "log.h"
 
@@ -17,10 +17,10 @@ static void Basic_PWM_Output_Cfg(void)
 {
     TIM_OC_InitTypeDef sConfig = {0};
 
-    gptimb1_ch1_io_init(PA00, true, 0);
-    gptimb1_ch2_io_init(PA01, true, 0);
-    gptimb1_ch3_io_init(PB14, true, 0);
-    gptimb1_ch4_io_init(PB15, true, 0);
+    pinmux_gptimb1_ch1_init(PA00, true, 0);
+    pinmux_gptimb1_ch2_init(PA01, true, 0);
+    pinmux_gptimb1_ch3_init(PB14, true, 0);
+    pinmux_gptimb1_ch4_init(PB15, true, 0);
     /*##-1- Configure the TIM peripheral #######################################*/
     TimHandle.Instance = LSGPTIMB;
     TimHandle.Init.Prescaler = TIM_PRESCALER; 

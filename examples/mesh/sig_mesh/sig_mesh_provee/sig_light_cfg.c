@@ -1,14 +1,14 @@
 #include "sig_light_cfg.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "sig_mesh_ctl.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "log.h"
 #include "builtin_timer.h"
 
 TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
 static struct light_state ls_mesh_light_state[3]={0};
-extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_cfg_idx );
+extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_indx);
 extern void app_generic_onoff_status_report(uint8_t onoff);
 
 #define APP_STATE_OFF                (0)
@@ -152,9 +152,9 @@ void ls_mesh_pwm_init(void)
     uint16_t level_t = 0x5FF;
     light_tim_hdl.Instance = TIMx;
 
-    gptimb1_ch1_io_init(LIGHT_LED_1,true,0);
-	gptimb1_ch2_io_init(LIGHT_LED_2,true,0);
-    gptimb1_ch3_io_init(LIGHT_LED_3,true,0);
+    pinmux_gptimb1_ch1_init(LIGHT_LED_1,true,0);
+	pinmux_gptimb1_ch2_init(LIGHT_LED_2,true,0);
+    pinmux_gptimb1_ch3_init(LIGHT_LED_3,true,0);
   
     light_tim_hdl.Init.Prescaler = 15;
     light_tim_hdl.Init.Period = 0xfffe;
@@ -191,22 +191,22 @@ void light_button_init(void)
     io_cfg_input(LIGHT_BUTTON_1);
     io_pull_write(LIGHT_BUTTON_1,IO_PULL_DOWN);
     io_exti_config(LIGHT_BUTTON_1,INT_EDGE_RISING);
-    io_exti_enable(LIGHT_BUTTON_1,true);
+    
 
     io_cfg_input(LIGHT_BUTTON_2);
     io_pull_write(LIGHT_BUTTON_2,IO_PULL_DOWN);
     io_exti_config(LIGHT_BUTTON_2,INT_EDGE_RISING);
-    io_exti_enable(LIGHT_BUTTON_2,true);
+    
 
     io_cfg_input(LIGHT_BUTTON_3);
     io_pull_write(LIGHT_BUTTON_3,IO_PULL_DOWN);
     io_exti_config(LIGHT_BUTTON_3,INT_EDGE_RISING);
-    io_exti_enable(LIGHT_BUTTON_3,true);
+    
 
     ls_uart_init();
 }
 
-void io_exti_callback(uint8_t pin) // override io_exti_callback
+void io_exti_callback(uint8_t pin,exti_edge_t edge) // override io_exti_callback
 {
     static uint32_t on_off=0; 
     static uint32_t light_lvl=0; 
@@ -234,7 +234,7 @@ void io_exti_callback(uint8_t pin) // override io_exti_callback
           light_lvl=0x12345678;
           button2_valid =true;
           button2.check_count = button2.count;
-          app_client_model_tx_message_handler(light_lvl,MESH_CMDL_CFG_IDX_GENC_LEVEL);
+          app_client_model_tx_message_handler(light_lvl,MODEL1_GENERIC_LEVEL_CLI);
        }       
     }    
     break;
@@ -255,7 +255,7 @@ void io_exti_callback(uint8_t pin) // override io_exti_callback
 
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_SIG_MESH_Config.UARTX = UART1;
     UART_SIG_MESH_Config.Init.BaudRate = UART_BAUDRATE_115200;

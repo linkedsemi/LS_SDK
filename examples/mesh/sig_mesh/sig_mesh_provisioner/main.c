@@ -9,7 +9,7 @@
 #include "sig_mesh_prover_ctl.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tinyfs.h"
 #include "field_manipulate.h"
 #include "le501x.h"
@@ -18,7 +18,7 @@
 
 #define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
-#define MAX_NB_ADDR_REPLAY 5
+#define MAX_NB_ADDR_REPLAY 20
 #define CNT_NETWORK_TRANS  5
 #define INTERVAL_NETWORK_TRANS 2
 #define PROV_AUTH_ACCEPT   1
@@ -438,6 +438,7 @@ void prover_send_message_vendor_model(uint32_t vendor_opcode, uint32_t model_id,
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tinyfs_mkdir(&ls_sigmesh_provision_dir, ROOT_DIR, 5);   
     ble_init();
     auto_check_unbind();

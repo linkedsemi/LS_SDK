@@ -1,22 +1,23 @@
 #include "sdk_config.h"
 #include "le501x.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "compile_flag.h"
-#include "lscache.h"
+#include "ls_hal_cache.h"
 #include "platform.h"
 #include "modem_rf_le501x.h"
 #include "reg_syscfg.h"
 #include "field_manipulate.h"
 #include "sleep.h"
 #include "reg_rcc.h"
-#include "reg_lsgpio.h"
+#include "reg_gpio.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "io_config.h"
-#include "lsrtc.h"
+#include "ls_soc_gpio.h"
+#include "ls_hal_rtc.h"
 #include "systick.h"
-#include "reg_lsgpio.h"
+#include "reg_gpio.h"
 #include "sys_stat.h"
+#include "ls_hal_iwdg.h"
 
 const uint16_t wkup_delay_us = 1500;
 static uint32_t CPU_PSP;
@@ -27,14 +28,14 @@ void cpu_sleep_asm(void);
 
 #if SDK_DCDC_BYPASS
 void dcdc_off(){}
-XIP_BANNED void dcdc_on(){}
+void XIP_BANNED_FUNC(dcdc_on,){}
 #else
 void dcdc_off()
 {
     REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
 }
 
-XIP_BANNED void dcdc_on()
+void XIP_BANNED_FUNC(dcdc_on,)
 {
     REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 1);
 }
@@ -46,12 +47,12 @@ uint8_t get_deep_sleep_enable(void)
     return SDK_DEEP_SLEEP_ENABLE;
 }
 
-XIP_BANNED static void ble_hclk_clr()
+static void XIP_BANNED_FUNC(ble_hclk_clr,)
 {
     REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 0);
 }
 
-XIP_BANNED static void normal_sleep_set()
+static void XIP_BANNED_FUNC(normal_sleep_set,)
 {
     MODIFY_REG(SYSCFG->PMU_WKUP,SYSCFG_SLP_LVL_MASK,
         NORMAL_SLEEP<<SYSCFG_SLP_LVL_POS|
@@ -60,7 +61,7 @@ XIP_BANNED static void normal_sleep_set()
 }
 
 #if DEBUG_MODE == 0
-XIP_BANNED static void sleep_mode_set()
+static void XIP_BANNED_FUNC(sleep_mode_set,)
 {
     SCB->SCR |= (1<<2);
     MODIFY_REG(SYSCFG->PMU_WKUP,SYSCFG_SLP_LVL_MASK,
@@ -69,14 +70,35 @@ XIP_BANNED static void sleep_mode_set()
         (BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING|RTC_WKUP_EDGE_RISING)<<SYSCFG_WKUP_EDGE_POS);
 }
 #else
-XIP_BANNED static void sleep_mode_set()
+static void XIP_BANNED_FUNC(sleep_mode_set,)
 {
     normal_sleep_set();
 }
 #endif
 
-XIP_BANNED void before_wfi()
+void XIP_BANNED_FUNC(iwdg_check,)
 {
+    if(REG_FIELD_RD(RCC->AHBEN, RCC_IWDT)==0)
+    {
+        return;
+    }
+    if(REG_FIELD_RD(LSIWDG->IWDG_CON,IWDG_EN)==0)
+    {
+        return;
+    }
+    if(LSIWDG->IWDG_RIS)
+    {
+        while(1);
+    }
+    if(LSIWDG->IWDG_VALUE<100)
+    {
+        while(1);
+    }
+}
+
+void XIP_BANNED_FUNC(before_wfi,)
+{
+    iwdg_check();
     sleep_mode_set();
     while(REG_FIELD_RD(SYSCFG->PMU_PWR, SYSCFG_BLE_PWR3_ST));
     ble_hclk_clr();
@@ -84,7 +106,7 @@ XIP_BANNED void before_wfi()
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
 }
 
-XIP_BANNED static void wait_dpll_lock()
+static void XIP_BANNED_FUNC(wait_dpll_lock,)
 {
     uint32_t i = 0;
     while(1)
@@ -107,30 +129,27 @@ static void wkup_ble()
     RCC->BLECFG |= RCC_BLE_WKUP_RST_MASK;
 }
 
-XIP_BANNED uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn);
+uint32_t XIP_BANNED_FUNC(__NVIC_GetPendingIRQ,IRQn_Type IRQn);
 
-XIP_BANNED void after_wfi()
+void XIP_BANNED_FUNC(after_wfi,)
 {
     LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn)||__NVIC_GetPendingIRQ(EXTI_IRQn)||__NVIC_GetPendingIRQ(RTC_IRQn));
     wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     normal_sleep_set();
-    if(wkup_stat & WDT_WKUP)
-    {
-        while(1);
-    }
     dcdc_on();
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     wait_dpll_lock();
     clk_switch();
+    iwdg_check();
 }
 
-void clr_ble_wkup_req()
+static void clr_ble_wkup_req()
 {
     RCC->BLECFG &= ~RCC_BLE_WKUP_RST_MASK;
 }
 
-XIP_BANNED void power_up_hardware_modules()
+void XIP_BANNED_FUNC(power_up_hardware_modules,)
 {
     uint32_t pmu_pwr = SYSCFG->PMU_PWR;
     uint32_t clr_mask = 0;
@@ -152,7 +171,7 @@ XIP_BANNED void power_up_hardware_modules()
     SYSCFG->PMU_PWR = 0;
 }
 
-XIP_BANNED static void power_down_hardware_modules()
+static void XIP_BANNED_FUNC(power_down_hardware_modules,)
 {
     if(SYSCFG->PMU_WKUP & (PA00_IO_WKUP|PA07_IO_WKUP|PB11_IO_WKUP|PB15_IO_WKUP)<<WKUP_EN_POS)
     {
@@ -167,21 +186,21 @@ XIP_BANNED static void power_down_hardware_modules()
     }
 }
 
-NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
+NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
 {
-    spi_flash_xip_stop();
-    spi_flash_deep_power_down();
+    hal_flash_xip_stop();
+    hal_flash_deep_power_down();
     power_down_hardware_modules();
     cpu_sleep_asm();
     power_up_hardware_modules();
     __disable_irq();
-    spi_flash_init();
-    spi_flash_release_from_deep_power_down();
+    hal_flash_init();
+    hal_flash_release_from_deep_power_down();
     DELAY_US(8);
-    spi_flash_xip_start();
+    hal_flash_xip_start();
 }
 
-XIP_BANNED uint32_t io_retention_pull(uint32_t idx,uint16_t oe,uint16_t ie,uint16_t dout,uint32_t pupd)
+uint32_t XIP_BANNED_FUNC(io_retention_pull,uint32_t idx,uint16_t oe,uint16_t ie,uint16_t dout,uint32_t pupd)
 {
     if((1<<idx) & oe)
     {
@@ -221,7 +240,7 @@ void ble_wkup_status_set(bool status)
     waiting_ble_wkup_irq = status;
 }
 
-void ble_hclk_set()
+static void ble_hclk_set()
 {
     REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 1);
 }
@@ -238,10 +257,14 @@ static void ble_radio_en_sync()
 //    LS_ASSERT(__NVIC_GetPendingIRQ(BLE_WKUP_IRQn)==0);
     __NVIC_ClearPendingIRQ(BLE_WKUP_IRQn);
     __NVIC_EnableIRQ(BLE_WKUP_IRQn);
+    ble_hclk_set();
+    clr_ble_wkup_req();
 }
 
 static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
 {
+    __disable_irq();
+    systick_stop();
     NVIC->ICER[0] = 0xffffffff;
     lvl2_lvl3_io_retention(LSGPIOA);
     lvl2_lvl3_io_retention(LSGPIOB);
@@ -265,11 +288,11 @@ static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
     SCB->SCR |= (1<<2);
 }
 
-XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup)
+void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,struct deep_sleep_wakeup *wakeup)
 {
     lvl2_lvl3_mode_prepare(wakeup);
-    spi_flash_xip_stop();
-    spi_flash_deep_power_down();
+    hal_flash_xip_stop();
+    hal_flash_deep_power_down();
     uint16_t c_oe = LSGPIOC->OE;
     uint16_t c_ie = LSGPIOC->IE;
     uint16_t c_dout = LSGPIOC->DOUT;
@@ -288,14 +311,12 @@ void deep_sleep()
     systick_stop();
     lvd33_disable();
     cpu_flash_deep_sleep_and_recover();
-    rco_freq_counting_config();
     wkup_ble();
     lvd33_enable();
     irq_reinit();
     ble_wkup_status_set(true);
     ble_radio_en_sync();
     systick_start();
-    rco_freq_counting_start();
 }
 
 void uart_log_pause(void);
@@ -323,16 +344,19 @@ void sleep_process()
 }
 
 bool timer_sleep(void);
-void deep_sleep_no_ble()
+void low_power_mode_sched()
 {
-    uint32_t cpu_stat = enter_critical();
-    uart_log_pause();
-    if(timer_sleep())
+    if (!peri_status_busy() && !app_event_status_busy())
     {
-        deep_sleep();
+        uint32_t cpu_stat = enter_critical();
+        uart_log_pause();
+        if(timer_sleep())
+        {
+            deep_sleep();
+        }
+        uart_log_resume();
+        exit_critical(cpu_stat);
     }
-    uart_log_resume();
-    exit_critical(cpu_stat);
 }
 
 bool ble_wkup_status_get(void)
@@ -371,28 +395,28 @@ void LPWKUP_Handler(void)
     {
         if(exti_int_pending(PB15)==false)
         {
-            io_exti_callback(PB15);
+            io_exti_callback(PB15,INT_EDGE_UNKNOWN);
         }
     }
     if(wkup_stat&PA00_IO_WKUP)
     {
         if(exti_int_pending(PA00)==false)
         {
-            io_exti_callback(PA00);
+            io_exti_callback(PA00,INT_EDGE_UNKNOWN);
         }
     }
     if(wkup_stat&PA07_IO_WKUP)
     {
         if(exti_int_pending(PA07)==false)
         {
-            io_exti_callback(PA07);
+            io_exti_callback(PA07,INT_EDGE_UNKNOWN);
         }
     }
     if(wkup_stat&PB11_IO_WKUP)
     {
         if(exti_int_pending(PB11)==false)
         {
-            io_exti_callback(PB11);
+            io_exti_callback(PB11,INT_EDGE_UNKNOWN);
         }
     }
     if (wkup_stat & RTC_WKUP)
@@ -409,15 +433,26 @@ void BLE_WKUP_IRQ_DISABLE()
     __NVIC_DisableIRQ(BLE_WKUP_IRQn);
 }
 
-XIP_BANNED uint64_t store_psp_return_msp_and_addr()
+uint64_t XIP_BANNED_FUNC(store_psp_return_msp_and_addr,)
 {
     CPU_CONTROL = __get_CONTROL();
     CPU_PSP = __get_PSP();
     return __get_MSP();
 }
 
-XIP_BANNED void restore_psp()
+void XIP_BANNED_FUNC(restore_psp,)
 {
     __set_PSP(CPU_PSP);
     __set_CONTROL(CPU_CONTROL);
+}
+
+__attribute__((weak)) void ble_reg_restore(){}
+
+void BLE_WKUP_Handler()
+{
+    ble_reg_restore();
+    modem_rf_reinit();
+    ble_irq_clr_and_enable();
+    ble_wkup_status_set(false);
+    BLE_WKUP_IRQ_DISABLE();
 }

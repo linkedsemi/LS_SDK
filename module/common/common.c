@@ -4,6 +4,8 @@
 #include "compile_flag.h"
 #include "co_math.h"
 
+__attribute__((weak)) int (*rand_fn)(void) = rand;
+
 ROM_SYMBOL void rand_gen_by_word(uint8_t *ptr,uint8_t word_num)
 {
     while(word_num--)

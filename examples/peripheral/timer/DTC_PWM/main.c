@@ -1,8 +1,14 @@
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include <string.h>
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "platform.h"
 #include "log.h"
+
+#if defined(LE501X)
+#define DTC_PWM_TIMER LSADTIM
+#elif defined(LM3050)
+#define DTC_PWM_TIMER LSADTIM1
+#endif
 
 #define TIM_PRESCALER     (SDK_HCLK_MHZ-1)
 #define TIM_PERIOD        (250 - 1) /* Period Value  */
@@ -15,11 +21,11 @@ TIM_HandleTypeDef TimHandle;
 
 static void DeadTime_Complementary_PWM_Cfg(void)
 {
-    adtim1_ch1_io_init(PA00,true,0);
-    adtim1_ch1n_io_init(PA01);
+    pinmux_adtim1_ch1_init(PA00,true,0);
+    pinmux_adtim1_ch1n_init(PA01);
     TIM_BreakDeadTimeConfigTypeDef BDT_Config = {0};
     TIM_OC_InitTypeDef sConfig = {0};
-    TimHandle.Instance = LSADTIM;
+    TimHandle.Instance = DTC_PWM_TIMER;
     TimHandle.Init.Prescaler = TIM_PRESCALER;
     TimHandle.Init.Period = TIM_PERIOD;
     TimHandle.Init.ClockDivision = 0;

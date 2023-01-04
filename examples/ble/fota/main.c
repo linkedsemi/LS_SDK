@@ -1,12 +1,12 @@
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "le501x.h"
-#include "lscache.h"
+#include "ls_hal_cache.h"
 #include "compile_flag.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
 #include "sdk_config.h"
 #include "platform.h"
-#include "reg_lsgpio.h"
+#include "reg_gpio.h"
 #include "reg_syscfg.h"
 #include "reg_rf.h"
 #include "prf_fotas.h"
@@ -16,6 +16,7 @@
 #include "log.h"
 #include "common.h"
 #include "systick.h"
+#include "ota_settings.h"
 #define FW_ECC_VERIFY (0)
 
 static uint8_t adv_obj_hdl;
@@ -41,8 +42,6 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
     {
     case FOTAS_START_REQ_EVT:
     {
-        // ota_settings_write(SINGLE_FOREGROUND); 
-        ota_settings_write(DOUBLE_FOREGROUND); 
         enum fota_start_cfm_status status;
         if(fw_signature_check(evt->fotas_start_req.digest, evt->fotas_start_req.signature))
         {
@@ -54,24 +53,28 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
         prf_fotas_start_confirm(status);
     }break;
     case FOTAS_FINISH_EVT:
-        if(evt->fotas_finish.integrity_checking_result)
+        if(evt->fotas_finish.status & FOTA_STATUS_MASK && evt->fotas_finish.status & FOTA_REBOOT_MASK)
         {
-            if(evt->fotas_finish.new_image->base != get_app_image_base())
+            if(evt->fotas_finish.boot_addr)
             {
-                ota_copy_info_set(evt->fotas_finish.new_image);
+                ota_boot_addr_set(evt->fotas_finish.boot_addr);
             }
-            else
+            if(evt->fotas_finish.status & FOTA_SETTINGS_ERASE_MASK)
             {
-                ota_settings_erase();
+                ota_settings_erase_req_set();
+            }
+            if(evt->fotas_finish.copy.fw_copy_size)
+            {
+                ota_copy_info_set(&evt->fotas_finish.copy);
             }
             platform_reset(RESET_OTA_SUCCEED);
-        }else
-        {
-            platform_reset(RESET_OTA_FAILED);
         }
     break;
+    case FOTAS_PROGRESS_EVT:
+    
+    break;
     default:
-        LS_ASSERT(0);
+
     break;
     }
 }

@@ -63,7 +63,7 @@ void dcdc_off(void);
 
 void deep_sleep(void);
 
-void deep_sleep_no_ble(void);
+void low_power_mode_sched(void);
 
 void ble_sleep(int32_t);
 
@@ -79,11 +79,7 @@ void ble_wkup_status_set(bool);
 
 bool ble_wkup_status_get(void);
 
-void ble_hclk_set(void);
-
 void BLE_WKUP_IRQ_DISABLE(void);
-
-void clr_ble_wkup_req(void);
 
 void LPWKUP_Handler(void);
 

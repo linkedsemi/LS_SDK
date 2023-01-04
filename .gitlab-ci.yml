@@ -7,7 +7,9 @@ stages:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /^release\/v*/
 
-include: 'tools/le501x/ci.yml'
+include: 
+  - 'tools/le501x/ci.yml'
+  - 'tools/lm3050/ci.yml'
 
 doxygen:
   stage: build

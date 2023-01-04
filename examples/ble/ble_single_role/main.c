@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "ble_common_api.h"
 
 #define SLAVE_SERVER_ROLE 1
@@ -220,7 +220,7 @@ static void ls_single_role_timer_cb(void *param)
 }
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -829,6 +829,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         start_adv();
         LOG_I("adv start");
     break;
+    case ADV_STARTED:
+        LOG_I("adv started");
+    break;
     case ADV_STOPPED:
         LOG_I("adv stopped");
     break;
@@ -839,6 +842,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         scan_obj_hdl = evt->obj_created.handle;
         create_init_obj();
+    break;
+    case SCAN_STARTED:
+        LOG_I("scan started");
     break;
     case SCAN_STOPPED:
         LOG_I("scan stopped, next_connect_addr=%d", next_connect_addr);
@@ -882,6 +888,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         init_obj_hdl = evt->obj_created.handle;
         start_scan();
+    break;
+    case INIT_STARTED:
+        LOG_I("init started");
     break;
     case INIT_STOPPED:
         init_status = INIT_IDLE;

@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "lstk.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
@@ -195,7 +195,7 @@ static void Error_TKHandle(void)
 /**
  * @brief  Key interrupt callback
  */
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch (pin)
     {

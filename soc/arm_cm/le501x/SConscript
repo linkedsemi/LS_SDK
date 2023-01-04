@@ -3,7 +3,8 @@ import sys
 Import('env')
 env['CPU'] = 'cortex-m0'
 env['LLVM_CFG'] = 'armv6m_soft_nofp_nosys.cfg'
-
+if not 'DEFAULT_OPT_LVL' in env:
+    env['DEFAULT_OPT_LVL'] = '-Os'
 def plf_postaction(self,target):
     if 'progen' in self['TOOLS']:
         return
@@ -32,59 +33,63 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/le501x/cpu.c',
         'arm_cm/le501x/platform.c',
         'arm_cm/le501x/stack_var.c',
+        'arm_cm/le501x/compiler/$COMPILER/stack_asm.S',
         'arm_cm/le501x/compiler/$COMPILER/sleep_asm.S',
         'arm_cm/le501x/compiler/$COMPILER/svcall_asm.S',
         'arm_cm/le501x/compiler/$COMPILER/delay_asm.S',
-        'arm_cm/le501x/integration/lsqspi_msp.c',
-        'arm_cm/le501x/integration/uart_msp.c',
-        'arm_cm/le501x/integration/spi_msp.c',
-        'arm_cm/le501x/integration/adc_msp.c',
-        'arm_cm/le501x/integration/i2c_msp.c',
+        'arm_cm/le501x/integration/ls_msp_qspi.c',
+        'arm_cm/le501x/integration/ls_msp_uart.c',
+        'arm_cm/le501x/integration/ls_msp_spi_i2s.c',
+        'arm_cm/le501x/integration/ls_msp_adc.c',
+        'arm_cm/le501x/integration/ls_msp_i2c.c',
         'arm_cm/le501x/integration/modem_rf_le501x.c',
         'arm_cm/le501x/integration/modem_rf_le501x_24g.c',
         'arm_cm/le501x/integration/calc_acc.c',
-        'arm_cm/le501x/integration/lscache_msp.c',
-        'arm_cm/le501x/integration/io_config.c',
-        'arm_cm/le501x/integration/dmac_msp.c',
-        'arm_cm/le501x/integration/lspdm_msp.c',
-        'arm_cm/le501x/integration/lsiwdg_msp.c',
-        'arm_cm/le501x/integration/rtc_msp.c',
-        'arm_cm/le501x/integration/lstimer_msp.c',
-        'arm_cm/le501x/integration/ssi_msp.c',
-        'arm_cm/le501x/integration/trng_msp.c',
-        'arm_cm/le501x/integration/lspis_msp.c',
-        'arm_cm/le501x/integration/lscrypt_msp.c',
-        'arm_cm/le501x/integration/lsecc_msp.c',
+        'arm_cm/le501x/integration/ls_msp_cache.c',
+        'arm_cm/le501x/integration/ls_soc_gpio.c',
+        'arm_cm/le501x/integration/ls_msp_dmac.c',
+        'arm_cm/le501x/integration/ls_msp_pdm.c',
+        'arm_cm/le501x/integration/ls_msp_iwdg.c',
+        'arm_cm/le501x/integration/ls_msp_wwdg.c',
+        'arm_cm/le501x/integration/ls_msp_rtc.c',
+        'arm_cm/le501x/integration/ls_msp_timer.c',
+        'arm_cm/le501x/integration/ls_msp_ssi.c',
+        'arm_cm/le501x/integration/ls_msp_trng.c',
+        'arm_cm/le501x/integration/ls_msp_pis.c',
+        'arm_cm/le501x/integration/ls_msp_crypt.c',
+        'arm_cm/le501x/integration/ls_msp_ecc.c',
         'arm_cm/le501x/sleep.c',
         'arm_cm/le501x/sys_stat.c',
         'arm_cm/le501x/sw_timer_port.c',
     ]))
-    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/peripheral/',x),[
-        'src/flash_svcall.c',
-        'src/adc_dma.c',
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+        'src/ls_hal_flash_svcall.c',
+        'src/ls_hal_adc_dma.c',
         'src/calc_div.c',
-        'src/dmac.c',
-        'src/lsadc.c',
-        'src/lscache.c',
-        'src/lscrypt.c',
-        'src/lsi2c.c',
-        'src/lsiwdg.c',
-        'src/lspdm_dma.c',
-        'src/lspdm.c',
-        'src/lspis.c',
-        'src/lsqspi.c',
-        'src/lsrtc.c',
-        'src/lsspi_dma.c',
-        'src/lsspi.c',
-        'src/lsssi_dma.c',
-        'src/lsssi.c',
-        'src/lstimer.c',
-        'src/lstrng.c',
-        'src/spi_flash_lsqspi.c',
-        'src/spi_flash.c',
-        'src/uart_dma.c',
-        'src/uart.c',
-        'src/lsecc.c',
+        'src/ls_hal_dmac.c',
+        'src/ls_hal_adc.c',
+        'src/ls_hal_cache.c',
+        'src/ls_hal_crypt.c',
+        'src/ls_hal_i2c.c',
+        'src/ls_hal_i2c_dma.c',
+        'src/ls_hal_iwdg.c',
+        'src/ls_hal_wwdg.c',
+        'src/ls_hal_pdm_dma.c',
+        'src/ls_hal_pdm.c',
+        'src/ls_hal_pis.c',
+        'src/ls_hal_qspi.c',
+        'src/ls_hal_rtc.c',
+        'src/ls_hal_spi_i2s_dma.c',
+        'src/ls_hal_spi_i2s.c',
+        'src/ls_hal_ssi_dma.c',
+        'src/ls_hal_ssi.c',
+        'src/ls_hal_timer.c',
+        'src/ls_hal_trng.c',
+        'src/ls_hal_flash.c',
+        'src/ls_hal_flash_qspi.c',
+        'src/ls_hal_uart_dma.c',
+        'src/ls_hal_uart.c',
+        'src/ls_hal_ecc.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',
@@ -96,10 +101,9 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'crc/crc16.c',
         'debug/log.c',
         'debug/ls_dbg.c',
-        'debug/$BASE_ARCH/$COMPILER/ls_dbg_asm.S',
         'debug/RTT/SEGGER_RTT.c',
         'static_buffer/linked_buffer.c',
-        #'static_buffer/fifo.c',
+        'static_buffer/fifo.c',
         'tinyfs/tinyfs_nvm.c',
         'tinyfs/tinyfs_write_cache.c',
         'tinyfs/tinyfs.c',
@@ -108,9 +112,11 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         #'adpcm/adpcm.c',
         #'micro-ecc/uECC.c',
         'ble/ble_common_api.c',
+        'settings/inflash_settings.c',
+        'settings/ota_settings.c',
     ]))
-    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),['peripheral/inc',
-        'peripheral/api',
+    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),['hal_driver/inc',
+        'hal_driver/api',
         'module/common',
         #'module/calendar',
         'module/crc',
@@ -123,6 +129,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         #'module/adpcm',
         'module/ble',
         'module/ble/prf',
+        'module/settings',
         'soc',
         'soc/arm_cm',
         'soc/arm_cm/cmsis',
@@ -147,24 +154,35 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
             rtos_adapt = 'arm_cm/le501x/freertos_adapt_mcu.c'
         rtos_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
             'arm_cm/le501x/compiler/$COMPILER/port.c',
+            'arm_cm/le501x/compiler/$COMPILER/portasm.S',
             rtos_adapt,
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
-    if mesh:
-        self.Append(LIBS = [File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))])
-        self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
-        self['APP_IMAGE_BASE'] = 0x18056000
-        if self.get('LINKSCRIPT') is None:
+    if self.get('STACK_LIB') is None:
+        if mesh:
+            self['STACK_LIB'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))
+        elif ble:
+            self['STACK_LIB'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))
+    if not self.get('STACK_LIB') is None:
+        self.Append(LIBS = [self['STACK_LIB']])
+    if self.get('STACK_HEX') is None:
+        if mesh:
+            self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex'))
+        elif ble:
+            self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
+    if self.get('APP_IMAGE_BASE') is None:
+        if mesh:
+            self['APP_IMAGE_BASE'] = 0x18056000
+        elif ble:
+            self['APP_IMAGE_BASE'] = 0x18034000
+        else:
+            self['APP_IMAGE_BASE'] = 0x18002000
+    if self.get('LINKSCRIPT') is None:
+        if mesh:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mesh.ld"))
-    elif ble:
-        self.Append(LIBS = [File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libfw.o'))])
-        self['STACK_HEX'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/fw.hex'))
-        self['APP_IMAGE_BASE'] = 0x18034000
-        if self.get('LINKSCRIPT') is None:
+        elif ble:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/ble.ld"))
-    else:
-        self['APP_IMAGE_BASE'] = 0x18002000
-        if self.get('LINKSCRIPT') is None:
+        else:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mcu.ld"))
     self.Append(LIBPATH = [self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/")])
     self.Append(CPPPATH = self.inc_dirs(inc_list))

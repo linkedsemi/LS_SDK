@@ -1,11 +1,11 @@
 #ifndef _LS_MESH_LIGHT_CFG_H_
 #define _LS_MESH_LIGHT_CFG_H_
 
-#include "lstimer.h"
+#include "ls_hal_timer.h"
 #include "le501x.h"
 #include "platform.h"
 #include "reg_rcc.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "field_manipulate.h"
 
 #include <string.h>

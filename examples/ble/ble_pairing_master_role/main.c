@@ -6,11 +6,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "ble_common_api.h"
 
 #define PAIR_ENCRYPT_ENABLE  0
@@ -210,7 +210,7 @@ static void ls_single_role_timer_cb(void *param)
 }
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -680,18 +680,24 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             connect_pattern_send_prepare(con_idx); 
 
 #if (PAIR_ENCRYPT_ENABLE == 1)
+           if (0xff == gap_manager_get_bonding_peer_id(con_idx))
+           {
             struct pair_feature feat_param={
             .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
             .oob = BLE_GAP_OOB_ENABLE,
-            .auth = AUTH_SEC_CON,
+            .auth = AUTH_SEC_CON | AUTH_BOND,
             .key_size = 16,
             .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
             .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
 
             
-        };
-
-           gap_manager_master_bond(con_idx,&feat_param);
+             };
+             gap_manager_master_bond(con_idx,&feat_param);
+          }
+          else
+          {
+             gap_manager_master_encrypt(con_idx);  
+          }
 #else
            gatt_manager_client_mtu_exch_send(con_idx);
 #endif //PAIR_ENCRYPT_ENABLE
@@ -732,6 +738,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     break;
     case ENCRYPT_DONE:
     {
+        LOG_I("ENCRYPT_DONE");
+        gatt_manager_client_mtu_exch_send(con_idx);  
     }break;  
     case NUMERIC_COMPARE:
     {
@@ -1016,9 +1024,30 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     }   
 }
 
+void exti_io_enable(void)
+{
+    io_cfg_input(PA07);    //PA07 config input
+    io_pull_write(PA07, IO_PULL_UP);    //PA07 config pullup
+    io_exti_config(PA07,INT_EDGE_FALLING);    //PA07 interrupt falling edge
+        //PA07 interrupt enable
+}
+
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
+{
+    if (pin == PA07)
+    {
+        uint8_t bonded_num =gap_manager_get_bonded_dev_num();
+        for(uint8_t i=0;i < bonded_num;i++)
+        {
+          gap_manager_delete_bonding(i);
+        }
+    }
+}
+
 int main()
 {
     sys_init_app();
+    exti_io_enable();
     ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);

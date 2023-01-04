@@ -12,20 +12,21 @@
 
 /* Includes ------------------------------------------------------------------*/
 #define LOG_TAG "MAIN"
-#include "ls_ble.h"
 #include "platform.h"
-#include "prf_diss.h"
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
-#include "lsspi.h"
-#include "lsssi.h"
-#include "lsdmac.h"
+#include "ls_hal_spi_i2s.h"
+#include "ls_hal_ssi.h"
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#else
+#include "ls_hal_dmac.h"
+#endif
 
 /* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);
@@ -51,13 +52,15 @@ void HAL_SSI_TxRxDMACpltCallback(SSI_HandleTypeDef *hssi)
 
 static void ssi_test_init(void)
 {
-    ssi_clk_io_init(PB09);		/* CLK-------------PB09 */	
-	ssi_nss0_io_init(PB08);	/* SSN-------------PB08 */	
-	ssi_dq0_io_init(PA07);		/* MOSI------------PA07 */	
-	ssi_dq1_io_init(PA00);		/* MISO------------PA00 */	
+    io_cfg_output(PA01);
+    io_write_pin(PA01, 1);
+    pinmux_ssi_clk_init(PB09);		/* CLK-------------PB09 */	
+	pinmux_ssi_nss0_init(PB08);	    /* SSN-------------PB08 */	
+	pinmux_ssi_dq0_init(PA07);		/* MOSI------------PA07 */	
+	pinmux_ssi_dq1_init(PA00);		/* MISO------------PA00 */	
 	
 	SsiHandle.REG = LSSSI;
-	SsiHandle.Init.clk_div = 64;
+	SsiHandle.Init.clk_div = 128;
 	SsiHandle.Init.rxsample_dly = 0;
 	SsiHandle.Init.ctrl.cph = SCLK_Toggle_In_Middle;
 	SsiHandle.Init.ctrl.cpol = Inactive_Low;
@@ -97,12 +100,12 @@ int main(void)
 	{
 		if(ssi_txrx_flag == 1)
 		{
+			ssi_txrx_flag = 0;
 			if(HAL_SSI_TransmitReceive_DMA(&SsiHandle, ssi_dma_tx_buf,ssi_dma_rx_buf, 4)!= HAL_OK)
             {
                 /* Transfer error in transmission process */
                 Error_Handler();
             }
-			ssi_txrx_flag = 0;
 		}
 		DELAY_US(10000);
 	}

@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "prf_fotas.h"
 #include "SEGGER_RTT.h"
 #include "ls_sys.h"
@@ -239,7 +239,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -522,7 +522,6 @@ static void Init_GPIO(void)
     io_cfg_input(PB15);
     io_pull_write(PB15, IO_PULL_UP);
     io_exti_config(PB15, INT_EDGE_FALLING);
-    io_exti_enable(PB15, true);
     /*LED io initial*/
     for (uint8_t i = 0; i < 8; i++)
     {
@@ -577,7 +576,7 @@ static void Touch_LED(void)
  * 
  * @param null
  */
-static void Touch_Updata()
+static void Touch_Updata(void *param)
 {
     Touch_LED();
     HAL_TK_Get_Reg(SIGLR0, (uint8_t *)RxBUFF, 1);
@@ -616,7 +615,7 @@ static void Error_TKHandle(void)
 /**
  * @brief  Key interrupt callback
  */
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
     switch (pin)
     {

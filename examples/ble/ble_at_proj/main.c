@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "main.h"
 
 #define UART_SERVER_MASTER_NUM 2 //SDK_MAX_CONN_NUM
@@ -546,6 +546,12 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
             LOG_I("write fail, status = %d", evt->client_write_rsp.status);
         }
         break;
+    case CLIENT_DISC_OP_DONE:
+        if(evt->client_discovery_operation_done.status != 0)
+        {
+            LOG_I("\r\nclient discory operation fail !!!");
+        }
+        break;
     default:
         LOG_I("Event not handled!");
         break;
@@ -729,6 +735,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_add_service(&ls_uart_server_svc);
         ls_uart_server_init(0xff);
         ls_uart_client_init(0xff);
+        at_init();
     }
     break;
     case SERVICE_ADDED:
@@ -785,7 +792,6 @@ int main()
 {
     sys_init_app();
     ble_init();
-    at_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);

@@ -1,0 +1,21 @@
+
+define memory mem with size = 4G;
+
+define region RAM = mem: [from 0x20000000 size 0x2000];
+define region FLASH = mem: [from 0x800200 size 0x80000];
+define symbol __data_start__ = 0x20000148;
+
+place at address mem:0x800000 {symbol __info_array};
+keep {symbol __info_array};
+initialize by copy with packing = none {section .intvec,rw,section __iar_init$$done.xip_banned*};
+place at start of RAM {section .intvec};
+place at start of FLASH {section .intvec_init};
+place in FLASH {ro};
+define block RW_BLK {first block First{section __iar_init$$done.xip_banned.sleep_recover_asm},rw};
+place at address mem:__data_start__ {block RW_BLK};
+
+define block HEAP with alignment = 4,size = 0x200 {};
+define block CSTACK with alignment = 4,size = 0x300 {};
+place in RAM {block HEAP, block CSTACK};
+
+include "rom_sym.txt";

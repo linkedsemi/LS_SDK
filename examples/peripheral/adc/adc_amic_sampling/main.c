@@ -11,17 +11,17 @@
  ******************************************************************************/
 #define LOG_TAG	"ADC_AMIC"
 #include "app_config.h"
-#include "lsadc.h"
+#include "ls_hal_adc.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include <string.h>
 #include <stdlib.h>
-#include "lsdmac.h"
+#include "ls_hal_dmac.h"
 #include "log.h"
-#include "lsuart.h"
-#include "lstimer.h"
+#include "ls_hal_uart.h"
+#include "ls_hal_timer.h"
 
-#include "lspis.h"
+#include "ls_hal_pis.h"
 #if (AMIC_STREAM_FORMAT & AMIC_SAMPLE_ADPCM)
 #include "adpcm.h"
 #endif
@@ -69,7 +69,6 @@
 	io_pull_write(IO, PULL);			\
 	if (IRQ) {						\
 		io_exti_config(IO, EDGE);	\
-		io_exti_enable(IO, true);	\
 	}								\
 }
 
@@ -215,7 +214,7 @@ static void _AMIC_ExtChannel_Init(ADC_HandleTypeDef *hadc, void (*Callback)(ADC_
 static void _AMIC_Timer_Init(TIM_HandleTypeDef *TimHandle, bool isStart);
 
 //System weak define callback
-void io_exti_callback(uint8_t pin);
+void io_exti_callback(uint8_t pin,exti_edge_t edge);
 /******************************************************************************
  Local Function Definition
  ******************************************************************************/
@@ -399,9 +398,9 @@ static void _AMIC_Timer_Init(TIM_HandleTypeDef *TimHandle, bool isStart)
 static bool _AMIC_Uart_Init(UART_HandleTypeDef *huart, uint8_t txd, uint8_t rxd, bool isRxPullup)
 {
 	switch ((uint32_t)huart->UARTX) {
-		case (uint32_t)UART1: uart1_io_init(txd, rxd); break;
-		case (uint32_t)UART2: uart2_io_init(txd, rxd); break;
-		case (uint32_t)UART3: uart3_io_init(txd, rxd); break;
+		case (uint32_t)UART1: pinmux_uart1_init(txd, rxd); break;
+		case (uint32_t)UART2: pinmux_uart2_init(txd, rxd); break;
+		case (uint32_t)UART3: pinmux_uart3_init(txd, rxd); break;
 	}
 
 	if (isRxPullup) {
@@ -422,15 +421,15 @@ static bool _AMIC_Uart_Init(UART_HandleTypeDef *huart, uint8_t txd, uint8_t rxd,
 static void _AMIC_Sample_Channel_Enable(uint32_t channel)
 {
 	switch (channel) {
-		case ADC_CHANNEL_0: adc12b_in0_io_init(); break;
-		case ADC_CHANNEL_1: adc12b_in1_io_init(); break;
-		case ADC_CHANNEL_2: adc12b_in2_io_init(); break;
-		case ADC_CHANNEL_3: adc12b_in3_io_init(); break;
-		case ADC_CHANNEL_4: adc12b_in4_io_init(); break;
-		case ADC_CHANNEL_5: adc12b_in5_io_init(); break;
-		case ADC_CHANNEL_6: adc12b_in6_io_init(); break;
-		case ADC_CHANNEL_7: adc12b_in7_io_init(); break;
-		case ADC_CHANNEL_8: adc12b_in8_io_init(); break;
+		case ADC_CHANNEL_0: pinmux_adc12b_in0_init(); break;
+		case ADC_CHANNEL_1: pinmux_adc12b_in1_init(); break;
+		case ADC_CHANNEL_2: pinmux_adc12b_in2_init(); break;
+		case ADC_CHANNEL_3: pinmux_adc12b_in3_init(); break;
+		case ADC_CHANNEL_4: pinmux_adc12b_in4_init(); break;
+		case ADC_CHANNEL_5: pinmux_adc12b_in5_init(); break;
+		case ADC_CHANNEL_6: pinmux_adc12b_in6_init(); break;
+		case ADC_CHANNEL_7: pinmux_adc12b_in7_init(); break;
+		case ADC_CHANNEL_8: pinmux_adc12b_in8_init(); break;
 		default:
 			break;
 	}
@@ -445,7 +444,7 @@ static void _AMIC_Sample_Channel_Enable(uint32_t channel)
  * Overview:
  * Note:
  ******************************************************************************/
-void io_exti_callback(uint8_t pin)
+void io_exti_callback(uint8_t pin,exti_edge_t edge)
 {
 	switch (pin) {
 		case BTN_IO:

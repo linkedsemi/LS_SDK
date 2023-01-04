@@ -6,7 +6,7 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "tinyfs.h"
 #include "tinycrypt/sha256.h"
 #include "tinycrypt/constants.h"
@@ -14,12 +14,12 @@
 #include "le501x.h"
 #include "sig_mesh_ctl.h"
 #include "sig_mesh_vendor_event.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "builtin_timer.h"
 
 #define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
-#define MAX_NB_ADDR_REPLAY 5
+#define MAX_NB_ADDR_REPLAY 20
 #define PROV_AUTH_ACCEPT 1
 #define PROV_AUTH_NOACCEPT 0
 #define DEV_NAME_MAX_LEN 0x20
@@ -57,7 +57,7 @@ static uint8_t seqnum_offset=0;
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
 struct vendor_model_publish_message tx_msg_info;
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx, uint16_t model_cfg_idx);
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx);
 #if (AUTO_SIG_MESH_LP_MODE == 1)
 #define TIMER_100ms	  100
 static bool glp_tx_enable=false;
@@ -131,7 +131,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     
 }
 
-void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx, uint16_t model_cfg_idx)
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx)
 {
     struct model_cli_trans_info param;
         model_tid++;
@@ -498,6 +498,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 int main()
 {
     sys_init_app();
+    mesh_stack_data_bss_init();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
     #if (AUTO_SIG_MESH_LP_MODE == 0)
     io_cfg_output(PROV_SUCCESS_LED);

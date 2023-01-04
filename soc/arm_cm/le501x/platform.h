@@ -5,19 +5,12 @@
 #include "sdk_config.h"
 #include "compile_flag.h"
 #include "prf_fotas.h"
+#include "le501x.h"
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
 
-#define LSI_CNT_CYCLES (100)
-
-enum OTA_settings_type
-{
-    SINGLE_FOREGROUND = 0,
-    DOUBLE_FOREGROUND = 1,
-    DOUBLE_BACKGROUND = 2,
-    OTA_SETTINGS_TYPE_MAX = DOUBLE_BACKGROUND + 1,
-};
+#define LSI_CNT_CYCLES (1500)
 
 struct reset_retain_struct
 {
@@ -62,10 +55,6 @@ void platform_reset(uint32_t error);
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param);
 
-void rco_freq_counting_config(void);
-
-void rco_freq_counting_start(void);
-
 uint64_t lpcycles_to_hus(uint32_t lpcycles);
 
 uint32_t us_to_lpcycles(uint32_t us);
@@ -78,8 +67,6 @@ uint64_t idiv_acc(uint32_t,uint32_t,bool);
 
 void arm_cm_delay_asm(uint32_t);
 
-void request_ota_reboot(void);
-
 void power_up_hardware_modules(void);
 
 void remove_hw_isolation(void);
@@ -91,19 +78,7 @@ void arm_cm_set_int_isr(int8_t type,void (*isr)());
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/5)
 
-void ota_settings_erase(void);
-
-void ota_settings_write(uint32_t ota_settings_type);
-
-uint32_t ota_settings_read(void);
-
-bool ota_copy_info_get(struct fota_image_info *ptr);
-
-void ota_copy_info_set(struct fota_image_info *ptr);
-
 uint32_t get_app_image_base(void);
-
-uint32_t get_fota_image_base(void);
 
 void LVD33_Handler(void);
 
@@ -112,6 +87,8 @@ void lvd33_config(void);
 void lvd33_enable(void);
 
 void lvd33_disable(void);
+
+void mesh_stack_data_bss_init(void);
 
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))

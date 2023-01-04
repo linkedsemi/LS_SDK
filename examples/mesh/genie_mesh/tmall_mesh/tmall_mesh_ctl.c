@@ -4,7 +4,7 @@
 #include "log.h"
 #include "le501x.h"
 #include "tmall_light_cfg.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 extern struct mesh_model_info model_env;
 //static uint8_t advertising_data[28];
@@ -123,7 +123,7 @@ void tmall_mesh_recv_light_hsl_msg(struct model_rx_info *msg)
 //    io_cfg_input(PB15);
 //    io_pull_write(PB15,IO_PULL_DISABLE);
 //    io_exti_config(PB15,INT_EDGE_RISING);
-//    io_exti_enable(PB15,true);
+//    
 
 //     NVIC_SetPriority(EXTI_IRQn, 1);
 //     NVIC_EnableIRQ(EXTI_IRQn);

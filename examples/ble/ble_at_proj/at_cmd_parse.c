@@ -1,8 +1,8 @@
 #include "at_recv_cmd.h"
 #include "at_cmd_parse.h"
-#include "lsrtc.h"
+#include "ls_hal_rtc.h"
 #include "sleep.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 
 #define WAKEUP_MS 5000
 
@@ -367,7 +367,7 @@ static void at_link_get_handler(uint8_t *p_cmd_parse)
     uart_write(msg_rsp,msg_len);
     if ( *p_cmd_parse == '?')
     {
-        for (uint8_t i=0; i < get_ble_con_num(); i++)
+        for (uint8_t i=0; i < SDK_MAX_CONN_NUM; i++)
         {
             if (get_con_status(i)==false)
             {
@@ -413,10 +413,10 @@ static void at_sleep_handler(uint8_t *p_cmd_parse)
             msg_len = sprintf((char *)msg_rsp,"\r\n+SLEEP:\r\nOK\r\n");
             uart_write(msg_rsp,msg_len);
             HAL_UART_DeInit(&UART_Server_Config);
-            uart1_io_deinit();
+            pinmux_uart1_deinit();
             io_pull_write(PB01,IO_PULL_DISABLE);
             if(sleep_mode_set==0){
-                wkup_io_init();
+                wkup_io_setup();
             }
             else if(sleep_mode_set==1){
                 HAL_RTC_Init(RTC_CKSEL_LSI);
@@ -597,7 +597,7 @@ static void at_tx_power_handler(uint8_t *p_cmd_parse)
             else
             {
                 LOG_I("power:%d",ls_at_buff_env.default_info.rfpower);
-                rf_set_power(ls_at_buff_env.default_info.rfpower);
+                rf_set_power((enum rf_tx_pwr)ls_at_buff_env.default_info.rfpower);
                 msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nOK\r\n",ls_at_buff_env.default_info.rfpower);
             }
             uart_write(msg_rsp,msg_len);

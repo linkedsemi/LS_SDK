@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "lsuart.h"
+#include "ls_hal_uart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "fota_svc_server.h"
 #include "SEGGER_RTT.h"
 
@@ -164,7 +164,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 static void ls_uart_init(void)
 {
-    uart1_io_init(PB00, PB01);
+    pinmux_uart1_init(PB00, PB01);
     io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
@@ -239,6 +239,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         connect_id = 0xff;
         uart_server_mtu = UART_SERVER_MTU_DFT;
         LOG_I("disconnected!");
+        fota_clean_state();
         start_adv();
     break;
     case CONN_PARAM_REQ:

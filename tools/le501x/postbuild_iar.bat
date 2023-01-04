@@ -1,0 +1,6 @@
+%2\tools\srec_cat.exe -o %4\build\Exe\info_sbl.hex -I %2\soc\arm_cm\le501x\bin\bram.bin -Bin -of 0x18000300 -crc32-l-e -max-a %2\soc\arm_cm\le501x\bin\bram.bin -Bin -of 0x18000300 %2\tools\le501x\info.bin -Bin -of 0x18000000 -gen 0x1800001c 0x18000020 -const-l-e 0x18000300 4 -gen 0x18000020 0x18000024 -const-l-e -l %2\soc\arm_cm\le501x\bin\bram.bin -Bin 4 -gen 0x18000024 0x18000028 -const-l-e %3 4 -gen 0x1800002c 0x18000030 -const-l-e 0x1807c000 4 -gen 0x18000030 0x18000036 -rep-d 0xff 0xff 0xff 0xff 0xff 0xff 
+if "%5" NEQ "" (
+%2\tools\srec_cat.exe -Output %4\build\Exe\%1_production.hex -Intel %4\build\Exe\info_sbl.hex -Intel %4\build\Exe\%1.hex -Intel %2\%5 -Intel
+) else (
+%2\tools\srec_cat.exe -Output %4\build\Exe\%1_production.hex -Intel %4\build\Exe\info_sbl.hex -Intel %4\build\Exe\%1.hex -Intel
+)

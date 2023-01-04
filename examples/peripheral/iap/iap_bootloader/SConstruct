@@ -1,0 +1,14 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'uart_process.c',
+    'upgrade_process.c',
+    'main.c',
+    'iap_sha256.c',
+]
+inc = [
+    '.'
+]
+env.app_build('iap_bootloader',src,inc,ble = False)

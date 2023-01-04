@@ -63,8 +63,8 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     /*##-1- Enable peripherals and GPIO Clocks #################################*/
     /* TIMx Peripheral clock enable */
     REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);
-    gptimb1_ch1_io_init(LED_PIN_0,true,0);
-    gptimb1_ch1_io_init(LED_PIN_1,true,0);
+    pinmux_gptimb1_ch1_init(LED_PIN_0,true,0);
+    pinmux_gptimb1_ch1_init(LED_PIN_1,true,0);
 }
 
 void ls_mesh_light_init(void)
@@ -72,8 +72,8 @@ void ls_mesh_light_init(void)
     uint16_t level_t = 0x55FF;
     light_tim_hdl.Instance = TIMx;
 
-    gptimb1_ch1_io_init(LED_PIN_0, true, 0);
-    gptimb1_ch1_io_init(LED_PIN_1, true, 0);
+    pinmux_gptimb1_ch1_init(LED_PIN_0, true, 0);
+    pinmux_gptimb1_ch1_init(LED_PIN_1, true, 0);
 
     light_tim_hdl.Init.Prescaler = 63;
     light_tim_hdl.Init.Period = 249;
