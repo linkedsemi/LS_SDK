@@ -3,6 +3,8 @@ import sys
 Import('env')
 env['ABI'] = 'ilp32e'
 env['ARCH'] = 'rv32emc'
+if not 'DEFAULT_OPT_LVL' in env:
+    env['DEFAULT_OPT_LVL'] = '-Os'
 
 def plf_postaction(self,target):
     self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
