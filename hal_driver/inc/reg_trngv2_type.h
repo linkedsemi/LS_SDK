@@ -2,9 +2,6 @@
 #define REG_TRNG_TYPE_H_
 #include <stdint.h>
 
-
-#define TRNG ((reg_trng_t *)0x4008CC00)
-
 typedef struct
 {
     volatile uint32_t TRNG_CTRL; //0x0
@@ -79,26 +76,16 @@ enum TRNG_REG_RO1_DLY_SEL_FIELD
 
 enum TRNG_REG_INTR_MSK_FIELD
 {
-    TRNG_INTR_MSK_MASK = (int)0xf,
-    TRNG_INTR_MSK_POS = 0,
-};
-
-enum TRNG_REG_INTR_CLR_FIELD
-{
-    TRNG_INTR_CLR_MASK = (int)0xf,
-    TRNG_INTR_CLR_POS = 0,
-};
-
-enum TRNG_REG_INTR_STAT_FIELD
-{
-    TRNG_INTR_STAT_MASK = (int)0xf,
-    TRNG_INTR_STAT_POS = 0,
-};
-
-enum TRNG_REG_INTR_RAW_FIELD
-{
-    TRNG_INTR_RAW_MASK = (int)0xf,
-    TRNG_INTR_RAW_POS = 0,
+    TRNG_INTR_ALL_MASK = (int)0xf,
+    TRNG_INTR_ALL_POS = 0,
+    TRNG_INTR_RISI_MASK = (int)0x1,
+    TRNG_INTR_RISI_POS = 0,
+    TRNG_INTR_FALLING_MASK = (int)0x2,
+    TRNG_INTR_FALLING_POS = 1,
+    TRNG_INTR_LOCK_MASK = (int)0x4,
+    TRNG_INTR_LOCK_POS = 2,
+    TRNG_INTR_NOFND_MASK = (int)0x8,
+    TRNG_INTR_NOFND_POS = 3,
 };
 
 enum TRNG_REG_TRNG_OUT_FIELD
