@@ -1,5 +1,4 @@
-#include "ls_msp_trng.h"
-#include "reg_rcc.h"
+#include "ls_msp_trngv2.h"
 #include "field_manipulate.h"
 #include "platform.h"
 #include "lm3050.h"

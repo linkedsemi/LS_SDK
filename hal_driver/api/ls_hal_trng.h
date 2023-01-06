@@ -2,7 +2,6 @@
 #define LS_HAL_TRNG_H_
 #include <stdint.h>
 #include "HAL_def.h"
-#include "ls_msp_trng.h"
 
 /** \addtogroup PERIPHERAL
  *  @{
