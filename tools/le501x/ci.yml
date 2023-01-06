@@ -174,6 +174,25 @@ le501x_ble_mult_roles_iar_build:
   script:
     - cd examples/ble/ble_mult_roles/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_mult_roles.ewp -build * -log all
 
+le501x_ble_mult_servers_build:
+  stage: build
+  script:
+    - cd examples/ble/ble_mult_servers && scons
+
+le501x_ble_mult_servers_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_mult_servers/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ble_mult_servers.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_ble_mult_servers_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_mult_servers/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_mult_servers.ewp -build * -log all
+
 le501x_ble_single_role_build:
   stage: build
   script:
@@ -192,6 +211,25 @@ le501x_ble_single_role_iar_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/ble/ble_single_role/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_single_role.ewp -build * -log all
+
+le501x_ble_single_master_build:
+  stage: build
+  script:
+    - cd examples/ble/ble_single_master && scons
+
+le501x_ble_single_master_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_single_master/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ble_single_master.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_ble_single_master_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_single_master/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_single_master.ewp -build * -log all
 
 le501x_ble_pairing_master_role_build:
   stage: build
