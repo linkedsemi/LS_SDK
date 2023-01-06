@@ -106,7 +106,10 @@ static bool uart_rx_pass_key_flg=false;
 static bool uart_rx_numeric_comparison_flg=false;
 #endif//NUMERIC_COMPARISON_ENABLE
 
+#if ((SC_OOB_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1))
 static bool uart_rx_oob_flg=false;
+#endif//SC_OOB_ENABLE || LEGACY_OOB_ENABLE
+
 #endif
 
 static const uint8_t ls_uart_svc_uuid_128[] = {0x9e,0xca,0xdc,0x24,0x0e,0xe5,0xa9,0xe0,0x93,0xf3,0xa3,0xb5,0x01,0x00,0x40,0x6e};
@@ -198,7 +201,11 @@ static void start_adv(void);
 static void ls_uart_server_client_uart_tx(void);
 static void ls_single_role_timer_cb(void *param);
 #if (PAIR_ENCRYPT_ENABLE == 1)
+
+#if ((NUMERIC_COMPARISON_ENABLE == 1) || (LEGACY_PASSKEY_ENTRY_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1) || (SC_OOB_ENABLE == 1))
 static uint8_t uart_pairing_ble_buf[UART_SVC_BUFFER_SIZE];
+#endif
+
 #if (SC_OOB_ENABLE  == 1)
 static void ls_uart_sc_oob_set(void);
 #endif //SC_OOB_ENABLE
@@ -409,7 +416,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     LOG_I("tx cplt, current_uart_tx_idx = %d", current_uart_tx_idx);
     uart_tx_busy = false;
 #if (PAIR_ENCRYPT_ENABLE == 1)
+    #if ((NUMERIC_COMPARISON_ENABLE == 1) || (LEGACY_PASSKEY_ENTRY_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1))
     uart_pairing_ble_buf[0] = 0; // clear oob buffer sync byte
+    #endif
 #endif 
  
     if ((current_uart_tx_idx & (1 << 7)) == 0)
@@ -561,7 +570,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
               memcpy((void*)&uart_pairing_ble_buf[0], (void*)&uart_rx_buf[UART_SYNC_BYTE_LEN+UART_LINK_ID_LEN], BLE_KEY_LEN);
               #endif //LEGACY_OOB_ENABLE
 
+              #if ((SC_OOB_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1))
               uart_rx_oob_flg =true;
+              #endif//SC_OOB_ENABLE || LEGACY_OOB_ENABLE
           }
     break;
 #if (LEGACY_PASSKEY_ENTRY_ENABLE ==1)      
@@ -760,7 +771,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             };
             gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
             LOG_I("LEGACY_OOB  ");		
-            
+                 
         #elif (SC_OOB_ENABLE == 1)
             struct pair_feature feat_param={
                 .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
