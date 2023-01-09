@@ -32,7 +32,7 @@ bool sign_app_code(uint8_t *p_data,uint16_t data_len)
         return false;
     }
 #if defined(LE501X)
-    sha256_get((uint8_t)APP_DATA_ADDR_BASE, app_config.code_len, sha256_code);
+    sha256_get((uint8_t *)APP_DATA_ADDR_BASE, app_config.code_len, sha256_code);
 #else
     uint32_t sha256_buffer[8];
     uint8_t j;
