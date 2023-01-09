@@ -28,7 +28,7 @@ struct ls_mesh_rx_msg_evt
     uint16_t handle;       /*!< rx message handle*/
     uint32_t version;      /*!< Version dependent handle*/
     uint8_t value[__LS_MESH_EMPTY];  /*!< rx message value*/
-} ;
+}__attribute__((packed));
 
 /**
   * @brief Linkedsemi mesh event union
