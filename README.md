@@ -20,8 +20,10 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | ble/ble_hid                                                               |  √     |        |
 | ble/ble_hid_dmic                                                          |  √     |        |
 | ble/ble_mult_roles                                                        |  √     |        |
+| ble/ble_mult_servers                                                      |  √     |        |
 | ble/ble_pairing_master_role                                               |  √     |        |
 | ble/ble_pairing_slave_role                                                |  √     |        |
+| ble/ble_single_master                                                     |  √     |        |
 | ble/ble_single_role                                                       |  √     |        |
 | ble/ble_tk                                                                |  √     |        |
 | ble/ble_uart_server                                                       |  √     |        |
@@ -106,6 +108,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/tk/tk_polling                                                  |  √     |        |
 | peripheral/touchkey/touchkey_it                                           |        |  √     |
 | peripheral/touchkey/touchkey_polling                                      |        |  √     |
+| peripheral/trng/trng_it                                                   |  √     |  √     |
+| peripheral/trng/trng_polling                                              |  √     |  √     |
 | peripheral/uart/ll_uart_it                                                |  √     |  √     |
 | peripheral/uart/ll_uart_polling                                           |  √     |  √     |
 | peripheral/uart/uart_dma                                                  |  √     |  √     |
