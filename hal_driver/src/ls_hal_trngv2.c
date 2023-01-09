@@ -64,8 +64,8 @@ __attribute__((weak)) void HAL_TRNG_ReadyDataCallback(uint32_t random32bit) {}
 
 void HAL_TRNG_IRQHandler(void)
 {
-    REG_FIELD_WR(LSTRNG->TRNG_CTRL, TRNG_FSM_RST, 1);
     uint32_t out = LSTRNG->TRNG_OUT;
+    REG_FIELD_WR(LSTRNG->TRNG_CTRL, TRNG_FSM_RST, 1);
     LSTRNG->INTR_CLR = TRNG_INTR_ALL_MASK;
     if (out & TRNG_MATCHED_MASK)
     {
