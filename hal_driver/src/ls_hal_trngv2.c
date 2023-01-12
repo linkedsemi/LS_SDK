@@ -66,13 +66,14 @@ void HAL_TRNG_IRQHandler(void)
 {
     uint32_t out = LSTRNG->TRNG_OUT;
     REG_FIELD_WR(LSTRNG->TRNG_CTRL, TRNG_FSM_RST, 1);
-    LSTRNG->INTR_CLR = TRNG_INTR_ALL_MASK;
+    if (out & TRNG_NO_FND_MASK)
+    {
+        LSTRNG->INTR_CLR = TRNG_INTR_NOFND_MASK;
+        return;
+    }
     if (out & TRNG_MATCHED_MASK)
     {
-        if (out & TRNG_NO_FND_MASK)
-        {
-            return;
-        }
+        LSTRNG->INTR_CLR = TRNG_INTR_RISI_MASK | TRNG_INTR_FALLING_MASK;
         if (generate_random32bit == 0)
         {
             generate_random32bit = REG_FIELD_RD(LSTRNG->TRNG_OUT, TRNG_RAND_DAT) << 16;
