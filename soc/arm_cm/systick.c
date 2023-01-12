@@ -1,5 +1,4 @@
 #include "systick.h"
-#include "arm_math.h"
 #include "compile_flag.h"
 #include "sdk_config.h"
 #include "common.h"

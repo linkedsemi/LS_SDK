@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include "sdk_config.h"
 #include "compile_flag.h"
-#include "prf_fotas.h"
 #include "le501x.h"
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
