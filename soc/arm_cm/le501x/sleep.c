@@ -387,6 +387,8 @@ static bool exti_int_pending(uint8_t pin)
     return false;
 }
 
+__attribute__((weak)) void rtc_wkup_callback(void){}
+
 void LPWKUP_Handler(void)
 {
     SYSCFG->PMU_WKUP &= ~(wkup_stat << WKUP_EN_POS);
