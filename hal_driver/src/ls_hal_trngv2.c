@@ -3,7 +3,7 @@
 #include "ls_msp_trngv2.h"
 #include "field_manipulate.h"
 
-volatile static uint32_t generate_random32bit;
+static uint32_t generate_random32bit;
 
 static void trng_config()
 {
@@ -64,16 +64,17 @@ __attribute__((weak)) void HAL_TRNG_ReadyDataCallback(uint32_t random32bit) {}
 
 void HAL_TRNG_IRQHandler(void)
 {
-    uint32_t out = LSTRNG->TRNG_OUT;
+    uint32_t stat = LSTRNG->INTR_STAT;
     REG_FIELD_WR(LSTRNG->TRNG_CTRL, TRNG_FSM_RST, 1);
-    if (out & TRNG_NO_FND_MASK)
+    if ((stat & TRNG_INTR_LOCK_MASK) | (stat & TRNG_INTR_NOFND_MASK))
     {
-        LSTRNG->INTR_CLR = TRNG_INTR_NOFND_MASK;
+        LSTRNG->INTR_CLR = TRNG_INTR_ALL_MASK;
+        REG_FIELD_WR(LSTRNG->TRNG_CTRL, TRNG_FSM_RST, 0);
         return;
     }
-    if (out & TRNG_MATCHED_MASK)
+    if ((stat & TRNG_INTR_RISI_MASK) | (stat & TRNG_INTR_FALLING_MASK))
     {
-        LSTRNG->INTR_CLR = TRNG_INTR_RISI_MASK | TRNG_INTR_FALLING_MASK;
+        LSTRNG->INTR_CLR = TRNG_INTR_ALL_MASK;
         if (generate_random32bit == 0)
         {
             generate_random32bit = REG_FIELD_RD(LSTRNG->TRNG_OUT, TRNG_RAND_DAT) << 16;
