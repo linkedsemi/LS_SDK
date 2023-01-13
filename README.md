@@ -55,6 +55,9 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/can/CAN_Normal                                                 |        |  √     |
 | peripheral/comp/comp_dac                                                  |        |  √     |
 | peripheral/comp/comp_internal                                             |        |  √     |
+| peripheral/crypt/des_ecb_cbc_it                                           |  √     |  √     |
+| peripheral/crypt/des_ecb_cbc_polling                                      |  √     |  √     |
+| peripheral/crypt/des_it_padding                                           |  √     |  √     |
 | peripheral/crypt/ecb_cbc_it                                               |  √     |  √     |
 | peripheral/crypt/ecb_cbc_polling                                          |  √     |  √     |
 | peripheral/crypt/ecb_it_padding                                           |  √     |  √     |

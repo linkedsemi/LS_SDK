@@ -55,6 +55,63 @@ lm3050_ecb_it_padding_iar_build:
   script:
     - cd examples/peripheral/crypt/ecb_it_padding/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_it_padding.ewp -build * -log all
 
+lm3050_des_ecb_cbc_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_polling && scons ic=lm3050
+
+lm3050_des_ecb_cbc_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b des_ecb_cbc_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_des_ecb_cbc_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_ecb_cbc_polling.ewp -build * -log all
+    
+lm3050_des_ecb_cbc_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_it && scons ic=lm3050
+
+lm3050_des_ecb_cbc_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b des_ecb_cbc_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_des_ecb_cbc_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_ecb_cbc_it.ewp -build * -log all
+
+lm3050_des_it_padding_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/des_it_padding && scons ic=lm3050
+
+lm3050_des_it_padding_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_it_padding/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b des_it_padding.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_des_it_padding_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_it_padding/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_it_padding.ewp -build * -log all
+
 lm3050_sha_polling_build:
   stage: build
   script:
