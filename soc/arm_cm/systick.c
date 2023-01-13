@@ -2,6 +2,7 @@
 #include "compile_flag.h"
 #include "sdk_config.h"
 #include "common.h"
+#include "platform.h"
 typedef struct
 {
   volatile uint32_t CTRL;                   /*!< Offset: 0x000 (R/W)  SysTick Control and Status Register */
@@ -140,6 +141,7 @@ typedef struct
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
 #define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
 
+#define SYSTICK_IRQ_NUM -5
 static uint32_t total_ticks;
 
 void XIP_BANNED_FUNC(SysTick_Handler,)
@@ -150,6 +152,7 @@ void XIP_BANNED_FUNC(SysTick_Handler,)
 void systick_start()
 {
     total_ticks = 0;
+    arm_cm_set_int_isr(SYSTICK_IRQ_NUM,SysTick_Handler);
     SysTick->LOAD  = (uint32_t)(SDK_HCLK_MHZ*1000000/SYSTICK_RATE_HZ - 1UL);
     SysTick->VAL   = 0UL;
     SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
