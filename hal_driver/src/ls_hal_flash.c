@@ -179,39 +179,31 @@ ROM_SYMBOL void hal_flash_multi_io_page_program(uint32_t offset,uint8_t *data,ui
     }
 }
 
-ROM_SYMBOL void hal_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+ROM_SYMBOL void do_hal_flash_erase(void *param)
 {
-    hal_flash_program_operation(offset,data,length,QUAD_WIRE);
+    flash_writing_critical(do_hal_flash_erase_func,param);
 }
 
-ROM_SYMBOL void hal_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+static void flash_erase_param_set(uint32_t offset,uint8_t opcode,struct flash_erase_param *param)
 {
-    hal_flash_program_operation(offset,data,length,DUAL_WIRE);
-}
-
-ROM_SYMBOL void hal_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length)
-{
-    hal_flash_program_operation(offset,data,length,SINGLE_WIRE);
-}
-
-ROM_SYMBOL void do_hal_flash_erase(uint32_t offset,uint8_t opcode)
-{
-    struct flash_erase_param param;
-    param.addr[0] = offset>>16&0xff;
-    param.addr[1] = offset>>8&0xff;
-    param.addr[2] = offset&0xff;
-    param.opcode = opcode;
-    flash_writing_critical(do_hal_flash_erase_func,&param);
+    param->addr[0] = offset>>16&0xff;
+    param->addr[1] = offset>>8&0xff;
+    param->addr[2] = offset&0xff;
+    param->opcode = opcode;
 }
 
 ROM_SYMBOL void hal_flash_page_erase(uint32_t offset)
 {
-    hal_flash_erase_operation(offset,PAGE_ERASE_OPCODE);
+    struct flash_erase_param param;
+    flash_erase_param_set(offset,PAGE_ERASE_OPCODE,&param);
+    hal_flash_erase_operation(&param);
 }
 
 ROM_SYMBOL void hal_flash_sector_erase(uint32_t offset)
 {
-    hal_flash_erase_operation(offset,SECTOR_ERASE_OPCODE);
+    struct flash_erase_param param;
+    flash_erase_param_set(offset,SECTOR_ERASE_OPCODE,&param);
+    hal_flash_erase_operation(&param);
 }
 
 ROM_SYMBOL void do_hal_flash_chip_erase()
@@ -255,16 +247,6 @@ ROM_SYMBOL void do_hal_flash_erase_security_area(uint8_t idx)
 ROM_SYMBOL void hal_flash_erase_security_area(uint8_t idx)
 {
     hal_flash_erase_security_area_operation(idx);
-}
-
-ROM_SYMBOL void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
-{
-    hal_flash_program_security_area_operation(idx, addr,data,length);
-}
-
-ROM_SYMBOL void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
-{
-    hal_flash_read_security_area_operation(idx, addr,data,length);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_qe_status_read_and_set,)
