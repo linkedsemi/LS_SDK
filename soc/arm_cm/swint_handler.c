@@ -36,13 +36,13 @@ __attribute__((naked)) void do_hal_flash_chip_erase_swint(void)
 
 }
 
-__attribute__((naked)) void do_hal_flash_erase_security_are_swint(uint8_t idx)
+__attribute__((naked)) void do_hal_flash_erase_security_area_swint(uint8_t idx)
 {
     SWINT_FUNC_CALL_INLINE_ASM(do_hal_flash_erase_security_area,flash_swint_set);
 
 }
 
-__attribute__((naked)) void do_hal_flash_program_security_are_swint(void *param)
+__attribute__((naked)) void do_hal_flash_program_security_area_swint(void *param)
 {
     SWINT_FUNC_CALL_INLINE_ASM(do_hal_flash_program_security_area,flash_swint_set);
 
