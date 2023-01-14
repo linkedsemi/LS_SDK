@@ -1,5 +1,5 @@
-#include "hal_flash_svcall.h"
-#include "flash_svcall_int.h"
+#include "hal_flash_swint.h"
+#include "flash_swint_int.h"
 #include "hal_flash_int.h"
 
 #define FLASH_EXECUTE_WITH_RETVAL(return_val,op,...) \
@@ -9,7 +9,7 @@
             return_val = op(__VA_ARGS__);\
         }else\
         {\
-            return_val = op##_svcall(__VA_ARGS__);\
+            return_val = op##_swint(__VA_ARGS__);\
         }\
     }while(0)
 
@@ -20,7 +20,7 @@
             op(__VA_ARGS__);\
         }else\
         {\
-            op##_svcall(__VA_ARGS__);\
+            op##_swint(__VA_ARGS__);\
         }\
     }while(0)
 

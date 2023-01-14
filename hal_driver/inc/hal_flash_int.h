@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "sdk_config.h"
 #include "ls_hal_flash.h"
-#include "hal_flash_svcall.h"
+#include "hal_flash_swint.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"

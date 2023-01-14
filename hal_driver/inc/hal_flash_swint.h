@@ -1,5 +1,5 @@
-#ifndef HAL_FLASH_SVCALL_H_
-#define HAL_FLASH_SVCALL_H_
+#ifndef HAL_FLASH_SWINT_H_
+#define HAL_FLASH_SWINT_H_
 #include <stdint.h>
 #include <stdbool.h>
 

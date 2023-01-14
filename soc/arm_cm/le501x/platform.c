@@ -31,6 +31,7 @@
 #include "sw_timer.h"
 #include "ls_sys.h"
 #include "sys_stat.h"
+#include "swint_call_asm.h"
 #define XTAL_STB_VAL 20
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
@@ -56,11 +57,11 @@ static void bb_mem_clr(void)
 
 static void irq_priority()
 {
-    __NVIC_SetPriority(SVCall_IRQn,2);
+    __NVIC_SetPriority(SVCall_IRQn,3);
     __NVIC_SetPriority(SysTick_IRQn, 1);
     __NVIC_SetPriority(PendSV_IRQn,3);
     NVIC->IP[0] = IRQ_NVIC_PRIO(EXTI_IRQn,3) | IRQ_NVIC_PRIO(WWDT_IRQn,3) | IRQ_NVIC_PRIO(LPWKUP_IRQn,2) | IRQ_NVIC_PRIO(BLE_IRQn,1);
-    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,3) | IRQ_NVIC_PRIO(ECC_IRQn,3);
+    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,2) | IRQ_NVIC_PRIO(ECC_IRQn,3);
     NVIC->IP[2] = IRQ_NVIC_PRIO(CACHE_IRQn,3) | IRQ_NVIC_PRIO(TRNG_IRQn,3) | IRQ_NVIC_PRIO(IWDT_IRQn,3) | IRQ_NVIC_PRIO(CRYPT_IRQn,3);
     NVIC->IP[3] = IRQ_NVIC_PRIO(PDM_IRQn,3) | IRQ_NVIC_PRIO(BLE_WKUP_IRQn,1) | IRQ_NVIC_PRIO(ADC_IRQn,3) | IRQ_NVIC_PRIO(ADTIM1_IRQn,3);
     NVIC->IP[4] = IRQ_NVIC_PRIO(BSTIM1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMA1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMB1_IRQn,3) | IRQ_NVIC_PRIO(BLE_ERR_IRQn,1);
@@ -666,6 +667,16 @@ void aos_swint_init(void (*isr)())
 void aos_swint_set()
 {
     __NVIC_SetPendingIRQ(CACHE_IRQn);
+}
+
+void flash_swint_init(void (*isr)())
+{
+    arm_cm_set_int_isr(QSPI_IRQn,isr);
+}
+
+void flash_swint_set()
+{
+    SWINT_SET_INLINE_ASM(QSPI_IRQn);
 }
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)
