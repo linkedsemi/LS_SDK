@@ -48,6 +48,8 @@ void main_task_app_init(void);
 
 void main_task_itf_init(void);
 
+void SWINT_Handler_ASM(void);
+
 __attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}    
 
 static void bb_mem_clr(void)
@@ -419,6 +421,7 @@ static void var_init()
     bb_mem_clr();
     stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init(SWINT_Handler_ASM);
 }
 
 void sys_init_itf()
@@ -442,6 +445,7 @@ void sys_init_none()
     analog_init();
     HAL_PIS_Init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init(SWINT_Handler_ASM);
     cpu_sleep_recover_init();
     calc_acc_init();
     mac_init();
@@ -469,6 +473,7 @@ static void ll_var_init()
     bb_mem_clr();
     ll_stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init(SWINT_Handler_ASM);
 }
 
 void sys_init_ll()
