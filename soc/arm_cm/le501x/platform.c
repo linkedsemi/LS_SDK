@@ -679,10 +679,12 @@ void flash_swint_init(void (*isr)())
     arm_cm_set_int_isr(QSPI_IRQn,isr);
 }
 
+#ifndef __CC_ARM
 void flash_swint_set()
 {
     SWINT_SET_INLINE_ASM(QSPI_IRQn);
 }
+#endif
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)
 {
