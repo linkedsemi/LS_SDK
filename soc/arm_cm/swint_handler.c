@@ -30,7 +30,7 @@ __attribute__((naked)) void do_hal_flash_read_reg_swint(void *param)
     SWINT_FUNC_CALL_INLINE_ASM(do_hal_flash_read_reg,flash_swint_set);
 }
 
-__attribute__((naked)) void do_hal_flash_chip_eras_swint(void)
+__attribute__((naked)) void do_hal_flash_chip_erase_swint(void)
 {
     SWINT_FUNC_CALL_INLINE_ASM(do_hal_flash_chip_erase,flash_swint_set);
 
