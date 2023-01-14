@@ -90,7 +90,7 @@ void XIP_BANNED_FUNC(do_hal_flash_prog_func,void *param)
     lsqspi_stig_write_data( param);
 }
 
-static void flash_program_param_set(int32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type,struct lsqspi_stig_rd_wr_param *param)
+static void flash_program_param_set(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type,struct lsqspi_stig_rd_wr_param *param)
 {
     param->start.data = data;
     param->start.opcode = multi_type == QUAD_WIRE ? QUAD_PAGE_PROGRAM_OPCODE : PAGE_PROGRAM_OPCODE;
@@ -102,11 +102,6 @@ static void flash_program_param_set(int32_t offset,uint8_t *data,uint16_t length
     param->start.opcode_en = 1;
     param->size = length;
     param->quad_data = multi_type == QUAD_WIRE;
-}
-
-void do_hal_flash_program(void *param)
-{
-    flash_writing_critical(do_hal_flash_prog_func,param);
 }
 
 void hal_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
@@ -221,11 +216,6 @@ void XIP_BANNED_FUNC(do_hal_flash_program_security_area_func,void *param)
     lsqspi_stig_write_data( param);
 }
 
-void do_hal_flash_program_security_area(void *param)
-{
-    flash_writing_critical(do_hal_flash_program_security_area_func, &param);
-}
-
 void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
@@ -245,11 +235,6 @@ void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
 void XIP_BANNED_FUNC(do_hal_flash_read_security_area_func,void *param)
 {
     lsqspi_stig_read_data( param);
-}
-
-void do_hal_flash_read_security_area(void *param)
-{
-    flash_reading_critical(do_hal_flash_read_security_area_func,param);
 }
 
 void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)

@@ -168,6 +168,11 @@ ROM_SYMBOL void hal_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t l
     }
 }
 
+ROM_SYMBOL void do_hal_flash_program(void *param)
+{
+    flash_writing_critical(do_hal_flash_prog_func,param);
+}
+
 ROM_SYMBOL void hal_flash_multi_io_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 {
     if(hal_flash_dual_mode_get())
@@ -247,6 +252,16 @@ ROM_SYMBOL void do_hal_flash_erase_security_area(uint8_t idx)
 ROM_SYMBOL void hal_flash_erase_security_area(uint8_t idx)
 {
     hal_flash_erase_security_area_operation(idx);
+}
+
+ROM_SYMBOL void do_hal_flash_read_security_area(void *param)
+{
+    flash_reading_critical(do_hal_flash_read_security_area_func,param);
+}
+
+ROM_SYMBOL void do_hal_flash_program_security_area(void *param)
+{
+    flash_writing_critical(do_hal_flash_program_security_area_func,&param);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_qe_status_read_and_set,)

@@ -146,7 +146,7 @@ static void lvd33_irq_enable()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
+    NVIC->ISER[0] = 1<<QSPI_IRQn|1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
     lvd33_irq_enable();
 }
 
