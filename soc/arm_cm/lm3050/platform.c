@@ -101,11 +101,19 @@ void arm_cm_set_int_isr(int8_t type,void (*isr)())
 }
 
 void SWINT_Handler_ASM();
+
+static void flash_swint_init()
+{
+    arm_cm_set_int_isr(QSPI_IRQn,SWINT_Handler_ASM);
+    __NVIC_ClearPendingIRQ(QSPI_IRQn);
+    __NVIC_EnableIRQ(QSPI_IRQn);
+}
+
 void sys_init_none()
 {
     clk_flash_init();
     clk_switch();
-    flash_swint_init(SWINT_Handler_ASM);
+    flash_swint_init();
     LOG_INIT();
     io_init();
     low_power_init();
@@ -113,10 +121,7 @@ void sys_init_none()
     sw_timer_module_init();
 }
 
-void flash_swint_init(void (*isr)())
-{
-    arm_cm_set_int_isr(QSPI_IRQn,isr);
-}
+
 
 void platform_reset(uint32_t error)
 {

@@ -415,13 +415,18 @@ static void analog_init()
     arm_cm_set_int_isr(LVD33_IRQn,LVD33_Handler);
 }
 
+static void flash_swint_init()
+{
+    arm_cm_set_int_isr(QSPI_IRQn,SWINT_Handler_ASM);
+}
+
 static void var_init()
 {
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
-    flash_swint_init(SWINT_Handler_ASM);
+    flash_swint_init();
 }
 
 void sys_init_itf()
@@ -445,7 +450,7 @@ void sys_init_none()
     analog_init();
     HAL_PIS_Init();
     hal_flash_drv_var_init(true,false);
-    flash_swint_init(SWINT_Handler_ASM);
+    flash_swint_init();
     cpu_sleep_recover_init();
     calc_acc_init();
     mac_init();
@@ -473,7 +478,7 @@ static void ll_var_init()
     bb_mem_clr();
     ll_stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
-    flash_swint_init(SWINT_Handler_ASM);
+    flash_swint_init();
 }
 
 void sys_init_ll()
@@ -672,11 +677,6 @@ void aos_swint_init(void (*isr)())
 void aos_swint_set()
 {
     __NVIC_SetPendingIRQ(CACHE_IRQn);
-}
-
-void flash_swint_init(void (*isr)())
-{
-    arm_cm_set_int_isr(QSPI_IRQn,isr);
 }
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)

@@ -90,9 +90,6 @@ void lvd33_disable(void);
 
 void mesh_stack_data_bss_init(void);
 
-void flash_swint_init(void (*isr)());
-
-
 #define FLASH_SWINT_SET_ASM SWINT_SET_INLINE_ASM(QSPI_IRQn)
 
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)
