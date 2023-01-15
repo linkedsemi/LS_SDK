@@ -5,6 +5,7 @@
 #include "sdk_config.h"
 #include "compile_flag.h"
 #include "le501x.h"
+#include "swint_call_asm.h"
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
@@ -91,7 +92,8 @@ void mesh_stack_data_bss_init(void);
 
 void flash_swint_init(void (*isr)());
 
-void flash_swint_set(void);
+
+#define FLASH_SWINT_SET_ASM SWINT_SET_INLINE_ASM(QSPI_IRQn)
 
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))
