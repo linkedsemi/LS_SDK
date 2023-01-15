@@ -100,15 +100,22 @@ void arm_cm_set_int_isr(int8_t type,void (*isr)())
     ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
 }
 
+void SWINT_Handler_ASM();
 void sys_init_none()
 {
     clk_flash_init();
     clk_switch();
+    flash_swint_init(SWINT_Handler_ASM);
     LOG_INIT();
     io_init();
     low_power_init();
     systick_start();
     sw_timer_module_init();
+}
+
+void flash_swint_init(void (*isr)())
+{
+    arm_cm_set_int_isr(QSPI_IRQn,isr);
 }
 
 void platform_reset(uint32_t error)

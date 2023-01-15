@@ -7,6 +7,7 @@
 	.type SWINT_Handler_ASM,%function
 SWINT_Handler_ASM:
     mov r0,sp
-	b SWINT_Handler_C
+	ldr r1,=SWINT_Handler_C
+	bx r1
 
     .size	SWINT_Handler_ASM, . - SWINT_Handler_ASM
