@@ -49,8 +49,6 @@ void arm_cm_delay_asm(uint32_t);
 
 void sys_init_none();
 
-void flash_swint_init(void (*isr)());
-
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/4)
 
 #define FLASH_SWINT_SET_ASM SWINT_SET_INLINE_ASM(QSPI_IRQn)
