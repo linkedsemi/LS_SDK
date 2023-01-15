@@ -7,8 +7,8 @@
             SWINT_SET_ASM;\
         }while(0)
 
-#define STRINGIFY(x) #x
-#define SWINT_TO_STR(line_num) STRINGIFY(line_num)
+#define SWINT_STRINGIFY(x) #x
+#define SWINT_TO_STR(line_num) SWINT_STRINGIFY(line_num)
 #define SWINT_LOOP_LABEL "label_line"SWINT_TO_STR(__LINE__)
 
 #define SWINT_SET_INLINE_ASM(irq_num) \

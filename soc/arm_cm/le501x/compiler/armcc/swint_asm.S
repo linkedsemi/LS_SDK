@@ -11,4 +11,27 @@ SWINT_Handler_ASM PROC
     ALIGN
     ENDP
     
-    END
+#define FLASH_SWINT_FUNC do_hal_flash_program
+#include "flash_swint_asm.inc"
+	
+#define FLASH_SWINT_FUNC do_hal_flash_erase
+#include "flash_swint_asm.inc"
+
+#define FLASH_SWINT_FUNC do_hal_flash_read
+#include "flash_swint_asm.inc"
+
+#define FLASH_SWINT_FUNC do_hal_flash_read_reg
+#include "flash_swint_asm.inc"
+
+#define FLASH_SWINT_FUNC do_hal_flash_chip_erase
+#include "flash_swint_asm.inc"
+
+#define FLASH_SWINT_FUNC do_hal_flash_erase_security_area
+#include "flash_swint_asm.inc"
+	
+#define FLASH_SWINT_FUNC do_hal_flash_program_security_area
+#include "flash_swint_asm.inc"
+
+#define FLASH_SWINT_FUNC do_hal_flash_read_security_area
+#include "flash_swint_asm.inc"
+	END
