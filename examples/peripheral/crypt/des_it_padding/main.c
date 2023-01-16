@@ -36,10 +36,10 @@ const uint32_t des_tdes_cbc_ecb_key_64[] = {
 
 /**tdes_cbc-ecb-key-ciphertext-128**/
 const uint32_t tdes_cbc_ecb_key_128[] = {
-    0x05060708,
-    0x01020304,
     0xA5A6A7A8,
-    0xA1A2A3A4};
+    0xA1A2A3A4,
+    0x05060708,
+    0x01020304};
 
 /*ECB MODE ------ Plaintext is a multiple of 8*/
 const uint8_t tdes_ecb_ciphertext_128_None_aligned[] = {

@@ -464,18 +464,28 @@ HAL_StatusTypeDef HAL_LSCRYPT_DES_Key_Config(const uint32_t *key,enum tdes_key_t
     {
         REG_FIELD_WR(LSCRYPT->CR, CRYPT_TDES, 0); 
     }
-    do
+
+    if(key_size == DES_KEY_64)
     {
         LSCRYPT->KEY0 = *key++;
         LSCRYPT->KEY1 = *key++;
-        if (key_size == DES_KEY_64)break;
+    }
+    else if(key_size == TDES_KEY_128)
+    {
         LSCRYPT->KEY2 = *key++;
         LSCRYPT->KEY3 = *key++;
-        if (key_size == TDES_KEY_128)break;
+        LSCRYPT->KEY0 = *key++;
+        LSCRYPT->KEY1 = *key++;
+    }
+    else
+    {
         LSCRYPT->KEY4 = *key++;
         LSCRYPT->KEY5 = *key++;
-        if (key_size == TDES_KEY_192)break;
-    } while (0);
+        LSCRYPT->KEY2 = *key++;
+        LSCRYPT->KEY3 = *key++;
+        LSCRYPT->KEY0 = *key++;
+        LSCRYPT->KEY1 = *key++;
+    }
     return HAL_OK;
 }
 
