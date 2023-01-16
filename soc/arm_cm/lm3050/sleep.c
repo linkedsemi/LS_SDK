@@ -162,8 +162,6 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     hal_flash_xip_start();
 }
 
-void io_irq_enable(void);
-
 static void deep_sleep_no_ble()
 {
     uint32_t cpu_stat = enter_critical();
@@ -177,7 +175,6 @@ static void deep_sleep_no_ble()
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
     memcpy32((uint32_t *)NVIC->IP,NVIC_IP,ARRAY_LEN(NVIC_IP));
     memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,ARRAY_LEN(NVIC_EN));
-    io_irq_enable();
     systick_start();
     SCB->SCR &= ~(1<<2);
     exit_critical(cpu_stat);

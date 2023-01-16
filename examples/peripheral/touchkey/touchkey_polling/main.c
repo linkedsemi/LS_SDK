@@ -4,11 +4,6 @@
 #include <string.h>
 #include "log.h"
 #include "ls_hal_touchkey.h"
-#include "ls_msp_touchkey.h"
-#include "field_manipulate.h"
-#include "reg_sysc_per_type.h"
-#include "reg_sysc_awo_type.h"
-#include "reg_touchkey_type.h"
 
 static uint32_t data[16];
 static uint32_t chn_avg[16];

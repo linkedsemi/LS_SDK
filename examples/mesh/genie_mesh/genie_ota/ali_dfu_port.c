@@ -5,6 +5,7 @@
 #include "ls_hal_flash.h"
 #include "tmall_genie_ota.h"
 #include "log.h"
+#include "prf_fotas.h"
 
 #define SPIF_SECTOR_SIZE 0x1000
 #define OTA_MAX_LENGTH  0x14000 //80K

@@ -27,15 +27,14 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         start_src = ['$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/startup.S']
     sdk_src = []
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
-        'arm_cm/svcall.c',
         'arm_cm/systick.c',
         'arm_cm/swint_handler.c',
         'arm_cm/le501x/cpu.c',
         'arm_cm/le501x/platform.c',
         'arm_cm/le501x/stack_var.c',
+        'arm_cm/le501x/compiler/$COMPILER/swint_asm.S',
         'arm_cm/le501x/compiler/$COMPILER/stack_asm.S',
         'arm_cm/le501x/compiler/$COMPILER/sleep_asm.S',
-        'arm_cm/le501x/compiler/$COMPILER/svcall_asm.S',
         'arm_cm/le501x/compiler/$COMPILER/delay_asm.S',
         'arm_cm/le501x/integration/ls_msp_qspi.c',
         'arm_cm/le501x/integration/ls_msp_uart.c',
@@ -63,7 +62,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/le501x/sw_timer_port.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
-        'src/ls_hal_flash_svcall.c',
+        'src/ls_hal_flash_swint.c',
         'src/ls_hal_adc_dma.c',
         'src/calc_div.c',
         'src/ls_hal_dmac.c',
