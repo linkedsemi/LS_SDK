@@ -441,18 +441,22 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 void gpio_exit_init(void)
 {
     io_cfg_input(PA00);
+    io_pull_write(PA00,IO_PULL_DOWN);
     io_exti_config(PA00,INT_EDGE_RISING);
     
 
     io_cfg_input(PA07);
+    io_pull_write(PA07,IO_PULL_DOWN);
     io_exti_config(PA07,INT_EDGE_RISING);
     
 
     io_cfg_input(PB11);
+    io_pull_write(PB11,IO_PULL_DOWN);
     io_exti_config(PB11,INT_EDGE_RISING);
     
 
     io_cfg_input(PB15);
+    io_pull_write(PB15,IO_PULL_DOWN);
     io_exti_config(PB15,INT_EDGE_RISING);
     
 }
