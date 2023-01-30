@@ -162,6 +162,14 @@ static void ancs_ntf_att_report(uint8_t con_idx,struct ancs_att_ind *param)
             }
             LOG_RAW("\r\n");
             break;
+        case NTF_ATT_ID_SUBTITLE:
+            LOG_I("att id subtitle:");
+            for(i = 0; i < param->length; i++)
+            {
+                LOG_RAW("0x%02x ", param->val[i]);
+            }
+            LOG_RAW("\r\n");
+            break;		
         case NTF_ATT_ID_MSG:
             LOG_I("att id msg:");
             for(i = 0; i < param->length; i++)
@@ -205,7 +213,7 @@ static void call_handler(uint8_t con_idx,struct ancs_ntf_src *ntf_src)
     case EVT_ID_NTF_ADDED:
         prf_ancs_get_notification_attributes(con_idx,ntf_src->ntf_uid,
             1 << NTF_ATT_ID_APP_ID| 1 << NTF_ATT_ID_TITLE | 1 << NTF_ATT_ID_MSG | 1 << NTF_ATT_ID_POS_ACTION_LABEL | 1 << NTF_ATT_ID_NEG_ACTION_LABEL,
-            20,0,20);
+            20,20,20);
     break;
     case EVT_ID_NTF_MODIFIED:
 
