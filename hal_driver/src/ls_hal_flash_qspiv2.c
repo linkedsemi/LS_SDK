@@ -209,20 +209,19 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_prog_func,void *param)
     lsqspiv2_stg_read_write(param);
 }
 
-ROM_SYMBOL void do_hal_flash_program(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type)
+static void flash_program_param_set(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type,struct lsqspiv2_stg_cfg *cfg)
 {
-    struct lsqspiv2_stg_cfg cfg;
-    cfg.ctrl.sw_cyc = 31;
-    cfg.ctrl.sw_en = 1;
-    cfg.ctrl.mw_wid = multi_type;
-    cfg.ctrl.hz_cyc = 0;
-    cfg.ctrl.mw_cyc = 0;
-    cfg.ctrl.mw_en = 0;
-    cfg.ctrl.reserved0 = 0;
-    cfg.ctrl.reserved1 = 0;
-    cfg.ctrl.reserved2 = 0;
-    cfg.ctrl.reserved3 = 0;
-    cfg.ctrl.reserved4 = 0;
+    cfg->ctrl.sw_cyc = 31;
+    cfg->ctrl.sw_en = 1;
+    cfg->ctrl.mw_wid = multi_type;
+    cfg->ctrl.hz_cyc = 0;
+    cfg->ctrl.mw_cyc = 0;
+    cfg->ctrl.mw_en = 0;
+    cfg->ctrl.reserved0 = 0;
+    cfg->ctrl.reserved1 = 0;
+    cfg->ctrl.reserved2 = 0;
+    cfg->ctrl.reserved3 = 0;
+    cfg->ctrl.reserved4 = 0;
     uint8_t opcode = 0;
     switch(multi_type)
     {
@@ -236,17 +235,38 @@ ROM_SYMBOL void do_hal_flash_program(uint32_t offset,uint8_t *data,uint16_t leng
         opcode = QUAD_PAGE_PROGRAM_OPCODE;
     break;
     }
-    cfg.ca_high = opcode << 24 | offset;
-    cfg.dat_ctrl.dat_en = 1;
-    cfg.dat_ctrl.dat_bytes = length - 1;
-    cfg.dat_ctrl.dat_dir = WRITE_TO_FLASH;
-    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
-    cfg.dat_ctrl.reserved0 = 0;
-    cfg.dat_ctrl.reserved1 = 0;
-    cfg.dat_ctrl.reserved2 = 0;
-    cfg.data = data;
-    flash_writing_critical(do_hal_flash_prog_func,&cfg);
+    cfg->ca_high = opcode << 24 | offset;
+    cfg->dat_ctrl.dat_en = 1;
+    cfg->dat_ctrl.dat_bytes = length - 1;
+    cfg->dat_ctrl.dat_dir = WRITE_TO_FLASH;
+    cfg->dat_ctrl.dat_offset = (uint32_t)data&0x3;
+    cfg->dat_ctrl.reserved0 = 0;
+    cfg->dat_ctrl.reserved1 = 0;
+    cfg->dat_ctrl.reserved2 = 0;
+    cfg->data = data;
 }
+
+ROM_SYMBOL void hal_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+{
+    struct lsqspiv2_stg_cfg param;
+    flash_program_param_set(offset,data,length,QUAD_WIRE,&param);
+    hal_flash_program_operation(&param);
+}
+
+ROM_SYMBOL void hal_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+{
+    struct lsqspiv2_stg_cfg param;
+    flash_program_param_set(offset,data,length,DUAL_WIRE,&param);
+    hal_flash_program_operation(&param);
+}
+
+ROM_SYMBOL void hal_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+{
+    struct lsqspiv2_stg_cfg param;
+    flash_program_param_set(offset,data,length,SINGLE_WIRE,&param);
+    hal_flash_program_operation(&param);
+}
+
 
 ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_erase_func,void *param)
 {
@@ -415,7 +435,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_program_security_area_func,void *pa
     lsqspiv2_stg_read_write( param);
 }
 
-ROM_SYMBOL void do_hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+ROM_SYMBOL void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 31;
@@ -438,16 +458,15 @@ ROM_SYMBOL void do_hal_flash_program_security_area(uint8_t idx,uint16_t addr,uin
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = data;
-    flash_writing_critical(do_hal_flash_program_security_area_func, &cfg);
+    hal_flash_program_security_area_operation(&cfg);
 }
-
 
 ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_read_security_area_func,void *param)
 {
     lsqspiv2_stg_read_write( param);
 }
 
-ROM_SYMBOL void do_hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+ROM_SYMBOL void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 39;
@@ -470,7 +489,7 @@ ROM_SYMBOL void do_hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = data;
-    flash_reading_critical(do_hal_flash_read_security_area_func,&cfg);
+    hal_flash_read_security_area_operation(&cfg);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_software_reset)
