@@ -197,12 +197,6 @@ void EXTI_Handler(void)
     }
 }
 
-void io_irq_enable()
-{
-    __NVIC_EnableIRQ(EXTI_ASYNC_IRQn);
-    __NVIC_EnableIRQ(EXTI_IRQn);
-}
-
 void io_init(void)
 {
     SYSC_AWO->IO[0].IEN_OD = 0x9fff0000;
@@ -216,11 +210,11 @@ void io_init(void)
     SYSC_AWO->IO[3].OE_DOT = 0;
     SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_SET_EXTI_MASK;
     arm_cm_set_int_isr(EXTI_ASYNC_IRQn,V33_EXTI_Async_Handler);
-    arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
     __NVIC_ClearPendingIRQ(EXTI_ASYNC_IRQn);
+    __NVIC_EnableIRQ(EXTI_ASYNC_IRQn);
+    arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
     __NVIC_ClearPendingIRQ(EXTI_IRQn);
-    io_irq_enable();
-}
+    __NVIC_EnableIRQ(EXTI_IRQn);}
 
 
 void io_cfg_output(uint8_t pin)

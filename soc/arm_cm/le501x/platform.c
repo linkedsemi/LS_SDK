@@ -31,6 +31,7 @@
 #include "sw_timer.h"
 #include "ls_sys.h"
 #include "sys_stat.h"
+#include "swint_call_asm.h"
 #define XTAL_STB_VAL 20
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
@@ -47,6 +48,8 @@ void main_task_app_init(void);
 
 void main_task_itf_init(void);
 
+void SWINT_Handler_ASM(void);
+
 __attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}    
 
 static void bb_mem_clr(void)
@@ -56,11 +59,11 @@ static void bb_mem_clr(void)
 
 static void irq_priority()
 {
-    __NVIC_SetPriority(SVCall_IRQn,2);
+    __NVIC_SetPriority(SVCall_IRQn,3);
     __NVIC_SetPriority(SysTick_IRQn, 1);
     __NVIC_SetPriority(PendSV_IRQn,3);
     NVIC->IP[0] = IRQ_NVIC_PRIO(EXTI_IRQn,3) | IRQ_NVIC_PRIO(WWDT_IRQn,3) | IRQ_NVIC_PRIO(LPWKUP_IRQn,2) | IRQ_NVIC_PRIO(BLE_IRQn,1);
-    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,3) | IRQ_NVIC_PRIO(ECC_IRQn,3);
+    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,2) | IRQ_NVIC_PRIO(ECC_IRQn,3);
     NVIC->IP[2] = IRQ_NVIC_PRIO(CACHE_IRQn,3) | IRQ_NVIC_PRIO(TRNG_IRQn,3) | IRQ_NVIC_PRIO(IWDT_IRQn,3) | IRQ_NVIC_PRIO(CRYPT_IRQn,3);
     NVIC->IP[3] = IRQ_NVIC_PRIO(PDM_IRQn,3) | IRQ_NVIC_PRIO(BLE_WKUP_IRQn,1) | IRQ_NVIC_PRIO(ADC_IRQn,3) | IRQ_NVIC_PRIO(ADTIM1_IRQn,3);
     NVIC->IP[4] = IRQ_NVIC_PRIO(BSTIM1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMA1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMB1_IRQn,3) | IRQ_NVIC_PRIO(BLE_ERR_IRQn,1);
@@ -143,7 +146,7 @@ static void lvd33_irq_enable()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
+    NVIC->ISER[0] = 1<<QSPI_IRQn|1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
     lvd33_irq_enable();
 }
 
@@ -412,12 +415,18 @@ static void analog_init()
     arm_cm_set_int_isr(LVD33_IRQn,LVD33_Handler);
 }
 
+static void flash_swint_init()
+{
+    arm_cm_set_int_isr(QSPI_IRQn,SWINT_Handler_ASM);
+}
+
 static void var_init()
 {
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init();
 }
 
 void sys_init_itf()
@@ -441,6 +450,7 @@ void sys_init_none()
     analog_init();
     HAL_PIS_Init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init();
     cpu_sleep_recover_init();
     calc_acc_init();
     mac_init();
@@ -468,6 +478,7 @@ static void ll_var_init()
     bb_mem_clr();
     ll_stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init();
 }
 
 void sys_init_ll()

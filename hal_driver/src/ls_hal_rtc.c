@@ -194,4 +194,4 @@ void RTC_wkuptime_clr(void)
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKCAL, 0);
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKSEL, 0);
 }
-__attribute__((weak)) void rtc_wkup_callback(void){}
+

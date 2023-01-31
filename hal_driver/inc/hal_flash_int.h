@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "sdk_config.h"
 #include "ls_hal_flash.h"
-#include "hal_flash_svcall.h"
+#include "hal_flash_swint.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"
@@ -105,9 +105,9 @@ void flash_writing_critical(void (*func)(void *),void *param);
 
 void do_hal_flash_read(void *param);
 
-void do_hal_flash_erase(uint32_t offset,uint8_t opcode);
+void do_hal_flash_erase(void *param);
 
-void do_hal_flash_program(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type);
+void do_hal_flash_program(void *param);
 
 void do_hal_flash_chip_erase(void);
 
@@ -115,9 +115,9 @@ void do_hal_flash_write_status_reg(uint16_t status);
 
 void do_hal_flash_erase_security_area(uint8_t idx);
 
-void do_hal_flash_program_security_area(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
+void do_hal_flash_program_security_area(void *param);
 
-void do_hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
+void do_hal_flash_read_security_area(void *param);
 
 void do_hal_flash_read_reg(void *param);
 
