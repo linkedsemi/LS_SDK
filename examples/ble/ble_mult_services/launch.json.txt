@@ -6,8 +6,8 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/ble/ble_uart_server/build/le501x/ble_uart_servers.elf",
-            "name": "LE501X Debug BLE_UART_SERVERS",
+            "executable": "examples/ble/ble_mult_services/build/le501x/ble_mult_services.elf",
+            "name": "LE501X Debug BLE_MULTI_SERVICES",
             "device": "LE501X",
             "interface": "swd",
             "preLaunchCommands":[
@@ -20,8 +20,8 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/ble/ble_uart_server/build/le501x/ble_uart_servers.elf",
-            "name": "LE501X Attach BLE_UART_SERVERS",
+            "executable": "examples/ble/ble_mult_services/build/le501x/ble_mult_services.elf",
+            "name": "LE501X Attach BLE_MULTI_SERVICES",
             "device": "LE501X",
             "interface": "swd",
             "preAttachCommands":[

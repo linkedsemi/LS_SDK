@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('ble_mult_servers',src,inc)
+env.app_build('ble_mult_services',src,inc)

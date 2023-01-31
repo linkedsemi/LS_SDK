@@ -182,7 +182,7 @@ uint32_t HAL_DAC_GetValue(DAC_HandleTypeDef *hdac)
         result = hdac->Instance->DAC_DOR2;
         break;    
     default:
-        result = 0;
+        result = hdac->Instance->DAC_DOR1 | hdac->Instance->DAC_DOR2 << 13;
         break;
     }
     return result;

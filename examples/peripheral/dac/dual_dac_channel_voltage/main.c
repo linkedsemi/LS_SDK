@@ -38,7 +38,7 @@ int main(void)
     pinmux_dac_init();
     DAC_Init_Func();
     HAL_DAC_SetValue(&DACx_Hdl, DAC12_ALIGN_12B_RD, 0xfff0fff);
-    LOG_I("%d",HAL_DAC_GetValue(&DACx_Hdl));
+    LOG_I("DAC1 GetValue=%d,DA2 GetValue=%d",HAL_DAC_GetValue(&DACx_Hdl)&0xfff,HAL_DAC_GetValue(&DACx_Hdl)>>13);
     while ((1))
     {
    
