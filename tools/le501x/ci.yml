@@ -174,25 +174,6 @@ le501x_ble_mult_roles_iar_build:
   script:
     - cd examples/ble/ble_mult_roles/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_mult_roles.ewp -build * -log all
 
-le501x_ble_mult_servers_build:
-  stage: build
-  script:
-    - cd examples/ble/ble_mult_servers && scons
-
-le501x_ble_mult_servers_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/ble/ble_mult_servers/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ble_mult_servers.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
-
-le501x_ble_mult_servers_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/ble/ble_mult_servers/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_mult_servers.ewp -build * -log all
-
 le501x_ble_single_role_build:
   stage: build
   script:
@@ -287,6 +268,25 @@ le501x_ble_uart_server_iar_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/ble/ble_uart_server/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_uart_server.ewp -build * -log all
+
+le501x_ble_mult_services_build:
+  stage: build
+  script:
+    - cd examples/ble/ble_mult_services && scons
+
+le501x_ble_mult_services_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_mult_services/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ble_mult_services.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_ble_mult_services_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/ble/ble_mult_services/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ble_mult_services.ewp -build * -log all
 
 le501x_ble_uart_server_mult_link_build:
   stage: build
