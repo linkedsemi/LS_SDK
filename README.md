@@ -20,13 +20,13 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | ble/ble_hid                                                               |  √     |        |
 | ble/ble_hid_dmic                                                          |  √     |        |
 | ble/ble_mult_roles                                                        |  √     |        |
-| ble/ble_mult_servers                                                      |  √     |        |
 | ble/ble_pairing_master_role                                               |  √     |        |
 | ble/ble_pairing_slave_role                                                |  √     |        |
 | ble/ble_single_master                                                     |  √     |        |
 | ble/ble_single_role                                                       |  √     |        |
 | ble/ble_tk                                                                |  √     |        |
 | ble/ble_uart_server                                                       |  √     |        |
+| ble/ble_mult_services                                                     |  √     |        |
 | ble/ble_uart_server_mult_link                                             |  √     |        |
 | ble/fota                                                                  |  √     |        |
 | ble/host_test                                                             |  √     |        |
