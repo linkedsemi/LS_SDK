@@ -45,6 +45,7 @@ if(CONFIG_SOC_LE5010)
     ../soc/arm_cm/le501x/integration/ls_msp_trng.c
     ../soc/arm_cm/le501x/integration/ls_msp_ecc.c
     ../soc/arm_cm/le501x/integration/ls_msp_pis.c
+    ../soc/arm_cm/le501x/integration/ls_msp_qspi.c
     ../soc/arm_cm/le501x/integration/modem_rf_le501x.c
   )
 
