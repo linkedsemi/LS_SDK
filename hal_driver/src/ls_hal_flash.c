@@ -1,5 +1,4 @@
 #include "hal_flash_int.h"
-#include "flash_swint_int.h"
 #if !defined(HAL_FLASH_C_MERGED) || defined(HAL_FLASH_C_DESTINATION)
 ROM_SYMBOL struct hal_flash_status
 {

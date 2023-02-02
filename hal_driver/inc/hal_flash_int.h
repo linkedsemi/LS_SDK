@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include "sdk_config.h"
 #include "ls_hal_flash.h"
-#include "hal_flash_swint.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"
@@ -78,6 +77,39 @@ struct flash_read_reg_param
     uint8_t opcode;
     uint8_t length;    
 };
+
+
+void hal_flash_program_operation(void *param);
+
+void hal_flash_erase_operation(void *param);
+
+void hal_flash_read_operation(void *param);
+
+void hal_flash_chip_erase_operation(void);
+
+void hal_flash_erase_security_area_operation(uint8_t idx);
+
+void hal_flash_program_security_area_operation(void *param);
+
+void hal_flash_read_security_area_operation(void *param);
+
+void hal_flash_read_reg_operation(void *param);
+
+void do_hal_flash_program_swint(void *param);
+
+void do_hal_flash_erase_swint(void *param);
+
+void do_hal_flash_read_swint(void *param);
+
+void do_hal_flash_read_reg_swint(void *param);
+
+void do_hal_flash_chip_erase_swint(void);
+
+void do_hal_flash_erase_security_area_swint(uint8_t idx);
+
+void do_hal_flash_program_security_area_swint(void *param);
+
+void do_hal_flash_read_security_area_swint(void *param);
 
 void hal_flash_write_enable(void);
 

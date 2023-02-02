@@ -1,5 +1,3 @@
-#include "hal_flash_swint.h"
-#include "flash_swint_int.h"
 #include "hal_flash_int.h"
 
 #define FLASH_EXECUTE_WITH_RETVAL(return_val,op,...) \
