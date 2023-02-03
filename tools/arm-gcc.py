@@ -1,4 +1,5 @@
 from SCons.Tool import cc,cxx,ar,link
+import rspfile
 import importlib
 assembler = importlib.import_module('SCons.Tool.as')
 
@@ -9,6 +10,7 @@ def generate(env):
     assembler.generate(env)
     ar.generate(env)
     link.generate(env)
+    rspfile.link_by_rspfile(env)
     env['CC'] = 'arm-none-eabi-gcc'
     env['CXX'] = 'arm-none-eabi-g++'
     env['AS'] = 'arm-none-eabi-gcc'

@@ -63,7 +63,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'arm_cm/lm3050/compiler/$COMPILER/swint_asm.S',
         'arm_cm/lm3050/compiler/$COMPILER/delay_asm.S',
         'arm_cm/lm3050/compiler/$COMPILER/sleep_asm.S',
-        'arm_cm/swint_handler.c',
         'arm_cm/systick.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[

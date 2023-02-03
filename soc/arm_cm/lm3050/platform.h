@@ -7,7 +7,6 @@
 #include "ls_dbg.h"
 #include "reg_sysc_awo_type.h"
 #include "field_manipulate.h"
-#include "swint_call_asm.h"
 
 __attribute__((always_inline)) static inline void hclk_set(uint32_t mhz)
 {
@@ -51,7 +50,9 @@ void sys_init_none();
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/4)
 
-#define FLASH_SWINT_SET_ASM SWINT_SET_INLINE_ASM(QSPI_IRQn)
+#define FLASH_SWINT_NUM QSPI_IRQn
+
+#define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
 
 #define SRAM_BIT_BAND_ADDR(addr,bit) (uint32_t *)(((uint32_t)(addr)-0x20000000)*32+4*(bit)+0x22000000)
 

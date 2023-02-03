@@ -28,7 +28,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
     sdk_src = []
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
         'arm_cm/systick.c',
-        'arm_cm/swint_handler.c',
         'arm_cm/le501x/cpu.c',
         'arm_cm/le501x/platform.c',
         'arm_cm/le501x/stack_var.c',
