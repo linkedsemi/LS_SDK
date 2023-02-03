@@ -5,7 +5,6 @@
 #include "sdk_config.h"
 #include "compile_flag.h"
 #include "le501x.h"
-#include "swint_call_asm.h"
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
@@ -90,7 +89,7 @@ void lvd33_disable(void);
 
 void mesh_stack_data_bss_init(void);
 
-#define FLASH_SWINT_SET_ASM SWINT_SET_INLINE_ASM(QSPI_IRQn)
+#define FLASH_SWINT_NUM QSPI_IRQn
 #define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
 
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)

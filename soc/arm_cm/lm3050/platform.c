@@ -132,3 +132,9 @@ void XIP_BANNED_FUNC(sync_for_xip_stop,)
 {
     while((SYSC_AWO->IO[3].DIN&1<<10)==0);
 }
+
+void SWINT_Handler_C(uint32_t *args)
+{
+    uint32_t (*func)(uint32_t,uint32_t,uint32_t) = (uint32_t (*)(uint32_t,uint32_t,uint32_t))args[3];
+    args[0] = func(args[0],args[1],args[2]);
+}
