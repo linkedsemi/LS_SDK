@@ -7,7 +7,6 @@
 #include "ls_dbg.h"
 #include "reg_sysc_awo_type.h"
 #include "field_manipulate.h"
-#include "swint_call_asm.h"
 
 __attribute__((always_inline)) static inline void hclk_set(uint32_t mhz)
 {
@@ -51,7 +50,7 @@ void sys_init_none();
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/4)
 
-#define FLASH_SWINT_SET_ASM SWINT_SET_INLINE_ASM(QSPI_IRQn)
+#define FLASH_SWINT_NUM QSPI_IRQn
 
 #define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
 
