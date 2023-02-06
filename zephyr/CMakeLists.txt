@@ -29,7 +29,6 @@ if(CONFIG_SOC_LE5010)
     ../hal_driver/src/ls_hal_qspi.c
     ../hal_driver/src/ls_hal_ecc.c
     ../hal_driver/src/ls_hal_pis.c
-    ../soc/arm_cm/swint_handler.c
     ../soc/arm_cm/systick.c
     ../soc/arm_cm/le501x/cpu.c
     ../soc/arm_cm/le501x/platform.c
