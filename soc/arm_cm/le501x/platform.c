@@ -357,8 +357,8 @@ static void module_init()
     calc_acc_init();
     cpu_sleep_recover_init();
     mac_init();
-    modem_rf_init();
     irq_init();
+    modem_rf_init();
     systick_start();
     rco_freq_counting_start();
     uint32_t base_offset = flash_data_storage_base_offset();
@@ -491,8 +491,8 @@ void sys_init_ll()
     calc_acc_init();
     cpu_sleep_recover_init();
     mac_init();
-    modem_rf_init();
     irq_init();
+    modem_rf_init();
     systick_start();
 }
 
@@ -691,8 +691,7 @@ void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t
     cb(param);
 }
 
-void SWINT_Handler_C(uint32_t *args)
+void SWINT_Handler_C(uint32_t *args,uint32_t (*func)(uint32_t,uint32_t,uint32_t,uint32_t))
 {
-    uint32_t (*func)(uint32_t,uint32_t,uint32_t) = (uint32_t (*)(uint32_t,uint32_t,uint32_t))args[3];
-    args[0] = func(args[0],args[1],args[2]);
+    args[0] = func(args[0],args[1],args[2],args[3]);
 }
