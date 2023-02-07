@@ -8,7 +8,7 @@
 
 #define SWINT_FUNC_CALL_INLINE_ASM(func,irq_num)\
         do{\
-            __asm volatile ("ldr r3,="#func"\n": : : );\
+            __asm volatile ("ldr r4,="#func"\n": : : );\
             uint32_t mask = 1<<((irq_num)&0x1f);\
             uint32_t pending_addr = 0xe000e200 + ((irq_num)>>5)*4;\
             uint32_t pending_stat = 0;\
@@ -18,7 +18,7 @@
                     "tst %[aMask],%[aStat]\n"\
                     "bne "SWINT_LOOP_LABEL : [aStat] "+r" (pending_stat) : \
                 [aMask] "r" (mask),[aAddr] "r" (pending_addr)\
-                : "r0", "r1", "r2", "r3");\
+                : "r0", "r1", "r2", "r3","r4");\
         }while(0)
 #endif
 #endif

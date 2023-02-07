@@ -6,6 +6,7 @@
 SWINT_FUNC PROC
     EXPORT SWINT_FUNC
     IMPORT FLASH_SWINT_FUNC
+    push	{r4, r5, r6, lr}
     ldr r3, = FLASH_SWINT_FUNC
     movs r5, #0x40
     ldr r6, = 0xe000e200
@@ -14,6 +15,7 @@ SWINT_LOOP_LABEL(FLASH_SWINT_FUNC)
     ldr r4, [r6,#0]
     tst r5,r4
     bne SWINT_LOOP_LABEL(FLASH_SWINT_FUNC)
+    pop	{r4, r5, r6, pc}
     ALIGN
     ENDP
 #undef SWINT_CONCAT
