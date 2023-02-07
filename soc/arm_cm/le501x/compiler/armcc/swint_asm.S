@@ -6,8 +6,9 @@ SWINT_Handler_ASM PROC
     EXPORT SWINT_Handler_ASM
     IMPORT SWINT_Handler_C
     mov r0,sp
-	ldr r1,=SWINT_Handler_C
-	bx r1
+    mov r1,r4
+	ldr r2,=SWINT_Handler_C
+	bx r2
     ALIGN
     ENDP
     
