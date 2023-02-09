@@ -15,6 +15,7 @@ __NO_RETURN static void boot_app(uint32_t base)
     __set_MSP(*msp);
     __enable_irq();
     (*reset_handler)();
+    while(1);
 }
 
 __NO_RETURN void boot_ram_start()
