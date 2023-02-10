@@ -41,13 +41,20 @@ HAL_StatusTypeDef HAL_RTC_CalendarSet(calendar_cal_t *calendar_cal, calendar_tim
 
 HAL_StatusTypeDef HAL_RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t *calendar_time)
 {
-    calendar_cal->year = REG_FIELD_RD(RTC->CURCAL, RTC_CAL_YEAR);
-    calendar_cal->mon = REG_FIELD_RD(RTC->CURCAL, RTC_CAL_MON);
-    calendar_cal->week = REG_FIELD_RD(RTC->CURCAL, RTC_CAL_WEEK);
-    calendar_time->date = REG_FIELD_RD(RTC->CURTIME, RTC_TIME_DATE);
-    calendar_time->hour = REG_FIELD_RD(RTC->CURTIME, RTC_TIME_HOUR) - 1;
-    calendar_time->min = REG_FIELD_RD(RTC->CURTIME, RTC_TIME_MIN) - 1;
-    calendar_time->sec = REG_FIELD_RD(RTC->CURTIME, RTC_TIME_SEC) - 1;
+    uint32_t reg_time, reg_cal;
+    do
+    {
+        reg_time = RTC->TIME;
+        reg_cal = RTC->CAL;
+    } while (RTC->TIME != reg_time);
+
+    calendar_cal->year = REG_FIELD_RD(reg_cal, RTC_CAL_YEAR);
+    calendar_cal->mon = REG_FIELD_RD(reg_cal, RTC_CAL_MON);
+    calendar_cal->week = REG_FIELD_RD(reg_cal, RTC_CAL_WEEK);
+    calendar_time->date = REG_FIELD_RD(reg_time, RTC_TIME_DATE);
+    calendar_time->hour = REG_FIELD_RD(reg_time, RTC_TIME_HOUR) - 1;
+    calendar_time->min = REG_FIELD_RD(reg_time, RTC_TIME_MIN) - 1;
+    calendar_time->sec = REG_FIELD_RD(reg_time, RTC_TIME_SEC) - 1;
     return HAL_OK;
 }
 
