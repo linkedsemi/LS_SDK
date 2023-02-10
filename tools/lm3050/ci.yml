@@ -1,3 +1,8 @@
+le3050_boot_ram_build:
+  stage: build
+  script:
+    - cd bootloader/boot_ram/lm3050 && scons ic=lm3050
+
 lm3050_ecb_cbc_it_build:
   stage: build
   script:

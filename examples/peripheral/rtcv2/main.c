@@ -1,6 +1,7 @@
 #include "ls_hal_rtcv2.h"
 #include "ls_soc_gpio.h"
 #include "platform.h"
+#include "sleep.h"
 #include "log.h"
 #include <stdio.h>
 
@@ -73,6 +74,7 @@ int main(void)
     // HAL_RTC_Cycle_Set(SDK_LCLK_HZ, 0, false); /* If you want to modify the modification cycle or calibration */
     rtc_test_calendar_set();
     rtc_test_alarm_set();
+    low_power_mode_sched();
     while(1)
     {
         rtc_test_calendar_get();

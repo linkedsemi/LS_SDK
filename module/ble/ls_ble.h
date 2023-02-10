@@ -274,6 +274,7 @@ struct profile_added_evt
   */
 struct service_added_evt
 {
+    struct gatt_svc_env *env;
     uint16_t start_hdl;                             /*!< Start handle of the Service*/ 
     uint8_t status;                                 /*!< Status of the service add action*/ 
 };
@@ -797,6 +798,7 @@ enum svc_get_value_status
 struct gatt_svc_env
 {
     void *hdr;                         /*!< Pointer to next gatt_svc_env*/
+    struct svc_decl *decl;
     uint16_t start_hdl;                /*!< Start handle of the service*/
     uint8_t att_num;                   /*!< Attributes number in the service*/
 };
@@ -1027,6 +1029,9 @@ void dev_manager_add_service_with_start_handle(struct svc_decl *svc, uint16_t st
  ****************************************************************************************
  */
 void dev_manager_add_service(struct svc_decl *svc);
+
+void dev_manager_register_gatt_service(struct gatt_svc_env *svc_env);
+
 /**
  ****************************************************************************************
  * \brief Set value for specified attribute.
@@ -1379,6 +1384,9 @@ void gap_manager_set_pkt_size(uint8_t con_idx, struct gap_set_pkt_size *p_param)
  ****************************************************************************************
  */
 void gap_manager_delete_bonding(uint8_t peer_id);
+
+void gap_manager_delete_bonding_all(void);
+
 /**
  ****************************************************************************************
  * \brief Gets the pairing ID of the bound device. 
