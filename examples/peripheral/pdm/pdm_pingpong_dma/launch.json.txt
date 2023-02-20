@@ -6,8 +6,8 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/pdm/build/le501x/pdm.elf",
-            "name": "LE501X Debug PDM",
+            "executable": "examples/peripheral/pdm/pdm_pingpong_dma/build/le501x/pdm_pingpong_dma.elf",
+            "name": "LE501X Debug PDM_PINGPONG_DMA",
             "device": "LE501X",
             "interface": "swd",
             "preLaunchCommands":[
@@ -20,8 +20,8 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/pdm/build/le501x/pdm.elf",
-            "name": "LE501X Attach PDM",
+            "executable": "examples/peripheral/pdm/pdm_pingpong_dma/build/le501x/pdm_pingpong_dma.elf",
+            "name": "LE501X Attach PDM_PINGPONG_DMA",
             "device": "LE501X",
             "interface": "swd",
             "preAttachCommands":[

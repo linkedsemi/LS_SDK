@@ -1332,3 +1332,22 @@ lm3050_trng_it_iar_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/trng/trng_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_it.ewp -build * -log all
+    
+lm3050_pdm_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/pdm/pdm_it && scons flags=-Werror
+
+lm3050_pdm_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/pdm/pdm_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b pdm_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_pdm_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/pdm/pdm_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" pdm_it.ewp -build * -log all
