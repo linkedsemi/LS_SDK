@@ -4,6 +4,9 @@
 #include "ls_sig_mesh.h"
 #include "tinyfs.h"
 
+#define NODE_INITI_REPORT_TID_MIN            0x80
+#define NODE_INITI_REPORT_TID_MAX            0xBF
+
 #define MESH_VENDOR_ASKING_ATTR             0x0001A8de
 #define MESH_VENDOR_ASKING_ATTR_RET         0x0001A8df
 
@@ -19,7 +22,7 @@
 #define VENDOR_ATTR_TYPE_THIRD_ONOFF        0x0125
 
 #define VENDOR_ATTR_TYPE_WORK_STATUS        0xF001
-#define VENDOR_ATTR_SCENE_MODEL			    0xF004
+#define VENDOR_ATTR_SCENE_MODEL             0xF004
 
 #define VENDOR_ATTR_TYPE_SET_UNIX           0xF01F
 #define VENDOR_ATTR_TYPE_SET_TIMEZONE       0xF01E
@@ -27,20 +30,21 @@
 #define VENDOR_ATTR_TYPE_SET_TIMER          0xF010
 #define VENDOR_ATTR_TYPE_SET_PERIOD_TIMER   0xF011
 
-#define VENDOR_ATTR_TYPE_workSwitch			0x0135
-#define VENDOR_ATTR_TYPE_lefttime	        0x012f
-#define VENDOR_ATTR_TYPE_localRecipe	    0x0571
-#define VENDOR_ATTR_TYPE_workstatus			0xf001
-#define VENDOR_ATTR_TYPE_runTime			0x012d
-#define VENDOR_ATTR_TYPE_ReserveLeftTime	0x0550
-#define VENDOR_ATTR_TYPE_stirringSpeed		0x015a
-#define VENDOR_ATTR_TYPE_holdingTemp		0x015b
-#define VENDOR_ATTR_TYPE_errorCode			0x0000
+#define VENDOR_ATTR_TYPE_workSwitch         0x0135
+#define VENDOR_ATTR_TYPE_lefttime           0x012f
+#define VENDOR_ATTR_TYPE_localRecipe        0x0571
+#define VENDOR_ATTR_TYPE_workstatus         0xf001
+#define VENDOR_ATTR_TYPE_runTime            0x012d
+#define VENDOR_ATTR_TYPE_ReserveLeftTime    0x0550
+#define VENDOR_ATTR_TYPE_stirringSpeed      0x015a
+#define VENDOR_ATTR_TYPE_holdingTemp        0x015b
+#define VENDOR_ATTR_TYPE_errorCode          0x0000
 
-#define RECORD_PRESET_SCENCE_BASE			0X2710		//10000
-#define RECORD_PRESET_SCENCE_NUM			9
-#define RECORD_CONFIG_SCENCE_BASE			0X2774		//10100
-#define RECORD_CONFIG_SCENCE_NUM			24
+#define RECORD_PRESET_SCENCE_BASE           0X2710          //10000
+#define RECORD_PRESET_SCENCE_NUM            9
+#define RECORD_CONFIG_SCENCE_BASE           0X2774          //10100
+#define RECORD_CONFIG_SCENCE_NUM            24
+#define NODE_HARDWARE_RST_EVENT             0x23 
 extern uint16_t mesh_key_lid;
 
 // Generic OnOff Set
@@ -125,14 +129,6 @@ struct mesh_vendor_model_set
     uint8_t *attr_parameter;
 }__attribute__((packed));
 
-// Vendor Model Indication
-struct mesh_vendor_model_indication
-{
-    uint8_t tid;
-    uint16_t attr_type;
-    uint8_t *attr_parameter;
-}__attribute__((packed));
-
 struct scene_recall_messge
 {
    uint16_t scene_number;
@@ -164,8 +160,8 @@ struct scene_store_message
 {
     uint16_t scene_number;
     uint8_t vendor_model;
-	uint16_t type_curtainctrl;
-	uint8_t parameter_curtainctrl[6];
+     uint16_t type_curtainctrl;
+     uint8_t parameter_curtainctrl[6];
 }__attribute__((packed));
 
 //Scene register status message
@@ -181,4 +177,5 @@ void tmall_mesh_recv_light_ctl_msg(struct model_rx_info *msg);
 void tmall_mesh_recv_light_hsl_msg(struct model_rx_info *msg);
 void exti_gpio_init(void);
 void tmall_mesh_recv_scene_msg(struct model_rx_info *info);
+uint8_t tmall_mesh_hardware_node_reset_ind(uint8_t model_lid, uint8_t app_key_lid, uint16_t dst_addr);
 #endif
