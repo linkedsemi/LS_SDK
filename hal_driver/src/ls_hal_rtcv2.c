@@ -44,9 +44,9 @@ HAL_StatusTypeDef HAL_RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_tim
     uint32_t reg_time, reg_cal;
     do
     {
-        reg_time = RTC->TIME;
-        reg_cal = RTC->CAL;
-    } while (RTC->TIME != reg_time);
+        reg_time = RTC->CURTIME;
+        reg_cal = RTC->CURCAL;
+    } while (RTC->CURTIME != reg_time);
 
     calendar_cal->year = REG_FIELD_RD(reg_cal, RTC_CAL_YEAR);
     calendar_cal->mon = REG_FIELD_RD(reg_cal, RTC_CAL_MON);

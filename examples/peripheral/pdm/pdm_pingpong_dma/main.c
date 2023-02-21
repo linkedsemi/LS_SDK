@@ -26,7 +26,7 @@ static void ls_pdm_uart_init(void)
     UART_PDM_Config.UARTX = UART1;
     UART_PDM_Config.DMAC_Instance = &dmac1_inst;
     UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3;
-    UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_500000;
+    UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_921600;
     UART_PDM_Config.Init.MSBEN = 0;
     UART_PDM_Config.Init.Parity = UART_NOPARITY;
     UART_PDM_Config.Init.StopBits = UART_STOPBITS1;
@@ -66,8 +66,8 @@ void pdm_dma_test()
 
 void pdm_init()
 {
-    pinmux_pdm_clk_init(PB10);
-    pinmux_pdm_data0_init(PB09);
+    pinmux_pdm_clk_init(PB09);
+    pinmux_pdm_data0_init(PB08);
     pdm.Instance = LSPDM;
     PDM_Init_TypeDef Init = 
     {

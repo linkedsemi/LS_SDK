@@ -173,6 +173,7 @@ enum mesh_provisioned_state
     UNPROVISIONED_KO = 0x00,     /*!< The device was not a node*/
     PROVISIONING,
     PROVISIONED_OK,               /*!< The device was a node*/
+    UNPROVISIONING,               /*!< The node is doing active unprovisioning */
 };
 
 /**
