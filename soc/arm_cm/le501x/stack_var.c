@@ -6,7 +6,7 @@
 #include "log.h"
 #include "modem_rf_le501x.h"
 #define ENV_BUF_SIZE 2048
-#if CONFIG_AOS
+#if CONFIG_AOS || __ZEPHYR__
 #define DB_BUF_SIZE 0
 #define MSG_BUF_SIZE 1900
 #define NON_RET_BUF_SIZE (12)
