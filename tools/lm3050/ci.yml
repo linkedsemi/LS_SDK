@@ -117,6 +117,44 @@ lm3050_des_it_padding_iar_build:
   script:
     - cd examples/peripheral/crypt/des_it_padding/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_it_padding.ewp -build * -log all
 
+lm3050_ecdh_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdh_it && scons flags=-Werror ic=lm3050
+
+lm3050_ecdh_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecdh_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_ecdh_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecdh_it.ewp -build * -log all
+
+lm3050_ecdh_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling && scons flags=-Werror ic=lm3050
+
+lm3050_ecdh_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecdh_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_ecdh_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecdh_polling.ewp -build * -log all
+
 lm3050_sha_polling_build:
   stage: build
   script:
