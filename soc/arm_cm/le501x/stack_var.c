@@ -17,12 +17,11 @@
 
 #endif
 
-
+extern int (*rand_fn) (void);
 
 __attribute((weak)) void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 __attribute((weak)) void (*app_init_fn)(void); 
 __attribute((weak)) void (*platform_reset_fn)(uint32_t);
-__attribute((weak)) int (*rand_fn) (void);
 __attribute((weak)) uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 __attribute((weak)) void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
 __attribute((weak)) void (*exit_critical_fn)(uint32_t);
@@ -39,6 +38,7 @@ __attribute((weak)) uint8_t max_activity_num;
 __attribute((weak)) uint8_t max_profile_num;
 __attribute((weak)) uint8_t max_ral_num;
 __attribute((weak)) uint8_t max_user_task_num;
+__attribute((weak)) bool slave_md_enable_default;
 
 #if !defined(CONFIG_AOS)
 struct {
@@ -161,6 +161,7 @@ void stack_var_ptr_init()
     max_profile_num = SDK_MAX_PROFILE_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
+    slave_md_enable_default = false;
 
     statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
     prf_fn_init();
@@ -257,6 +258,7 @@ void ll_stack_var_ptr_init()
     max_activity_num = SDK_MAX_ACT_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
+    slave_md_enable_default = false;
 
     ll_stack_buffer_init(ENV_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
 }

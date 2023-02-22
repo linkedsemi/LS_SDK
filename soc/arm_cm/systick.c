@@ -1,5 +1,4 @@
 #include "systick.h"
-#include "arm_math.h"
 #include "compile_flag.h"
 #include "sdk_config.h"
 #include "common.h"
@@ -143,7 +142,7 @@ typedef struct
 
 static uint32_t total_ticks;
 
-XIP_BANNED void SysTick_Handler()
+void XIP_BANNED_FUNC(SysTick_Handler,)
 {
     total_ticks += 1;
 }
@@ -158,12 +157,12 @@ void systick_start()
                      SysTick_CTRL_ENABLE_Msk;
 }
 
-XIP_BANNED uint32_t systick_get_value()
+uint32_t XIP_BANNED_FUNC(systick_get_value,)
 {
     return total_ticks;
 }
 
-XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
+bool XIP_BANNED_FUNC(systick_poll_timeout,uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
 {
     va_list ap;
     uint32_t end_tick = start_tick + timeout;

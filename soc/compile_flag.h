@@ -1,21 +1,27 @@
 #ifndef COMPILE_FLAG_H_
 #define COMPILE_FLAG_H_
 #include <stdint.h>
-#if (ROM_CODE==1 || BOOT_RAM==1)
+#if (ROM_CODE==1||(defined(FLASH_PROG_ALGO)&&defined(LE501X)))
 #define ROM_SYMBOL
-#define XIP_BANNED 
+#else 
+#define ROM_SYMBOL __attribute__((weak))
+#endif
+
+#if defined(__ICCARM__)
+#define __XIP_BANNED_LABEL "__iar_init$$done"
+#else
+#define __XIP_BANNED_LABEL ""
+#endif
+
+#if (ROM_CODE==1 || BOOT_RAM==1)
+#define XIP_BANNED_FUNC(__NAME,...) __NAME(__VA_ARGS__)
 #if defined(BOOT_ROM)
 #define LL_PKT_ISR 
 #else
 #define LL_PKT_ISR __attribute((section(".ll_pkt_isr")))
 #endif
 #else
-#define ROM_SYMBOL __attribute__((weak))
-#ifdef FLASH_PROG_ALGO
-#define XIP_BANNED
-#else
-#define XIP_BANNED __attribute__((section(".xip_banned")))
-#endif
+#define XIP_BANNED_FUNC(__NAME,...) __attribute__((section(__XIP_BANNED_LABEL".xip_banned."#__NAME))) __NAME(__VA_ARGS__)
 #define LL_PKT_ISR 
 #endif
 
@@ -34,6 +40,10 @@ extern uint32_t reset_retain_start;
 #define RESET_RETAIN_BASE   (&(reset_retain_start))
 extern uint32_t reset_retain_end;
 #define RESET_RETAIN_END   (&(reset_retain_end))
+#elif defined(__ICCARM__)
+#pragma section="RESET_RETAIN"
+#define RESET_RETAIN_BASE __section_begin("RESET_RETAIN")
+#define RESET_RETAIN_END __section_end("RESET_RETAIN")
 #endif
 
 #endif

@@ -1,0 +1,12 @@
+
+
+execUserFlashInit()  // Called by debugger before loading flash loader in RAM.
+{
+//  __message "--- Start downloading \n";
+}
+
+execUserFlashExit()  // Called by debugger on flashloader exit.
+{
+// __message "--- Resetting device \n";
+// __hwReset(0);
+}

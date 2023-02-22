@@ -63,7 +63,7 @@ void dcdc_off(void);
 
 void deep_sleep(void);
 
-void deep_sleep_no_ble(void);
+void low_power_mode_sched(void);
 
 void ble_sleep(int32_t);
 

@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../../Source/main.c',
+    '../../Source/fota_svc_server.c',
+]
+inc = [
+    '../../Include/.',
+    '../../.',
+]
+env.app_build('ble_fota_server',src,inc)

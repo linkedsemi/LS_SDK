@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include "log.h"
 #include "SEGGER_RTT.h"
-#include "lsuart.h"
-#include "io_config.h"
+#include "ls_hal_uart.h"
+#include "ls_soc_gpio.h"
 
 #define JLINK_RTT           1
 #define UART_LOG           2
 #define RAM_LOG             4
 #ifndef LOG_BACKEND
-#if __arm__
+#if __arm__ || __ICCARM__
 #define LOG_BACKEND (JLINK_RTT)
 #elif __riscv
 #define LOG_BACKEND (0)
@@ -34,14 +34,14 @@ static void log_uart_tx(char *ptr,int len)
 
 static void log_uart_init()
 {
-    uart3_io_init(LOG_UART_TXD, LOG_UART_RXD);
+    pinmux_uart3_init(LOG_UART_TXD, LOG_UART_RXD);
     HAL_UART_Init(&log_uart);
 }
 
 static void log_uart_deinit()
 {
     HAL_UART_DeInit(&log_uart);
-    uart3_io_deinit();
+    pinmux_uart3_deinit();
 }
 
 void uart_log_pause()
@@ -101,6 +101,26 @@ int _write (int fd, char *ptr, int len)
     return len;
 }
 #endif
+#elif defined(__ICCARM__)
+int __write (int fd, char *ptr, int len)
+{
+    #if(LOG_BACKEND&JLINK_RTT)
+    {
+        SEGGER_RTT_Write(0, ptr, len);
+    }
+    #endif
+    #if(LOG_BACKEND&UART_LOG)
+    {
+        log_uart_tx(ptr,len);
+    }
+    #endif
+    #if(LOG_BACKEND&RAM_LOG)
+    {
+//        ram_log_print(linefeed,format,&args);
+    }
+    #endif
+    return len;
+}
 #endif
 
 void log_output(bool linefeed,const char *format,...)

@@ -19,7 +19,7 @@ SECTIONS
     {
         . = ALIGN(4);
         *(.data*)
-        *(.xip_banned)
+        *(.xip_banned*)
 		*(vtable)
 
 		. = ALIGN(4);

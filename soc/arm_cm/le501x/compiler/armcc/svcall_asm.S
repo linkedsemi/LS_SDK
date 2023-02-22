@@ -1,6 +1,6 @@
     PRESERVE8
     THUMB
-    AREA    |.text|, CODE, READONLY
+    AREA    |.text.SVC_Handler|, CODE, READONLY
     FRAME UNWIND ON
 SVC_Handler PROC
     EXPORT SVC_Handler

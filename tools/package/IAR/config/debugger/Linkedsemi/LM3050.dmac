@@ -1,0 +1,14 @@
+//
+// LM30xx device macros
+//
+
+
+execConfigureTraceETM()
+{
+	__message "---- execConfigureTraceETM for the debugger ----\n";
+}
+
+execConfigureTraceSWO()
+{
+	__message "---- execConfigureTraceSWO for the debugger ----\n";
+}

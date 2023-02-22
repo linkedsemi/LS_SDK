@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_board>
+  <pass>
+    <range>CODE 0x00800000 0x0087FFFF </range>
+    <loader>$TOOLKIT_DIR$\config\flashloader\Linkedsemi\FlashLM3050.flash</loader>
+  </pass>
+</flash_board>
+
+

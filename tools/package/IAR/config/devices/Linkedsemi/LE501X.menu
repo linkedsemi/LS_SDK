@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<optionMenuItem>
+  <tag>LE501X</tag>
+  <display>Linkedsemi LE501X</display>
+  <data>$CUR_DIR$\LE501X.i79</data>
+</optionMenuItem>

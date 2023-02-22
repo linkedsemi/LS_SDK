@@ -1,0 +1,5 @@
+使用KEIL，开发Linkedsemi MCU
+
+1、版本：1.0.0.0
+2、Linkedsemi.DFP.1.0.0.pack，适用于 Keil MDK集成开发环境，安装此Linkedsemi.DFP之前，需要先安装Keil MDK；
+3、Linkedsemi.DFP.1.0.0.pack，支持Linkedsemi LE501X和LM3050系列芯片。

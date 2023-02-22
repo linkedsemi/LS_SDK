@@ -3,7 +3,7 @@
 
 #if defined(__CC_ARM)
 #define SVCALL(number, return_type, signature) return_type __svc(number) signature
-#else
+#elif defined(__GNUC__)
 #define SVCALL(number, return_type, signature)          \
   _Pragma("GCC diagnostic push")                        \
   _Pragma("GCC diagnostic ignored \"-Wreturn-type\"")   \
@@ -17,6 +17,11 @@
     );                                                  \
   }                                                     \
   _Pragma("GCC diagnostic pop")
+#elif defined(__ICCARM__)
+#define PRAGMA(x) _Pragma(#x)
+#define SVCALL(number, return_type, signature)          \
+  PRAGMA(swi_number = (number))                        \
+  __swi return_type signature;
 #endif
 
 enum svcall_num_enum
@@ -32,12 +37,12 @@ enum svcall_num_enum
     SVCALL_NUM_MAX,
 };
 
-SVCALL(SVCALL_FLASH_PROGRAM,void,do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type));
-SVCALL(SVCALL_FLASH_ERASE,void, do_spi_flash_erase_svcall(uint32_t offset,uint8_t opcode));
-SVCALL(SVCALL_FLASH_READ,void,do_spi_flash_read_svcall(void *param));
-SVCALL(SVCALL_FLASH_CHIP_ERASE,void,do_spi_flash_chip_erase_svcall(void));
-SVCALL(SVCALL_FLASH_ERASE_SECURITY,void,do_spi_flash_erase_security_area_svcall(uint8_t idx));
-SVCALL(SVCALL_FLASH_PROGRAM_SECURITY,void,do_spi_flash_program_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
-SVCALL(SVCALL_FLASH_READ_SECURITY,void,do_spi_flash_read_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
-SVCALL(SVCALL_FLASH_READ_REG,void,do_spi_flash_read_reg_svcall(void *param));
+SVCALL(SVCALL_FLASH_PROGRAM,void,do_hal_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type));
+SVCALL(SVCALL_FLASH_ERASE,void, do_hal_flash_erase_svcall(uint32_t offset,uint8_t opcode));
+SVCALL(SVCALL_FLASH_READ,void,do_hal_flash_read_svcall(void *param));
+SVCALL(SVCALL_FLASH_CHIP_ERASE,void,do_hal_flash_chip_erase_svcall(void));
+SVCALL(SVCALL_FLASH_ERASE_SECURITY,void,do_hal_flash_erase_security_area_svcall(uint8_t idx));
+SVCALL(SVCALL_FLASH_PROGRAM_SECURITY,void,do_hal_flash_program_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
+SVCALL(SVCALL_FLASH_READ_SECURITY,void,do_hal_flash_read_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
+SVCALL(SVCALL_FLASH_READ_REG,void,do_hal_flash_read_reg_svcall(void *param));
 #endif

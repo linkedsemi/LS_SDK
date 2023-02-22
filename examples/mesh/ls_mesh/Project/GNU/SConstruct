@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../../Source/main.c',
+    '../../Source/ls_mesh_light_cfg.c',
+]
+inc = [
+    '../../Include/.',
+    '../../.',
+]
+env.app_build('ls_mesh',src,inc)

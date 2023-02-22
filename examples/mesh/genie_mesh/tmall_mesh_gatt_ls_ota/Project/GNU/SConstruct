@@ -1,0 +1,14 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../../Source/main.c',
+    '../../Source/tmall_light_cfg.c',
+    '../../Source/tmall_mesh_ctl.c',
+]
+inc = [
+    '../../Include/.',
+    '../../.',
+]
+env.app_build('tmall_mesh_gatt_ls_ota',src,inc,mesh=True)

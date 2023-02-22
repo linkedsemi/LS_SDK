@@ -1,0 +1,26 @@
+[FILEFORMAT]
+rev=1.6
+
+[CHIP]
+name=LM3050
+endiansupport=le
+thumbsupport=true
+armsupport=false
+fpu=VFPv4
+SIMD=false
+
+DeviceMacros=$TOOLKIT_DIR$\config\debugger\Linkedsemi\LM3050.dmac
+
+JTAG=true
+RTCK=false
+SWD=true
+SWO_TraceD0=false
+
+[CORE]
+name=Cortex-M4
+
+[DDF FILE]
+name=Linkedsemi\LM3050.ddf
+
+[FLASH LOADER]
+little=$TOOLKIT_DIR$\config\flashloader\Linkedsemi\FlashLM3050.board

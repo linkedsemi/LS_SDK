@@ -1,0 +1,5 @@
+使用IAR（IAR EW for Arm）开发调试Linkedsemi MCU
+
+1、版本：1.0.0.0
+2、特别说明，支持IAR 8.0以上版本；
+3、安装完IAR后，将config文件夹拷贝至IAR安装目录下的arm文件夹内（如C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm）。

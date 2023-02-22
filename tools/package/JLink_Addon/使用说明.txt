@@ -1,0 +1,8 @@
+使用Segger JLink，添加Linkedsemi MCU的Flash烧录算法至Segger安装目录下
+
+1、版本：1.0.0.0
+2、特别说明，以“管理员身份”运行Linkedsemi_Segger_Addon.exe本程序，支持Jlink 6.2以上版本；
+3、Linkedsemi_Segger_Addon.exe，会更新Segger JLink支持文件到KEIL和IAR IDE中。
+
+如 IAR的安装路径， C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\
+    KEIL的安装路径，C:\Keil_v5\

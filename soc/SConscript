@@ -3,9 +3,11 @@ import os
 Import('env')
 plf = {
     'le501x': 'arm_cm',
+    'lm3050': 'arm_cm',
+    'sccc9xx': 'arm_cm',
 }
 if env.get('IC') is None:
-    env['IC'] = ARGUMENTS.get('ic','le501x')
+    env['IC'] = ARGUMENTS.get('ic','lm3050')
 env['BASE_ARCH'] = plf[env['IC']]
 env['CPPDEFINES'] = [env['IC'].upper()]
 
@@ -22,6 +24,7 @@ def inc_dirs(self,dirs):
 
 def image_build(self,name,src,inc,ble=False,mesh=False,rtos = None,with_startup = True,objprefix = ''):
     self.Append(CPPPATH = self.inc_dirs(inc))
+    self.Append(CCFLAGS = ['-Werror'])
     self.Append(LINKFLAGS = ' $GC_OPTION ')
     return self.plf_build(name,src,rtos,with_startup,ble,mesh,objprefix)
 
@@ -39,11 +42,10 @@ flags = env.ParseFlags(ARGUMENTS.get('flags'))
 env.MergeFlags(flags)
 
 ### default build parameters
-default_opt_level = '-Os'
 for v in flags['CCFLAGS']:
     print(v)
     if '-O' in v:
-        default_opt_level = ''
+        env['DEFAULT_OPT_LVL'] = ''
         break
-env.MergeFlags(default_opt_level)
+env.MergeFlags(env['DEFAULT_OPT_LVL'])
 

@@ -1,6 +1,6 @@
     PRESERVE8
     THUMB
-    AREA    |.xip_banned|, CODE, READONLY
+    AREA    |.xip_banned.arm_cm_delay_asm|, CODE, READONLY
     FRAME UNWIND ON
 arm_cm_delay_asm PROC
     EXPORT arm_cm_delay_asm

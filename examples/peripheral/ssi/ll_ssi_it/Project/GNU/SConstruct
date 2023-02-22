@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../../Source/main.c',
+    '../../Source/ll_ssi_handler.c',
+]
+inc = [
+    '../../Include/.',
+    '../../.',
+]
+env.app_build('ll_ssi_it',src,inc,ble = False)

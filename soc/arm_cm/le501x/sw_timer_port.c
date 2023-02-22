@@ -1,4 +1,4 @@
-#include "sw_timer_port.h"
+#include "sw_timer_int.h"
 #include "platform.h"
 #include "le501x.h"
 #include "reg_rcc.h"
@@ -69,11 +69,8 @@ void timer_irq_clr()
     INT_CLR = 0x40;
 }
 
-void timer_isr_func_set(void (*isr)())
-{
-    timer_isr = isr;
-}
 __attribute((weak)) void ls_24g_restore_in_wkup(void){}
+
 static void WKUP_Handler_For_SW_Timer()
 {
     CNTL = 0x100;
@@ -83,7 +80,8 @@ static void WKUP_Handler_For_SW_Timer()
     ble_wkup_status_set(false);
     BLE_WKUP_IRQ_DISABLE();
 }
-__attribute((weak)) XIP_BANNED void PROP_24g_Handler(uint32_t int_stat_24g){}
+__attribute((weak)) void XIP_BANNED_FUNC(PROP_24g_Handler,uint32_t int_stat_24g){}
+
 static void Handler_For_SW_Timer()
 {
     static uint32_t error = 0;
@@ -124,7 +122,7 @@ static void Handler_For_SW_Timer()
     PROP_24g_Handler(int_stat);
 }
 
-void mac_init_for_sw_timer()
+static void mac_init_for_sw_timer()
 {
     arm_cm_set_int_isr(BLE_WKUP_IRQn,WKUP_Handler_For_SW_Timer);
     arm_cm_set_int_isr(BLE_FIFO_IRQn,Handler_For_SW_Timer);
@@ -134,6 +132,12 @@ void mac_init_for_sw_timer()
     CNTL = 0x100;
     INT_MASK = 0;
     INT_CLR = 0xffffffff;
+}
+
+void timer_setup(void (*isr)())
+{
+    timer_isr = isr;
+    mac_init_for_sw_timer();
 }
 
 static bool wkup_sleep_interval_enough(sw_timer_time_t time,uint16_t cnt)

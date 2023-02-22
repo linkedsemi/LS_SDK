@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<optionMenuItem>
+  <tag>LM3050</tag>
+  <display>Linkedsemi LM3050</display>
+  <data>$CUR_DIR$\LM3050.i79</data>
+</optionMenuItem>

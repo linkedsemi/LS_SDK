@@ -27,6 +27,7 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define GENERIC_ONOFF_CLIENT             (0x1001)  /*!< SIG Model Index of generic onoff client 0x1001*/
 #define GENERIC_LVL_SERVER               (0x1002)  /*!< SIG Model Index of generic level server 0x1002*/
 #define GENERIC_LVL_CLIENT               (0x1003)  /*!< SIG Model Index of generic level client 0x1003*/
+#define SCENE_SERVER                     (0x1203)  /*!< SIG Model Index of Scene server 0x1203*/
 #define LIGHTNESS_SERVER                 (0x1300)  /*!< SIG Model Index of light lightness server 0x1300*/
 #define LIGHTS_CTL_SERVER                (0x1303)  /*!< SIG Model Index of light control server 0x1303*/
 #define LIGHTS_CTLT_SERVER               (0x1306)  /*!< SIG Model Index of light CTL temperature server 0x1306*/
@@ -62,6 +63,19 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define GENERIC_LVL_SET                  (0x0682) /*!< Opcdoe of generic level set 0x0682*/
 #define GENERIC_LVL_SET_UNAK             (0x0782) /*!< Opcdoe of generic level set unacknowleged 0x0782*/
 #define GENERIC_LVL_STATUS               (0x0882) /*!< Opcdoe of generic level status 0x0882*/
+// SCENE SERVER
+#define SCENE_GET                        (0x4182)  /*!< Opcdoe of scene get 0x4182*/
+#define SCENE_RECALL                     (0x4282)  /*!< Opcdoe of scene recall 0x4282*/
+#define SCENE_RECALL_UNAK                (0x4382)  /*!< Opcdoe of scene recall unacknowleged 0x4382*/
+#define SCENE_STATUS                     (0x5E)    /*!< Opcdoe of scene status 0x5e*/
+#define SCENE_REGISTER_GET               (0x4482)  /*!< Opcdoe of scene register get 0x4482*/
+#define SCENE_REGISTER_STATUS            (0x4582)  /*!< Opcdoe of scene register status 0x4582*/
+
+// SCENE SETUP SERVER
+#define SCENE_STORE                      (0x4682)  /*!< Opcdoe of scene store 0x4682*/
+#define SCENE_STORE_UNAK                 (0x4782)  /*!< Opcdoe of scene store 0x4782*/
+#define SCENE_DELETE                     (0x9E82)  /*!< Opcdoe of scene delete 0x9e82*/
+#define SCENE_DELETE_UNAK                (0x9F82)  /*!< Opcdoe of scene delete unacknowleged 0x9f82*/
 
 //Light Lightness        
 #define LIGHT_LIGHTNESS_SET              (0x4c82) /*!< Opcdoe of light lightness set 0x4c82*/
@@ -246,7 +260,13 @@ enum mesh_state_idx
     MESH_STATE_LIGHT_XYL_XY_TGT,            /*!< Light xyL x and y Target*/
     MESH_STATE_LIGHT_XYL_LN_DFLT,           /*!< Light xyL Lightness Default*/ 
     MESH_STATE_LIGHT_XYL_XY_DFLT,           /*!< Light xyL x and y Default*/ 
-    MESH_STATE_LIGHT_XYL_XY_RANGE           /*!< Light xyL x and y Range*/ 
+    MESH_STATE_LIGHT_XYL_XY_RANGE,           /*!< Light xyL x and y Range*/ 
+
+    MESH_STATE_SCENE_RECALL_SCENE_NUM =250,  /*!< Recall Scene num*/
+    MESH_STATE_SCENE_STORE_SCENE_NUM,        /*!< Store Scene num*/
+    MESH_STATE_SCENE_DELETE_SCENE_NUM,       /*!< Delete Scene num*/
+    MESH_STATE_SCENE_GET_STATUS,             /*!< Get Scene status*/
+    MESH_STATE_SCENE_REGISTER_GET_STATUS,    /*!< Get Register Scene status*/
 };
 
 /**
@@ -286,6 +306,14 @@ enum friend_node_min_queue_size_log
     FRIEND_NODE_MIN_QUEUE_SIZE_LOG_N64,          /*!< At least 6 messages are stored in the friend queue*/
     FRIEND_NODE_MIN_QUEUE_SIZE_LOG_N128,         /*!< At least 7 messages are stored in the friend queue*/
 };
+
+enum scene_status_code_
+{
+    SCENE_STATUS_CODE_SUCCESS    =0x00,
+    SCENE_STATUS_CODE_REG_FULL   =0x01,
+    SCENE_STATUS_CODE_NOT_FOUND  =0x02,
+    SCENE_STATUS_CODE_RESERVED   =0x03
+}; 
 
 /**
   * @brief Device state information struct
@@ -500,7 +528,7 @@ struct mesh_publish_info_ind
     uint8_t  model_lid;            /*!< Model local index*/
     uint32_t period_ms;            /*!< Publish period in milliseconds*/
     uint16_t addr;                 /*!< Publication address*/
-}__attribute__((packed));
+};
 
 /**
   * @brief Auto provisioning information for model
@@ -781,7 +809,7 @@ void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool
  * 
  *  * @param seq_offset  set offset of seqence number by length of message
  */
-void ls_sig_mesh_auto_prov_update_ivseq_handler(uint8_t seq_offset);
+void ls_sig_mesh_auto_prov_update_ivseq_handler(uint32_t seq_offset);
 /**
  * @brief Report unicast_address of provisioner
  * 

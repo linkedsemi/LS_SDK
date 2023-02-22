@@ -4,12 +4,12 @@
 #include <stdbool.h>
 #include "sdk_config.h"
 #include "compile_flag.h"
-#include "prf_fotas.h"
+#include "le501x.h"
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
 
-#define LSI_CNT_CYCLES (100)
+#define LSI_CNT_CYCLES (1500)
 
 struct reset_retain_struct
 {
@@ -53,10 +53,6 @@ void stack_assert_asm(uint32_t,uint32_t,uint32_t);
 void platform_reset(uint32_t error);
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param);
-
-void rco_freq_counting_config(void);
-
-void rco_freq_counting_start(void);
 
 uint64_t lpcycles_to_hus(uint32_t lpcycles);
 

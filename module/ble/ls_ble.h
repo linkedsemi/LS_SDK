@@ -146,6 +146,15 @@ enum phy_type
     PHY_TYPE_CODED,                                /*!< LE Coded phy*/ 
 };
 /**
+  * @brief PHY option.
+  */
+enum phy_option
+{
+    PHY_OPT_LE_CODED_ALL_RATES     = (1 << 0),   	/*!< No preference for rate used when transmitting on the LE Coded PHY*/
+    PHY_OPT_LE_CODED_500K_RATE     = (1 << 1),    	/*!< 500kbps rate preferred when transmitting on the LE Coded PHY*/
+    PHY_OPT_LE_CODED_125K_RATE     = (1 << 2),		/*!< 125kbps  when transmitting on the LE Coded PHY*/
+};  
+/**
   * @brief Extended adv object parameters structure.
   */
 struct ext_adv_obj_param
@@ -465,6 +474,7 @@ enum gap_evt_type
     GET_DEV_INFO_APPEARANCE,                        /*!< Get appearance Icon of device information*/
     GET_DEV_INFO_SLV_PRE_PARAM,                     /*!< Get slave preferred parameters of device information*/
     GET_DEV_INFO_PEER_RSSI,                         /*!< Get connection RSSI indication*/
+    PHY_UPDATED,										                /*!< PHY updated event*/
 };
 /**
   * @brief BLE roles enumeration.
@@ -578,6 +588,15 @@ struct gap_connected
 struct gap_disconnected
 {
     uint8_t reason;                         /*!< Reason for disconnection*/
+};
+
+/**
+  * @brief Disconnected indication event structure.
+  */
+struct gap_phy_updated
+{
+    uint8_t tx_phy;                         /// LE PHY for data transmission (@see enum phy_type)
+    uint8_t rx_phy;                         /// LE PHY for data reception (@see enum phy_type)
 };
 
 /**
@@ -703,6 +722,7 @@ union gap_evt_u
     struct gap_dev_info_appearance get_appearance;             /*!< Get Get appearance*/
     struct gap_dev_info_slave_pref_param slv_pref_param;       /*!< Get slave preferred parameters*/
     struct gap_dev_info_peer_rssi peer_rssi;                   /*!< Get RSSI value of the current connection*/
+    struct gap_phy_updated phy_updated;                        /*!< PHY updated event*/
 };
 /**
   * @brief Connection parameter update.
@@ -745,6 +765,7 @@ enum gatt_evt_type
     CLIENT_RD_CHAR_VAL_BY_UUID_IND,    /*!< Read characteristic value by UUID indication for client*/
     CLIENT_WRITE_WITH_RSP_DONE,        /*!<  Write response indication for client*/
     CLIENT_WRITE_NO_RSP_DONE,          /*!<  Write with no response indication for client*/
+    CLIENT_DISC_OP_DONE,               /*!<  discovery operation done for client*/
 
     MTU_CHANGED_INDICATION,            /*!<  MTU exchange indication for client & server*/
     GATT_EVT_MAX
@@ -898,6 +919,15 @@ struct gatt_write_no_rsp
     uint8_t status;                               /*!< Status of write*/
 };
 /**
+  * @brief Send discovery operation done on GATT server.
+  */
+struct gatt_client_discovery_operation_done
+{
+    uint16_t transaction_id;                      /*!< Index of transaction*/
+    uint8_t status;                               /*!< Status of write*/
+};
+
+/**
   * @brief Union definition for GATT events.
   */
 union gatt_evt_u
@@ -914,6 +944,7 @@ union gatt_evt_u
     struct gatt_read_indicate client_read_indicate;                                      /*!< GATT client read indicate.*/
     struct gatt_write_rsp client_write_rsp;                                              /*!< GATT client write request response.*/
     struct gatt_write_no_rsp client_write_no_rsp;                                        /*!< GATT client write command response.*/
+    struct gatt_client_discovery_operation_done  client_discovery_operation_done;        /*!< GATT client discovery operation done.*/
 };
 
 /**
@@ -951,6 +982,14 @@ void ble_loop(void);
  ****************************************************************************************
  */
 void dev_manager_init(void (*cb)(enum dev_evt_type,union dev_evt_u *));
+/**
+ ****************************************************************************************
+ * \brief Re-register callback of dev_manager.
+ * 
+ * \param[in]  cb                Callback function to handle all the dev_manager messages.
+ ****************************************************************************************
+ */
+void dev_manager_register_callback(void (*cb)(enum dev_evt_type,union dev_evt_u *));
 /**
  ****************************************************************************************
  * \brief Initialization of dev_manager stack.
@@ -1170,6 +1209,15 @@ uint8_t dev_manager_update_adv_interval(uint8_t adv_handle, uint32_t new_intv_mi
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 /**
  ****************************************************************************************
+ * \brief Re-register callback of gap_manager.
+ * 
+ * \param[in]  evt_cb             Callback function to handle all the gap_manager messages.
+ * 
+ ****************************************************************************************
+ */
+void gap_manager_register_callback(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
+/**
+ ****************************************************************************************
  * \brief Disconnect specified connection.
  * 
  * \param[in]  con_idx            Connection ID number to disconnect.
@@ -1178,6 +1226,18 @@ void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t
  ****************************************************************************************
  */
 void gap_manager_disconnect(uint8_t con_idx,uint8_t reason);
+/**
+ ****************************************************************************************
+ * \brief Set Phy for specific connection.
+ * 
+ * \param[in]  con_idx            Connection ID number to disconnect.
+ * \param[in]  tx_phy             Supported LE PHY for data transmission (@see enum phy_type)
+ * \param[in]  rx_phy             Supported LE PHY for data reception (@see enum phy_type)
+ * \param[in]  phy_opt            PHY options (@see enum phy_option)
+ * 
+ ****************************************************************************************
+ */   
+void gap_manager_set_phy(uint8_t con_idx,uint8_t tx_phy,uint8_t rx_phy,uint8_t phy_opt);
 /**
  ****************************************************************************************
  * \brief The master starts the bonding process
@@ -1353,6 +1413,15 @@ void gap_manager_get_peer_rssi(uint8_t link_id);
  ****************************************************************************************
  */
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
+/**
+ ****************************************************************************************
+ * \brief Re-register callback of GATT manager.
+ *
+ * \param[in]  evt_cb               Callback function for gatt service.
+ *
+ ****************************************************************************************
+ */
+void gatt_manager_register_callback(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 /**
  ****************************************************************************************
  * \brief Register service in GATT manager.
