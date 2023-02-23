@@ -154,6 +154,13 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
         SYSC_AWO->IO[i].IEN_OD = GPIO_IEN_OD[i];
         SYSC_AWO->IO[i].PUPD = GPIO_PUPD[i];
     }
+    if(hal_flash_dual_mode_get())
+    {
+        pinmux_hal_flash_init();
+    }else
+    {
+        pinmux_hal_flash_quad_init();
+    }
     gpio_pd_latch_state_exit();
     hal_flash_init();
     clk_flash_init();
