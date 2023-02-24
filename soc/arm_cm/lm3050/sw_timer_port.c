@@ -27,11 +27,13 @@ void timer_match_set(sw_timer_time_t match)
 void timer_irq_unmask()
 {
     __NVIC_EnableIRQ(LSTIM_IRQn);
+    V33_RG->WKUP_CTRL |= 0x4;
 }
 
 void timer_irq_mask()
 {
     __NVIC_DisableIRQ(LSTIM_IRQn);
+    V33_RG->WKUP_CTRL &= ~0x4;
 }
 
 void timer_irq_clr()
