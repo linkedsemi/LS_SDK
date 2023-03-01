@@ -10,4 +10,5 @@ inc = [
     '../../Include/.',
     '../../.',
 ]
+env['LINKSCRIPT'] = File(env.subst('../../compiler/$COMPILER/single_bank_fota_link.txt'))
 env.app_build('fota',src,inc)

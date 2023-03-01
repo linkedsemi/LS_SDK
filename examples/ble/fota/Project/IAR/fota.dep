@@ -1,0 +1,1908 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <fileVersion>4</fileVersion>
+    <fileChecksum>3290226470</fileChecksum>
+    <configuration>
+        <name>fota</name>
+        <outputs>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_rtc.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_wwdg.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_timer.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_uart_dma.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_iwdg.o</file>
+            <file>$PROJ_DIR$\build\Obj\common.o</file>
+            <file>$PROJ_DIR$\build\Obj\crc16.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_i2c_dma.o</file>
+            <file>$PROJ_DIR$\build\Obj\log.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_dbg.o</file>
+            <file>$PROJ_DIR$\build\Obj\fifo.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_pdm_dma.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_spi_i2s.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_spi_i2s_dma.o</file>
+            <file>$PROJ_DIR$\build\Obj\ota_settings.o</file>
+            <file>$PROJ_DIR$\build\Obj\SEGGER_RTT.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_flash_qspi.o</file>
+            <file>$PROJ_DIR$\build\Obj\inflash_settings.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_pdm.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_pis.o</file>
+            <file>$PROJ_DIR$\build\Obj\ble_common_api.o</file>
+            <file>$PROJ_DIR$\build\Obj\sha256.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_uart.o</file>
+            <file>$PROJ_DIR$\build\Obj\linked_buffer.o</file>
+            <file>$PROJ_DIR$\build\Obj\sw_timer.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_qspi.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_ssi.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_ssi_dma.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_i2c.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_flash_svcall.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_trng.o</file>
+            <file>$PROJ_DIR$\build\Obj\circular_doubly_linked_list.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_adc.o</file>
+            <file>$PROJ_DIR$\build\Obj\tinyfs_nvm.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_crypt.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_dmac.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_qspi.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_wwdg.o</file>
+            <file>$PROJ_DIR$\build\Obj\tinyfs.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_pis.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_soc_gpio.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_ssi.o</file>
+            <file>$PROJ_DIR$\build\Obj\modem_rf_le501x.o</file>
+            <file>$PROJ_DIR$\build\Obj\utils.o</file>
+            <file>$PROJ_DIR$\build\Obj\tinyfs_write_cache.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_ecc.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_spi_i2s.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_timer.o</file>
+            <file>$PROJ_DIR$\build\Obj\modem_rf_le501x_24g.o</file>
+            <file>$PROJ_DIR$\build\Obj\platform.o</file>
+            <file>$PROJ_DIR$\build\Obj\cpu.o</file>
+            <file>$PROJ_DIR$\build\Obj\sleep.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_cache.o</file>
+            <file>$PROJ_DIR$\build\Obj\svcall.o</file>
+            <file>$PROJ_DIR$\build\Obj\sw_timer_port.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_pdm.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_trng.o</file>
+            <file>$PROJ_DIR$\build\Obj\stack_var.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_i2c.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_iwdg.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_rtc.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_uart.o</file>
+            <file>$PROJ_DIR$\build\Obj\calc_acc.o</file>
+            <file>$PROJ_DIR$\..\..\Include\app_config.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_cache.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_crypt.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\fifo.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\gpio_mode.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\i2c_misc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\flash_svcall_int.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\hal_flash_int.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\le501x.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\ls_24g.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\crc\crc16.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\HAL_def.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\hal_flash_svcall.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\field_manipulate.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\log.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\ls_ble.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\ls_dbg.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\dmac_config.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\linked_buffer.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_adc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\settings\inflash_settings.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\cpu.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\co_math.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\calc_div.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\core_cm0.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\calc_acc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\builtin_timer.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\circular_doubly_linked_list.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\cmsis_compiler.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\cmsis_version.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\ble_common_api.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\cmsis_iccarm.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\co_list.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\compile_flag.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\common.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_dmac.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_rtc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_trng.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_uart.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_ll_i2c.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_flash.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_ecc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\ls_hal_qspi.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_spi_i2s.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_ll_spi.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_timer.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_ll_uart.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_pdm.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_adc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_i2c.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_pis.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_iwdg.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_wwdg.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_ll_ssi.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\api\ls_hal_ssi.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_spi_i2s.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_trng.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_pis.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_timer.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_i2c.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_ssi.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_cache.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_wwdg.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\settings\ota_settings.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_rtc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_ecc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_iwdg.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\ls_sys.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_crypt.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_dmac.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\pis_config.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_qspi.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_soc_gpio.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_pdm.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x_24g.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\platform.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_uart.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_soc_pinmux.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\svcall.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_uart_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_rcc_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sleep.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_timer_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\sw_timer.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\sw_timer_int.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_spi_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_syscfg.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\RTT\SEGGER_RTT.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_rcc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_rf.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_rf_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_wwdg_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_qspi_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\sdk_config.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_pis_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_syscfg_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sdk_default_config.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\RTT\SEGGER_RTT_Conf.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\ssi_misc.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_rtc_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_ssi_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_trng_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_i2c_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_dmac_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_mdm2_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_pdm_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\prf\prf_fotas.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_calc_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_cache_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_crypt_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_gpio_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_gpio.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_iwdg_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_exti_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_adc_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_lptim.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_mdm2.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\reg_ecc_type.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\reg_base_addr.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_pdm_dma.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_iwdg.c</file>
+            <file>$PROJ_DIR$\..\..\Source\main.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sw_timer_port.h</file>
+            <file>$PROJ_DIR$\..\..\Source\pub_key.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_pdm.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_qspi.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_ecc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sys_stat.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_config.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\calc_div.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_pis.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_rtc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_spi_i2s.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_spi_i2s_dma.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_dmac.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_i2c_dma.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\systick.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_nvm.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_adc_dma.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_cache.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_crypt.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_write_cache.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_svcall.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_i2c.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_adc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_qspi.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\ble\ble_common_api.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_nvm.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\cpu.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_ssi_dma.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\linked_buffer.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_write_cache.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_trng.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\source\utils.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_adc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_ssi.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\ls_dbg.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\calc_acc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\delay_asm.S</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_cache.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_crypt.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\crc\crc16.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\log.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\settings\ota_settings.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_timer.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\common.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\settings\inflash_settings.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\fifo.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\debug\RTT\SEGGER_RTT.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_wwdg.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\source\sha256.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\circular_doubly_linked_list.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\common\sw_timer.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_uart.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_uart_dma.c</file>
+            <file>$PROJ_DIR$\build\Obj\main.o</file>
+            <file>$PROJ_DIR$\build\Obj\pub_key.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_adc.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_cache.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_dmac.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_crypt.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_ecc.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_flash.o</file>
+            <file>$PROJ_DIR$\build\Obj\calc_div.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_adc_dma.o</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\svcall.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\stack_asm.S</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_pis.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_trng.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_ecc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_uart.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x_24g.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_spi_i2s.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_wwdg.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\platform.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_soc_gpio.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sleep.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\sleep_asm.S</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\stack_var.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_qspi.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\svcall_asm.S</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_timer.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\startup.S</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_pdm.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_i2c.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sw_timer_port.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\swint_handler.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_iwdg.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sys_stat.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\systick.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_dmac.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_rtc.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_ssi.c</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ecc.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_crypt.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\sleep_asm.o</file>
+            <file>$PROJ_DIR$\build\Obj\main.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_cache.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_flash_qspi.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_pdm_dma.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\startup.o</file>
+            <file>$PROJ_DIR$\build\Obj\calc_div.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\stack_asm.o</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_adc.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_flash.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_iwdg.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_pdm.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_qspi.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_spi_i2s_dma.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_i2c.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\sys_stat.o</file>
+            <file>$PROJ_DIR$\build\Obj\svcall_asm.o</file>
+            <file>$PROJ_DIR$\build\Obj\pub_key.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_pis.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_ssi.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_ssi_dma.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_rtc.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_spi_i2s.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_i2c_dma.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_adc_dma.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_dmac.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_ecc.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_flash_svcall.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\swint_handler.o</file>
+            <file>$PROJ_DIR$\build\Obj\delay_asm.o</file>
+            <file>$PROJ_DIR$\build\Obj\systick.o</file>
+            <file>$PROJ_DIR$\build\Obj\ble_common_api.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\crc16.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\circular_doubly_linked_list.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_dbg.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\linked_buffer.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\sw_timer.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_trng.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\log.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\common.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\tinyfs_write_cache.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_cache.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_crypt.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_timer.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ota_settings.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\utils.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\calc_acc.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_dmac.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_uart_dma.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_iwdg.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\inflash_settings.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_uart.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\SEGGER_RTT.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\fifo.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\tinyfs_nvm.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\cpu.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\tinyfs.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_hal_wwdg.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_i2c.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_adc.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\sha256.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_ecc.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_pdm.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_wwdg.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_timer.pbi</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ecc_dsa.h</file>
+            <file>$PROJ_DIR$\build\Obj\svcall.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\stack_var.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+            <file>$PROJ_DIR$\build\Obj\ls_soc_gpio.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\iccarm_builtin.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+            <file>$PROJ_DIR$\build\Obj\swint_handler.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_trng.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\sw_timer_port.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_qspi.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_uart.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\platform.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\modem_rf_le501x.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\modem_rf_le501x_24g.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_ssi.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_spi_i2s.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\systick.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_rtc.pbi</file>
+            <file>$PROJ_DIR$\build\Exe\fota.out</file>
+            <file>$PROJ_DIR$\build\Obj\fota.pbd</file>
+            <file>$PROJ_DIR$\build\Obj\sleep.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\sys_stat.pbi</file>
+            <file>$PROJ_DIR$\build\Obj\ls_msp_pis.pbi</file>
+            <file>$PROJ_DIR$\build\Exe\fota.hex</file>
+            <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_stdlib.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\iar_intrinsics_common.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\sha256.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\utils.h</file>
+            <file>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\constants.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\time.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\time32.h</file>
+        </outputs>
+        <file>
+            <name>[ROOT_NODE]</name>
+            <outputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 376</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_pdm_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 11</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 295</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 289 362 359 182 137 98 286 287 74 133 110 76 283 288 364 169 80 167 284</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_iwdg.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 4</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 301</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 287 282 362 74 359 286 76 285 129 289 182 114 84 283 288 176 364</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Source\main.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 242</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 292</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 97 87 175 94 359 362 152 356 92 361 364 64 157 153 79 126 286 287 124 182 174 281 284 282 170 71 96 76 139 150 78 77 200 283 288 91 160 154 103 172 144 63 177 159 289</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Source\pub_key.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 243</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 308</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 287 359 362 283 288</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_pdm.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 18</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 302</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 364 182 362 76 137 284 97 74 169 286 287 359 110 283 288 289</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_qspi.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 25</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 303</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 135 286 283 156 282 76 84 383 362 105 79 96 289 288 382 287 364 182</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_ecc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 248</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 317</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 289 287 97 359 286 104 284 382 128 76 383 283 288 182 364 181 362</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\calc_div.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 250</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 297</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 364 286 287 362 359 86 283 288 76 171 182</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_pis.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 19</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 309</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 283 362 364 76 74 158 286 288 120 182 134 359 287 113</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_rtc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 0</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 312</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 385 76 163 139 77 359 286 71 127 364 382 79 287 289 392 157 160 87 92 94 361 384 391 99 74 84 97 283 288 383 96 63 91 182 284 285 282</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_spi_i2s.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 12</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 313</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 157 76 284 364 97 160 283 74 200 118 359 288 286 282 107 77 79 63 362 287 182 289 106 149</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_spi_i2s_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 13</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 304</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 76 286 289 98 359 364 97 160 80 362 106 287 74 200 157 282 283 288 107 118 77 79 149 133 167 284 63 182</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_dmac.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 246</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 316</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 283 80 182 76 133 84 364 167 362 286 288 98 359 287</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_i2c_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 7</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 314</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 364 361 166 71 92 74 122 359 288 362 87 94 77 139 98 283 63 157 68 112 76 289 287 160 96 91 102 79 182 284 167 282 80 133</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_adc_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 251</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 315</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 287 76 364 98 289 288 79 178 362 82 111 359 283 160 167 284 74 157 282 63 182 80 133</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_cache.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 245</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 293</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 362 76 283 182 124 286 288 64 96 287 172</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_crypt.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 247</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 290</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 283 282 359 384 364 286 76 74 288 182 385 132 79 382 362 287 173 289 383 65</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 249</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 300</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71 79 283 362 91 103 359 63 364 142 284 84 288 286 69 200 157 75 96 139 287 289 160 282 70 87 92 94 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_svcall.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 29</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 318</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_i2c.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 28</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 305</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 74 182 102 200 63 282 362 122 84 359 364 157 91 112 76 139 287 71 94 285 286 289 283 288 79 166 68 77 160 284 96 87 92 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_adc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 244</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 299</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 283 286 282 77 364 111 160 362 289 82 76 200 288 79 178 157 285 359 287 74 63 182 284</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_qspi.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 16</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 294</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 84 283 362 284 359 63 182 103 79 288 286 96 135 105 364 157 75 139 287 289 160 282 87 92 94 361 70 71 91 156</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 38</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 347</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 362 209 289 383 382 97 364 284 192 81 73 287 384 96 205 201 77 79 85 359 157 160 283 288 385 63 282 95</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\ble\ble_common_api.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 20</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 322</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 362 359 284 78 364 287 289 93 283 288</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_nvm.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 33</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 345</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 364 103 362 287 201 286 283 288</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\cpu.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 50</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 346</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 94 362 91 359 287 87 92 286 283 288 361 71 84 96 364</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_ssi_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 27</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 311</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 182 289 76 98 359 80 362 123 286 287 160 74 157 162 117 283 288 63 164 116 133 167 284 364</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\linked_buffer.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 23</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 326</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 97 286 287 364 362 96 81 382 79 359 284 289 282 283 288 383 95</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_write_cache.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 44</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 331</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 287 383 286 205 289 283 382 359 288 201 362</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_trng.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 30</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 328</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 76 362 287 182 119 74 286 283 288 100 165</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\source\utils.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 43</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 336</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 382 362 286 284 359 287 389 283 288 289 383 390 364</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_adc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 32</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 350</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 111 182 139 288 63 71 150 359 144 364 76 74 133 283 79 87 92 94 361 289 152 82 131 191 80 284 178 286 287 157 282 160 91 96 167 159</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_ssi.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 26</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 310</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 117 284 77 287 364 123 76 79 164 362 359 116 162 182 283 288 282 289 74</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\debug\ls_dbg.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 9</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 325</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 282 364 77 288 362 286 283 84 96 287 284 289</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\calc_acc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 62</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 337</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 287 359 152 286 283 288 144 76</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\delay_asm.S</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 320</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_cache.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 52</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 332</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 286 283 96 76 144 359 287 288 152</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_crypt.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 34</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 333</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 283 364 139 152 173 362 286 288 144 63 91 74 191 76 65 182 359 287 96 132 157 71 160 87 92 94 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\crc\crc16.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 6</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 323</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 287 286 362 359 73 283 288</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\debug\log.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 8</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 329</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 282 283 359 364 136 361 289 140 151 288 362 161 386 157 160 143 77 101 287 284 384 387 385 74 109 63 76 285 182 141</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\settings\ota_settings.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 14</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 335</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 359 103 170 287 83 364 286 283 288 126</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_timer.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 2</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 334</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 286 362 79 157 121 287 108 76 289 182 63 364 284 283 288 74 146 160 282</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\common\common.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 5</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 330</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 85 359 383 97 289 287 362 364 382 96 385 283 288 284 384</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\settings\inflash_settings.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 17</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 341</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 287 97 362 103 79 364 359 283 288 289 83 284 282</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\fifo.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 10</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 344</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 364 286 289 359 284 66 287 383 382 385 283 288 362 97 384 96</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\debug\RTT\SEGGER_RTT.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 15</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 343</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 359 384 387 385 289 382 161 282 386 361 383 151 287 283 288</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_wwdg.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 1</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 348</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 364 125 76 362 74 359 287 182 115 283 288 155</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\source\sha256.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 21</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 351</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 362 359 389 287 289 390 364 284 383 388 283 288 382</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\common\circular_doubly_linked_list.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 31</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 324</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 364 289 287 96 284 359 283 288 362 90</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\module\common\sw_timer.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 24</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 327</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 288 289 364 84 359 186 97 96 362 147 286 283 148 79 287 90 284 282</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_uart.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 22</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 342</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 288 289 157 282 200 286 160 182 362 364 76 283 140 101 77 359 287 74 109 63 285 143 284</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_uart_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 3</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 339</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 143 63 76 362 283 157 80 101 359 288 286 364 140 98 289 287 160 74 109 133 167 284 182</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\svcall.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 53</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 357</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 139 364 362 282 75 286 287 289 160 157 96 359 69 284 103 84 79 283 288 63 71 91 142 70 87 92 94 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\stack_asm.S</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 298</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_pis.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 39</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 380</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 287 158 288 76 362 359 152 182 134 286 283 144 120</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_trng.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 56</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 365</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 287 91 139 359 364 71 160 362 74 76 165 152 191 100 182 286 157 94 119 283 288 144 96 63 87 92 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_ecc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 45</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 352</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 94 181 139 286 76 128 144 283 96 63 191 71 104 362 359 287 288 364 91 152 87 92 361 157 160 182</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 42</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 370</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 154 157 144 180 362 160 76 103 364 286 287 152 153 150 79 359 283 288 168 159 131 282 63</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_uart.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 61</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 368</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 92 80 74 140 361 167 71 87 94 76 191 284 182 362 286 287 109 160 96 152 101 139 133 143 359 283 288 144 364 157 63 91 289</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x_24g.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 48</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 371</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 160 72 92 286 180 364 144 154 157 87 289 76 139 287 71 284 152 153 150 79 77 359 283 288 168 159 96 63 91 138 94 361 282</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_spi_i2s.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 46</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 373</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 288 91 182 80 362 76 157 284 71 359 144 364 97 160 286 282 96 191 283 74 200 118 289 167 152 106 139 133 149 287 107 77 79 63 87 92 94 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_wwdg.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 37</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 354</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 155 286 152 362 76 182 359 287 125 283 288 144</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\platform.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 49</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 369</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 191 362 131 359 128 282 284 145 136 364 86 103 150 108 286 181 182 74 384 192 77 64 88 100 200 147 289 288 385 96 156 141 146 382 139 84 209 71 135 152 138 89 104 76 79 113 179 130 383 283 63 91 157 172 95 97 134 121 90 287 160 87 92 94 361 124 144 81 159 120 158 186</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_soc_gpio.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 40</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 360</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 359 160 139 361 136 92 152 145 76 289 364 157 87 94 67 175 150 79 71 286 287 362 174 284 283 288 144 177 141 159 282 96 63 91</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sleep.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 51</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 378</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 200 92 76 283 64 79 87 96 182 359 103 131 152 136 191 63 288 74 71 139 150 145 175 84 99 114 160 91 286 287 94 361 364 172 144 174 282 176 157 124 159 177 141 127 163 285 129 289</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\sleep_asm.S</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 291</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\stack_var.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 57</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 358</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 284 362 84 71 157 131 359 288 91 384 139 77 283 289 63 364 287 385 160 96 87 92 94 361 282</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_qspi.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 36</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 367</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 144 288 76 156 286 152 96 182 362 283 135 359 287</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\svcall_asm.S</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 307</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_timer.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 47</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 355</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 146 160 362 288 71 286 121 91 94 96 152 191 283 74 361 108 76 139 182 359 287 157 63 144 87 92 364</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\startup.S</name>
+            <outputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 296</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_pdm.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 55</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 353</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 182 362 359 152 364 71 80 287 96 160 139 76 191 110 169 286 283 288 157 63 87 92 94 361 74 137 91 144</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_i2c.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 58</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 349</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 74 359 91 364 80 157 160 286 362 71 166 282 76 96 191 284 287 102 122 289 167 152 112 139 133 182 283 288 144 79 68 77 63 87 92 94 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sw_timer_port.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 54</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 366</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 364 286 287 90 362 145 289 96 359 71 284 63 91 144 139 152 157 147 283 288 186 160 87 92 148 94 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\swint_handler.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 319</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 363</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 286 287 359 362 283 288</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_iwdg.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 59</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 340</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 176 359 152 287 362 76 182 286 129 283 288 144</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sys_stat.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 306</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 379</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 288 359 286 191 289 383 283 382 287 364</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\systick.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 321</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 374</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 160 287 362 289 157 282 286 96 97 364 359 283 288 63 284 200</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_dmac.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 35</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 338</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 182 71 76 359 362 133 80 286 152 139 191 98 167 287 91 157 63 283 288 144 87 92 94 361 364 96 160</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_rtc.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 60</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 375</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 362 76 286 150 152 163 288 159 364 182 139 71 99 283 96 160 87 92 94 361 127 359 287 157 63 91 144 74</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\ls_msp_ssi.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 41</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 372</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 361 287 96 160 362 92 116 71 182 87 94 123 76 80 359 364 162 152 139 191 117 164 286 283 288 144 157 63 91 74</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\build\Exe\fota.out</name>
+            <outputs>
+                <tool>
+                    <name>OBJCOPY</name>
+                    <file> 381</file>
+                </tool>
+            </outputs>
+        </file>
+        <forcedrebuild>
+            <name>[MULTI_TOOL]</name>
+            <tool>ILINK</tool>
+        </forcedrebuild>
+    </configuration>
+</project>
