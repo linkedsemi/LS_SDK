@@ -7,7 +7,7 @@ plf = {
     'sccc9xx': 'arm_cm',
 }
 if env.get('IC') is None:
-    env['IC'] = ARGUMENTS.get('ic','lm3050')
+    env['IC'] = ARGUMENTS.get('ic','le501x')
 env['BASE_ARCH'] = plf[env['IC']]
 env['CPPDEFINES'] = [env['IC'].upper()]
 
