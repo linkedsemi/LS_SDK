@@ -915,6 +915,44 @@ lm3050_uart_polling_iar_build:
   script:
     - cd examples/peripheral/uart/uart_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_polling.ewp -build * -log all    
 
+lm3050_usbd_cdc_msc_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_cdc_msc_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_cdc_msc.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_cdc_msc_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_cdc_msc.ewp -build * -log all    
+
+lm3050_usbd_hid_composite_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_hid_composite_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_hid_composite.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_hid_composite_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_hid_composite.ewp -build * -log all    
+
 lm3050_adc_amic_sampling_build:
   stage: build
   script:

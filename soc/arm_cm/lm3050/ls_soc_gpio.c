@@ -10,6 +10,7 @@
 #include "reg_exti_type.h"
 #include "ls_dbg.h"
 #include "compile_flag.h"
+#include "reg_sysc_cpu_type.h"
 
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
@@ -2090,19 +2091,23 @@ void pinmux_bxcan_deinit(void)
 
 static void usb_io_cfg(uint8_t dp,uint8_t dm)
 {
-    io_clr_pin(dp);
-    io_clr_pin(dm);
-    io_cfg_output(dp);
-    io_cfg_output(dm);
+    io_cfg_input(dm);
+    io_cfg_input(dp);
 }
 
-void pinmux_usb_init(uint8_t dp,uint8_t dm)
+void pinmux_usb_init(void)
 {
-    *(uint8_t *)&usb_dp = dp;
-    *(uint8_t *)&usb_dm = dm;
+    uint8_t dp = PA12;
+    uint8_t dm = PA11;
     usb_io_cfg(dp,dm);
+
     per_func_enable(pin2func_io((gpio_pin_t *)&dp),USB_DP);
     per_func_enable(pin2func_io((gpio_pin_t *)&dm),USB_DM);
+
+    gpio_pin_t *x = (gpio_pin_t *)&dm;
+    SYSC_AWO->IO[x->port].DS |= 1 << 16 << x->num;
+
+    REG_FIELD_WR(SYSC_CPU->GATE_SYS,SYSC_CPU_USB_RX_DIFF_SEL,1);
 }
 
 void pinmux_usb_deinit(void)
