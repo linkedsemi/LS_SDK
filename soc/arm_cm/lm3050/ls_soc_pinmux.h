@@ -935,10 +935,8 @@ void pinmux_bxcan_deinit(void);
 
 /**
  * @brief         Set pin mux function to usb
- * @param dp      Specific GPIO pin 
- * @param dm      Specific GPIO pin 
  */
-void pinmux_usb_init(uint8_t dp,uint8_t dm);
+void pinmux_usb_init(void);
 
 /**
  * @brief clear pin mux function of usb

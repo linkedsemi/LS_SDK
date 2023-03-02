@@ -21,7 +21,7 @@ def plf_postaction(self,target):
     self.Append(LIBS = [info_obj])
 
 
-def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
+def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     start_src = []
     if with_startup:
         start_src = ['$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/startup_asm.S']
@@ -145,6 +145,48 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
         'soc/arm_cm/cmsis',
         'soc/arm_cm/lm3050',
     ]))
+    if usb:
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+            'arm_cm/lm3050/ls_msp_usb.c',
+        ]))
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+            'src/ls_tusb_dcd.c',
+            'src/ls_tusb_hcd.c'
+        ]))
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/tinyusb',x),[
+            'src/tusb.c',
+            'src/device/usbd.c',
+            'src/device/usbd_control.c',
+            'src/common/tusb_fifo.c',
+            'src/host/hub.c',
+            'src/host/usbh.c',
+            'src/class/audio/audio_device.c',
+            'src/class/bth/bth_device.c',
+            'src/class/cdc/cdc_device.c',
+            'src/class/cdc/cdc_host.c',
+            'src/class/cdc/cdc_rndis_host.c',
+            'src/class/dfu/dfu_device.c',
+            'src/class/dfu/dfu_rt_device.c',
+            'src/class/hid/hid_device.c',
+            'src/class/hid/hid_host.c',
+            'src/class/midi/midi_device.c',
+            'src/class/msc/msc_device.c',
+            'src/class/msc/msc_host.c',
+            'src/class/net/ecm_rndis_device.c',
+            'src/class/net/ncm_device.c',
+            'src/class/usbtmc/usbtmc_device.c',
+            'src/class/vendor/vendor_device.c',
+            'src/class/vendor/vendor_host.c',
+            'src/class/video/video_device.c',
+        ]))
+        inc_list += list(map(lambda x:os.path.join('$SDK_ROOT/module/tinyusb',x),[
+            'src',
+            'src/common',
+            'src/device',
+            'src/host',
+            'src/osal',
+            'hw'
+        ]))
     rtos_src = []
     if self.get('LINKSCRIPT') is None:
         self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/link_script.txt"))

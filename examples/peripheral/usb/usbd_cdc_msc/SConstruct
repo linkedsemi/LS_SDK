@@ -1,0 +1,16 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../bsp.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/cdc_msc/src/main.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/cdc_msc/src/msc_disk.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/cdc_msc/src/usb_descriptors.c',
+]
+inc = [
+    '.',
+    '$SDK_ROOT/module/tinyusb/examples/device/cdc_msc/src/',
+]
+env.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
+env.app_build('usbd_cdc_msc',src,inc, ble = False,usb=True)
