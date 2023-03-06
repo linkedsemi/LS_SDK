@@ -501,7 +501,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     switch (type)
     {
     case MESH_ACTIVE_ENABLE:
-    {       
+    {      
         gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
         TIMER_Set(2, 3000); //clear power up num
     }
@@ -797,6 +797,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
              model_env.info[1].model_id = VENDOR_TMALL_SERVER;
              model_env.info[1].element_id = 0;
              ls_sig_mesh_init(&model_env);
+             auto_check_unbind();
              break;
          }
      }
@@ -813,7 +814,6 @@ int main()
     //exti_gpio_init();
     gen_ali_authValue();
     ble_init();
-    auto_check_unbind();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
