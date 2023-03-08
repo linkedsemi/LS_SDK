@@ -11,7 +11,8 @@
 #include "ls_dbg.h"
 #include "compile_flag.h"
 #include "reg_sysc_cpu_type.h"
-
+#define USB_DP_PAD PA12
+#define USB_DM_PAD PA11
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t uart1_ctsn;
@@ -102,8 +103,7 @@ static gpio_pin_t ssi_dq3;
 
 static gpio_pin_t bxcan_txd;
 static gpio_pin_t bxcan_rxd;
-static gpio_pin_t usb_dp;
-static gpio_pin_t usb_dm;
+
 static gpio_pin_t comp1_dat;
 static gpio_pin_t comp2_dat;
 static gpio_pin_t comp3_dat;
@@ -2098,8 +2098,8 @@ static void usb_io_cfg(uint8_t dp,uint8_t dm)
 
 void pinmux_usb_init(void)
 {
-    uint8_t dp = PA12;
-    uint8_t dm = PA11;
+    uint8_t dp = USB_DP_PAD;
+    uint8_t dm = USB_DM_PAD;
     usb_io_cfg(dp,dm);
 
     per_func_enable(pin2func_io((gpio_pin_t *)&dp),USB_DP);
@@ -2113,8 +2113,10 @@ void pinmux_usb_init(void)
 
 void pinmux_usb_deinit(void)
 {
-    per_func_disable(pin2func_io((gpio_pin_t *)&usb_dp));
-    per_func_disable(pin2func_io((gpio_pin_t *)&usb_dm));
+    uint8_t dp = USB_DP_PAD;
+    uint8_t dm = USB_DM_PAD;
+    per_func_disable(pin2func_io((gpio_pin_t *)&dp));
+    per_func_disable(pin2func_io((gpio_pin_t *)&dm));
 }
 
 static void  comp_io_cfg(uint8_t dat)
