@@ -187,6 +187,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
             'src/osal',
             'hw'
         ]))
+        self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
     rtos_src = []
     if self.get('LINKSCRIPT') is None:
         self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/link_script.txt"))

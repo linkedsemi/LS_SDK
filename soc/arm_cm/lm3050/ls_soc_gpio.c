@@ -2091,6 +2091,7 @@ void pinmux_bxcan_deinit(void)
 
 static void usb_io_cfg(uint8_t dp,uint8_t dm)
 {
+    io_pull_write(dm,IO_PULL_DOWN);
     io_cfg_input(dm);
     io_cfg_input(dp);
 }

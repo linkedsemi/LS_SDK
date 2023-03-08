@@ -250,11 +250,8 @@
 #define USB_DEVCTL_DEV          0x00000080  // Device Mode (OTG only)
 #define USB_DEVCTL_FSDEV        0x00000040  // Full-Speed Device Detected
 #define USB_DEVCTL_LSDEV        0x00000020  // Low-Speed Device Detected
-#define USB_DEVCTL_VBUS_M       0x00000018  // VBUS Level (OTG only)
-#define USB_DEVCTL_VBUS_NONE    0x00000000  // Below SessionEnd
-#define USB_DEVCTL_VBUS_SEND    0x00000008  // Above SessionEnd, below AValid
-#define USB_DEVCTL_VBUS_AVALID  0x00000010  // Above AValid, below VBUSValid
-#define USB_DEVCTL_VBUS_VALID   0x00000018  // Above VBUSValid
+#define USB_DEVCTL_PUCON        0x00000010
+#define USB_DEVCTL_PDCON        0x00000008
 #define USB_DEVCTL_HOST         0x00000004  // Host Mode
 #define USB_DEVCTL_HOSTREQ      0x00000002  // Host Request (OTG only)
 #define USB_DEVCTL_SESSION      0x00000001  // Session Start/End (OTG only)
