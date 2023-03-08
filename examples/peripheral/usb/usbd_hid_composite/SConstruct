@@ -11,5 +11,4 @@ inc = [
     '.',
     '$SDK_ROOT/module/tinyusb/examples/device/hid_composite/src/',
 ]
-env.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
 env.app_build('usbd_hid_composite',src,inc, ble = False,usb = True)

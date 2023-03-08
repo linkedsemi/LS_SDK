@@ -26,8 +26,7 @@
 
 #include "tusb_option.h"
 
-#if CFG_TUH_ENABLED && \
-  TU_CHECK_MCU(OPT_MCU_MSP432E4, OPT_MCU_TM4C123, OPT_MCU_TM4C129)
+#if CFG_TUH_ENABLED
 
 #if __GNUC__ > 8 && defined(__ARM_FEATURE_UNALIGNED)
 /* GCC warns that an address may be unaligned, even though
@@ -35,21 +34,18 @@
 _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
 #endif
 
+#include "platform.h"
+#include "cpu.h"
 #include "host/hcd.h"
 
-#if TU_CHECK_MCU(OPT_MCU_MSP432E4)
-  #include "musb_msp432e.h"
+#include "musb_type.h"
+#include "ls_msp_usb.h"
+#include "field_manipulate.h"
+#include "log.h"
+#include "ls_soc_gpio.h"
+#include "compile_flag.h"
 
-#elif TU_CHECK_MCU(OPT_MCU_TM4C123, OPT_MCU_TM4C129)
-  #include "musb_tm4c.h"
-
-  // HACK generalize later
-  #include "musb_type.h"
-  #define FIFO0_WORD FIFO0
-
-#else
-  #error "Unsupported MCUs"
-#endif
+// #define FIFO0_WORD FIFO0
 
 #ifndef HCD_ATTR_ENDPOINT_MAX
 # define HCD_ATTR_ENDPOINT_MAX 8
@@ -65,22 +61,22 @@ typedef struct {
   uint_fast16_t end; /* offset of excluding the last element */
 } free_block_t;
 
-typedef struct TU_ATTR_PACKED {
-  uint8_t TXFUNCADDR;
-  uint8_t RESERVED0;
-  uint8_t TXHUBADDR;
-  uint8_t TXHUBPORT;
-  uint8_t RXFUNCADDR;
-  uint8_t RESERVED1;
-  uint8_t RXHUBADDR;
-  uint8_t RXHUBPORT;
-} hw_addr_t;
+// typedef struct TU_ATTR_PACKED {
+//   uint8_t TXFUNCADDR;
+//   uint8_t RESERVED0;
+//   uint8_t TXHUBADDR;
+//   uint8_t TXHUBPORT;
+//   uint8_t RXFUNCADDR;
+//   uint8_t RESERVED1;
+//   uint8_t RXHUBADDR;
+//   uint8_t RXHUBPORT;
+// } hw_addr_t;
 
 typedef struct TU_ATTR_PACKED {
-  uint16_t TXMAXP;
+  uint8_t TXMAXP;
   uint8_t  TXCSRL;
   uint8_t  TXCSRH;
-  uint16_t RXMAXP;
+  uint8_t RXMAXP;
   uint8_t  RXCSRL;
   uint8_t  RXCSRH;
   uint16_t RXCOUNT;
@@ -125,6 +121,7 @@ typedef struct
  *------------------------------------------------------------------*/
 static hcd_data_t _hcd;
 
+#if 0
 static inline free_block_t *find_containing_block(free_block_t *beg, free_block_t *end, uint_fast16_t addr)
 {
   free_block_t *cur = beg;
@@ -222,11 +219,11 @@ static unsigned find_free_memory(uint_fast16_t size_in_log2_minus3)
   TU_ASSERT(min, 0);
   return min->beg;
 }
-
+#endif
 static inline volatile hw_endpoint_t* edpt_regs(unsigned epnum_minus1)
 {
-  volatile hw_endpoint_t *regs = (volatile hw_endpoint_t*)((uintptr_t)&USB0->TXMAXP1);
-  return regs + epnum_minus1;
+    USB0->EPIDX = epnum_minus1 + 1;
+    return (volatile hw_endpoint_t*)&USB0->TXMAXP;
 }
 
 static unsigned find_pipe(uint_fast8_t dev_addr, uint_fast8_t ep_addr)
@@ -286,7 +283,8 @@ static bool edpt0_xfer_out(void)
     pipe->buf = NULL;
     return true;
   }
-  unsigned const dev_addr = USB0->TXFUNCADDR0;
+  // unsigned const dev_addr = USB0->TXFUNCADDR0;
+  unsigned const dev_addr = USB0->FADDR;
   unsigned const mps = _hcd.ctl_mps[dev_addr];
   unsigned const len = TU_MIN(rem, mps);
   void          *buf = pipe->buf;
@@ -303,7 +301,8 @@ static bool edpt0_xfer_in(void)
 {
   pipe_state_t *pipe = &_hcd.pipe0;
   unsigned const rem = pipe->remaining;
-  unsigned const dev_addr = USB0->TXFUNCADDR0;
+  // unsigned const dev_addr = USB0->TXFUNCADDR0;
+  unsigned const dev_addr = USB0->FADDR;
   unsigned const mps = _hcd.ctl_mps[dev_addr];
   unsigned const vld = USB0->COUNT0;
   unsigned const len = TU_MIN(TU_MIN(rem, mps), vld);
@@ -328,8 +327,10 @@ static bool edpt0_xfer(uint8_t rhport, uint8_t dev_addr, uint8_t ep_addr, uint8_
   unsigned const req = _hcd.bmRequestType;
   TU_ASSERT(req != REQUEST_TYPE_INVALID);
   TU_ASSERT(dev_addr < sizeof(_hcd.ctl_mps));
+  USB0->EPIDX = 0;
 
-  USB0->TXFUNCADDR0 = dev_addr;
+  // USB0->TXFUNCADDR0 = dev_addr;
+  USB0->FADDR = dev_addr;
   const unsigned dir_in = tu_edpt_dir(ep_addr);
   if (tu_edpt_dir(req) == dir_in) { /* DATA stage */
     TU_ASSERT(buffer);
@@ -420,7 +421,8 @@ static void process_ep0(uint8_t rhport)
   uint_fast8_t csrl = USB0->CSRL0;
   // TU_LOG1(" EP0 CSRL = %x\n", csrl);
 
-  unsigned const dev_addr = USB0->TXFUNCADDR0;
+  // unsigned const dev_addr = USB0->TXFUNCADDR0;
+  unsigned const dev_addr = USB0->FADDR;
   unsigned const req = _hcd.bmRequestType;
   if (csrl & (USB_CSRL0_ERROR | USB_CSRL0_NAKTO | USB_CSRL0_STALLED)) {
     /* No response / NAK timed out / Stall received */
@@ -449,7 +451,7 @@ static void process_ep0(uint8_t rhport)
     }
     return;
   }
-  if (csrl & USB_CSRL0_STATUS) {
+  if (csrl & USB_CSRL0_STATUS && csrl & USB_CSRL0_RXRDY) {
     /* STATUS IN */
     TU_ASSERT(USB_CSRL0_RXRDY == (csrl & USB_CSRL0_RXRDY),);
     TU_ASSERT(0 == USB0->COUNT0,);
@@ -561,28 +563,32 @@ static void process_pipe_rx(uint8_t rhport, uint_fast8_t pipenum)
 /*------------------------------------------------------------------
  * Host API
  *------------------------------------------------------------------*/
+static void USB_IRQHandler(void)
+{
+    hcd_int_handler(0);
+}
 
 bool hcd_init(uint8_t rhport)
 {
   (void)rhport;
-
-  NVIC_ClearPendingIRQ(USB_IRQn);
+  HAL_USB_MSP_Init(USB_IRQHandler);
+  HAL_USB_MSP_ClearPendingIRQ();
   _hcd.bmRequestType = REQUEST_TYPE_INVALID;
-  USB0->DEVCTL |= USB_DEVCTL_SESSION;
   USB0->IE = USB_IE_DISCON | USB_IE_CONN | USB_IE_BABBLE | USB_IE_RESUME;
+  HAL_USB_MSP_Host_Setup(NULL);
   return true;
 }
 
 void hcd_int_enable(uint8_t rhport)
 {
   (void)rhport;
-  NVIC_EnableIRQ(USB_IRQn);
+  HAL_USB_MSP_EnableIRQ();
 }
 
 void hcd_int_disable(uint8_t rhport)
 {
   (void)rhport;
-  NVIC_DisableIRQ(USB_IRQn);
+  HAL_USB_MSP_DisableIRQ();
 }
 
 uint32_t hcd_frame_number(uint8_t rhport)
@@ -610,9 +616,7 @@ bool hcd_port_connect_status(uint8_t rhport)
 void hcd_port_reset(uint8_t rhport)
 {
   (void)rhport;
-  USB0->POWER |= USB_POWER_HSENAB | USB_POWER_RESET;
-  unsigned cnt = SystemCoreClock / 1000 * 20;
-  while (cnt--) __NOP();
+  DELAY_US(1000*50);
   USB0->POWER &= ~USB_POWER_RESET;
   _hcd.need_reset = false;
 }
@@ -628,7 +632,6 @@ tusb_speed_t hcd_port_speed_get(uint8_t rhport)
   unsigned devctl = USB0->DEVCTL;
   if (devctl & USB_DEVCTL_LSDEV)      return TUSB_SPEED_LOW;
   if (!(devctl & USB_DEVCTL_FSDEV))   return TUSB_SPEED_INVALID;
-  if (USB0->POWER & USB_POWER_HSMODE) return TUSB_SPEED_HIGH;
   return TUSB_SPEED_FULL;
 }
 
@@ -637,8 +640,8 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
   (void)rhport;
   if (sizeof(_hcd.ctl_mps) <= dev_addr) return;
 
-  unsigned const ie = NVIC_GetEnableIRQ(USB_IRQn);
-  NVIC_DisableIRQ(USB_IRQn);
+  unsigned const ie = HAL_USB_MSP_GetEnableIRQ();
+  HAL_USB_MSP_DisableIRQ();
   _hcd.ctl_mps[dev_addr] = 0;
   if (!dev_addr) return;
 
@@ -646,9 +649,9 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
   for (unsigned i = 0; i < sizeof(_hcd.addr)/sizeof(_hcd.addr[0]); ++i) {
     for (unsigned j = 0; j < 2; ++j, ++p) {
       if (dev_addr != p->dev) continue;
-      hw_addr_t volatile     *fadr = (hw_addr_t volatile*)&USB0->TXFUNCADDR0 + i + 1;
+      // hw_addr_t volatile     *fadr = (hw_addr_t volatile*)&USB0->TXFUNCADDR0 + i + 1;
       hw_endpoint_t volatile *regs = edpt_regs(i);
-      USB0->EPIDX = i + 1;
+      // USB0->EPIDX = i + 1;
       if (j) {
         USB0->TXIE      &= ~TU_BIT(i + 1);
         if (regs->TXCSRL & USB_TXCSRL1_TXRDY)
@@ -658,11 +661,12 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
         regs->TXMAXP     = 0;
         regs->TXTYPE     = 0;
         regs->TXINTERVAL = 0;
-        fadr->TXFUNCADDR = 0;
-        fadr->TXHUBADDR  = 0;
-        fadr->TXHUBPORT  = 0;
-        USB0->TXFIFOADD  = 0;
-        USB0->TXFIFOSZ   = 0;
+        USB0->FADDR = 0;
+        // fadr->TXFUNCADDR = 0;
+        // fadr->TXHUBADDR  = 0;
+        // fadr->TXHUBPORT  = 0;
+        // USB0->TXFIFOADD  = 0;
+        // USB0->TXFIFOSZ   = 0;
       } else {
         USB0->RXIE      &= ~TU_BIT(i + 1);
         if (regs->RXCSRL & USB_RXCSRL1_RXRDY)
@@ -672,11 +676,12 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
         regs->RXMAXP     = 0;
         regs->RXTYPE     = 0;
         regs->RXINTERVAL = 0;
-        fadr->RXFUNCADDR = 0;
-        fadr->RXHUBADDR  = 0;
-        fadr->RXHUBPORT  = 0;
-        USB0->RXFIFOADD  = 0;
-        USB0->RXFIFOSZ   = 0;
+        USB0->FADDR = 0;
+        // fadr->RXFUNCADDR = 0;
+        // fadr->RXHUBADDR  = 0;
+        // fadr->RXHUBPORT  = 0;
+        // USB0->RXFIFOADD  = 0;
+        // USB0->RXFIFOSZ   = 0;
       }
       p->dev = 0;
       p->ep  = 0;
@@ -686,7 +691,7 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
       pipe->remaining = 0;
     }
   }
-  if (ie) NVIC_EnableIRQ(USB_IRQn);
+  if (ie) HAL_USB_MSP_EnableIRQ();
 }
 
 //--------------------------------------------------------------------+
@@ -696,22 +701,24 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
 bool hcd_setup_send(uint8_t rhport, uint8_t dev_addr, uint8_t const setup_packet[8])
 {
   (void)rhport;
+  USB0->EPIDX = 0;
   pipe_write_packet((void*)(uintptr_t)setup_packet, &USB0->FIFO0_WORD, 8);
   _hcd.pipe0.buf       = (void*)(uintptr_t)setup_packet;
   _hcd.pipe0.length    = 8;
   _hcd.pipe0.remaining = 0;
 
-  hcd_devtree_info_t devtree;
-  hcd_devtree_get_info(dev_addr, &devtree);
-  switch (devtree.speed) {
-    default: return false;
-    case TUSB_SPEED_LOW:  USB0->TYPE0 = USB_TYPE0_SPEED_LOW;  break;
-    case TUSB_SPEED_FULL: USB0->TYPE0 = USB_TYPE0_SPEED_FULL; break;
-    case TUSB_SPEED_HIGH: USB0->TYPE0 = USB_TYPE0_SPEED_HIGH; break;
-  }
-  USB0->TXHUBADDR0     = devtree.hub_addr;
-  ->TXHUBPORT0     = devtree.hub_port;
-  USB0->TXFUNCADDR0    = dev_addr;
+  // hcd_devtree_info_t devtree;
+  // hcd_devtree_get_info(dev_addr, &devtree);
+  // switch (devtree.speed) {
+  //   default: return false;
+  //   case TUSB_SPEED_LOW:  USB0->TYPE0 = USB_TYPE0_SPEED_LOW;  break;
+  //   case TUSB_SPEED_FULL: USB0->TYPE0 = USB_TYPE0_SPEED_FULL; break;
+  //   case TUSB_SPEED_HIGH: USB0->TYPE0 = USB_TYPE0_SPEED_HIGH; break;
+  // }
+  // USB0->TXHUBADDR0     = devtree.hub_addr;
+  // USB0->TXHUBPORT0     = devtree.hub_port;
+  // USB0->TXFUNCADDR0    = dev_addr;
+  USB0->FADDR = dev_addr;
   USB0->CSRL0 = USB_CSRL0_TXRDY | USB_CSRL0_SETUP;
   return true;
 }
@@ -764,13 +771,14 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
     case TUSB_XFER_INTERRUPT:   pipe_type |= USB_TXTYPE1_PROTO_INT;  break;
     case TUSB_XFER_ISOCHRONOUS: pipe_type |= USB_TXTYPE1_PROTO_ISOC; break;
   }
+  USB0->FADDR = dev_addr;
 
-  hw_addr_t volatile     *fadr = (hw_addr_t volatile*)&USB0->TXFUNCADDR0 + pipenum;
+  // hw_addr_t volatile     *fadr = (hw_addr_t volatile*)&USB0->TXFUNCADDR0 + pipenum;
   hw_endpoint_t volatile *regs = edpt_regs(pipenum - 1);
   if (dir_tx) {
-    fadr->TXFUNCADDR = dev_addr;
-    fadr->TXHUBADDR  = devtree.hub_addr;
-    fadr->TXHUBPORT  = devtree.hub_port;
+    // fadr->TXFUNCADDR = dev_addr;
+    // fadr->TXHUBADDR  = devtree.hub_addr;
+    // fadr->TXHUBPORT  = devtree.hub_port;
     regs->TXMAXP     = mps;
     regs->TXTYPE     = pipe_type | epn;
     regs->TXINTERVAL = ep_desc->bInterval;
@@ -780,9 +788,9 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
       regs->TXCSRL = USB_TXCSRL1_CLRDT;
     USB0->TXIE |= TU_BIT(pipenum);
   } else {
-    fadr->RXFUNCADDR = dev_addr;
-    fadr->RXHUBADDR  = devtree.hub_addr;
-    fadr->RXHUBPORT  = devtree.hub_port;
+    // fadr->RXFUNCADDR = dev_addr;
+    // fadr->RXHUBADDR  = devtree.hub_addr;
+    // fadr->RXHUBPORT  = devtree.hub_port;
     regs->RXMAXP     = mps;
     regs->RXTYPE     = pipe_type | epn;
     regs->RXINTERVAL = ep_desc->bInterval;
@@ -792,7 +800,7 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
       regs->RXCSRL = USB_RXCSRL1_CLRDT;
     USB0->RXIE |= TU_BIT(pipenum);
   }
-
+#if 0
   /* Setup FIFO */
   int size_in_log2_minus3 = 28 - TU_MIN(28, __CLZ((uint32_t)mps));
   if ((8u << size_in_log2_minus3) < mps) ++size_in_log2_minus3;
@@ -806,6 +814,29 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
   } else {
     USB0->RXFIFOADD = addr;
     USB0->RXFIFOSZ  = size_in_log2_minus3;
+  }
+#endif
+  if (dir_tx) 
+  {
+      USB0->TXFIFO_SIZE[0] = 8;
+      if(mps <= 32)
+      {
+          USB0->TXFIFO_SIZE[1] = (2 << USB_TX_FIFO_SIZE_POS) | USB_TX_FIFO_DPB_MASK;
+      }else
+      {
+          USB0->TXFIFO_SIZE[1] = 3 << USB_TX_FIFO_SIZE_POS;
+      }
+  }
+  else
+  {
+      USB0->RXFIFO_SIZE[0] = 8;
+      if(mps <= 32)
+      {
+          USB0->RXFIFO_SIZE[1] = 2 << USB_RX_FIFO_SIZE_POS | USB_RX_FIFO_DPB_MASK;
+      }else
+      {
+          USB0->RXFIFO_SIZE[1] = 3 << USB_RX_FIFO_SIZE_POS;
+      }
   }
   return true;
 }
@@ -857,6 +888,7 @@ void hcd_int_handler(uint8_t rhport)
   }
   if (is & USB_IS_DISCON) {
     hcd_event_device_remove(rhport, true);
+    HAL_USB_MSP_Host_Discon_Hook();
   }
   if (is & USB_IS_BABBLE) {
   }

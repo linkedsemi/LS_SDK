@@ -34,6 +34,7 @@
 _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
 #endif
 
+#include "usbd.h"
 #include "platform.h"
 #include "cpu.h"
 #include "dcd.h"
@@ -624,10 +625,15 @@ static void process_bus_reset(uint8_t rhport)
  * Device API
  *------------------------------------------------------------------*/
 
+static void USB_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+
 void dcd_init(uint8_t rhport)
 {
     (void)rhport;
-    HAL_USB_MSP_Init();
+    HAL_USB_MSP_Init(USB_IRQHandler);
     USB0->IE |= USB_IE_SUSPND;
 
     dcd_connect(rhport);
