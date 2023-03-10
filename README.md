@@ -22,9 +22,11 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | ble/ble_mult_roles                                                        |  √     |        |
 | ble/ble_pairing_master_role                                               |  √     |        |
 | ble/ble_pairing_slave_role                                                |  √     |        |
+| ble/ble_single_master                                                     |  √     |        |
 | ble/ble_single_role                                                       |  √     |        |
 | ble/ble_tk                                                                |  √     |        |
 | ble/ble_uart_server                                                       |  √     |        |
+| ble/ble_mult_services                                                     |  √     |        |
 | ble/ble_uart_server_mult_link                                             |  √     |        |
 | ble/fota                                                                  |  √     |        |
 | ble/host_test                                                             |  √     |        |
@@ -53,6 +55,9 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/can/CAN_Normal                                                 |        |  √     |
 | peripheral/comp/comp_dac                                                  |        |  √     |
 | peripheral/comp/comp_internal                                             |        |  √     |
+| peripheral/crypt/des_ecb_cbc_it                                           |  √     |  √     |
+| peripheral/crypt/des_ecb_cbc_polling                                      |  √     |  √     |
+| peripheral/crypt/des_it_padding                                           |  √     |  √     |
 | peripheral/crypt/ecb_cbc_it                                               |  √     |  √     |
 | peripheral/crypt/ecb_cbc_polling                                          |  √     |  √     |
 | peripheral/crypt/ecb_it_padding                                           |  √     |  √     |
@@ -71,7 +76,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/i2c/ll_i2c_polling                                             |  √     |  √     |
 | peripheral/iap/iap_application                                            |  √     |  √     |
 | peripheral/iap/iap_bootloader                                             |  √     |  √     |           
-| peripheral/pdm                                                            |  √     |        |
+| peripheral/pdm_pingpong_dma                                               |  √     |        |           
+| peripheral/pdm_it                                                         |  √     |  √     |
 | peripheral/rtc                                                            |  √     |        |
 | peripheral/rtcv2                                                          |        |  √     |
 | peripheral/sha/sha_it                                                     |        |  √     |
@@ -106,6 +112,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/tk/tk_polling                                                  |  √     |        |
 | peripheral/touchkey/touchkey_it                                           |        |  √     |
 | peripheral/touchkey/touchkey_polling                                      |        |  √     |
+| peripheral/trng/trng_it                                                   |  √     |  √     |
+| peripheral/trng/trng_polling                                              |  √     |  √     |
 | peripheral/uart/ll_uart_it                                                |  √     |  √     |
 | peripheral/uart/ll_uart_polling                                           |  √     |  √     |
 | peripheral/uart/uart_dma                                                  |  √     |  √     |

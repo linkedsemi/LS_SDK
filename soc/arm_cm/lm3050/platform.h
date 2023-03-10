@@ -50,6 +50,10 @@ void sys_init_none();
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/4)
 
+#define FLASH_SWINT_NUM QSPI_IRQn
+
+#define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
+
 #define SRAM_BIT_BAND_ADDR(addr,bit) (uint32_t *)(((uint32_t)(addr)-0x20000000)*32+4*(bit)+0x22000000)
 
 #define PERI_BIT_BAND_ADDR(addr,bit) (uint32_t *)(((uint32_t)(addr)-0x40000000)*32+4*(bit)+0x42000000)

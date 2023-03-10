@@ -13,11 +13,11 @@
 #include "ls_soc_gpio.h"
 #include "ble_common_api.h"
 
-#define PAIR_ENCRYPT_ENABLE  0
-#define SC_OOB_ENABLE (1 & PAIR_ENCRYPT_ENABLE)
+#define PAIR_ENCRYPT_ENABLE  1
+#define SC_OOB_ENABLE (0 & PAIR_ENCRYPT_ENABLE)
 #define LEGACY_OOB_ENABLE (0 & PAIR_ENCRYPT_ENABLE)
 #define LEGACY_PASSKEY_ENTRY_ENABLE (0 & PAIR_ENCRYPT_ENABLE)
-#define LEGACY_JUST_WORKS_ENABLE (0 & PAIR_ENCRYPT_ENABLE)
+#define LEGACY_JUST_WORKS_ENABLE (1 & PAIR_ENCRYPT_ENABLE)
 #define NUMERIC_COMPARISON_ENABLE (0 & PAIR_ENCRYPT_ENABLE)
 #define LEGACY_PAIRING_ENABLE (LEGACY_OOB_ENABLE || LEGACY_PASSKEY_ENTRY_ENABLE || LEGACY_JUST_WORKS_ENABLE || NUMERIC_COMPARISON_ENABLE)
 
@@ -106,7 +106,10 @@ static bool uart_rx_pass_key_flg=false;
 static bool uart_rx_numeric_comparison_flg=false;
 #endif//NUMERIC_COMPARISON_ENABLE
 
+#if ((SC_OOB_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1))
 static bool uart_rx_oob_flg=false;
+#endif//SC_OOB_ENABLE || LEGACY_OOB_ENABLE
+
 #endif
 
 static const uint8_t ls_uart_svc_uuid_128[] = {0x9e,0xca,0xdc,0x24,0x0e,0xe5,0xa9,0xe0,0x93,0xf3,0xa3,0xb5,0x01,0x00,0x40,0x6e};
@@ -198,7 +201,11 @@ static void start_adv(void);
 static void ls_uart_server_client_uart_tx(void);
 static void ls_single_role_timer_cb(void *param);
 #if (PAIR_ENCRYPT_ENABLE == 1)
+
+#if ((NUMERIC_COMPARISON_ENABLE == 1) || (LEGACY_PASSKEY_ENTRY_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1) || (SC_OOB_ENABLE == 1))
 static uint8_t uart_pairing_ble_buf[UART_SVC_BUFFER_SIZE];
+#endif
+
 #if (SC_OOB_ENABLE  == 1)
 static void ls_uart_sc_oob_set(void);
 #endif //SC_OOB_ENABLE
@@ -409,7 +416,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     LOG_I("tx cplt, current_uart_tx_idx = %d", current_uart_tx_idx);
     uart_tx_busy = false;
 #if (PAIR_ENCRYPT_ENABLE == 1)
+    #if ((NUMERIC_COMPARISON_ENABLE == 1) || (LEGACY_PASSKEY_ENTRY_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1))
     uart_pairing_ble_buf[0] = 0; // clear oob buffer sync byte
+    #endif
 #endif 
  
     if ((current_uart_tx_idx & (1 << 7)) == 0)
@@ -561,7 +570,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
               memcpy((void*)&uart_pairing_ble_buf[0], (void*)&uart_rx_buf[UART_SYNC_BYTE_LEN+UART_LINK_ID_LEN], BLE_KEY_LEN);
               #endif //LEGACY_OOB_ENABLE
 
+              #if ((SC_OOB_ENABLE == 1) || (LEGACY_OOB_ENABLE == 1))
               uart_rx_oob_flg =true;
+              #endif//SC_OOB_ENABLE || LEGACY_OOB_ENABLE
           }
     break;
 #if (LEGACY_PASSKEY_ENTRY_ENABLE ==1)      
@@ -680,154 +691,202 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
 {
     switch(type)
     {
-    case CONNECTED:
-    
-        if (gap_manager_get_role(con_idx) == LS_BLE_ROLE_SLAVE)
-        {
-            LS_ASSERT(con_idx_server == 0xff);
-            con_idx_server = con_idx;   
-            connect_pattern_send_prepare(con_idx); 
+        case CONNECTED:
+            if (gap_manager_get_role(con_idx) == LS_BLE_ROLE_SLAVE)
+            {
+                LS_ASSERT(con_idx_server == 0xff);
+                con_idx_server = con_idx;   
+                connect_pattern_send_prepare(con_idx); 
 
-#if (PAIR_ENCRYPT_ENABLE == 1)
-        gap_manager_slave_security_req(con_idx, AUTH_SEC_CON);
-#endif //PAIR_ENCRYPT_ENABLE
+    #if (PAIR_ENCRYPT_ENABLE == 1)
+            gap_manager_slave_security_req(con_idx, AUTH_SEC_CON);
+    #endif //PAIR_ENCRYPT_ENABLE
 
-        }
-        LOG_I("connected! new con_idx = %d", con_idx);
-    break;
-    case DISCONNECTED:
-        LOG_I("disconnected! delete con_idx = %d", con_idx);       
-        if (CONNECTION_IS_SERVER(con_idx))
-        {
-            ls_uart_server_init();
-            disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_SLAVE);
-            con_idx_server = CON_IDX_INVALID_VAL;        
-            uart_server_mtu = UART_SERVER_MTU_DFT;
-            start_adv();
+            }
+            LOG_I("connected! new con_idx = %d", con_idx);
+        break;
+        case DISCONNECTED:
+            LOG_I("disconnected! delete con_idx = %d", con_idx);       
+            if (CONNECTION_IS_SERVER(con_idx))
+            {
+                ls_uart_server_init();
+                disconnect_pattern_send_prepare(con_idx, LS_BLE_ROLE_SLAVE);
+                con_idx_server = CON_IDX_INVALID_VAL;        
+                uart_server_mtu = UART_SERVER_MTU_DFT;
+                start_adv();
+            }      
+        break;
+        case CONN_PARAM_REQ:
+
+        break;
+        case CONN_PARAM_UPDATED:
+        break;
+    #if (PAIR_ENCRYPT_ENABLE == 1)   
+    case MASTER_PAIR_REQ:
+        {	
+        #if (LEGACY_JUST_WORKS_ENABLE == 1)
+            struct pair_feature feat_param={
+                .iocap = BLE_GAP_IO_CAPS_NONE,
+                .oob = BLE_GAP_OOB_DISABLE,
+                .auth = AUTH_MITM | AUTH_BOND,
+                .key_size = 16,
+                .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+                .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+            };
+            gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
+            LOG_I("JUST_WORKS  ");
+        
+        #elif (LEGACY_PASSKEY_ENTRY_ENABLE == 1)
+            struct pair_feature feat_param={
+                .iocap = BLE_GAP_IO_CAPS_DISPLAY_ONLY,
+                .oob = BLE_GAP_OOB_DISABLE,
+                .auth = AUTH_MITM | AUTH_BOND,
+                .key_size = 16,
+                .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+                .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+            };
+            gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
+            LOG_I("PASSKEY  ");
             
-        }      
-    break;
-    case CONN_PARAM_REQ:
-
-    break;
-    case CONN_PARAM_UPDATED:
-    break;
-#if (PAIR_ENCRYPT_ENABLE == 1)   
-   case MASTER_PAIR_REQ:
-    {
-        struct pair_feature feat_param={
-            .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
-            .oob = BLE_GAP_OOB_ENABLE,
-            .auth = AUTH_SEC_CON | AUTH_BOND,
-            .key_size = 16,
-            .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
-            .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
-        };
-        gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
-    }break;
-    case PAIR_DONE:
-    {
-        if(evt->pair_done.succeed)
+        #elif (NUMERIC_COMPARISON_ENABLE == 1)
+            struct pair_feature feat_param={
+                .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
+                .oob = BLE_GAP_OOB_DISABLE,
+                .auth = AUTH_SEC_CON | AUTH_MITM,
+                .key_size = 16,
+                .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+                .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+            };
+            gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
+            LOG_I("NUMERIC_COMPARISON  ");		
+            
+        #elif (LEGACY_OOB_ENABLE == 1)
+            struct pair_feature feat_param={
+                .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
+                .oob = BLE_GAP_OOB_ENABLE,
+                .auth = AUTH_MITM ,
+                .key_size = 16,
+                .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+                .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+            };
+            gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
+            LOG_I("LEGACY_OOB  ");		
+                 
+        #elif (SC_OOB_ENABLE == 1)
+            struct pair_feature feat_param={
+                .iocap = BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,
+                .oob = BLE_GAP_OOB_ENABLE,
+                .auth = AUTH_SEC_CON | AUTH_BOND,
+                .key_size = 16,
+                .ikey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+                .rkey_dist = KDIST_ENCKEY|KDIST_IDKEY,
+            };
+            gap_manager_slave_pair_response_send(con_idx, true, &feat_param);
+        #endif
+        }break;
+        case PAIR_DONE:
         {
-             LOG_I("PAIR_DONE");
+            if(evt->pair_done.succeed)
+            {
+                LOG_I("PAIR_DONE");
+            }
         }
-    }
-    break;
-    case ENCRYPT_FAIL:
-        LOG_I("ENCRYPT_FAIL");
-    break;
-    case ENCRYPT_DONE:
-    {
-    }break;  
-    case NUMERIC_COMPARE:
-    {
-         #if (NUMERIC_COMPARISON_ENABLE == 1)
-          LOG_I("NUMERIC_COMPARE");
-         uint8_t str_numeric_comparison[NUMERIC_COMPARISON_LEN *2 +1]={0};
-         uint8_t str_numeric_comparison_len=0;
-         memcpy(str_numeric_comparison,(uint8_t *)&(evt->numeric_compare.number),NUMERIC_COMPARISON_LEN);
-         str_numeric_comparison_len = sprintf((char*)&uart_pairing_ble_buf[0],"\r\nNC=%s\r\n",str_numeric_comparison);
-         uint32_t cpu_stat = enter_critical();
-        if(!uart_tx_busy)
+        break;
+        case ENCRYPT_FAIL:
+            LOG_I("ENCRYPT_FAIL");
+        break;
+        case ENCRYPT_DONE:
         {
-            uart_tx_busy = true;
-            HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], str_numeric_comparison_len);
-        } 
-        exit_critical(cpu_stat);
-           
-         #endif //NUMERIC_COMPARISON_ENABLE
-    }
-    break;
-    case REQUEST_PASSKEY:
-    {
-         #if (LEGACY_PASSKEY_ENTRY_ENABLE == 1)
-        LOG_I("REQUEST_PASSKEY");
-        legacy_paring_pattern_send_prepare(con_idx,REQUEST_PASSKEY);
-        uint32_t cpu_stat = enter_critical();
-        if(!uart_tx_busy)
+        }break;  
+        case NUMERIC_COMPARE:
         {
-            uart_tx_busy = true;
-            HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], UART_SYNC_BYTE_LEN+UART_LEGACY_PAIRING_REQ_LEN);
-        } 
-        exit_critical(cpu_stat);
-        #endif //LEGACY_PASSKEY_ENTRY_ENABLE
-    }
-    break;
-    case DISPLAY_PASSKEY:
-    {
-        #if (LEGACY_PASSKEY_ENTRY_ENABLE == 1)
-        LOG_I("DISPLAY_PASSKEY");
-        uint8_t str_pass_key_entry[LEGACY_PAIRING_PASSKEY_LEN *2 +1]={0};
-        uint8_t str_pass_key_entry_len=0;
-        memcpy(str_pass_key_entry,(uint8_t *)&(evt->display_passkey.passkey),LEGACY_PAIRING_PASSKEY_LEN);
-        str_pass_key_entry_len = sprintf((char*)&uart_pairing_ble_buf[0],"\r\nPK=%s\r\n",str_pass_key_entry);
-        uint32_t cpu_stat = enter_critical();
-        if(!uart_tx_busy)
+            #if (NUMERIC_COMPARISON_ENABLE == 1)
+            LOG_I("NUMERIC_COMPARE");
+            uint8_t str_numeric_comparison[NUMERIC_COMPARISON_LEN *2 +1]={0};
+            uint8_t str_numeric_comparison_len=0;
+            memcpy(str_numeric_comparison,(uint8_t *)&(evt->numeric_compare.number),NUMERIC_COMPARISON_LEN);
+            str_numeric_comparison_len = sprintf((char*)&uart_pairing_ble_buf[0],"\r\nNC=%s\r\n",str_numeric_comparison);
+            uint32_t cpu_stat = enter_critical();
+            if(!uart_tx_busy)
+            {
+                uart_tx_busy = true;
+                HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], str_numeric_comparison_len);
+            } 
+            exit_critical(cpu_stat);
+            
+            #endif //NUMERIC_COMPARISON_ENABLE
+        }
+        break;
+        case REQUEST_PASSKEY:
         {
-            uart_tx_busy = true;
-            HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], str_pass_key_entry_len);
-        } 
-        exit_critical(cpu_stat);
-        #endif //LEGACY_PASSKEY_ENTRY_ENABLE
-    }
-    break;
-    case REQUEST_LEGACY_OOB:
-    {
-       #if (LEGACY_OOB_ENABLE == 1)
-        LOG_I("REQUEST_LEGACY_OOB");
-        legacy_paring_pattern_send_prepare(con_idx,REQUEST_LEGACY_OOB);
-        uint32_t cpu_stat = enter_critical();
-        if(!uart_tx_busy)
+            #if (LEGACY_PASSKEY_ENTRY_ENABLE == 1)
+            LOG_I("REQUEST_PASSKEY");
+            legacy_paring_pattern_send_prepare(con_idx,REQUEST_PASSKEY);
+            uint32_t cpu_stat = enter_critical();
+            if(!uart_tx_busy)
+            {
+                uart_tx_busy = true;
+                HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], UART_SYNC_BYTE_LEN+UART_LEGACY_PAIRING_REQ_LEN);
+            } 
+            exit_critical(cpu_stat);
+            #endif //LEGACY_PASSKEY_ENTRY_ENABLE
+        }
+        break;
+        case DISPLAY_PASSKEY:
         {
-            uart_tx_busy = true;
-            HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], UART_SYNC_BYTE_LEN+UART_LEGACY_PAIRING_REQ_LEN);
-        } 
-        exit_critical(cpu_stat);
-        #endif //LEGACY_OOB_ENABLE
-    }
-    break;
-    case REQUEST_SC_OOB:
-    {
-        #if (SC_OOB_ENABLE == 1)
-         LOG_I("REQUEST_SC_OOB");
-        uart_pairing_ble_buf[0] = UART_PAIRING_SYNC_BYTE;
-        uart_pairing_ble_buf[1] = con_idx;
-        memcpy((void*)&uart_pairing_ble_buf[UART_SYNC_BYTE_LEN+UART_LINK_ID_LEN], &(evt->sc_oob_exchange.sc_oob->conf[0]),BLE_KEY_LEN);
-        memcpy((void*)&uart_pairing_ble_buf[UART_SYNC_BYTE_LEN+UART_LINK_ID_LEN+BLE_KEY_LEN], &(evt->sc_oob_exchange.sc_oob->rand[0]),BLE_KEY_LEN);
-        uint32_t cpu_stat = enter_critical();
-        if(!uart_tx_busy)
+            #if (LEGACY_PASSKEY_ENTRY_ENABLE == 1)
+            LOG_I("DISPLAY_PASSKEY");
+            uint8_t str_pass_key_entry[LEGACY_PAIRING_PASSKEY_LEN *2 +1]={0};
+            uint8_t str_pass_key_entry_len=0;
+            memcpy(str_pass_key_entry,(uint8_t *)&(evt->display_passkey.passkey),LEGACY_PAIRING_PASSKEY_LEN);
+            str_pass_key_entry_len = sprintf((char*)&uart_pairing_ble_buf[0],"\r\nPK=%s\r\n",str_pass_key_entry);
+            uint32_t cpu_stat = enter_critical();
+            if(!uart_tx_busy)
+            {
+                uart_tx_busy = true;
+                HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], str_pass_key_entry_len);
+            } 
+            exit_critical(cpu_stat);
+            #endif //LEGACY_PASSKEY_ENTRY_ENABLE
+        }
+        break;
+        case REQUEST_LEGACY_OOB:
         {
-            uart_tx_busy = true;
-            HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], UART_SYNC_BYTE_LEN+UART_SC_OOB_LEN);
-        } 
-        exit_critical(cpu_stat);
-       #endif //SC_OOB_ENABLE
-    }
-    break;
-#endif  // PAIR_ENCRYPT_ENABLE
-    default:
+        #if (LEGACY_OOB_ENABLE == 1)
+            LOG_I("REQUEST_LEGACY_OOB");
+            legacy_paring_pattern_send_prepare(con_idx,REQUEST_LEGACY_OOB);
+            uint32_t cpu_stat = enter_critical();
+            if(!uart_tx_busy)
+            {
+                uart_tx_busy = true;
+                HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], UART_SYNC_BYTE_LEN+UART_LEGACY_PAIRING_REQ_LEN);
+            } 
+            exit_critical(cpu_stat);
+            #endif //LEGACY_OOB_ENABLE
+        }
+        break;
+        case REQUEST_SC_OOB:
+        {
+            #if (SC_OOB_ENABLE == 1)
+            LOG_I("REQUEST_SC_OOB");
+            uart_pairing_ble_buf[0] = UART_PAIRING_SYNC_BYTE;
+            uart_pairing_ble_buf[1] = con_idx;
+            memcpy((void*)&uart_pairing_ble_buf[UART_SYNC_BYTE_LEN+UART_LINK_ID_LEN], &(evt->sc_oob_exchange.sc_oob->conf[0]),BLE_KEY_LEN);
+            memcpy((void*)&uart_pairing_ble_buf[UART_SYNC_BYTE_LEN+UART_LINK_ID_LEN+BLE_KEY_LEN], &(evt->sc_oob_exchange.sc_oob->rand[0]),BLE_KEY_LEN);
+            uint32_t cpu_stat = enter_critical();
+            if(!uart_tx_busy)
+            {
+                uart_tx_busy = true;
+                HAL_UART_Transmit_IT(&UART_Config, &uart_pairing_ble_buf[0], UART_SYNC_BYTE_LEN+UART_SC_OOB_LEN);
+            } 
+            exit_critical(cpu_stat);
+        #endif //SC_OOB_ENABLE
+        }
+        break;
+    #endif  // PAIR_ENCRYPT_ENABLE
+        default:
 
-    break;
+        break;
     }
 }
 

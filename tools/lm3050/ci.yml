@@ -1,7 +1,12 @@
+le3050_boot_ram_build:
+  stage: build
+  script:
+    - cd bootloader/boot_ram/lm3050 && scons flags=-Werror ic=lm3050
+
 lm3050_ecb_cbc_it_build:
   stage: build
   script:
-    - cd examples/peripheral/crypt/ecb_cbc_it && scons ic=lm3050
+    - cd examples/peripheral/crypt/ecb_cbc_it && scons flags=-Werror ic=lm3050
 
 lm3050_ecb_cbc_it_keil_build:
   stage: build
@@ -20,7 +25,7 @@ lm3050_ecb_cbc_it_iar_build:
 lm3050_ecb_cbc_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/crypt/ecb_cbc_polling && scons ic=lm3050
+    - cd examples/peripheral/crypt/ecb_cbc_polling && scons flags=-Werror ic=lm3050
 
 lm3050_ecb_cbc_polling_keil_build:
   stage: build
@@ -39,7 +44,7 @@ lm3050_ecb_cbc_polling_iar_build:
 lm3050_ecb_it_padding_build:
   stage: build
   script:
-    - cd examples/peripheral/crypt/ecb_it_padding && scons ic=lm3050
+    - cd examples/peripheral/crypt/ecb_it_padding && scons flags=-Werror ic=lm3050
 
 lm3050_ecb_it_padding_keil_build:
   stage: build
@@ -55,10 +60,105 @@ lm3050_ecb_it_padding_iar_build:
   script:
     - cd examples/peripheral/crypt/ecb_it_padding/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecb_it_padding.ewp -build * -log all
 
+lm3050_des_ecb_cbc_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_polling && scons flags=-Werror ic=lm3050
+
+lm3050_des_ecb_cbc_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b des_ecb_cbc_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_des_ecb_cbc_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_ecb_cbc_polling.ewp -build * -log all
+    
+lm3050_des_ecb_cbc_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_it && scons flags=-Werror ic=lm3050
+
+lm3050_des_ecb_cbc_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b des_ecb_cbc_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_des_ecb_cbc_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_ecb_cbc_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_ecb_cbc_it.ewp -build * -log all
+
+lm3050_des_it_padding_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/des_it_padding && scons flags=-Werror ic=lm3050
+
+lm3050_des_it_padding_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_it_padding/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b des_it_padding.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_des_it_padding_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/crypt/des_it_padding/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" des_it_padding.ewp -build * -log all
+
+lm3050_ecdh_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdh_it && scons flags=-Werror ic=lm3050
+
+lm3050_ecdh_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecdh_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_ecdh_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecdh_it.ewp -build * -log all
+
+lm3050_ecdh_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling && scons flags=-Werror ic=lm3050
+
+lm3050_ecdh_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ecdh_polling.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_ecdh_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ecdh_polling.ewp -build * -log all
+
 lm3050_sha_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/sha/sha_polling && scons ic=lm3050
+    - cd examples/peripheral/sha/sha_polling && scons flags=-Werror ic=lm3050
 
 lm3050_sha_polling_keil_build:
   stage: build
@@ -77,7 +177,7 @@ lm3050_sha_polling_iar_build:
 lm3050_sha_it_build:
   stage: build
   script:
-    - cd examples/peripheral/sha/sha_it && scons ic=lm3050
+    - cd examples/peripheral/sha/sha_it && scons flags=-Werror ic=lm3050
 
 lm3050_sha_it_keil_build:
   stage: build
@@ -96,7 +196,7 @@ lm3050_sha_it_iar_build:
 lm3050_sm4_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/sm4/sm4_polling && scons ic=lm3050
+    - cd examples/peripheral/sm4/sm4_polling && scons flags=-Werror ic=lm3050
 
 lm3050_sm4_polling_keil_build:
   stage: build
@@ -115,7 +215,7 @@ lm3050_sm4_polling_iar_build:
 lm3050_sm4_it_build:
   stage: build
   script:
-    - cd examples/peripheral/sm4/sm4_it && scons ic=lm3050
+    - cd examples/peripheral/sm4/sm4_it && scons flags=-Werror ic=lm3050
 
 lm3050_sm4_it_keil_build:
   stage: build
@@ -134,7 +234,7 @@ lm3050_sm4_it_iar_build:
 lm3050_touchkey_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/touchkey/touchkey_polling && scons ic=lm3050
+    - cd examples/peripheral/touchkey/touchkey_polling && scons flags=-Werror ic=lm3050
 
 lm3050_touchkey_polling_keil_build:
   stage: build
@@ -153,7 +253,7 @@ lm3050_touchkey_polling_iar_build:
 lm3050_touchkey_it_build:
   stage: build
   script:
-    - cd examples/peripheral/touchkey/touchkey_it && scons ic=lm3050
+    - cd examples/peripheral/touchkey/touchkey_it && scons flags=-Werror ic=lm3050
 
 lm3050_touchkey_it_keil_build:
   stage: build
@@ -172,7 +272,7 @@ lm3050_touchkey_it_iar_build:
 lm3050_gpio_build:
   stage: build
   script:
-    - cd examples/peripheral/gpio && scons ic=lm3050
+    - cd examples/peripheral/gpio && scons flags=-Werror ic=lm3050
 
 lm3050_gpio_keil_build:
   stage: build
@@ -191,7 +291,7 @@ lm3050_gpio_iar_build:
 lm3050_i2c_it_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_it && scons ic=lm3050
+    - cd examples/peripheral/i2c/i2c_it && scons flags=-Werror ic=lm3050
 
 lm3050_i2c_it_keil_build:
   stage: build
@@ -210,7 +310,7 @@ lm3050_i2c_it_iar_build:
 lm3050_ll_i2c_it_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/ll_i2c_it && scons ic=lm3050
+    - cd examples/peripheral/i2c/ll_i2c_it && scons flags=-Werror ic=lm3050
 
 lm3050_ll_i2c_it_keil_build:
   stage: build
@@ -229,7 +329,7 @@ lm3050_ll_i2c_it_iar_build:
 lm3050_ll_i2c_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/ll_i2c_polling && scons ic=lm3050
+    - cd examples/peripheral/i2c/ll_i2c_polling && scons flags=-Werror ic=lm3050
 
 lm3050_ll_i2c_polling_keil_build:
   stage: build
@@ -248,7 +348,7 @@ lm3050_ll_i2c_polling_iar_build:
 lm3050_i2c_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_polling && scons ic=lm3050
+    - cd examples/peripheral/i2c/i2c_polling && scons flags=-Werror ic=lm3050
 
 lm3050_i2c_polling_keil_build:
   stage: build
@@ -267,7 +367,7 @@ lm3050_i2c_polling_iar_build:
 lm3050_i2c_dma_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_dma && scons ic=lm3050
+    - cd examples/peripheral/i2c/i2c_dma && scons flags=-Werror ic=lm3050
 
 lm3050_i2c_dma_keil_build:
   stage: build
@@ -286,7 +386,7 @@ lm3050_i2c_dma_iar_build:
 lm3050_software_calendar_build:
   stage: build
   script:
-    - cd examples/peripheral/software_calendar && scons ic=lm3050
+    - cd examples/peripheral/software_calendar && scons flags=-Werror ic=lm3050
 
 lm3050_software_calendar_keil_build:
   stage: build
@@ -305,7 +405,7 @@ lm3050_software_calendar_iar_build:
 lm3050_software_timers_build:
   stage: build
   script:
-    - cd examples/peripheral/software_timers && scons ic=lm3050
+    - cd examples/peripheral/software_timers && scons flags=-Werror ic=lm3050
 
 lm3050_software_timers_keil_build:
   stage: build
@@ -324,7 +424,7 @@ lm3050_software_timers_iar_build:
 lm3050_ll_spi_it_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/ll_spi_it && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/ll_spi_it && scons flags=-Werror ic=lm3050
 
 lm3050_ll_spi_it_keil_build:
   stage: build
@@ -343,7 +443,7 @@ lm3050_ll_spi_it_iar_build:
 lm3050_ll_spi_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/ll_spi_polling && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/ll_spi_polling && scons flags=-Werror ic=lm3050
 
 lm3050_ll_spi_polling_keil_build:
   stage: build
@@ -362,7 +462,7 @@ lm3050_ll_spi_polling_iar_build:
 lm3050_spi_dma_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/spi_dma_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_dma_master && scons flags=-Werror ic=lm3050
 
 lm3050_spi_dma_master_keil_build:
   stage: build
@@ -381,7 +481,7 @@ lm3050_spi_dma_master_iar_build:
 lm3050_spi_dma_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/spi_dma_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_dma_slave && scons flags=-Werror ic=lm3050
 
 lm3050_spi_dma_slave_keil_build:
   stage: build
@@ -400,7 +500,7 @@ lm3050_spi_dma_slave_iar_build:
 lm3050_spi_it_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/spi_it_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_it_master && scons flags=-Werror ic=lm3050
 
 lm3050_spi_it_master_keil_build:
   stage: build
@@ -419,7 +519,7 @@ lm3050_spi_it_master_iar_build:
 lm3050_spi_it_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/spi_it_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_it_slave && scons flags=-Werror ic=lm3050
 
 lm3050_spi_it_slave_keil_build:
   stage: build
@@ -438,7 +538,7 @@ lm3050_spi_it_slave_iar_build:
 lm3050_spi_polling_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/spi_polling_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_polling_master && scons flags=-Werror ic=lm3050
 
 lm3050_spi_polling_master_keil_build:
   stage: build
@@ -457,7 +557,7 @@ lm3050_spi_polling_master_iar_build:
 lm3050_spi_polling_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/spi_polling_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/spi_polling_slave && scons flags=-Werror ic=lm3050
 
 lm3050_spi_polling_slave_keil_build:
   stage: build
@@ -476,7 +576,7 @@ lm3050_spi_polling_slave_iar_build:
 lm3050_i2s_dma_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/i2s_dma_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/i2s_dma_master && scons flags=-Werror ic=lm3050
 
 lm3050_i2s_dma_master_keil_build:
   stage: build
@@ -495,7 +595,7 @@ lm3050_i2s_dma_master_iar_build:
 lm3050_i2s_dma_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/i2s_dma_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave && scons flags=-Werror ic=lm3050
 
 lm3050_i2s_dma_slave_keil_build:
   stage: build
@@ -514,7 +614,7 @@ lm3050_i2s_dma_slave_iar_build:
 lm3050_i2s_it_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/i2s_it_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/i2s_it_master && scons flags=-Werror ic=lm3050
 
 lm3050_i2s_it_master_keil_build:
   stage: build
@@ -533,7 +633,7 @@ lm3050_i2s_it_master_iar_build:
 lm3050_i2s_it_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/i2s_it_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/i2s_it_slave && scons flags=-Werror ic=lm3050
 
 lm3050_i2s_it_slave_keil_build:
   stage: build
@@ -552,7 +652,7 @@ lm3050_i2s_it_slave_iar_build:
 lm3050_i2s_polling_master_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/i2s_polling_master && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/i2s_polling_master && scons flags=-Werror ic=lm3050
 
 lm3050_i2s_polling_master_keil_build:
   stage: build
@@ -571,7 +671,7 @@ lm3050_i2s_polling_master_iar_build:
 lm3050_i2s_polling_slave_build:
   stage: build
   script:
-    - cd examples/peripheral/spi_i2s/i2s_polling_slave && scons ic=lm3050
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave && scons flags=-Werror ic=lm3050
 
 lm3050_i2s_polling_slave_keil_build:
   stage: build
@@ -590,7 +690,7 @@ lm3050_i2s_polling_slave_iar_build:
 lm3050_ll_ssi_it_build:
   stage: build
   script:
-    - cd examples/peripheral/ssi/ll_ssi_it && scons ic=lm3050
+    - cd examples/peripheral/ssi/ll_ssi_it && scons flags=-Werror ic=lm3050
 
 lm3050_ll_ssi_it_keil_build:
   stage: build
@@ -609,7 +709,7 @@ lm3050_ll_ssi_it_iar_build:
 lm3050_ssi_dma_build:
   stage: build
   script:
-    - cd examples/peripheral/ssi/ssi_dma && scons ic=lm3050
+    - cd examples/peripheral/ssi/ssi_dma && scons flags=-Werror ic=lm3050
 
 lm3050_ssi_dma_keil_build:
   stage: build
@@ -628,7 +728,7 @@ lm3050_ssi_dma_iar_build:
 lm3050_ssi_it_build:
   stage: build
   script:
-    - cd examples/peripheral/ssi/ssi_it && scons ic=lm3050
+    - cd examples/peripheral/ssi/ssi_it && scons flags=-Werror ic=lm3050
 
 lm3050_ssi_it_keil_build:
   stage: build
@@ -647,7 +747,7 @@ lm3050_ssi_it_iar_build:
 lm3050_Basic_PWM_build:
   stage: build
   script:
-    - cd examples/peripheral/timer/Basic_PWM && scons ic=lm3050
+    - cd examples/peripheral/timer/Basic_PWM && scons flags=-Werror ic=lm3050
 
 lm3050_Basic_PWM_keil_build:
   stage: build
@@ -666,7 +766,7 @@ lm3050_Basic_PWM_iar_build:
 lm3050_Basic_TIM_build:
   stage: build
   script:
-    - cd examples/peripheral/timer/Basic_TIM && scons ic=lm3050
+    - cd examples/peripheral/timer/Basic_TIM && scons flags=-Werror ic=lm3050
 
 lm3050_Basic_TIM_keil_build:
   stage: build
@@ -685,7 +785,7 @@ lm3050_Basic_TIM_iar_build:
 lm3050_DTC_PWM_build:
   stage: build
   script:
-    - cd examples/peripheral/timer/DTC_PWM && scons ic=lm3050
+    - cd examples/peripheral/timer/DTC_PWM && scons flags=-Werror ic=lm3050
 
 lm3050_DTC_PWM_keil_build:
   stage: build
@@ -704,7 +804,7 @@ lm3050_DTC_PWM_iar_build:
 lm3050_input_Capture_build:
   stage: build
   script:
-    - cd examples/peripheral/timer/input_Capture && scons ic=lm3050
+    - cd examples/peripheral/timer/input_Capture && scons flags=-Werror ic=lm3050
 
 lm3050_input_Capture_keil_build:
   stage: build
@@ -723,7 +823,7 @@ lm3050_input_Capture_iar_build:
 lm3050_uart_dma_build:
   stage: build
   script:
-    - cd examples/peripheral/uart/uart_dma && scons ic=lm3050
+    - cd examples/peripheral/uart/uart_dma && scons flags=-Werror ic=lm3050
 
 lm3050_uart_dma_keil_build:
   stage: build
@@ -742,7 +842,7 @@ lm3050_uart_dma_iar_build:
 lm3050_uart_it_build:
   stage: build
   script:
-    - cd examples/peripheral/uart/uart_it && scons ic=lm3050
+    - cd examples/peripheral/uart/uart_it && scons flags=-Werror ic=lm3050
 
 lm3050_uart_it_keil_build:
   stage: build
@@ -761,7 +861,7 @@ lm3050_uart_it_iar_build:
 lm3050_ll_uart_it_build:
   stage: build
   script:
-    - cd examples/peripheral/uart/ll_uart_it && scons ic=lm3050
+    - cd examples/peripheral/uart/ll_uart_it && scons flags=-Werror ic=lm3050
 
 lm3050_ll_uart_it_keil_build:
   stage: build
@@ -780,7 +880,7 @@ lm3050_ll_uart_it_iar_build:
 lm3050_ll_uart_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/uart/ll_uart_polling && scons ic=lm3050
+    - cd examples/peripheral/uart/ll_uart_polling && scons flags=-Werror ic=lm3050
 
 lm3050_ll_uart_polling_keil_build:
   stage: build
@@ -799,7 +899,7 @@ lm3050_ll_uart_polling_iar_build:
 lm3050_uart_polling_build:
   stage: build
   script:
-    - cd examples/peripheral/uart/uart_polling && scons ic=lm3050
+    - cd examples/peripheral/uart/uart_polling && scons flags=-Werror ic=lm3050
 
 lm3050_uart_polling_keil_build:
   stage: build
@@ -815,10 +915,48 @@ lm3050_uart_polling_iar_build:
   script:
     - cd examples/peripheral/uart/uart_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" uart_polling.ewp -build * -log all    
 
+lm3050_usbd_cdc_msc_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_cdc_msc_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_cdc_msc.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_cdc_msc_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_cdc_msc.ewp -build * -log all    
+
+lm3050_usbd_hid_composite_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_hid_composite_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_hid_composite.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_hid_composite_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_hid_composite.ewp -build * -log all    
+
 lm3050_adc_amic_sampling_build:
   stage: build
   script:
-    - cd examples/peripheral/adcv2/adc_amic_sampling && scons ic=lm3050
+    - cd examples/peripheral/adcv2/adc_amic_sampling && scons flags=-Werror ic=lm3050
 
 lm3050_adc_amic_sampling_keil_build:
   stage: build
@@ -837,7 +975,7 @@ lm3050_adc_amic_sampling_iar_build:
 lm3050_adc_blocking_sampling_build:
   stage: build
   script:
-    - cd examples/peripheral/adcv2/adc_blocking_sampling && scons ic=lm3050
+    - cd examples/peripheral/adcv2/adc_blocking_sampling && scons flags=-Werror ic=lm3050
 
 lm3050_adc_blocking_sampling_keil_build:
   stage: build
@@ -856,7 +994,7 @@ lm3050_adc_blocking_sampling_iar_build:
 lm3050_adc_single_channel_build:
   stage: build
   script:
-    - cd examples/peripheral/adcv2/adc_single_channel && scons ic=lm3050
+    - cd examples/peripheral/adcv2/adc_single_channel && scons flags=-Werror ic=lm3050
 
 lm3050_adc_single_channel_keil_build:
   stage: build
@@ -875,7 +1013,7 @@ lm3050_adc_single_channel_iar_build:
 lm3050_adc_multi_channel_build:
   stage: build
   script:
-    - cd examples/peripheral/adcv2/adc_multi_channel && scons ic=lm3050
+    - cd examples/peripheral/adcv2/adc_multi_channel && scons flags=-Werror ic=lm3050
 
 lm3050_adc_multi_channel_keil_build:
   stage: build
@@ -894,7 +1032,7 @@ lm3050_adc_multi_channel_iar_build:
 lm3050_adc_analog_wdg_build:
   stage: build
   script:
-    - cd examples/peripheral/adcv2/adc_analog_wdg && scons ic=lm3050
+    - cd examples/peripheral/adcv2/adc_analog_wdg && scons flags=-Werror ic=lm3050
 
 lm3050_adc_analog_wdg_keil_build:
   stage: build
@@ -913,7 +1051,7 @@ lm3050_adc_analog_wdg_iar_build:
 lm3050_adc_multi_channel_dma_build:
   stage: build
   script:
-    - cd examples/peripheral/adcv2/adc_multi_channel_dma && scons ic=lm3050
+    - cd examples/peripheral/adcv2/adc_multi_channel_dma && scons flags=-Werror ic=lm3050
 
 lm3050_adc_multi_channel_dma_keil_build:
   stage: build
@@ -932,7 +1070,7 @@ lm3050_adc_multi_channel_dma_iar_build:
 lm3050_dual_dac_channel_dma_voltage_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage && scons ic=lm3050
+    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage && scons flags=-Werror ic=lm3050
 
 lm3050_dual_dac_channel_dma_voltage_keil_build:
   stage: build
@@ -951,7 +1089,7 @@ lm3050_dual_dac_channel_dma_voltage_iar_build:
 lm3050_dual_dac_channel_voltage_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/dual_dac_channel_voltage && scons ic=lm3050
+    - cd examples/peripheral/dac/dual_dac_channel_voltage && scons flags=-Werror ic=lm3050
 
 lm3050_dual_dac_channel_voltage_keil_build:
   stage: build
@@ -970,7 +1108,7 @@ lm3050_dual_dac_channel_voltage_iar_build:
 lm3050_dual_dac_channel_wave_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/dual_dac_channel_wave && scons ic=lm3050
+    - cd examples/peripheral/dac/dual_dac_channel_wave && scons flags=-Werror ic=lm3050
 
 lm3050_dual_dac_channel_wave_keil_build:
   stage: build
@@ -989,7 +1127,7 @@ lm3050_dual_dac_channel_wave_iar_build:
 lm3050_single_dac_channel_dma_voltage_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/single_dac_channel_dma_voltage && scons ic=lm3050
+    - cd examples/peripheral/dac/single_dac_channel_dma_voltage && scons flags=-Werror ic=lm3050
 
 lm3050_single_dac_channel_dma_voltage_keil_build:
   stage: build
@@ -1008,7 +1146,7 @@ lm3050_single_dac_channel_dma_voltage_iar_build:
 lm3050_single_dac_channel_sine_wave_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/single_dac_channel_sine_wave && scons ic=lm3050
+    - cd examples/peripheral/dac/single_dac_channel_sine_wave && scons flags=-Werror ic=lm3050
 
 lm3050_single_dac_channel_sine_wave_keil_build:
   stage: build
@@ -1027,7 +1165,7 @@ lm3050_single_dac_channel_sine_wave_iar_build:
 lm3050_single_dac_channel_voltage_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/single_dac_channel_voltage && scons ic=lm3050
+    - cd examples/peripheral/dac/single_dac_channel_voltage && scons flags=-Werror ic=lm3050
 
 lm3050_single_dac_channel_voltage_keil_build:
   stage: build
@@ -1046,7 +1184,7 @@ lm3050_single_dac_channel_voltage_iar_build:
 lm3050_single_dac_channel_wave_build:
   stage: build
   script:
-    - cd examples/peripheral/dac/single_dac_channel_wave && scons ic=lm3050
+    - cd examples/peripheral/dac/single_dac_channel_wave && scons flags=-Werror ic=lm3050
 
 lm3050_single_dac_channel_wave_keil_build:
   stage: build
@@ -1065,7 +1203,7 @@ lm3050_single_dac_channel_wave_iar_build:
 lm3050_rtcv2_build:
   stage: build
   script:
-    - cd examples/peripheral/rtcv2 && scons ic=lm3050
+    - cd examples/peripheral/rtcv2 && scons flags=-Werror ic=lm3050
 
 lm3050_rtcv2_keil_build:
   stage: build
@@ -1084,7 +1222,7 @@ lm3050_rtcv2_iar_build:
 lm3050_can_loopback_build:
   stage: build
   script:
-    - cd examples/peripheral/can/CAN_LoopBack && scons ic=lm3050
+    - cd examples/peripheral/can/CAN_LoopBack && scons flags=-Werror ic=lm3050
 
 lm3050_can_loopback_keil_build:
   stage: build
@@ -1103,7 +1241,7 @@ lm3050_can_loopback_iar_build:
 lm3050_can_normal_build:
   stage: build
   script:
-    - cd examples/peripheral/can/CAN_Normal && scons ic=lm3050
+    - cd examples/peripheral/can/CAN_Normal && scons flags=-Werror ic=lm3050
 
 lm3050_can_normal_keil_build:
   stage: build
@@ -1122,7 +1260,7 @@ lm3050_can_normal_iar_build:
 lm3050_iwdg_build:
   stage: build
   script:
-    - cd examples/peripheral/wdg/iwdg && scons ic=lm3050
+    - cd examples/peripheral/wdg/iwdg && scons flags=-Werror ic=lm3050
 
 lm3050_iwdg_keil_build:
   stage: build
@@ -1141,7 +1279,7 @@ lm3050_iwdg_iar_build:
 lm3050_wwdg_build:
   stage: build
   script:
-    - cd examples/peripheral/wdg/wwdg && scons ic=lm3050
+    - cd examples/peripheral/wdg/wwdg && scons flags=-Werror ic=lm3050
 
 lm3050_wwdg_keil_build:
   stage: build
@@ -1160,7 +1298,7 @@ lm3050_wwdg_iar_build:
 lm3050_comp_internal_build:
   stage: build
   script:
-    - cd examples/peripheral/comp/comp_internal && scons ic=lm3050
+    - cd examples/peripheral/comp/comp_internal && scons flags=-Werror ic=lm3050
 
 lm3050_comp_internal_keil_build:
   stage: build
@@ -1179,7 +1317,7 @@ lm3050_comp_internal_iar_build:
 lm3050_comp_dac_build:
   stage: build
   script:
-    - cd examples/peripheral/comp/comp_dac && scons ic=lm3050
+    - cd examples/peripheral/comp/comp_dac && scons flags=-Werror ic=lm3050
 
 lm3050_comp_dac_keil_build:
   stage: build
@@ -1198,7 +1336,7 @@ lm3050_comp_dac_iar_build:
 lm3050_iap_bootloader_build:
   stage: build
   script:
-    - cd examples/peripheral/iap/iap_bootloader && scons ic=lm3050
+    - cd examples/peripheral/iap/iap_bootloader && scons flags=-Werror ic=lm3050
 
 lm3050_iap_bootloader_keil_build:
   stage: build
@@ -1217,7 +1355,7 @@ lm3050_iap_bootloader_iar_build:
 lm3050_iap_application_build:
   stage: build
   script:
-    - cd examples/peripheral/iap/iap_application && scons ic=lm3050
+    - cd examples/peripheral/iap/iap_application && scons flags=-Werror ic=lm3050
 
 lm3050_iap_application_keil_build:
   stage: build
@@ -1232,4 +1370,60 @@ lm3050_iap_application_iar_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/iap/iap_application/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iap_application.ewp -build * -log all    
-   
+
+lm3050_trng_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/trng/trng_polling && scons flags=-Werror ic=lm3050
+
+lm3050_trng_polling_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/trng/trng_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng_polling.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_trng_polling_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/trng/trng_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_polling.ewp -build * -log all
+
+lm3050_trng_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/trng/trng_it && scons flags=-Werror ic=lm3050
+
+lm3050_trng_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/trng/trng_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng_it.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_trng_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/trng/trng_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_it.ewp -build * -log all
+    
+lm3050_pdm_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/pdm/pdm_it && scons flags=-Werror
+
+lm3050_pdm_it_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/pdm/pdm_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b pdm_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+lm3050_pdm_it_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/pdm/pdm_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" pdm_it.ewp -build * -log all

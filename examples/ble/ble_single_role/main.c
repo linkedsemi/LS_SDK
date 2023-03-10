@@ -413,7 +413,7 @@ static void start_scan(void)
         .duration = 0,
         .period = 0,
         .type = OBSERVER,
-        .active = 0,
+        .active = 1,
         .filter_duplicates = 0,
     };
     dev_manager_start_scan(scan_obj_hdl, &scan_param);

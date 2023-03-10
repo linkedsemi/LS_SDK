@@ -22,14 +22,14 @@ def variant_dir_source(self,srcs):
 def inc_dirs(self,dirs):
     return [os.path.relpath(self.subst(x),Dir('#').abspath) for x in dirs]
 
-def image_build(self,name,src,inc,ble=False,mesh=False,rtos = None,with_startup = True,objprefix = ''):
+def image_build(self,name,src,inc,ble=False,mesh=False,usb=False,rtos = None,with_startup = True,objprefix = ''):
     self.Append(CPPPATH = self.inc_dirs(inc))
-    self.Append(CCFLAGS = ['-Werror'])
+    #self.Append(CCFLAGS = ['-Werror'])
     self.Append(LINKFLAGS = ' $GC_OPTION ')
-    return self.plf_build(name,src,rtos,with_startup,ble,mesh,objprefix)
+    return self.plf_build(name,src,rtos,with_startup,ble,mesh,usb,objprefix)
 
-def app_build(self,app_name,src,inc,ble = True,mesh = False,rtos = None):
-    target = self.image_build(app_name,src,inc,ble,mesh,rtos)
+def app_build(self,app_name,src,inc,ble = True,mesh = False,usb=False,rtos = None):
+    target = self.image_build(app_name,src,inc,ble,mesh,usb,rtos)
     self.plf_postaction(target)
 
 env.AddMethod(image_build)

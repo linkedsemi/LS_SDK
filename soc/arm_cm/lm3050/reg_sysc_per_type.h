@@ -14,7 +14,7 @@ typedef struct
     volatile uint32_t PD_PER_SRST1; //0x14
     volatile uint32_t PD_PER_SRST2; //0x18
     volatile uint32_t PD_PER_SRST3; //0x1c
-    volatile uint32_t FUNC_SEL[15];//0x20-0x5c
+    volatile uint32_t FUNC_SEL[16];//0x20-0x5c
     volatile uint32_t COMP_PIS; //0x60
 }reg_sysc_per_t;
 

@@ -79,7 +79,7 @@ void sleep_wakeup_config()
                           |FIELD_BUILD(V33_RG_PD_TK,1)
                           |FIELD_BUILD(V33_RG_PD_DAC12,1)
                           |FIELD_BUILD(V33_RG_BAT_DTCT_EN,0);
-    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x3d)
+    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x39)
                         |FIELD_BUILD(V33_RG_SWD_IO_WKUP_EN,0)
                         |FIELD_BUILD(V33_RG_WKUP0_SYNC_SEL,0)
                         |FIELD_BUILD(V33_RG_WKUP1_SYNC_SEL,0);
@@ -154,6 +154,13 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
         SYSC_AWO->IO[i].IEN_OD = GPIO_IEN_OD[i];
         SYSC_AWO->IO[i].PUPD = GPIO_PUPD[i];
     }
+    if(hal_flash_dual_mode_get())
+    {
+        pinmux_hal_flash_init();
+    }else
+    {
+        pinmux_hal_flash_quad_init();
+    }
     gpio_pd_latch_state_exit();
     hal_flash_init();
     clk_flash_init();
@@ -161,8 +168,6 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     DELAY_US(8);
     hal_flash_xip_start();
 }
-
-void io_irq_enable(void);
 
 static void deep_sleep_no_ble()
 {
@@ -177,7 +182,6 @@ static void deep_sleep_no_ble()
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
     memcpy32((uint32_t *)NVIC->IP,NVIC_IP,ARRAY_LEN(NVIC_IP));
     memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,ARRAY_LEN(NVIC_EN));
-    io_irq_enable();
     systick_start();
     SCB->SCR &= ~(1<<2);
     exit_critical(cpu_stat);

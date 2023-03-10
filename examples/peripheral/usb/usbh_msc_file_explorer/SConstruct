@@ -1,0 +1,20 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    '../bsp.c',
+    '$SDK_ROOT/module/tinyusb/examples/host/msc_file_explorer/src/main.c',
+    '$SDK_ROOT/module/tinyusb/examples/host/msc_file_explorer/src/msc_app.c',
+    '$SDK_ROOT/module/fatfs/source/ff.c',
+    '$SDK_ROOT/module/fatfs/source/ffsystem.c',
+    '$SDK_ROOT/module/fatfs/source/ffunicode.c',
+]
+inc = [
+    '.',
+    '$SDK_ROOT/module/tinyusb/examples/host/msc_file_explorer/src/',
+    '$SDK_ROOT/module/fatfs/source/',
+    '$SDK_ROOT/module/embedded-cli/',
+]
+#env.Append(CPPDEFINES=['CFG_TUSB_DEBUG=3'])
+env.app_build('usbh_msc_file_explorer',src,inc, ble = False,usb = True)

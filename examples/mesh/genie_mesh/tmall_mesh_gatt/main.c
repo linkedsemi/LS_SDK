@@ -353,7 +353,11 @@ void auto_check_unbind(void)
     {
         coutinu_power_up_num = 0;
         tinyfs_write(mesh_dir, RECORD_KEY1, &coutinu_power_up_num, sizeof(coutinu_power_up_num));
-        SIGMESH_UnbindAll();
+        if ((Node_Get_Proved_State == PROVISIONED_OK) || (Node_Proved_State == MESH_PROV_SUCCEED))
+        {
+            Node_Get_Proved_State = UNPROVISIONING;
+            Node_Proved_State = MESH_PROV_STARTED;
+        }
     }
     else
     {
@@ -494,6 +498,26 @@ static void ls_genie_ais_timer_cb(void *param)
             platform_reset(RESET_OTA_SUCCEED);
         }
     }
+
+     //do tmall hardware node reset event
+     if (Node_Get_Proved_State == UNPROVISIONING)
+     {
+         uint16_t dst_addr=0;
+         if (gatt_mesh_src_addr !=TMALL_GATT_SRC_ADDR_INVALID)
+         {
+            dst_addr = gatt_mesh_src_addr;
+         }
+         else
+         {
+            dst_addr = provisioner_unicast_addr;
+         }
+         
+         if (0 == tmall_mesh_hardware_node_reset_ind(model_env.info[1].model_lid, model_env.app_key_lid, dst_addr))
+         {
+             Node_Get_Proved_State = UNPROVISIONED_KO;
+         }
+      }
+
     if(ls_genie_ais_timer_inst)
     {
       builtin_timer_start(ls_genie_ais_timer_inst, AIS_SERVER_TIMEOUT, NULL); 
@@ -614,6 +638,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     {   
         gatt_mesh_src_addr = TMALL_GATT_SRC_ADDR_INVALID;
         TIMER_Set(2, 3000); //clear power up num
+        auto_check_unbind();
     }
     break;
     case MESH_ACTIVE_DISABLE:
@@ -855,7 +880,6 @@ int main()
     genie_triple_init();
     tinyfs_mkdir(&mesh_dir, ROOT_DIR, 5);
     ble_init();
-    auto_check_unbind();
     ls_genie_ais_fw_version_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);

@@ -18,6 +18,7 @@
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((weak)) void SystemInit(){
+    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
     MODIFY_REG(V33_RG->TRIM0,V33_RG_HSE_BIAS_ADJ_MASK|V33_RG_HSE_LP_MASK,1<<V33_RG_HSE_LP_POS|3<<V33_RG_HSE_BIAS_ADJ_POS);
     REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_CLK_SEL_LS, SDK_LSI_USED ? 1 : 2);
     V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
@@ -99,16 +100,28 @@ void arm_cm_set_int_isr(int8_t type,void (*isr)())
     ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
 }
 
+void SWINT_Handler_ASM();
+
+static void flash_swint_init()
+{
+    arm_cm_set_int_isr(QSPI_IRQn,SWINT_Handler_ASM);
+    __NVIC_ClearPendingIRQ(QSPI_IRQn);
+    __NVIC_EnableIRQ(QSPI_IRQn);
+}
+
 void sys_init_none()
 {
     clk_flash_init();
     clk_switch();
+    flash_swint_init();
     LOG_INIT();
     io_init();
     low_power_init();
     systick_start();
     sw_timer_module_init();
 }
+
+
 
 void platform_reset(uint32_t error)
 {
@@ -118,4 +131,9 @@ void platform_reset(uint32_t error)
 void XIP_BANNED_FUNC(sync_for_xip_stop,)
 {
     while((SYSC_AWO->IO[3].DIN&1<<10)==0);
+}
+
+void SWINT_Handler_C(uint32_t *args,uint32_t (*func)(uint32_t,uint32_t,uint32_t,uint32_t))
+{
+    args[0] = func(args[0],args[1],args[2],args[3]);
 }
