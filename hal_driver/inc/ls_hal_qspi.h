@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include "ls_msp_qspi.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct lsqspi_direct_read_config_param
 {
     uint8_t opcode;
@@ -47,6 +51,10 @@ void lsqspi_stig_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
 void lsqspi_stig_send_command(uint8_t opcode);
 
 void lsqspi_stig_read_register(uint8_t opcode,uint8_t *data,uint8_t length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

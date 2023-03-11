@@ -2,6 +2,10 @@
 #define PRF_HID_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup BLE
  *  @{
  */
@@ -161,5 +165,9 @@ void hid_ntf_cfg_init(uint16_t ntf_cfg,uint8_t con_idx,uint8_t peer_id);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

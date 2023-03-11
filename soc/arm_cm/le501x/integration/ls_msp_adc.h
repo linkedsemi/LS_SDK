@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_adc_type.h" 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// LSADC Macro for Register Access
 #ifdef LSADC_BASE_ADDR
 #define LSADC ((reg_adc_t *)LSADC_BASE_ADDR)
@@ -22,5 +26,9 @@ void adc_channel_vbat_disable(void);
 
 void adc_channel_tempsensor_enable(void);
 void adc_channel_tempsensor_disable(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

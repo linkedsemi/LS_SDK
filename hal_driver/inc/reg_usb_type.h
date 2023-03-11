@@ -2,6 +2,10 @@
 #define REG_USB_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if 0
 typedef struct
 {
@@ -368,6 +372,10 @@ enum USB_REG_RX_FIFO_SIZE_FIELD
     USB_RX_FIFO_DPB_MASK = (int)0x10,
     USB_RX_FIFO_DPB_POS = 4,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

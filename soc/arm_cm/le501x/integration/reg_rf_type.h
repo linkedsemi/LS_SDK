@@ -2,6 +2,10 @@
 #define REG_RF_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t REG00; //0x0
@@ -550,5 +554,10 @@ enum RF_REG_REG70_FIELD
     RF_RX2MBW_FORCE_EN_MASK = (int)0x80000000,
     RF_RX2MBW_FORCE_EN_POS = 31,
 };
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

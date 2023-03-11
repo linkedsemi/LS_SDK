@@ -2,6 +2,10 @@
 #define REG_LSQSPI_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CFG;             // 0x00
@@ -192,7 +196,9 @@ enum LSQSPI_REG_STIG_GO_FIELD
     LSQSPI_STIG_HOLD_CS_POS = 4,
 };
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

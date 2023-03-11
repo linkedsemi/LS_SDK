@@ -2,6 +2,10 @@
 #define REG_RTCV2_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CTRL;
@@ -84,5 +88,9 @@ enum RTC_REG_INTR_FIELD
     RTC_INTR_MASK = 0x00000001,
     RTC_INTR_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

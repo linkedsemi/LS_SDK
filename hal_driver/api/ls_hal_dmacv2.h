@@ -2,6 +2,10 @@
 #define LS_HAL_DMACV2_H_
 #include "ls_msp_dmacv2.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DMA_RAM_ATTR 
 
 typedef struct __DMA_Controller_HandleTypeDef
@@ -70,5 +74,10 @@ void HAL_DMA_Controller_DeInit(DMA_Controller_HandleTypeDef *hdma);
 void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,struct DMA_Channel_Config *cfg,void (*callback)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t),uint32_t param);
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

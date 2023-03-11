@@ -2,6 +2,10 @@
 #define REG_MDM2_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t REG00; //0x0
@@ -142,5 +146,8 @@ enum MDM2_REG_REG20_FIELD
     MDM2_LR_ACC_INVERT_MASK = (int)0x8000,
     MDM2_LR_ACC_INVERT_POS = 15,
 };
+#ifdef __cplusplus
+}
+#endif
 
 #endif

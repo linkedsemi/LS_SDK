@@ -2,6 +2,10 @@
 #define REG_DMACV2_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CSR; //0x20
@@ -284,6 +288,10 @@ enum DMAC_REG_BCR_FIELD
     DMAC_CBCR_MASK = (int)0xffff0000,
     DMAC_CBCR_POS = 16,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

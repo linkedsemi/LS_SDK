@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_uart_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef UART1_BASE_ADDR
 #define UART1 ((reg_uart_t *)UART1_BASE_ADDR) /*!< LSUART Macro for Register Access*/
 #endif
@@ -39,5 +43,8 @@ void HAL_UART_MSP_Idle_Set(struct __UART_HandleTypeDef *inst);
 uint8_t HAL_UART_TX_DMA_Handshake_Get(struct __UART_HandleTypeDef *inst);
 uint8_t HAL_UART_RX_DMA_Handshake_Get(struct __UART_HandleTypeDef *inst);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -2,6 +2,10 @@
 #define REG_LSIWDG_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t IWDG_LOAD;
@@ -53,5 +57,9 @@ enum IWDG_REG_IWDG_LOCK_FIELD
     IWDG_LOCK_MASK = (int)0xffffffff,
     IWDG_LOCK_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

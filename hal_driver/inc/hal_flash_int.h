@@ -9,6 +9,11 @@
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(FLASH_PROG_ALGO) && __arm__
 #define HAL_FLASH_C_MERGED
 #endif
@@ -156,5 +161,10 @@ void do_hal_flash_read_reg(void *param);
 void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode);
 
 void sync_for_xip_stop(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

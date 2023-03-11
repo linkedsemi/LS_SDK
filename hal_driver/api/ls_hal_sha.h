@@ -3,6 +3,10 @@
 #include "ls_msp_sha.h"
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SHA256_WORDS_NUM 8
 #define SHA224_WORDS_NUM 7
 #define SM3_WORDS_NUM 8
@@ -31,4 +35,9 @@ void HAL_LSSHA_SHA224_Complete_Callback(void);
 void HAL_LSSHA_SM3_Complete_Callback(void);
 
 void LSSHA_IRQHandler(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

@@ -14,7 +14,9 @@
  *  @{
  */
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// ADC CLOCK
 #define ADC_CLOCK   (SDK_PCLK_MHZ*1000000)
@@ -907,6 +909,9 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
   */
 void  HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc);
 
+#ifdef __cplusplus
+}
+#endif
 
 /** @}*/
 

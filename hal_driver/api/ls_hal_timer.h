@@ -6,6 +6,9 @@
 #include "sdk_config.h"
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -1477,6 +1480,11 @@ void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim);
  * @retval HAL status
  */
 HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, TIM_SlaveConfigTypeDef *sSlaveConfig);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* LSTIMER_H_ */
 
 /*****************************END OF FILE****************************/

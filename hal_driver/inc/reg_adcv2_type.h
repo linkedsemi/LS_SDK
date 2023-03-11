@@ -2,6 +2,10 @@
 #define REG_ADCV2_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t ADCH; //0x0
@@ -598,6 +602,10 @@ enum ADC_REG_STAT_FIELD
     ADC_CNVT_REQ_MASK = (int)0xf0,
     ADC_CNVT_REQ_POS = 4,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

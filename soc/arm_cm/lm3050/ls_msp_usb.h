@@ -4,6 +4,10 @@
 #include "reg_base_addr.h"
 #include "reg_usb_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef LSUSB_BASE_ADDR
 #define USB0 ((volatile reg_usb_t*)(LSUSB_BASE_ADDR))
 #endif
@@ -23,4 +27,9 @@ uint32_t HAL_USB_MSP_GetEnableIRQ();
 void HAL_USB_MSP_Host_Setup(void *);
 
 void HAL_USB_MSP_Host_Discon_Hook();
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

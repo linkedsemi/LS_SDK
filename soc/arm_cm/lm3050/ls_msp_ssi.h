@@ -3,6 +3,10 @@
 #include "reg_ssi_type.h"
 #include "reg_base_addr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef LSSSI_BASE_ADDR
 /// LSSSI Macro for Register Access
 #define LSSSI ((reg_ssi_t *)LSSSI_BASE_ADDR)
@@ -18,4 +22,9 @@ uint8_t HAL_SSI_RX_DMA_Handshake_Get(struct __SSI_HandleTypeDef *hssi);
 
 void LL_SSI_MSP_Init(void);
 void LL_SSI_MSP_DeInit(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

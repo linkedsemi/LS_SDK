@@ -14,6 +14,10 @@
   * @{
   */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Exported types ------------------------------------------------------------*/
 /** @defgroup CAN_Exported_Types CAN Exported Types
   * @{
@@ -772,4 +776,9 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan);
   * @retval None
   */
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

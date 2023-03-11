@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_sm4_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef LSSM4_BASE_ADDR
 /// LSSM4 Macro for Register Access
 #define LSSM4 ((reg_sm4_t *)LSSM4_BASE_ADDR)
@@ -10,5 +14,9 @@
 
 void HAL_LSSM4_MSP_Init(void);
 void HAL_LSSM4_MSP_DeInit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
