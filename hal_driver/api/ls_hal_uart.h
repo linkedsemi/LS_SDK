@@ -5,6 +5,10 @@
 #include "sdk_config.h"
 #include "ls_ll_uart.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -256,6 +260,10 @@ void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _LSUART_H_
 

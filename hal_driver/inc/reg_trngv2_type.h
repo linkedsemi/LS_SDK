@@ -2,6 +2,10 @@
 #define REG_TRNG_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t TRNG_CTRL; //0x0
@@ -105,6 +109,10 @@ enum TRNG_REG_CUR_RO_SLE_FIELD
     TRNG_CUR_RO_SEL_MASK = (int)0xfff,
     TRNG_CUR_RO_SEL_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

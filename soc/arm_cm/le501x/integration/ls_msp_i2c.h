@@ -3,6 +3,9 @@
 #include "reg_base_addr.h"
 #include "reg_i2c_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// LSI2C Macro for Register Access
 #ifdef I2C1_BASE_ADDR
@@ -26,5 +29,9 @@ void LL_I2C1_MSP_Init(void);
 void LL_I2C1_MSP_DeInit(void);
 void LL_I2C2_MSP_Init(void);
 void LL_I2C2_MSP_DeInit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

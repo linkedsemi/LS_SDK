@@ -4,6 +4,10 @@
 #include "HAL_def.h"
 #include "ls_msp_adc.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -526,6 +530,11 @@ HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 

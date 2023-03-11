@@ -21,6 +21,9 @@
 #include <stdbool.h>        // boolean definition
 #include <stddef.h>         // for NULL and size_t
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * DEFINES
@@ -284,4 +287,9 @@ static inline struct co_list_hdr *co_list_next(const struct co_list_hdr *const l
 }
 
 /// @} CO_LIST
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // _CO_LIST_H_

@@ -2,6 +2,10 @@
 #define REG_PDM_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct pdm_fir
 {
     uint32_t COEF[64];
@@ -95,5 +99,9 @@ enum PDM_REG_ICR_FIELD
     PDM_ICR_INT_POS = 0,
     PDM_ICR_INT = PDM_ICR_INT_MASK
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

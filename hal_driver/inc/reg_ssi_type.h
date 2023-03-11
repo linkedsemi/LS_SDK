@@ -2,6 +2,10 @@
 #define REG_SSI_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CTRLR0;
@@ -274,5 +278,9 @@ enum SSI_SPI_CTRLR0_FIELD
     SSI_TRANS_TYPE_MASK = 0x3,
     SSI_TRANS_TYPE_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

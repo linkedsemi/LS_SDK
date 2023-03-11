@@ -5,6 +5,10 @@
 #include "circular_doubly_linked_list.h"
 #include "sw_timer_port.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sw_timer_env
 {
 	struct cdll_hdr hdr;
@@ -39,5 +43,9 @@ bool sw_timer_active(struct sw_timer_env *timer);
 struct sw_timer_env *sw_timer_list_pick(void);
 
 void sw_timer_update(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

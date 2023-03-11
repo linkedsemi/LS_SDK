@@ -1,6 +1,11 @@
 #ifndef COMPILE_FLAG_H_
 #define COMPILE_FLAG_H_
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if (ROM_CODE==1||(defined(FLASH_PROG_ALGO)&&defined(LE501X)))
 #define ROM_SYMBOL
 #else 
@@ -44,6 +49,10 @@ extern uint32_t reset_retain_end;
 #pragma section="RESET_RETAIN"
 #define RESET_RETAIN_BASE __section_begin("RESET_RETAIN")
 #define RESET_RETAIN_END __section_end("RESET_RETAIN")
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

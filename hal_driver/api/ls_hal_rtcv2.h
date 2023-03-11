@@ -5,6 +5,10 @@
 #include "HAL_def.h"
 #include "field_manipulate.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -130,5 +134,9 @@ void HAL_RTC_IRQHandler(void);
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

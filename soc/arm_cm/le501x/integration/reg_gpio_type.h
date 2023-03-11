@@ -2,6 +2,10 @@
 #define REG_GPIO_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t DIN;
@@ -535,5 +539,8 @@ enum GPIO_REG_AF4_FIELD
     GPIO_IO15_AF_MASK = (int)0xff000000,
     GPIO_IO15_AF_POS = 24,
 };
+#ifdef __cplusplus
+}
+#endif
 
 #endif

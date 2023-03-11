@@ -2,6 +2,10 @@
 #define LINKED_ASYNC_FRAMEWORK_H_
 #include "co_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct linked_async_inst_s;
 
 typedef bool (*linked_async_callback_t)(struct linked_async_inst_s *,struct co_list_hdr *,void *,uint8_t);
@@ -24,6 +28,10 @@ struct co_list_hdr *linked_async_current_pick(linked_async_inst_t *inst);
 struct co_list_hdr *linked_async_list_pop(linked_async_inst_t *inst);
 
 uint16_t linked_async_list_current_size(linked_async_inst_t *inst);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

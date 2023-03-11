@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include "ls_ble.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup LSSIG_MESH_PROVEE
  *  @{
  */
@@ -838,5 +842,9 @@ void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot);
 void prov_foundation_mdl_cfg_svr_rsp(uint32_t opcode,uint16_t status);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //(_LS_SIG_MESH_H_

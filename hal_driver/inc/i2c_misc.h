@@ -1,6 +1,10 @@
 #ifndef __I2C_MISC_H
 #define __I2C_MISC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum
 {
   HAL_I2C_MODE_NONE               = 0x00U,   /*!< No I2C communication on going             */
@@ -127,6 +131,9 @@ enum
 #define I2C_CHECK_FLAG(__ISR__, __FLAG__)         ((((__ISR__) & (__FLAG__)) == (__FLAG__)) ? SET : RESET)
 #define I2C_CHECK_IT_SOURCE(__CR1__, __IT__)      ((((__CR1__) & (__IT__)) == (__IT__)) ? SET : RESET)
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

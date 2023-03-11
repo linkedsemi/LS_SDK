@@ -2,6 +2,10 @@
 #define REG_UART_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t RBR;
@@ -216,6 +220,10 @@ enum UART_REG_TI_FIELD
     UART_CM_MASK = 0x800,
     UART_CM_POS = 11,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

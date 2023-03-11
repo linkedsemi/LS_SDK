@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_dac_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // LSDAC12 Macro for Register Access
 #ifdef LSDAC_BASE_ADDR
 #define LSDAC12   ((reg_dac_t *)LSDAC_BASE_ADDR)
@@ -30,5 +34,9 @@ struct __DAC_HandleTypeDef;
 void HAL_LSDAC_MSP_Init(void);
 void HAL_LSDAC_MSP_DeInit(void);
 uint8_t HAL_DAC_DMA_Handshake_Get(uint8_t DACx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

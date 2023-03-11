@@ -2,6 +2,10 @@
 #define REG_SHA_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t SHA_START; //0x0
@@ -56,6 +60,10 @@ enum SHA_REG_FSM_STAT_FIELD
     SHA_FSM_IDLE_MASK = (int)0x1,
     SHA_FSM_IDLE_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

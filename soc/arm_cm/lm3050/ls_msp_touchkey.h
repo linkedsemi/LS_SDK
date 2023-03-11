@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_touchkey_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef LSTOUCHKEY_BASE_ADDR
 /// LSTOUCHKEY Macro for Register Access
 #define LSTOUCHKEY ((reg_touchkey_t *)LSTOUCHKEY_BASE_ADDR)
@@ -10,5 +14,9 @@
 
 void HAL_LSTOUCHKEY_MSP_Init(void);
 void HAL_LSTOUCHKEY_MSP_DeInit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

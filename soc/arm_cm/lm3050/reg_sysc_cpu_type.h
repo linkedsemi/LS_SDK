@@ -2,6 +2,10 @@
 #define REG_SYSC_CPU_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SYSC_CPU ((reg_sysc_cpu_t *)0x4000c000)
 
 typedef struct
@@ -160,6 +164,10 @@ enum SYSC_CPU_REG_DMAC_CH_SEL1_FIELD
     SYSC_CPU_DMAC_CH7_SEL_MASK = (int)0x7f000000,
     SYSC_CPU_DMAC_CH7_SEL_POS = 24,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -4,6 +4,9 @@
 #include "HAL_def.h"
 #include "ls_msp_pdm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -164,4 +167,9 @@ void HAL_PDM_IRQHandler(PDM_HandleTypeDef *hpdm);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

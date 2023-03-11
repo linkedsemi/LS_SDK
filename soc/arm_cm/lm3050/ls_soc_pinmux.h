@@ -2,7 +2,9 @@
 #define LS_SOC_PINMUX_H_
 #include <stdint.h>
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
   * @brief Init IO for SPI Flash (CS CLK DQ0 DQ1)
@@ -1335,4 +1337,9 @@ void pinmux_comp3_init(uint8_t dat);
  * @brief clear pin mux function of comp3
  */
 void pinmux_comp3_deinit(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
