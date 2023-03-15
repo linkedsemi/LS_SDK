@@ -938,7 +938,7 @@ void pinmux_bxcan_deinit(void);
 /**
  * @brief         Set pin mux function to usb
  */
-void pinmux_usb_init(void);
+void pinmux_usb_init(bool host);
 
 /**
  * @brief clear pin mux function of usb
