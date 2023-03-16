@@ -801,6 +801,25 @@ lm3050_DTC_PWM_iar_build:
   script:
     - cd examples/peripheral/timer/DTC_PWM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" DTC_PWM.ewp -build * -log all    
 
+lm3050_Encode_TIM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Encode_TIM && scons flags=-Werror ic=lm3050
+
+lm3050_Encode_TIM_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Encode_TIM/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b Encode_TIM.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_Encode_TIM_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Encode_TIM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Encode_TIM.ewp -build * -log all   
+
 lm3050_input_Capture_build:
   stage: build
   script:
