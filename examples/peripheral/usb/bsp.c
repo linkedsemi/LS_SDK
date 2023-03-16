@@ -2,11 +2,17 @@
 #include "systick.h"
 #include "platform.h"
 #include "ls_soc_pinmux.h"
+#include "tusb_config.h"
+#if CFG_TUH_ENABLED
+#define USB_HOST 1
+#else
+#define USB_HOST 0
+#endif
 
 void board_init(void)
 {
     sys_init_none();
-    pinmux_usb_init();
+    pinmux_usb_init(USB_HOST);
 }
 
 void board_led_write(bool state)
