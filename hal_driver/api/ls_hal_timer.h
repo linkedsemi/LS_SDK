@@ -182,6 +182,39 @@ typedef struct
 } TIM_BreakDeadTimeConfigTypeDef;
 
 /**
+  * @brief  TIM Encoder Configuration Structure definition
+  */
+typedef struct
+{
+  uint32_t EncoderMode;   /*!< Specifies the active edge of the input signal.
+                               This parameter can be a value of @ref TIM_Encoder_Mode */
+
+  uint32_t IC1Polarity;   /*!< Specifies the active edge of the input signal.
+                               This parameter can be a value of @ref TIM_Input_Capture_Polarity */
+
+  uint32_t IC1Selection;  /*!< Specifies the input.
+                               This parameter can be a value of @ref TIM_Input_Capture_Selection */
+
+  uint32_t IC1Prescaler;  /*!< Specifies the Input Capture Prescaler.
+                               This parameter can be a value of @ref TIM_Input_Capture_Prescaler */
+
+  uint32_t IC1Filter;     /*!< Specifies the input capture filter.
+                               This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF */
+
+  uint32_t IC2Polarity;   /*!< Specifies the active edge of the input signal.
+                               This parameter can be a value of @ref TIM_Input_Capture_Polarity */
+
+  uint32_t IC2Selection;  /*!< Specifies the input.
+                              This parameter can be a value of @ref TIM_Input_Capture_Selection */
+
+  uint32_t IC2Prescaler;  /*!< Specifies the Input Capture Prescaler.
+                               This parameter can be a value of @ref TIM_Input_Capture_Prescaler */
+
+  uint32_t IC2Filter;     /*!< Specifies the input capture filter.
+                               This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF */
+} TIM_Encoder_InitTypeDef;
+
+/**
  * @brief  HAL State structures definition
  */
 typedef enum
@@ -406,6 +439,16 @@ typedef struct __TIM_HandleTypeDef
 /**
  * @}
  */
+
+/** @defgroup TIM_Encoder_Mode TIM Encoder Mode
+  * @{
+  */
+#define TIM_ENCODERMODE_TI1                      TIMER_SMCR_SMS_0                                                      /*!< Quadrature encoder mode 1, x2 mode, counts up/down on TI1FP1 edge depending on TI2FP2 level  */
+#define TIM_ENCODERMODE_TI2                      TIMER_SMCR_SMS_1                                                      /*!< Quadrature encoder mode 2, x2 mode, counts up/down on TI2FP2 edge depending on TI1FP1 level. */
+#define TIM_ENCODERMODE_TI12                     (TIMER_SMCR_SMS_1 | TIMER_SMCR_SMS_0)                                   /*!< Quadrature encoder mode 3, x4 mode, counts up/down on both TI1FP1 and TI2FP2 edges depending on the level of the other input. */
+/**
+  * @}
+  */
 
 /** @defgroup TIM_Interrupt_definition TIM interrupt Definition
  * @{
@@ -1480,6 +1523,69 @@ void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim);
  * @retval HAL status
  */
 HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, TIM_SlaveConfigTypeDef *sSlaveConfig);
+
+/**
+  * @brief  Initializes the TIM Encoder Interface and initialize the associated handle.
+  * @param  htim TIM Encoder Interface handle
+  * @param  sConfig TIM Encoder Interface configuration structure
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_Encoder_Init(TIM_HandleTypeDef *htim,  TIM_Encoder_InitTypeDef *sConfig);
+
+/**
+  * @brief  DeInitializes the TIM Encoder interface
+  * @param  htim TIM Encoder Interface handle
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_Encoder_DeInit(TIM_HandleTypeDef *htim);
+
+/**
+  * @brief  Starts the TIM Encoder Interface.
+  * @param  htim TIM Encoder Interface handle
+  * @param  Channel TIM Channels to be enabled
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIM_CHANNEL_ALL: TIM Channel 1 and TIM Channel 2 are selected
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_Encoder_Start(TIM_HandleTypeDef *htim, uint32_t Channel);
+
+/**
+  * @brief  Stops the TIM Encoder Interface.
+  * @param  htim TIM Encoder Interface handle
+  * @param  Channel TIM Channels to be disabled
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIM_CHANNEL_ALL: TIM Channel 1 and TIM Channel 2 are selected
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_Encoder_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);
+
+/**
+  * @brief  Starts the TIM Encoder Interface in interrupt mode.
+  * @param  htim TIM Encoder Interface handle
+  * @param  Channel TIM Channels to be enabled
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIM_CHANNEL_ALL: TIM Channel 1 and TIM Channel 2 are selected
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_Encoder_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);
+
+/**
+  * @brief  Stops the TIM Encoder Interface in interrupt mode.
+  * @param  htim TIM Encoder Interface handle
+  * @param  Channel TIM Channels to be disabled
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIM_CHANNEL_ALL: TIM Channel 1 and TIM Channel 2 are selected
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIM_Encoder_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);
 
 #ifdef __cplusplus
 }
