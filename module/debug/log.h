@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LVL_ERROR 1
 #define LVL_WARN 2
 #define LVL_INFO 3
@@ -67,4 +71,9 @@ extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_lengt
 #define LOG_INIT()  
 
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

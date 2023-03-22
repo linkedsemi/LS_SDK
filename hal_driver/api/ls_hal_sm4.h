@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief LSSM4 Initialize 
  * 
@@ -86,5 +90,9 @@ void HAL_SM4_Calculation_Complete_Callback(bool Encrypt);
 void HAL_SM4_KeyExpansion_Complete_Callback();
 
 void HAL_SM4_IRQHandler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

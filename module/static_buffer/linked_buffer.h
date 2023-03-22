@@ -4,6 +4,10 @@
 #include "co_list.h"
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct{
     struct co_list allocatable;
     uint8_t *buf;
@@ -50,6 +54,10 @@ bool linked_buf_contain_element(linked_buffer_t *ptr,void *element);
 uint16_t linked_buf_element_size(linked_buffer_t *ptr);
 
 uint16_t linked_buf_element_num(linked_buffer_t *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

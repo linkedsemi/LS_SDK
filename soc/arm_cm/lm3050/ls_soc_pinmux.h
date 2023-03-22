@@ -2,7 +2,9 @@
 #define LS_SOC_PINMUX_H_
 #include <stdint.h>
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
   * @brief Init IO for SPI Flash (CS CLK DQ0 DQ1)
@@ -935,10 +937,8 @@ void pinmux_bxcan_deinit(void);
 
 /**
  * @brief         Set pin mux function to usb
- * @param dp      Specific GPIO pin 
- * @param dm      Specific GPIO pin 
  */
-void pinmux_usb_init(uint8_t dp,uint8_t dm);
+void pinmux_usb_init(bool host);
 
 /**
  * @brief clear pin mux function of usb
@@ -1337,4 +1337,9 @@ void pinmux_comp3_init(uint8_t dat);
  * @brief clear pin mux function of comp3
  */
 void pinmux_comp3_deinit(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

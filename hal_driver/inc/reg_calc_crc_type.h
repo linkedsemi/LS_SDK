@@ -2,6 +2,10 @@
 #define REG_CALC_CRC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CRC_PARAM; //0x0
@@ -20,5 +24,9 @@ enum CALC_CRC_REG_CRC_CTRL_FIELD
     CALC_CRC_CRC_LSB_MASK = (int)0x100,
     CALC_CRC_CRC_LSB_POS = 8,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

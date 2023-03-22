@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint32_t enter_critical(void);
 
 void exit_critical(uint32_t);
@@ -35,5 +39,10 @@ extern void (*exit_critical_fn)(uint32_t);
 __attribute__((long_call)) uint32_t enter_critical(void);
 __attribute__((long_call)) void exit_critical(uint32_t);
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

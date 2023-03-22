@@ -5,8 +5,9 @@
 #include "HAL_def.h"
 #include "field_manipulate.h"
 
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -124,5 +125,9 @@ void rtc_wkup_callback(void);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif 

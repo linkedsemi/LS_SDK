@@ -6,6 +6,10 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef NDEBUG
 #define LS_ASSERT(e) (void)(e)
 #define LS_RAM_ASSERT(e) (void)(e)
@@ -27,5 +31,9 @@ extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 void ls_assert(const char *expr,const char *file,int line);
 
 void ls_ram_assert(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LS_DBG_H_ */

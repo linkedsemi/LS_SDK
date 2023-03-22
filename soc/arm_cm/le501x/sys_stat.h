@@ -1,6 +1,11 @@
 #ifndef SYS_STAT_H_
 #define SYS_STAT_H_
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void uart1_status_set(bool);
 
 void uart2_status_set(bool);
@@ -42,5 +47,9 @@ void app_status_set(bool);
 bool peri_status_busy(void);
 
 bool app_event_status_busy(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

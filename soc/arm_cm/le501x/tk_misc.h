@@ -1,6 +1,10 @@
 #ifndef __TK_MISC_H
 #define __TK_MISC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define IS_TK_SCANCFG_NPRR(NPRR) (((NPRR) >= 0U) && ((NPRR) <= 7))
 #define IS_TK_SCANCFG_DNPR(DNPR) (((DNPR) == TK_DNPR_DISABLE) || \
                                   ((DNPR) == TK_DNPR_ENABLE))
@@ -19,5 +23,9 @@
 #define IS_TK_SCAN_PERIOD(SCANPERIOD) (((SCANPERIOD) > 0U) && ((SCANPERIOD) <= 3U))
 #define IS_TK_GSMASK(GSMASK) (((GSMASK)&0x0000U) == 0U)
 #define IS_TK_LSENSEGS(LSENSEGS) (((LSENSEGS)&0x00U) == 0U)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

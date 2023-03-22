@@ -5,6 +5,10 @@
 #ifndef _LS_24G_H_
 #define _LS_24G_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define VALID_TX_LEN_MAX 253
 
 enum prop_24g_status
@@ -164,4 +168,9 @@ enum prop_24g_status RF_24g_Rx(uint8_t *rxBuf, uint8_t *rxLen, void (*Rx_cmpt_cb
  ****************************************************************************************
  */
 uint8_t get_cur_prop_24g_state(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

@@ -2,6 +2,10 @@
 #define REG_CRYPT_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t DATA0;
@@ -205,5 +209,9 @@ enum CRYPT_REG_FIFO_FIELD
     CRYPT_FIFO_MASK = (int)0xffffffff,
     CRYPT_FIFO_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

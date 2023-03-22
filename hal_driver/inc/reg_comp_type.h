@@ -2,6 +2,10 @@
 #define REG_COMP_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t COMP_CTRL;
@@ -54,5 +58,9 @@ enum COMP_REG_CTRL_FIELD
     COMP_INTR_CLR_MASK = (int)0x600000,
     COMP_INTR_CLR_POS = 21,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

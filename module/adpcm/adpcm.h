@@ -1,6 +1,10 @@
 #ifndef __ADPCM_H
 #define __ADPCM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <string.h>
 /* Extra ADPCM structure definition for google TV remoter */
@@ -23,5 +27,9 @@ void Adpcm_FrameEncode(const int16_t *PCMBuffer, void *EncodeBuffer, int32_t Len
 void Adpcm_FrameDecode(int16_t *PCMBuffer, const void *EncodeBuffer, int32_t Len);
 void Adpcm_FrameEncode_Restart(google_tv_audio_header *AudioHeader);
 void Adpcm_FrameEncode_Google_TV_Audio(const int16_t *PCMBuffer, void *EncodeBuffer, google_tv_audio_header *AudioHeader, int32_t Len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ADPCM_H*/

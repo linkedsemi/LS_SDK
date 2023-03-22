@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const unsigned char one_bits[];
 /// Number of '1' bits in a byte
 #define NB_ONE_BITS(byte)   (one_bits[(byte) & 0x0F] + one_bits[(byte) >> 4])
@@ -45,4 +49,9 @@ uint8_t count_leading_zeros(uint32_t x);
 uint32_t __div64_32(uint64_t *n, uint32_t base);
 
 void memcpy_rev(uint8_t *dest, const uint8_t *src, uint32_t len);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

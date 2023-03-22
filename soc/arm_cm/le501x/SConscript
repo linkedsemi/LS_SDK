@@ -21,7 +21,7 @@ def plf_postaction(self,target):
 
 
 
-def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,objprefix):
+def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     start_src = []
     if with_startup:
         start_src = ['$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/startup.S']

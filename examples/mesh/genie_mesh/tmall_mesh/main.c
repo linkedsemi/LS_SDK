@@ -450,6 +450,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[4].model_id = LIGHTS_HSL_SERVER;
         model_env.info[4].element_id = 0;
         ls_sig_mesh_init(&model_env);
+        auto_check_unbind();
     }
     break;
     case ADV_OBJ_CREATED:
@@ -480,7 +481,6 @@ int main()
     tmall_light_init();
     gen_ali_authValue();
     ble_init();
-    auto_check_unbind();
     dev_manager_init(dev_manager_callback);
     ble_loop();
     return 0;

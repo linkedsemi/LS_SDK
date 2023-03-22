@@ -2,6 +2,10 @@
 #define REG_ADC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t SR;
@@ -314,5 +318,9 @@ enum ADC_REG_CCR_FIELD
     ADC_OCALV_MASK = (int)0xff000000,
     ADC_OCALV_POS = 24,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

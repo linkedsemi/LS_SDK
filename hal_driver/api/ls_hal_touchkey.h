@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TOUCHKEY_VCTRL_1540mV 0x01U /* touchkey_cp_vctl:1.54V   */
 #define TOUCHKEY_VCTRL_1670mV 0x02U /* touchkey_cp_vctl:1.67V   */
 #define TOUCHKEY_VCTRL_1800mV 0x03U /* touchkey_cp_vctl:1.8V   */
@@ -72,5 +76,9 @@ void HAL_TOUCHKEY_END_Callback(uint32_t cntresult[16]);
 void HAL_TOUCHKEY_ERR_Callback();
 
 void HAL_TOUCHKEY_IRQHandler();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

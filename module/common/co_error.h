@@ -1,6 +1,10 @@
 #ifndef CO_ERROR_H_
 #define CO_ERROR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum co_error
 {
     CO_ERROR_NO_ERROR                        = 0x00,
@@ -76,5 +80,8 @@ enum co_error
     CO_ERROR_HW_MEM_ALLOC_FAIL              = 0x01,
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

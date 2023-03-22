@@ -975,6 +975,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         {    
             app_status_set(true);     
             ls_sig_mesh_init(&model_env);
+            auto_check_unbind();
         }
         else
         {
@@ -985,6 +986,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         app_status_set(true);
         ls_tmall_glp_dly_timer_init();
         ls_sig_mesh_init(&model_env);
+        auto_check_unbind();
 #endif        
     }
     break;
@@ -1008,7 +1010,6 @@ int main()
     gen_ali_authValue();
     genie_triple_init();
     ble_init();
-    auto_check_unbind();
     ls_genie_ais_fw_version_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);

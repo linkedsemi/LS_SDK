@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -44,5 +48,9 @@ void HAL_TRNG_ReadyDataCallback(uint32_t random32bit);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

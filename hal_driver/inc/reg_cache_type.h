@@ -2,6 +2,10 @@
 #define REG_LSCACHE_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CCR;             // 0x00
@@ -30,5 +34,9 @@ enum LSCACHE_REG_CCR_FIELD
     LSCACHE_STATISTIC_EN_MASK = 0x40,
     LSCACHE_STATISTIC_EN_POS = 6,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

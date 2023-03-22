@@ -1,6 +1,10 @@
 #ifndef PER_FUNC_MUX_H_
 #define PER_FUNC_MUX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum per_func
 {
     RSV,
@@ -87,7 +91,9 @@ enum per_func
     COMP3_DAT,
 };
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 

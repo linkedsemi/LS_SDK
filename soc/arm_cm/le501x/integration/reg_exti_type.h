@@ -2,6 +2,10 @@
 #define REG_EXTI_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t EIER;
@@ -551,6 +555,10 @@ enum EXTI_REG_EICFG1_FIELD
     EXTI_EICFGS15_MASK = 0x70000000,
     EXTI_EICFGS15_POS = 28,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

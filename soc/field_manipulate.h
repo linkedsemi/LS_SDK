@@ -2,6 +2,10 @@
 #define FIELD_MANIPULATE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define REG_FIELD_WR(reg,field,val)\
         do{                                 \
         uint32_t old_val = (reg);\
@@ -32,4 +36,9 @@
 
 #define MODIFY_REG(REG, CLEARMASK, SETMASK)  \
         WRITE_REG((REG), (((READ_REG(REG)) & (~(CLEARMASK))) | (SETMASK)))
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

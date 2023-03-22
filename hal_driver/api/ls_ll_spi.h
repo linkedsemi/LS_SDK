@@ -6,6 +6,10 @@
 #include "field_manipulate.h"
 #include "ls_msp_spi_i2s.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -1142,6 +1146,10 @@ static inline void LL_SPI_ClearFlagIT(reg_spi_t *SPIx, uint32_t RegisterBit)
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -2,8 +2,18 @@
 #define MODEM_RF_LE501X_24G_H_
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void modem_rf_init_24g(void);
 void modem_rf_set_rx_phy(uint8_t phy);
 int8_t rf_rssi_convert_24g(uint8_t rssi_reg);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

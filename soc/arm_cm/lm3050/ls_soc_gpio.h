@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include "ls_soc_pinmux.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -249,6 +253,10 @@ void set_gpio_mode(gpio_pin_t *pin);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -206,6 +210,10 @@ __attribute__((long_call)) void hal_flash_read_status_register_0(uint8_t *);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

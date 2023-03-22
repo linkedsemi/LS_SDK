@@ -1,6 +1,10 @@
 #ifndef SDK_DEFAULT_CONFIG_H_
 #define SDK_DEFAULT_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SDK_HSE_USED
 #define SDK_HSE_USED (0)
 #endif
@@ -29,6 +33,28 @@
 #define SDK_LCLK_HZ (32768)
 #endif
 
+#ifndef LOG_UART_TXD
+#define LOG_UART_TXD (PB00)
+#endif
+#ifndef LOG_UART_RXD
+#define LOG_UART_RXD (PB01)
+#endif
+#ifndef LOG_UART_BAUDRATE
+#define LOG_UART_BAUDRATE UART_BAUDRATE_921600
+#endif
+#ifndef LOG_UART_WORDLENGTH
+#define LOG_UART_WORDLENGTH UART_BYTESIZE8
+#endif
+#ifndef LOG_UART_STOPBITS
+#define LOG_UART_STOPBITS UART_STOPBITS1
+#endif
+#ifndef LOG_UART_PARITY
+#define LOG_UART_PARITY UART_NOPARITY
+#endif
+#ifndef LOG_UART_MSBEN
+#define LOG_UART_MSBEN 0
+#endif
+
 #define SDK_PCLK_MHZ (SDK_HCLK_MHZ/SDK_PCLK_DIV)
 
 #ifndef SDK_SRAM1_PWR_DOWN
@@ -48,6 +74,10 @@
 #endif
 
 #define DMACV2 1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

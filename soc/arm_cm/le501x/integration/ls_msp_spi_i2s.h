@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_spi_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// LSSPI Macro for Register Access
 #define SPI2 ((reg_spi_t *)SPI2_BASE_ADDR)
 
@@ -20,4 +24,8 @@ void HAL_I2S_MSP_Idle_Set(struct __I2S_HandleTypeDef *inst);
 
 void LL_SPI2_MSP_Init(void);
 void LL_SPI2_MSP_DeInit(void);
+#ifdef __cplusplus
+}
+#endif
+
 #endif

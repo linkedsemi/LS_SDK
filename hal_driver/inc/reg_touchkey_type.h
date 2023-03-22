@@ -2,6 +2,10 @@
 #define REG_TOUCHKEY_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t TOUCHKEY_START;//0x000
@@ -81,5 +85,9 @@ enum TOUCHKEY_REG_INTR_FIELD
     TOUCHKEY_INTR_ERR_MASK = 0x2,
     TOUCHKEY_INTR_ERR_POS = 1,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -11,6 +11,10 @@
 #include "field_manipulate.h"
 #include "log.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -1338,4 +1342,9 @@ static inline void LL_I2C_ClearFlagIT(reg_i2c_t *I2Cx, uint32_t RegisterBit)
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

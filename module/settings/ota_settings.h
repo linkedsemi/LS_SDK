@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include "prf_fotas.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void ota_settings_erase(void);
 
 bool ota_settings_erase_req_get(void);
@@ -19,5 +23,9 @@ bool ota_copy_info_get(struct fota_copy_info *ptr);
 void ota_copy_info_set(struct fota_copy_info *ptr);
 
 void ota_copy_done_set(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

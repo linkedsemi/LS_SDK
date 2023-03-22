@@ -474,6 +474,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[MODEL2_VENDOR_MODEL_CLI].model_id = VENDOR_USER_CLIENT;
         
         ls_sig_mesh_init(&model_env);
+        auto_check_unbind();
     }
     break;
     case ADV_OBJ_CREATED:
@@ -505,7 +506,6 @@ int main()
     io_write_pin(PROV_SUCCESS_LED,LED_OFF);
     #endif
     ble_init();
-    auto_check_unbind();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);

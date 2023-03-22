@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum rf_tx_pwr
 {
     TX_N8DBM = -2,
@@ -39,5 +43,10 @@ void tempsensor_ldo_init(void);
 void tempsensor_ldo_deinit(void);
 
 void rf_reg_config(uint8_t,uint8_t,uint16_t);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

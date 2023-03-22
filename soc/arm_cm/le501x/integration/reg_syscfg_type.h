@@ -2,6 +2,10 @@
 #define REG_SYSCFG_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t MRMP; //0x0
@@ -355,6 +359,10 @@ enum SYSCFG_REG_BKD_FIELD
     SYSCFG_BK_DATA_MASK = (int)0xffffffff,
     SYSCFG_BK_DATA_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ROOT_DIR (root_dir_ptr)
 
 enum tinyfs_error_code
@@ -80,5 +84,9 @@ void tinyfs_earse_data(void);
 uint8_t tinyfs_get_child_dir_by_name(tinyfs_dir_t parent, uint16_t dir_name, tinyfs_dir_t *ptr);
 
 uint16_t tinyfs_get_dir_id_max(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -3,6 +3,10 @@
 #include "reg_rtcv2_type.h"
 #include "reg_base_addr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef LSRTC_BASE_ADDR
 #define RTC ((reg_rtc_t *)LSRTC_BASE_ADDR)
 #endif
@@ -17,4 +21,9 @@ void load_calendar_init_val(uint32_t *cal, uint32_t *time);
 void load_calendar_raw_val(uint32_t *raw_val);
 void load_seconds_remainder(uint32_t *remainder);
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

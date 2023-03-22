@@ -2,6 +2,11 @@
 #define SLEEP_H_
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const uint16_t wkup_delay_us;
 #define NORMAL_SLEEP           0x01
 #define SLEEP_MODE0            0x00
@@ -82,6 +87,10 @@ bool ble_wkup_status_get(void);
 void BLE_WKUP_IRQ_DISABLE(void);
 
 void LPWKUP_Handler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

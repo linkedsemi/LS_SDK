@@ -2,6 +2,10 @@
 #define LS_HAL_QSPIV2_H_
 #include "ls_msp_qspiv2.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum data_dir_type
 {
     WRITE_TO_FLASH = 0,
@@ -60,6 +64,10 @@ void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
 #if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *);
 __attribute__((long_call)) void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

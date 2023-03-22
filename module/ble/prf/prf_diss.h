@@ -2,6 +2,10 @@
 #define PRF_DISS_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum diss_evt_type
 {
     DIS_SERVER_SET_VALUE_RSP,
@@ -49,4 +53,9 @@ void prf_diss_set_value_req(uint8_t value,uint8_t length,uint8_t *data);
 void prf_diss_value_confirm(uint8_t value,uint8_t length,uint8_t *data);
 
 uint8_t prf_diss_get_current_req_con_idx(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

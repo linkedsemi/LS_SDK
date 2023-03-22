@@ -2,6 +2,10 @@
 #define PRF_ANCS_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ANC_APP_ID_MAX_LENGTH 32
 
 #define ANCS_DB_SIZE 26
@@ -227,5 +231,9 @@ void prf_ancs_perform_notfication_action(uint8_t con_idx,uint32_t ntf_uid,uint8_
 void prf_ancs_client_configuration_enable(uint8_t con_idx);
 
 void prf_ancs_client_configuration_disable(uint8_t con_idx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

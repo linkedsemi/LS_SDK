@@ -4,6 +4,10 @@
 #include "reg_adcv2_type.h" 
 #include "ls_hal_adcv2.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ADC_REG_SEQ0_RK(_CHANNELNB_, _RANKNB_)  \
     ((_CHANNELNB_) << (ADC_REG_SEQ01_POS * ((_RANKNB_)-1)))
 
@@ -110,5 +114,9 @@ void adc_channel_vbat_enable(void);
 void adc_channel_vbat_disable(void);
 
 uint8_t HAL_ADC_DMA_Handshake_Get(struct __ADC_HandleTypeDef *inst);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

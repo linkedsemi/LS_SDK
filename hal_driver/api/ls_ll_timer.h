@@ -7,6 +7,10 @@
 #include "HAL_def.h"
 #include "field_manipulate.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -3423,6 +3427,10 @@ static inline void LL_TIM_GenerateEvent_BRK(reg_timer_t *TIMx)
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

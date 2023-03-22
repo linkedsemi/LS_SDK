@@ -2,6 +2,10 @@
 #define REG_BXCAN_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LSBXCAN ((reg_bxcan_t *)0x4000E000)
 
 typedef struct
@@ -413,6 +417,10 @@ enum BXCAN_REG_CAN_FA1R_FIELD
     BXCAN_FACT_MASK = (int)0x3fff,
     BXCAN_FACT_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

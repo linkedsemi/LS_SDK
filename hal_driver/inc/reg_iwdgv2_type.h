@@ -2,6 +2,10 @@
 #define REG_IWDTV2_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t IWDT_LOAD; //0x0
@@ -39,5 +43,9 @@ enum IWDT_REG_IWDT_INTR_FIELD
     IWDT_INTR_MASK = (int)0x1,
     IWDT_INTR_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

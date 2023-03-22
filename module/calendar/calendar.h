@@ -4,6 +4,10 @@
 #include <time.h>
 #include "sw_timer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sw_calendar_alarm
 {
     struct cdll_hdr hdr;
@@ -23,6 +27,11 @@ bool sw_calendar_remove_alarm(struct sw_calendar_alarm *alarm);
 bool sw_calendar_alarm_active(struct sw_calendar_alarm *alarm);
 
 void sw_calendar_alarm_callback(struct sw_calendar_alarm *alarm);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 

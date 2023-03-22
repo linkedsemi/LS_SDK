@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include "pis_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CH[PIC_CHANNEL_NUM];
@@ -20,5 +24,10 @@ enum PIS_REG_CH_FIELD
     PIS_SYNC_MASK = (int)0x3000000,
     PIS_SYNC_POS = 24,
 };
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

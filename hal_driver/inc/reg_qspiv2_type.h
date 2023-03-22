@@ -2,6 +2,10 @@
 #define REG_LSQSPIV2_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t QSPI_CTRL0; //0x0
@@ -142,6 +146,10 @@ enum LSQSPIV2_REG_INT_FIELD
     LSQSPIV2_INT_FSM_END_MASK = (int)0x8,
     LSQSPIV2_INT_FSM_END_POS = 3,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

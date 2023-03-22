@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include "sw_timer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 sw_timer_time_t timer_time_add(sw_timer_time_t a,sw_timer_time_t b);
 
 int timer_time_compare(sw_timer_time_t a,sw_timer_time_t b);
@@ -20,5 +24,8 @@ void timer_irq_clr(void);
 
 void timer_setup(void (*isr)());
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

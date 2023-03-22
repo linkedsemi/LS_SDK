@@ -4,6 +4,10 @@
 #include "ls_msp_pis.h"
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -60,5 +64,9 @@ HAL_StatusTypeDef HAL_PIS_Output(uint8_t channel,bool enable);
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

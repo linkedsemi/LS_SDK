@@ -4,6 +4,9 @@
 #include "HAL_def.h"
 #include "ls_msp_dac.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Select the DAC peripherals
  * 
@@ -176,4 +179,9 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
  * @return HAL status
  */
 HAL_StatusTypeDef HAL_DAC_Stop_DMA(DAC_HandleTypeDef* hdac,uint32_t Channel);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

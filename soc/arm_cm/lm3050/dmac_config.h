@@ -1,6 +1,10 @@
 #ifndef DMAC_CONFIG_H_
 #define DMAC_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DMAC1_MAX_CHANNEL_NUM 8
 
 typedef enum
@@ -70,5 +74,9 @@ typedef enum
     CH_LSADTIM2_CH5 = 62,
     CH_LSADTIM2_CH6 = 63,
 } DMA_ChnSig_TypeDef;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

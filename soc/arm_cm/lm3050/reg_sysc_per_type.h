@@ -2,6 +2,10 @@
 #define REG_SYSC_PER_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SYSC_PER ((reg_sysc_per_t *)0x4008D000)
 
 typedef struct
@@ -455,6 +459,10 @@ enum SYSC_PER_REG_COMP_PIS_FIELD
     SYSC_PER_COMP_SEL_MASK = (int)0x7,
     SYSC_PER_COMP_SEL_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -4,6 +4,9 @@
 #include "ls_ll_ssi.h"
 #include "HAL_def.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -306,5 +309,9 @@ void HAL_SSI_IRQHandler(SSI_HandleTypeDef *hssi);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

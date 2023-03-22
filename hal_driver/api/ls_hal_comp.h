@@ -5,6 +5,10 @@
 #include "HAL_def.h"
 #include "ls_msp_comp.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum comp_speedmode
 {
   LowSpeed                            = 0x1,
@@ -182,5 +186,9 @@ void HAL_COMP_Callback(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool
  * @param  output comparator output results
  */
 void HAL_COMP_IRQHandler(COMP_HandleTypeDef *hcomp, enum comp_intr_edge edge, bool output);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

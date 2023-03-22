@@ -3,6 +3,10 @@
 #include "field_manipulate.h"
 #include "ls_msp_uart.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -1528,5 +1532,9 @@ static inline void LL_UART_ClearFlagIT(reg_uart_t *UARTx, uint32_t RegisterBit)
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

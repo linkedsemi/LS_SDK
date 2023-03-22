@@ -19,6 +19,10 @@
 #include <stdbool.h>       // boolean definitions
 #include <stdlib.h>        // standard library
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int (*rand_fn) (void);
 
 /*
@@ -233,5 +237,8 @@ static inline int co_abs(int val)
 
 /// @} CO_MATH
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _CO_MATH_H_

@@ -79,7 +79,7 @@ void sleep_wakeup_config()
                           |FIELD_BUILD(V33_RG_PD_TK,1)
                           |FIELD_BUILD(V33_RG_PD_DAC12,1)
                           |FIELD_BUILD(V33_RG_BAT_DTCT_EN,0);
-    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x3d)
+    V33_RG->WKUP_CTRL = FIELD_BUILD(V33_RG_WKUP_MSK,0x39)
                         |FIELD_BUILD(V33_RG_SWD_IO_WKUP_EN,0)
                         |FIELD_BUILD(V33_RG_WKUP0_SYNC_SEL,0)
                         |FIELD_BUILD(V33_RG_WKUP1_SYNC_SEL,0);
@@ -153,6 +153,13 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
         SYSC_AWO->IO[i].OE_DOT = GPIO_OE_DOT[i];
         SYSC_AWO->IO[i].IEN_OD = GPIO_IEN_OD[i];
         SYSC_AWO->IO[i].PUPD = GPIO_PUPD[i];
+    }
+    if(hal_flash_dual_mode_get())
+    {
+        pinmux_hal_flash_init();
+    }else
+    {
+        pinmux_hal_flash_quad_init();
     }
     gpio_pd_latch_state_exit();
     hal_flash_init();

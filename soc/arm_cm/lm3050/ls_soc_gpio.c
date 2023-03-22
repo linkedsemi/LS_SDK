@@ -10,7 +10,9 @@
 #include "reg_exti_type.h"
 #include "ls_dbg.h"
 #include "compile_flag.h"
-
+#include "reg_sysc_cpu_type.h"
+#define USB_DP_PAD PA12
+#define USB_DM_PAD PA11
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t uart1_ctsn;
@@ -101,8 +103,7 @@ static gpio_pin_t ssi_dq3;
 
 static gpio_pin_t bxcan_txd;
 static gpio_pin_t bxcan_rxd;
-static gpio_pin_t usb_dp;
-static gpio_pin_t usb_dm;
+
 static gpio_pin_t comp1_dat;
 static gpio_pin_t comp2_dat;
 static gpio_pin_t comp3_dat;
@@ -2088,27 +2089,41 @@ void pinmux_bxcan_deinit(void)
     per_func_disable(pin2func_io((gpio_pin_t *)&bxcan_rxd));
 }
 
-static void usb_io_cfg(uint8_t dp,uint8_t dm)
+static void usb_io_cfg(uint8_t dp,uint8_t dm,bool host)
 {
-    io_clr_pin(dp);
-    io_clr_pin(dm);
-    io_cfg_output(dp);
-    io_cfg_output(dm);
+    if(host)
+    {
+        io_pull_write(dp,IO_PULL_DOWN);
+    }else
+    {
+        io_pull_write(dp,IO_PULL_UP);
+    }
+    io_pull_write(dm,IO_PULL_DOWN);
+    io_cfg_input(dm);
+    io_cfg_input(dp);
 }
 
-void pinmux_usb_init(uint8_t dp,uint8_t dm)
+void pinmux_usb_init(bool host)
 {
-    *(uint8_t *)&usb_dp = dp;
-    *(uint8_t *)&usb_dm = dm;
-    usb_io_cfg(dp,dm);
+    uint8_t dp = USB_DP_PAD;
+    uint8_t dm = USB_DM_PAD;
+    usb_io_cfg(dp,dm,host);
+
     per_func_enable(pin2func_io((gpio_pin_t *)&dp),USB_DP);
     per_func_enable(pin2func_io((gpio_pin_t *)&dm),USB_DM);
+
+    gpio_pin_t *x = (gpio_pin_t *)&dm;
+    SYSC_AWO->IO[x->port].DS |= 1 << 16 << x->num;
+
+    REG_FIELD_WR(SYSC_CPU->GATE_SYS,SYSC_CPU_USB_RX_DIFF_SEL,1);
 }
 
 void pinmux_usb_deinit(void)
 {
-    per_func_disable(pin2func_io((gpio_pin_t *)&usb_dp));
-    per_func_disable(pin2func_io((gpio_pin_t *)&usb_dm));
+    uint8_t dp = USB_DP_PAD;
+    uint8_t dm = USB_DM_PAD;
+    per_func_disable(pin2func_io((gpio_pin_t *)&dp));
+    per_func_disable(pin2func_io((gpio_pin_t *)&dm));
 }
 
 static void  comp_io_cfg(uint8_t dat)

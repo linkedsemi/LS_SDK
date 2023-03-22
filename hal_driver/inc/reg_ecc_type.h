@@ -2,6 +2,10 @@
 #define REG_LSECC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t ARAM[64];
@@ -50,5 +54,9 @@ enum ECC_REG_DMACTR_FIELD
     ECC_DMA_EN_MASK = 0x1,
     ECC_DMA_EN_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -2,6 +2,10 @@
 #define _LS_MESH_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup LSMESH
  *  @{
  */
@@ -81,5 +85,9 @@ void ls_mesh_start(void);
 void ls_mesh_set_beacon_value_ind(const uint8_t *value, uint8_t len);
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_LS_MESH_H_

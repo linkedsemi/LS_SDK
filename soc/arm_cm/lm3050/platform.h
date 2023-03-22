@@ -8,6 +8,10 @@
 #include "reg_sysc_awo_type.h"
 #include "field_manipulate.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 __attribute__((always_inline)) static inline void hclk_set(uint32_t mhz)
 {
     switch(mhz)
@@ -60,6 +64,10 @@ void sys_init_none();
 
 #if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void arm_cm_delay_asm(uint32_t);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
