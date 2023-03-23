@@ -1,0 +1,18 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [  
+    'main.c',  
+    '../bsp.c',
+    'keyscan/keyscan.c',
+    'usb_descriptors.c',
+]
+inc = [
+    '.',
+    'keyscan/'
+]
+env.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
+env.app_build('usb_hid_keyboard',src,inc, ble = False,usb = True)
+
+

@@ -76,8 +76,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 static void TIM_Encoder_Init(void)
 { 
-    pinmux_gptima1_ch1_init(PB10,true,0);
-    pinmux_gptima1_ch2_init(PB11,true,0);
+    pinmux_gptima1_ch1_init(PB10,false,0);
+    pinmux_gptima1_ch2_init(PB11,false,0);
     TIM_Encoder_InitTypeDef Encoder_ConfigStructure;
 
     TIM_EncoderHandle.Instance = LSGPTIMA;
