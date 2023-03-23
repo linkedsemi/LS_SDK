@@ -119,6 +119,11 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/uart/uart_dma                                                  |  √     |  √     |
 | peripheral/uart/uart_it                                                   |  √     |  √     |
 | peripheral/uart/uart_polling                                              |  √     |  √     |
+| peripheral/usb/usbd_cdc_msc                                               |        |  √     |
+| peripheral/usb/usbd_cdc_msc_fatfs                                         |        |  √     |
+| peripheral/usb/usbd_hid_composite                                         |        |  √     |
+| peripheral/usb/usbd_hid_keyboard                                          |        |  √     |
+| peripheral/usb/usbh_msc_file_explorer                                     |        |  √     |
 | peripheral/wdg/iwdg                                                       |  √     |  √     |
 | peripheral/wdg/wwdg                                                       |  √     |  √     |
 | prop_24g/ls_prop_24g                                                      |  √     |        |

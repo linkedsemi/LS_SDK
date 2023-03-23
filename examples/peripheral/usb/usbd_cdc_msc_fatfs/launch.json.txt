@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/usb/usbd_cdc_msc_fatfs/build/lm3050/usbd_cdc_msc_fatfs.elf",
+            "name": "LM3050 Debug USBD_CDC_MSC_FATFS",
+            "device": "LM3050",
+            "interface": "swd",
+            "preLaunchCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/le501x/fw.elf",  
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/usb/usbd_cdc_msc_fatfs/build/lm3050/usbd_cdc_msc_fatfs.elf",
+            "name": "LM3050 Attach USBD_CDC_MSC_FATFS",
+            "device": "LM3050",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/le501x/fw.elf",  
+            ]
+        },
+    ]
+}
