@@ -2,6 +2,10 @@
 #define REG_LSTIM_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LSTIM ((reg_tim_t *)0x4000f100)
 
 typedef struct
@@ -40,6 +44,10 @@ enum TIM_REG_TIM_INTR_FIELD
     TIM_TIM_INTR_MASK = (int)0x1,
     TIM_TIM_INTR_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

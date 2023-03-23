@@ -2,6 +2,10 @@
 #define REG_V33_RG_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define V33_RG ((reg_v33_rg_t *)0x4000F000)
 
 typedef struct
@@ -422,6 +426,10 @@ enum V33_RG_REG_COMP_CTRL_FIELD
     V33_RG_COMP_INTR_FCLR_MASK = (int)0x400000,
     V33_RG_COMP_INTR_FCLR_POS = 22,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

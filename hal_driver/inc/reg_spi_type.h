@@ -2,6 +2,10 @@
 #define REG_SPI_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CR1;
@@ -256,5 +260,9 @@ enum SPI_REG_ICR_FIELD
     SPI_ICR_FREIC_MASK = 0x100,
     SPI_ICR_FREIC_POS = 8,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

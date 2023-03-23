@@ -1,6 +1,10 @@
 #ifndef PIS_CONFIG_H_
 #define PIS_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// PIS Source
 enum pis_src
 {
@@ -79,5 +83,8 @@ enum pis_dst
 
 #define PIC_CHANNEL_NUM 8
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

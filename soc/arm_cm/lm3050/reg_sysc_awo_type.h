@@ -2,6 +2,10 @@
 #define REG_SYSC_AWO_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SYSC_AWO ((reg_sysc_awo_t *)0x4000D000)
 
 typedef struct
@@ -373,6 +377,10 @@ enum SYSC_AWO_REG_ANA_STAT_FIELD
     SYSC_AWO_DPLL_LOCK_MASK = (int)0x2,
     SYSC_AWO_DPLL_LOCK_POS = 1,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

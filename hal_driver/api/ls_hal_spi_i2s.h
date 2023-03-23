@@ -10,6 +10,9 @@
 #include "ls_dbg.h"
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -584,6 +587,10 @@ void HAL_I2S_TxDMACpltCallback(I2S_HandleTypeDef *hi2s);
   * @retval None
   */
 void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

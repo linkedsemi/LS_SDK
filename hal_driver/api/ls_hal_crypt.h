@@ -5,6 +5,9 @@
 #include "HAL_def.h"
 #include "ls_msp_crypt.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -257,5 +260,9 @@ void HAL_LSCRYPT_IRQHandler(void);
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

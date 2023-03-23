@@ -1,6 +1,10 @@
 #ifndef SDK_DEFAULT_CONFIG_H_
 #define SDK_DEFAULT_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SDK_HSE_USED
 #define SDK_HSE_USED (0)
 #endif
@@ -70,6 +74,10 @@
 #endif
 
 #define DMACV2 1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

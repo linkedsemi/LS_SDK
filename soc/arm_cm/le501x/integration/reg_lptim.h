@@ -2,6 +2,11 @@
 #define REG_LPTIM_H_
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CON0; //0x0
@@ -19,4 +24,10 @@ typedef struct
 }reg_lptim_t;
 
 #define LPTIM ((reg_lptim_t *)0x40010000)
+
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

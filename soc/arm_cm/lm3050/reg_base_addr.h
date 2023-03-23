@@ -1,6 +1,10 @@
 #ifndef REG_BASE_ADDR_H_
 #define REG_BASE_ADDR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SPI2_BASE_ADDR (0x40087400)
 #define SPI3_BASE_ADDR (0x40087800)
 
@@ -78,5 +82,9 @@
 #define LSSYSC_PER_BASE_ADDR (0x4008D000)
 
 #define LSDAC_BASE_ADDR (0x4008D400)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

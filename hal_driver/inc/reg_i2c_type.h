@@ -2,6 +2,10 @@
 #define REG_I2C_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CR1;
@@ -385,5 +389,9 @@ enum I2C_REG_ICR_FIELD
     I2C_ICR_ALERTIC_MASK = 0x2000,
     I2C_ICR_ALERTIC_POS = 13,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

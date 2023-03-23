@@ -2,6 +2,10 @@
 #define REG_DAC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t DAC_CR; //0x0
@@ -156,5 +160,9 @@ enum DAC_REG_DAC_ANA_FIELD
     DAC_EN_DAC1_MASK = (int)0x1,
     DAC_EN_DAC1_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

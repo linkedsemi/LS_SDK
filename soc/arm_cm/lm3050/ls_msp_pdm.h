@@ -3,6 +3,10 @@
 #include "reg_pdm_type.h"
 #include "reg_base_addr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// LSPDM Macro for Register Access
 #define LSPDM ((reg_pdm_t *)LSPDM_BASE_ADDR)
 
@@ -13,5 +17,9 @@ void HAL_PDM_MSP_Idle_Set(struct __PDM_HandleTypeDef *hpdm);
 void HAL_PDM_MSP_DeInit(struct __PDM_HandleTypeDef *hpdm);
 uint8_t HAL_PDM_CH0_Handshake_Get(struct __PDM_HandleTypeDef *hpdm);
 uint8_t HAL_PDM_CH1_Handshake_Get(struct __PDM_HandleTypeDef *hpdm);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

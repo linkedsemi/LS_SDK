@@ -2,6 +2,10 @@
 #define REG_APB_LCD_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CR;
@@ -171,6 +175,10 @@ enum APB_LCD_REG_BUF7_FIELD
     APB_LCD_LCD_BUF7_MASK = (int)0xffffff,
     APB_LCD_LCD_BUF7_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

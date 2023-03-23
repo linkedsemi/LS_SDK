@@ -3,8 +3,16 @@
 #include "reg_patch_type.h"
 #include "reg_base_addr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LSPATCH ((reg_patch_t *)LSPATCH_BASE_ADDR)
 
 void lspatch_enable(uint8_t idx,uint32_t addr,uint32_t data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

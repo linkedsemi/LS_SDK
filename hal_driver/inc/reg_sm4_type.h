@@ -2,6 +2,10 @@
 #define REG_SM4_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t SM4_START;
@@ -104,5 +108,9 @@ enum SM4_REG_CALC_RSLT3_FIELD
     SM4_CALC_RSLT3_MASK = (int)0xffffffff,
     SM4_CALC_RSLT3_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

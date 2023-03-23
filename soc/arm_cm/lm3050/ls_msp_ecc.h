@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_ecc_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LSECC ((reg_ecc_t *)LSECC_BASE_ADDR)
 
 void HAL_LSECC_MSP_Init(void);
@@ -18,5 +22,9 @@ void HAL_LSECC_MSP_INT_ENABLE(void);
 void HAL_LSECC_MSP_INT_DISABLE(void);
 
 void HAL_LSECC_MSP_INT_CLRPENDING(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

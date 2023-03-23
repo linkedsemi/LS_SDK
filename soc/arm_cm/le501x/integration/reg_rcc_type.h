@@ -2,6 +2,10 @@
 #define REG_RCC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CK;
@@ -206,5 +210,9 @@ enum RCC_REG_BLECFG_FIELD
     RCC_BLE_MDM_REFCLK_CKEN_MASK = 0x400,
     RCC_BLE_MDM_REFCLK_CKEN_POS = 10,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

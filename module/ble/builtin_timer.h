@@ -5,6 +5,10 @@
 #include "linked_buffer.h"
 #include "co_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct builtin_timer
 {
     void (*timer_cb)(void *);
@@ -31,6 +35,10 @@ void builtin_timer_stop(void *timer);
 void builtin_timer_start(void *timer,uint32_t timeout,void *param);
 
 bool builtin_timer_active(void *timer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

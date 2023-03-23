@@ -1,5 +1,10 @@
 #ifndef SWINT_CALL_ASM_H_
 #define SWINT_CALL_ASM_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef __CC_ARM
 
 #define SWINT_STRINGIFY(x) #x
@@ -21,4 +26,9 @@
                 : "r0", "r1", "r2", "r3","r4");\
         }while(0)
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

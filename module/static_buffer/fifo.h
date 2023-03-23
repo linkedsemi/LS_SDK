@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct fifo_env{
     void *buf;
     uint16_t rd_idx;
@@ -35,5 +39,9 @@ bool dword_fifo_put(struct fifo_env *ptr,void *data);
 bool general_fifo_get(struct fifo_env *ptr,void *data);
 
 bool dword_fifo_get(struct fifo_env *ptr,void *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

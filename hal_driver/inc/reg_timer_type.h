@@ -3,6 +3,10 @@
 #define REG_TIMER_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CR1; //0x0
@@ -926,5 +930,9 @@ enum TIMER_REG_DMAEN_FIELD
     TIMER_DMAEN_TDE_POS = 6,
     TIMER_DMAEN_TDE = TIMER_DMAEN_TDE_MASK
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

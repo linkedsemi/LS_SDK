@@ -1,7 +1,12 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 
+
 #ifndef __HAL_DEF
 #define __HAL_DEF
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
   * @brief  HAL Status structures definition
@@ -79,6 +84,10 @@ typedef enum
 #endif /* __GNUC__ */
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif    // /* ___LE501X_HAL_DEF */
 

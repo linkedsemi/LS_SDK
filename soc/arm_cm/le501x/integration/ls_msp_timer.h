@@ -3,6 +3,10 @@
 #include "reg_base_addr.h"
 #include "reg_timer_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// LSTIMER Macro for Register Access
 #ifdef LSBSTIM_BASE_ADDR
 #define LSBSTIM ((reg_timer_t *)LSBSTIM_BASE_ADDR)
@@ -167,5 +171,9 @@ void HAL_TIM_MSP_Init(struct __TIM_HandleTypeDef *inst);
 void HAL_TIM_MSP_DeInit(struct __TIM_HandleTypeDef *inst);
 void HAL_TIM_MSP_Busy_Set(struct __TIM_HandleTypeDef *inst);
 void HAL_TIM_MSP_Idle_Set(struct __TIM_HandleTypeDef *inst);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

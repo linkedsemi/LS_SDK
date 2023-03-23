@@ -801,6 +801,25 @@ lm3050_DTC_PWM_iar_build:
   script:
     - cd examples/peripheral/timer/DTC_PWM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" DTC_PWM.ewp -build * -log all    
 
+lm3050_Encode_TIM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Encode_TIM && scons flags=-Werror ic=lm3050
+
+lm3050_Encode_TIM_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Encode_TIM/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b Encode_TIM.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_Encode_TIM_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/Encode_TIM/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Encode_TIM.ewp -build * -log all   
+
 lm3050_input_Capture_build:
   stage: build
   script:
@@ -934,6 +953,25 @@ lm3050_usbd_cdc_msc_iar_build:
   script:
     - cd examples/peripheral/usb/usbd_cdc_msc/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_cdc_msc.ewp -build * -log all    
 
+lm3050_usbd_cdc_msc_fatfs_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_cdc_msc_fatfs_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_cdc_msc_fatfs.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_cdc_msc_fatfs_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_cdc_msc_fatfs.ewp -build * -log all    
+
 lm3050_usbd_hid_composite_build:
   stage: build
   script:
@@ -952,6 +990,45 @@ lm3050_usbd_hid_composite_iar_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/usb/usbd_hid_composite/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_hid_composite.ewp -build * -log all    
+
+lm3050_usbd_hid_keyboard_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_keyboard && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_hid_keyboard_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_hid_keyboard/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_hid_keyboard.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_hid_keyboard_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_hid_keyboard/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_hid_keyboard.ewp -build * -log all    
+
+lm3050_usbh_msc_file_explorer_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbh_msc_file_explorer && scons flags=-Werror ic=lm3050
+
+lm3050_usbh_msc_file_explorer_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbh_msc_file_explorer/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbh_msc_file_explorer.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbh_msc_file_explorer_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbh_msc_file_explorer/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbh_msc_file_explorer.ewp -build * -log all    
+
 
 lm3050_adc_amic_sampling_build:
   stage: build

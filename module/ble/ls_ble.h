@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup BLE
  *  @{
  */
@@ -1615,6 +1619,10 @@ void gatt_manager_client_mtu_exch_send(uint8_t con_idx);
 void gatt_manager_client_read(uint8_t con_idx,uint16_t handle);
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

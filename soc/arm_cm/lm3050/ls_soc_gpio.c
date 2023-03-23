@@ -2089,18 +2089,25 @@ void pinmux_bxcan_deinit(void)
     per_func_disable(pin2func_io((gpio_pin_t *)&bxcan_rxd));
 }
 
-static void usb_io_cfg(uint8_t dp,uint8_t dm)
+static void usb_io_cfg(uint8_t dp,uint8_t dm,bool host)
 {
+    if(host)
+    {
+        io_pull_write(dp,IO_PULL_DOWN);
+    }else
+    {
+        io_pull_write(dp,IO_PULL_UP);
+    }
     io_pull_write(dm,IO_PULL_DOWN);
     io_cfg_input(dm);
     io_cfg_input(dp);
 }
 
-void pinmux_usb_init(void)
+void pinmux_usb_init(bool host)
 {
     uint8_t dp = USB_DP_PAD;
     uint8_t dm = USB_DM_PAD;
-    usb_io_cfg(dp,dm);
+    usb_io_cfg(dp,dm,host);
 
     per_func_enable(pin2func_io((gpio_pin_t *)&dp),USB_DP);
     per_func_enable(pin2func_io((gpio_pin_t *)&dm),USB_DM);

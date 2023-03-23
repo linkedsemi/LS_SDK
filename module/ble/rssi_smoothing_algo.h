@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _RSSI_SMOOTHING_ALGO_H_
 #define _RSSI_SMOOTHING_ALGO_H_
 #define CON_FOR_RSSI_SMTH_ALGO_NUM 4
@@ -13,4 +17,8 @@ void rssi_smoothing_algo_init(uint8_t con_id, bool enable);
 // the parameters of handler are rssi(int8_t), init_addr(const uint8_t*) and init_addr_type(uint8_t)
 // the handler will be executed in interrupt
 void con_rssi_thld_init(bool (*handler)(int8_t, const uint8_t*, uint8_t));
+#endif
+
+#ifdef __cplusplus
+}
 #endif
