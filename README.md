@@ -121,6 +121,7 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/uart/uart_polling                                              |  √     |  √     |
 | peripheral/usb/usbd_cdc_msc                                               |        |  √     |
 | peripheral/usb/usbd_cdc_msc_fatfs                                         |        |  √     |
+| peripheral/usb/usbd_cdc_msc_fatfs_upgrade                                 |        |  √     |
 | peripheral/usb/usbd_hid_composite                                         |        |  √     |
 | peripheral/usb/usbd_hid_keyboard                                          |        |  √     |
 | peripheral/usb/usbh_msc_file_explorer                                     |        |  √     |
