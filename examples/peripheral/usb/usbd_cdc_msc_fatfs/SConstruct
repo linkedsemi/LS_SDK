@@ -3,18 +3,19 @@ env = Environment(ENV=os.environ)
 env['SDK_ROOT'] = Dir('../../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'), exports=['env'])
 src = [
-    'bsp.c',
+    '../bsp.c',
     'main.c',
-    'msc_disk.c',
     'usb_descriptors.c',
-    'fatfs_flash/disk_port.c',
-    'fatfs_flash/diskio.c',
+
+    '../msc_fatfs_flash/msc_disk.c',
+    '../msc_fatfs_flash/disk_port.c',
+    '../msc_fatfs_flash/diskio.c',
 
     '$SDK_ROOT/module/fatfs/source/ff.c',
 ]
 inc = [
     '.',
-    'fatfs_flash/',
+    '../msc_fatfs_flash//',
     '$SDK_ROOT/module/fatfs/source/',
 ]
 env.Append(CPPDEFINES=['CFG_TUSB_MCU=OPT_MCU_LM3050'])
