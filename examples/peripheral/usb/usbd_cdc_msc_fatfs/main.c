@@ -27,12 +27,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bsp.h"
+#include "bsp/board.h"
 #include "tusb.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
 //--------------------------------------------------------------------+
+
+#define LED_RED_IDX 0
+#define LED_GREEN_IDX 1
+#define LED_BLUE_IDX 2
 
 /* Blink pattern
  * - 250 ms  : device not mounted
@@ -53,7 +57,7 @@ void cdc_task(void);
 /*------------- MAIN -------------*/
 int main(void)
 {
-  bsp_init();
+  board_init();
 
   // init device stack on configured roothub port
   tud_init(BOARD_TUD_RHPORT);
@@ -155,13 +159,16 @@ void tud_cdc_rx_cb(uint8_t itf)
 //--------------------------------------------------------------------+
 void led_blinking_task(void)
 {
+  extern uint8_t g_board_led_rgb_idx;
+
   static uint32_t start_ms = 0;
   static bool led_state = false;
 
   // Blink every interval ms
-  if ( bsp_millis() - start_ms < blink_interval_ms) return; // not enough time
+  if ( board_millis() - start_ms < blink_interval_ms) return; // not enough time
   start_ms += blink_interval_ms;
 
-  bsp_blue_led_write(led_state);
+  g_board_led_rgb_idx = LED_BLUE_IDX;
+  board_led_write(led_state);
   led_state = 1 - led_state; // toggle
 }
