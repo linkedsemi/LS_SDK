@@ -11,6 +11,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define ISR_VECTOR_ADDR ((uint32_t *)(0x20000000))
+
+__attribute__((always_inline)) static inline void arm_cm_set_int_isr(int8_t type,void (*isr)())
+{
+    ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
+}
 
 __attribute__((always_inline)) static inline void hclk_set(uint32_t mhz)
 {
