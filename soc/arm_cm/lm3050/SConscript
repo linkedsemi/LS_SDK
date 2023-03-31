@@ -189,6 +189,23 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
     rtos_src = []
+    if not rtos is None:
+        rtos_src = list(map(lambda x:os.path.join('$SDK_ROOT/rtos/freertos/',x),[
+            'croutine.c',
+            'event_groups.c',
+            'list.c',
+            'queue.c',
+            'stream_buffer.c',
+            'tasks.c',
+            'timers.c',
+            'heap_4.c',
+        ]))
+        rtos_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+            'arm_cm/lm3050/compiler/$COMPILER/port.c',
+            'arm_cm/lm3050/compiler/$COMPILER/portasm.S',
+            'arm_cm/lm3050/freertos_adapt.c',
+        ]))
+        inc_list += ['$SDK_ROOT/rtos/freertos/include']
     if self.get('LINKSCRIPT') is None:
         self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/link_script.txt"))
     self.Append(CPPPATH = self.inc_dirs(inc_list))
