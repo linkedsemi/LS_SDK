@@ -183,21 +183,6 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_write_enable,)
     lsqspiv2_stg_send_command(WRITE_ENABLE_OPCODE);
 }
 
-ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_read_status_register_0,uint8_t *status_reg_0)
-{
-    lsqspiv2_stg_read_register(READ_STATUS_REGISTER_0_OPCODE,status_reg_0,sizeof(uint8_t));
-}
-
-ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_read_status_register_1,uint8_t *status_reg_1)
-{
-    lsqspiv2_stg_read_register(READ_STATUS_REGISTER_1_OPCODE,status_reg_1,sizeof(uint8_t));
-}
-
-ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_write_status_reg_func,void * param)
-{
-    lsqspiv2_stg_write_register(WRITE_STATUS_REGISTER_OPCODE,param, sizeof(uint16_t));
-}
-
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_xip_mode_reset,)
 {
     uint8_t data = CONTINUOUS_READ_MODE_RESET;
@@ -267,14 +252,7 @@ ROM_SYMBOL void hal_flash_page_program(uint32_t offset,uint8_t *data,uint16_t le
     hal_flash_program_operation(&param);
 }
 
-
-ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_erase_func,void *param)
-{
-    struct flash_erase_param *erase_param = param;
-    lsqspiv2_stg_write_register(erase_param->opcode, erase_param->addr, 3);
-}
-
-ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_chip_erase_func,void *param)
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_chip_erase,)
 {
     lsqspiv2_stg_send_command(CHIP_ERASE_OPCODE);
 }
@@ -393,7 +371,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_release_from_deep_power_down,)
 
 ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_read_reg_func,void *param)
 {
-    struct flash_read_reg_param *ptr = param;
+    struct flash_wr_rd_reg_param *ptr = param;
     lsqspiv2_stg_read_register(ptr->opcode,ptr->buf,ptr->length);
 }
 
@@ -424,17 +402,6 @@ ROM_SYMBOL void hal_flash_read_unique_id(uint8_t unique_serial_id[16])
     hal_flash_read_operation(&cfg);
 }
 
-
-ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_erase_security_area_func,void *param)
-{
-    lsqspiv2_stg_write_register(ERASE_SECURITY_AREA_OPCODE,param,3);
-}
-
-ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_program_security_area_func,void *param)
-{
-    lsqspiv2_stg_read_write( param);
-}
-
 ROM_SYMBOL void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
@@ -458,12 +425,7 @@ ROM_SYMBOL void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = data;
-    hal_flash_program_security_area_operation(&cfg);
-}
-
-ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_read_security_area_func,void *param)
-{
-    lsqspiv2_stg_read_write( param);
+    hal_flash_program_operation(&cfg);
 }
 
 ROM_SYMBOL void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
@@ -489,7 +451,7 @@ ROM_SYMBOL void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = data;
-    hal_flash_read_security_area_operation(&cfg);
+    hal_flash_read_operation(&cfg);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_software_reset)

@@ -72,69 +72,36 @@ enum mw_wid_type
     QUAD_WIRE,
 };
 
-struct flash_erase_param
-{
-    uint8_t addr[3];
-    uint8_t opcode;
-};
-
-struct flash_read_reg_param
+struct flash_wr_rd_reg_param
 {
     uint8_t *buf;
     uint8_t opcode;
-    uint8_t length;    
+    uint8_t length;
 };
-
 
 void hal_flash_program_operation(void *param);
 
-void hal_flash_erase_operation(void *param);
+void hal_flash_write_reg_operation(void *param);
 
 void hal_flash_read_operation(void *param);
-
-void hal_flash_chip_erase_operation(void);
-
-void hal_flash_erase_security_area_operation(uint8_t idx);
-
-void hal_flash_program_security_area_operation(void *param);
-
-void hal_flash_read_security_area_operation(void *param);
 
 void hal_flash_read_reg_operation(void *param);
 
 void do_hal_flash_program_swint(void *param);
 
-void do_hal_flash_erase_swint(void *param);
+void do_hal_flash_write_reg_swint(void *param);
 
 void do_hal_flash_read_swint(void *param);
 
 void do_hal_flash_read_reg_swint(void *param);
 
-void do_hal_flash_chip_erase_swint(void);
-
-void do_hal_flash_erase_security_area_swint(uint8_t idx);
-
-void do_hal_flash_program_security_area_swint(void *param);
-
-void do_hal_flash_read_security_area_swint(void *param);
-
 void hal_flash_write_enable(void);
 
-void do_hal_flash_write_status_reg_func(void * param);
-
-void do_hal_flash_erase_func(void *param);
-
-void do_hal_flash_chip_erase_func(void *param);
+void do_hal_flash_write_reg_func(void * param);
 
 void do_hal_flash_read_func(void *param);
 
 void do_hal_flash_read_reg_func(void *param);
-
-void do_hal_flash_erase_security_area_func(void *param);
-
-void do_hal_flash_program_security_area_func(void *param);
-
-void do_hal_flash_read_security_area_func(void *param);
 
 void do_hal_flash_prog_func(void *param);
 
@@ -144,19 +111,9 @@ void flash_writing_critical(void (*func)(void *),void *param);
 
 void do_hal_flash_read(void *param);
 
-void do_hal_flash_erase(void *param);
-
 void do_hal_flash_program(void *param);
 
-void do_hal_flash_chip_erase(void);
-
-void do_hal_flash_write_status_reg(uint16_t status);
-
-void do_hal_flash_erase_security_area(uint8_t idx);
-
-void do_hal_flash_program_security_area(void *param);
-
-void do_hal_flash_read_security_area(void *param);
+void do_hal_flash_write_reg(void *param);
 
 void do_hal_flash_read_reg(void *param);
 

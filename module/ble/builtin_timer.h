@@ -9,11 +9,21 @@
 extern "C" {
 #endif
 
+#ifndef  CUSTOMIZED_MI_CONFIG_FILE
 struct builtin_timer
 {
     void (*timer_cb)(void *);
     void *param;
 };
+#else
+struct builtin_timer
+{
+    void (*timer_cb)(void *);
+    void *param;
+    uint32_t timeout_value;       
+    uint8_t mode;   //enum-type : mible_timer_mode
+};
+#endif
 
 #define DEF_BUILTIN_TIMER_ENV(num) \
     DEF_LINKED_BUF(builtin_timer_env,struct builtin_timer,(num))

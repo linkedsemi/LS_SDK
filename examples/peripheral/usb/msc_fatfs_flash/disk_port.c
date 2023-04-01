@@ -1,3 +1,4 @@
+#include "platform.h"
 #include "disk_port.h"
 #include "ls_hal_flash.h"
 #include "msc_disk.h"
@@ -18,7 +19,7 @@ DRESULT RAM_disk_read(BYTE *buff, DWORD sector, UINT count)
     uint32_t dev_flash_address;
     uint32_t dev_flash_address_end;
     int i;
-
+    __disable_irq();
     // LOG_I("disk_read sector:%d,count:%d\n", sector, count);
     dev_flash_address_end = DEV_FLASH_ADDRESS_END - DISK_BLOCK_SIZE;
 
@@ -34,7 +35,7 @@ DRESULT RAM_disk_read(BYTE *buff, DWORD sector, UINT count)
         sector++;
         buff += DISK_BLOCK_SIZE;
     }
-
+    __enable_irq();
     return RES_OK;
 }
 
@@ -44,7 +45,7 @@ DRESULT RAM_disk_write(const BYTE *buff, DWORD sector, UINT count)
     uint32_t dev_flash_address_end;
     BYTE *buf;
     int i;
-
+    __disable_irq();
     // LOG_I("disk_write sector:%d,count:%d\n", sector, count);
     dev_flash_address_end = DEV_FLASH_ADDRESS_END - DISK_BLOCK_SIZE;
     buf = (BYTE *)buff;
@@ -67,7 +68,7 @@ DRESULT RAM_disk_write(const BYTE *buff, DWORD sector, UINT count)
 
         sector++;
     }
-
+    __enable_irq();
     return RES_OK;
 }
 
