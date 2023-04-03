@@ -29,8 +29,9 @@ void pinmux_hal_flash_quad_deinit(void);
 /**
   * @brief  GPIO initilization
   * @param  clk  Specific GPIO pin
+  * @param  cpol  Clock polarity state
   */
-void pinmux_ssi_clk_init(uint8_t clk);
+void pinmux_ssi_clk_init(uint8_t clk, uint8_t cpol);
 
 /**
   * @brief     GPIO initilization as ssi nss0
@@ -106,8 +107,9 @@ void pinmux_ssi_dq3_deinit(void);
 /**
   * @brief  Set pin mux function to spi2 master clk
   * @param  clk   Specific GPIO pin
+  * @param  cpol  Clock polarity state
   */
-void pinmux_spi2_master_clk_init(uint8_t clk);
+void pinmux_spi2_master_clk_init(uint8_t clk, uint8_t cpol);
 
 /**
   * @brief   Set pin mux function to spi2 master nss
@@ -174,8 +176,9 @@ void pinmux_spi2_miso_deinit(void);
 /**
   * @brief  Set pin mux function to spi3 master clk
   * @param  clk   Specific GPIO pin
+  * @param  cpol  Clock polarity state
   */
-void pinmux_spi3_master_clk_init(uint8_t clk);
+void pinmux_spi3_master_clk_init(uint8_t clk, uint8_t cpol);
 
 /**
   * @brief   Set pin mux function to spi3 master nss
