@@ -58,10 +58,15 @@ uint8_t SizeOfRxqBuf;
  */
 static void ssi_test_init(void)
 {
-  pinmux_ssi_clk_init(PB09);  /* CLK-------------PB09 */
-  pinmux_ssi_nss0_init(PB08); /* SSN-------------PB08 */
-  pinmux_ssi_dq0_init(PA07);  /* MOSI------------PA07 */
-  pinmux_ssi_dq1_init(PA00);  /* MISO------------PA00 */
+   /* CLK-------------PB09 */
+   /* SSN-------------PB08 */	
+   /* MOSI------------PA07 */	
+   /* MISO------------PA00 */	
+
+  pinmux_ssi_clk_init(PB09,INACTIVE_LOW); // The idle state of clock must correspond to the polarity	  	
+  pinmux_ssi_nss0_init(PB08); 
+  pinmux_ssi_dq0_init(PA07);  
+  pinmux_ssi_dq1_init(PA00); 
 
   LL_SSI_MSP_Init();
   clr_pending_irq(SPI1_IRQn);

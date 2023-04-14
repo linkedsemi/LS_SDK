@@ -143,10 +143,18 @@ void pinmux_hal_flash_quad_init(void){}
 
 void pinmux_hal_flash_quad_deinit(void){}
 
-static void spi_master_clk_io_cfg(uint8_t clk)
+static void spi_master_clk_io_cfg(uint8_t clk, uint8_t cpol)
 {
-    io_clr_pin(clk);
-    io_pull_write(clk,IO_PULL_DOWN);
+    if (cpol)
+    {
+        io_set_pin(clk);
+        io_pull_write(clk,IO_PULL_UP);
+    }
+    else
+    {
+        io_clr_pin(clk);
+        io_pull_write(clk,IO_PULL_DOWN);
+    }
     io_cfg_output(clk);
 }
 
@@ -253,10 +261,10 @@ static void iis_slave_mck_io_cfg(uint8_t mck)
     io_cfg_input(mck);
 }
 
-void pinmux_spi2_master_clk_init(uint8_t clk)
+void pinmux_spi2_master_clk_init(uint8_t clk, uint8_t cpol)
 {
     *(uint8_t *)&spi2_clk = clk;
-    spi_master_clk_io_cfg(clk);
+    spi_master_clk_io_cfg(clk,cpol);
     gpio_af_init((gpio_pin_t *)&clk,AF_SPI2_SCK);
 }
 
@@ -407,10 +415,10 @@ void pinmux_iis2_mck_deinit(void)
     set_gpio_mode((gpio_pin_t *)&i2s2_mck);
 }
 
-void pinmux_ssi_clk_init(uint8_t clk)
+void pinmux_ssi_clk_init(uint8_t clk, uint8_t cpol)
 {
     *(uint8_t *)&ssi_clk = clk;
-    spi_master_clk_io_cfg(clk);
+    spi_master_clk_io_cfg(clk,cpol);
     gpio_af_init((gpio_pin_t *)&clk,AF_SPI1_SCK);
 }
 

@@ -29,6 +29,8 @@ extern "C" {
 void log_output(bool linefeed,const char *format,...);
 void ls_log_init(void);
 void log_hex_output(const void * data_pointer , uint16_t data_length);
+void uart_log_pause();
+void uart_log_resume();
 extern void (*log_output_fn)(bool linefeed,const char *format,...);
 extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
 

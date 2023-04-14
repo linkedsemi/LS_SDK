@@ -365,50 +365,7 @@ HAL_StatusTypeDef HAL_ADC_DeInit(ADC_HandleTypeDef* hadc)
   /* correctly completed.                                                     */
   if (tmp_hal_status == HAL_OK)
   {
-    /* ========== Reset ADC registers ========== */
-    /* Reset register SR */
-    __HAL_ADC_CLEAR_FLAG(hadc, ADC_FLAG_POSTCONV_ALL);
-                         
-    /* Reset register CR1 */
-    CLEAR_BIT(hadc->Instance->CR1, (ADC_RAWDEN_MASK  | ADC_JAWDEN_MASK  | ADC_DISCNUM_MASK | 
-                                    ADC_JDISCEN_MASK | ADC_RDISCEN_MASK | ADC_JAUTO_MASK   | 
-                                    ADC_AWDSGL_MASK  | ADC_SCAN_MASK    | ADC_JEOCIE_MASK  |   
-                                    ADC_AWDIE_MASK   | ADC_REOCIE_MASK  | ADC_AWDCH_MASK    ));
-    
-    /* Reset register CR2 */
-    CLEAR_BIT(hadc->Instance->CR2, (ADC_ALIGN_MASK   | ADC_DMAEN_MASK   |        
-                                    ADC_CONT_MASK   |  ADC_ADEN_MASK   ));
-    
-    /* Reset register SMPR1 */
-    CLEAR_BIT(hadc->Instance->SMPR1, 0xFFFFFF);
-
-    /* Reset register JOFR1 */
-    CLEAR_BIT(hadc->Instance->JOFR1, ADC_JOFF1_MASK);
-    /* Reset register JOFR2 */
-    CLEAR_BIT(hadc->Instance->JOFR2, ADC_JOFF2_MASK);
-    /* Reset register JOFR3 */
-    CLEAR_BIT(hadc->Instance->JOFR3, ADC_JOFF3_MASK);
-    /* Reset register JOFR4 */
-    CLEAR_BIT(hadc->Instance->JOFR4, ADC_JOFF4_MASK);
-    
-    /* Reset register HTR */
-    CLEAR_BIT(hadc->Instance->HTR, ADC_HT_MASK);
-    /* Reset register LTR */
-    CLEAR_BIT(hadc->Instance->LTR, ADC_LT_MASK);
-    
-    /* Reset register SQR1 */
-    CLEAR_BIT(hadc->Instance->RSQR1, ADC_RSQ1_MASK | ADC_RSQ2_MASK | ADC_RSQ3_MASK |
-                                     ADC_RSQ4_MASK | ADC_RSQ5_MASK | ADC_RSQ6_MASK |
-                                     ADC_RSQ7_MASK | ADC_RSQ8_MASK  );
-    
-    /* Reset register SQR2 */
-    CLEAR_BIT(hadc->Instance->RSQR2, ADC_RSQ9_MASK | ADC_RSQ10_MASK | ADC_RSQ11_MASK | 
-                                    ADC_RSQ12_MASK);
-    
-    /* Reset register JSQR */
-    CLEAR_BIT(hadc->Instance->JSQR, ADC_JSQ1_MASK | ADC_JSQ2_MASK | ADC_JSQ3_MASK | 
-                                    ADC_JSQ4_MASK);
-
+    adc_channel_vbat_disable();
     HAL_ADC_MSP_DeInit(hadc);
     HAL_ADC_MSP_Idle_Set(hadc);  
 

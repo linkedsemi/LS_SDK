@@ -17,8 +17,6 @@ void ls_24g_restore_in_wkup(void)
 }
 
 extern bool timer_sleep(void);
-extern void uart_log_pause(void);
-extern void uart_log_resume(void);
 extern void ls24_reg_store(void);
 extern void clr_24g_wkup_status(void);
 extern bool ls_24g_wkup_end(void);
@@ -33,7 +31,6 @@ void ls_24g_sleep_wakeup(void)
         }
         bool enter_sleep = false;
         uint32_t cpu_stat = enter_critical();
-        uart_log_pause();
         if(timer_sleep())
         {
             ls24_reg_store();
@@ -41,7 +38,6 @@ void ls_24g_sleep_wakeup(void)
             clr_24g_wkup_status();
             enter_sleep = true;
         }
-        uart_log_resume();
         exit_critical(cpu_stat);
         
         if (enter_sleep)

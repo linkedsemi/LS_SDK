@@ -1173,10 +1173,18 @@ ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
 }
 
-static void spi_master_clk_io_cfg(uint8_t clk)
+static void spi_master_clk_io_cfg(uint8_t clk, uint8_t cpol)
 {
-    io_clr_pin(clk);
-    io_pull_write(clk,IO_PULL_DOWN);
+    if (cpol)
+    {
+        io_set_pin(clk);
+        io_pull_write(clk,IO_PULL_UP);
+    }
+    else
+    {
+        io_clr_pin(clk);
+        io_pull_write(clk,IO_PULL_DOWN);
+    }
     io_cfg_output(clk);
 }
 
@@ -1283,10 +1291,10 @@ static void iis_slave_mck_io_cfg(uint8_t mck)
     io_cfg_input(mck);
 }
 
-void pinmux_spi2_master_clk_init(uint8_t clk)
+void pinmux_spi2_master_clk_init(uint8_t clk, uint8_t cpol)
 {
     *(uint8_t *)&spi2_clk = clk;
-    spi_master_clk_io_cfg( clk);
+    spi_master_clk_io_cfg(clk, cpol);
     per_func_enable(pin2func_io((gpio_pin_t *)&clk),SPI2_SCK);
 }
 
@@ -1360,10 +1368,10 @@ void pinmux_spi2_miso_deinit(void)
     set_gpio_mode((gpio_pin_t *)&spi2_miso);
 }
 
-void pinmux_spi3_master_clk_init(uint8_t clk)
+void pinmux_spi3_master_clk_init(uint8_t clk, uint8_t cpol)
 {
     *(uint8_t *)&spi3_clk = clk;
-    spi_master_clk_io_cfg( clk);
+    spi_master_clk_io_cfg(clk,cpol);
     per_func_enable(pin2func_io((gpio_pin_t *)&clk),SPI3_SCK);
 }
 
@@ -1591,10 +1599,10 @@ void pinmux_iis3_mck_deinit(void)
     set_gpio_mode((gpio_pin_t *)&i2s3_mck);
 }
 
-void pinmux_ssi_clk_init(uint8_t clk) 
+void pinmux_ssi_clk_init(uint8_t clk, uint8_t cpol) 
 {
     *(uint8_t *)&ssi_clk = clk;
-    spi_master_clk_io_cfg(clk);
+    spi_master_clk_io_cfg(clk,cpol);
     per_func_enable(pin2func_io((gpio_pin_t *)&clk),SPI1_SCK);
 }
 

@@ -32,7 +32,7 @@
 0x000013d9 T _hal_flash_chip_erase                       
 0x200000ec D flash_stat                                 
 0x000022e9 T pinmux_hal_flash_quad_init                         
-0x000019cd T hal_flash_read_status_register_0           
+0x000019cd T hal_flash_read_status_register_0_ram           
 0x00002fa1 T memset                                     
 0x000020e5 T exit_critical                              
 0x0000235d T SVC_Handler                                
@@ -52,7 +52,7 @@
 0x0000133d T flash_writing_critical                     
 0x00001ae7 T hal_flash_release_from_deep_power_down     
 0x00001efd T SVC_Handler_C                              
-0x000019d7 T hal_flash_read_status_register_1           
+0x000019d7 T hal_flash_read_status_register_1_ram           
 0x20000144 D flash_dual_mode_only                       
 0x000019ba T do_hal_flash_prog_func                     
 0x000019be T do_hal_flash_program_security_area_func    

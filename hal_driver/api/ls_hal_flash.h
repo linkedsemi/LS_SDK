@@ -46,12 +46,22 @@ void hal_flash_xip_start(void);
 /** \brief Exit SPI Flash XIP mode */
 void hal_flash_xip_stop(void);
 
-/** \brief Read Status Register 0 
+/** \brief Read Status Register 0 (can't be called during XIP)
+ *  \param[out] status_reg_0
+ */
+void hal_flash_read_status_register_0_ram(uint8_t *status_reg_0);
+
+/** \brief Read Status Register 0 (can be called during XIP)
  *  \param[out] status_reg_0
  */
 void hal_flash_read_status_register_0(uint8_t *status_reg_0);
 
-/** \brief Read Status Register 1 
+/** \brief Read Status Register 1 (can't be called during XIP) 
+ *  \param[out] status_reg_1
+ */
+void hal_flash_read_status_register_1_ram(uint8_t *status_reg_1);
+
+/** \brief Read Status Register 1 (can be called during XIP)
  *  \param[out] status_reg_1
  */
 void hal_flash_read_status_register_1(uint8_t *status_reg_1);
@@ -202,8 +212,8 @@ __attribute__((long_call)) void _hal_flash_chip_erase();
 __attribute__((long_call)) void _hal_flash_sector_erase(uint32_t);
 __attribute__((long_call)) void _hal_flash_page_program(uint32_t,uint8_t *,uint16_t);
 __attribute__((long_call)) void hal_flash_write_status_register(uint16_t);
-__attribute__((long_call)) void hal_flash_read_status_register_1(uint8_t *);
-__attribute__((long_call)) void hal_flash_read_status_register_0(uint8_t *);
+__attribute__((long_call)) void hal_flash_read_status_register_1_ram(uint8_t *);
+__attribute__((long_call)) void hal_flash_read_status_register_0_ram(uint8_t *);
 #endif
 
 /** @}*/

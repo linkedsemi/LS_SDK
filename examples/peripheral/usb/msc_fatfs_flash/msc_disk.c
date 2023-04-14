@@ -23,7 +23,6 @@
  *
  */
 
-#include "bsp.h"
 #include "tusb.h"
 #include "disk_port.h"
 #include "msc_disk.h"
@@ -116,12 +115,7 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
   // out of ramdisk
   if ( lba >= DISK_BLOCK_NUM ) return -1;
 
-  // uint8_t const* addr = msc_disk[lba] + offset;
-  // memcpy(buffer, addr, bufsize);  
-
   RAM_disk_read(buffer,lba,bufsize/DISK_BLOCK_SIZE);
-
-  // LOG_HEX(buffer,64);
 
   return (int32_t) bufsize;
 }

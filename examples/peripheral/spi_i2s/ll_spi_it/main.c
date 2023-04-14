@@ -92,7 +92,7 @@ static void spi_init(void)
   /* MISO------------PA03 */
 
 #if MASTER_BOARD
-  pinmux_spi2_master_clk_init(PA00);
+  pinmux_spi2_master_clk_init(PA00,LL_SPI_POLARITY_HIGH);  // The idle state of clock must correspond to the polarity
   pinmux_spi2_master_nss_init(PA01);
   pinmux_spi2_master_mosi_init(PA02);
   pinmux_spi2_master_miso_init(PA03);

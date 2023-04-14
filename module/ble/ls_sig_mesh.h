@@ -602,6 +602,19 @@ struct bcn_start_unprov_param
     uint32_t UriHash;                         /*!< URI-Hash information*/
     bool UriHash_Present;                     /*!< Support or not*/
 }__attribute__((packed));
+
+/**
+ *  @brief Encode transmission count & interval steps.
+ *
+ *  @param count      Number of retransmissions (first transmission is excluded).
+ *  @param intval_ms  Interval steps in milliseconds. Must be greater than 0,
+ *                    less than or equal to 1600, and a multiple of 50.
+ *
+ *  @return Mesh transmit value that can be used e.g. for the default
+ *          values of the configuration model data.
+ */
+#define MESH_PUB_TRANSMIT(count, intval_ms)  ((count) | (((intval_ms / 50) - 1) << 3))
+
 /**
  * @brief  Initialization Event Callback of Sig mesh.
  * 
@@ -661,7 +674,7 @@ void model_unsubscribe_all(uint8_t  ModelHandle);
  * @param app_key_lid  app_key local index 
  * @param publish_ttl        time to live for publish message 
  * @param publish_period     period transmit for publish message
- * @param publish_retransimit     Number of transmissions of published messages
+ * @param publish_retransimit     Encoded transmit parameters(see macro MESH_PUB_TRANSMIT)
  * @param friendship_cred_flag    jush for friendship
  * 
  */

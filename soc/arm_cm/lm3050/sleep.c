@@ -14,6 +14,7 @@
 #include "sys_stat.h"
 #include "cpu.h"
 #include "ls_msp_qspiv2.h"
+#include "log.h"
 static uint32_t CPU_MSP;
 static uint32_t CPU_PSP;
 static uint8_t CPU_CONTROL;
@@ -169,9 +170,11 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     hal_flash_xip_start();
 }
 
+__attribute__((weak)) void deep_sleep_exit_hook(){}
+
 static void deep_sleep_no_ble()
 {
-    uint32_t cpu_stat = enter_critical();
+    uart_log_pause();
     SCB->SCR |= (1<<2);
     systick_stop();
     uint32_t NVIC_EN[CEILING(IRQn_Max,32)];
@@ -184,14 +187,17 @@ static void deep_sleep_no_ble()
     memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,ARRAY_LEN(NVIC_EN));
     systick_start();
     SCB->SCR &= ~(1<<2);
-    exit_critical(cpu_stat);
+    uart_log_resume();
 }
+
+__attribute__((weak)) bool deep_sleep_prepare(){return true;}
 
 void low_power_mode_sched()
 {
+    uint32_t cpu_stat = enter_critical();
     if(dma_status_busy()==false)
     {
-        if(peri_status_busy()==false)
+        if(peri_status_busy()==false&&deep_sleep_prepare())
         {
             deep_sleep_no_ble();
         }else
@@ -204,6 +210,7 @@ void low_power_mode_sched()
         REG_FIELD_WR(SYSC_CPU->GATE_SYS,SYSC_CPU_GATE_SYS_EN,0);
         __WFI();
     }
+    exit_critical(cpu_stat);
 }
 
 static void lvl2_lvl3_mode_prepare(bool lp2_mode)

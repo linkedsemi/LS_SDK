@@ -30,7 +30,7 @@
  _hal_flash_chip_erase                        =0x000013d9 ;
  flash_stat                                  =0x200000ec ;
  pinmux_hal_flash_quad_init                  =0x000022e9 ;
- hal_flash_read_status_register_0            =0x000019cd ;
+ hal_flash_read_status_register_0_ram            =0x000019cd ;
  memset                                      =0x00002fa1 ;
  exit_critical                               =0x000020e5 ;
  SVC_Handler                                 =0x0000235d ;
@@ -50,7 +50,7 @@
  flash_writing_critical                      =0x0000133d ;
  hal_flash_release_from_deep_power_down      =0x00001ae7 ;
  SVC_Handler_C                               =0x00001efd ;
- hal_flash_read_status_register_1            =0x000019d7 ;
+ hal_flash_read_status_register_1_ram            =0x000019d7 ;
  flash_dual_mode_only                        =0x20000144 ;
  do_hal_flash_prog_func                      =0x000019ba ;
  do_hal_flash_program_security_area_func     =0x000019be ;

@@ -549,7 +549,7 @@ void XIP_BANNED_FUNC(BLE_Handler,)
         hal_flash_prog_erase_suspend();
         uint8_t status_reg1;
         do{
-            hal_flash_read_status_register_1(&status_reg1);
+            hal_flash_read_status_register_1_ram(&status_reg1);
         }while(hal_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
     }
     if(xip == false)

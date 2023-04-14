@@ -972,6 +972,25 @@ lm3050_usbd_cdc_msc_fatfs_iar_build:
   script:
     - cd examples/peripheral/usb/usbd_cdc_msc_fatfs/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_cdc_msc_fatfs.ewp -build * -log all    
 
+lm3050_usbd_cdc_msc_fatfs_upgrade_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs_upgrade && scons flags=-Werror ic=lm3050
+
+lm3050_usbd_cdc_msc_fatfs_upgrade_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs_upgrade/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b usbd_cdc_msc_fatfs_upgrade.uvprojx -o UVBuild/build.txt -j0
+
+lm3050_usbd_cdc_msc_fatfs_upgrade_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs_upgrade/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" usbd_cdc_msc_fatfs_upgrade.ewp -build * -log all    
+
 lm3050_usbd_hid_composite_build:
   stage: build
   script:

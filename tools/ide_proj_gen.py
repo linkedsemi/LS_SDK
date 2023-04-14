@@ -194,6 +194,7 @@ if __name__ == '__main__':
     lm3050_proj_gen('examples/peripheral/uart/uart_polling')
     lm3050_proj_gen('examples/peripheral/usb/usbd_cdc_msc')
     lm3050_proj_gen('examples/peripheral/usb/usbd_cdc_msc_fatfs')
+    lm3050_proj_gen('examples/peripheral/usb/usbd_cdc_msc_fatfs_upgrade')
     lm3050_proj_gen('examples/peripheral/usb/usbd_hid_composite')
     lm3050_proj_gen('examples/peripheral/usb/usbd_hid_keyboard')
     lm3050_proj_gen('examples/peripheral/usb/usbh_msc_file_explorer')

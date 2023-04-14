@@ -14,7 +14,6 @@
 #include "ls_dbg.h"
 #include "ls_msp_qspiv2.h"
 #include "log.h"
-#define ISR_VECTOR_ADDR ((uint32_t *)(0x20000000))
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((weak)) void SystemInit(){
@@ -93,11 +92,6 @@ NOINLINE void XIP_BANNED_FUNC(clk_flash_init,)
     dpll_qspi_clk_config();
     MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
     clk_switch();
-}
-
-void arm_cm_set_int_isr(int8_t type,void (*isr)())
-{
-    ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
 }
 
 void SWINT_Handler_ASM();
