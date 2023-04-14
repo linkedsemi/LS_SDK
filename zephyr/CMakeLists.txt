@@ -8,7 +8,6 @@ if(CONFIG_SOC_LE5010)
     ../soc/arm_cm/le501x/integration
     ../module/common
     ../module/debug
-    ../module/debug/RTT
     ../module/tinyfs
     ../module/ble
     ../module/static_buffer
@@ -20,7 +19,6 @@ if(CONFIG_SOC_LE5010)
     ../module/common/common.c
     ../module/debug/ls_dbg.c
     ../module/debug/log.c
-    ../module/debug/RTT/SEGGER_RTT.c
     ../hal_driver/src/calc_div.c
     ../hal_driver/src/ls_hal_trng.c
     ../hal_driver/src/ls_hal_flash.c
