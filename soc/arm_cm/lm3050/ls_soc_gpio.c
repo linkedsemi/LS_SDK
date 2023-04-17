@@ -336,14 +336,13 @@ io_pull_type_t io_pull_read(uint8_t pin)
 void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    MODIFY_REG(SYSC_AWO->IO[x->port].DS, SYSC_AWO_GPIOA_DS2_MASK << 2*x->num, drive << 2*x->num);
+    WRITE_REG(SYSC_AWO->IO[x->port].DS, (drive&0x1)<< (x->num) |((drive&0x2)<< (x->num +15))) ;
 }
 
 io_drive_type_t io_drive_capacity_read(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    io_drive_type_t drive = (io_drive_type_t)((SYSC_AWO->IO[x->port].DS >> 2 * x->num) & SYSC_AWO_GPIOA_DS2_MASK);
-    return drive;
+    return (((READ_REG(SYSC_AWO->IO[x->port].DS) & 0xffff) >> x->num) | READ_REG(SYSC_AWO->IO[x->port].DS) >> (x->num+15));
 }
 
 static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
