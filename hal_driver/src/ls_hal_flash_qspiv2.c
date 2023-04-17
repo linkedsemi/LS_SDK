@@ -194,6 +194,12 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_prog_func,void *param)
     lsqspiv2_stg_read_write(param);
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_write_reg_func,void *param)
+{
+    struct flash_wr_rd_reg_param *ptr = param;
+    lsqspiv2_stg_write_register(ptr->opcode,ptr->buf,ptr->length);
+}
+
 static void flash_program_param_set(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type,struct lsqspiv2_stg_cfg *cfg)
 {
     cfg->ctrl.sw_cyc = 31;

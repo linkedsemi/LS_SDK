@@ -89,14 +89,14 @@ static void spi_init(void)
 {
     /* Configure the GPIO AF */
     /* CLK-------------PB12 */	
-    /* CS--------------PB13  */	
+    /* CS--------------PB13 */	
     /* MOSI------------PB14 */	
     /* MISO------------PB15 */	
-
-    pinmux_spi2_master_clk_init(SPI_CLK_PIN);
+	
+    spi2_master_cs_init(SPI_CS_PIN);
+    pinmux_spi2_master_clk_init(SPI_CLK_PIN,SPI_POLARITY_LOW);  // The idle state of clock must correspond to the polarity
     pinmux_spi2_master_mosi_init(SPI_MOSI_PIN); 
     pinmux_spi2_master_miso_init(SPI_MISO_PIN);
-    spi2_master_cs_init(SPI_CS_PIN);
 
     /* Set the SPI parameters */
     SpiHandle.Instance               = SPI2;
