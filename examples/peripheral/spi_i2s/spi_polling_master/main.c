@@ -115,8 +115,8 @@ int main(void)
     /* system init app     */
     sys_init_none();
     /* init spi and GPIO   */
-    spi_init();
     LED_init();
+    spi_init();
 
     uint16_t data_length = BUFFERSIZE;
     uint8_t mult_factor = 1;
