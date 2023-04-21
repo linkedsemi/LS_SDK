@@ -169,7 +169,6 @@ static void spi_config(SPI_HandleTypeDef *hspi, bool itmode)
 
 static HAL_StatusTypeDef spi_data_transfer(SPI_HandleTypeDef *hspi, uint32_t Timeout)
 {
-    HAL_StatusTypeDef errorcode = HAL_OK;
     uint32_t tickstart = systick_get_value();
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
     uint32_t end_tick = tickstart + timeout;
@@ -188,14 +187,12 @@ static HAL_StatusTypeDef spi_data_transfer(SPI_HandleTypeDef *hspi, uint32_t Tim
         {
             if (time_diff(systick_get_value(), end_tick) > 0)
             {
-                goto error;
+                return HAL_TIMEOUT;
             }
         }
     }
 
-error:
-    errorcode = HAL_TIMEOUT;
-    return errorcode;
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint16_t Size, uint32_t Timeout)
@@ -429,7 +426,6 @@ static void i2s_config(I2S_HandleTypeDef *hi2s, uint16_t *pTxData, uint16_t *pRx
 
 static HAL_StatusTypeDef i2s_tx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
 {
-    HAL_StatusTypeDef errorcode = HAL_OK;
     uint32_t tickstart = systick_get_value();
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
     uint32_t end_tick = tickstart + timeout;
@@ -444,19 +440,16 @@ static HAL_StatusTypeDef i2s_tx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
         {
             if (time_diff(systick_get_value(), end_tick) > 0)
             {
-                goto error;
+                return HAL_TIMEOUT;
             }
         }
     }
 
-error:
-    errorcode = HAL_TIMEOUT;
-    return errorcode;
+    return HAL_OK;
 }
 
 static HAL_StatusTypeDef i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
 {
-    HAL_StatusTypeDef errorcode = HAL_OK;
     uint32_t tickstart = systick_get_value();
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
     uint32_t end_tick = tickstart + timeout;
@@ -487,15 +480,13 @@ static HAL_StatusTypeDef i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
             {
                 if (time_diff(systick_get_value(), end_tick) > 0)
                 {
-                    goto error;
+                    return HAL_TIMEOUT;
                 }
             }
         }
     }
-
-error:
-    errorcode = HAL_TIMEOUT;
-    return errorcode;
+    
+    return HAL_OK;
 }
 
 static void i2s_disable(I2S_HandleTypeDef *hi2s)
