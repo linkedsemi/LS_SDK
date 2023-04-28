@@ -1272,6 +1272,8 @@ void io_wkup_en_clr_set(uint8_t pin)
     }
 }
 
+__attribute__((weak)) void _arduino_exti_callback(uint8_t pin,exti_edge_t edge){}
+
 __attribute__((weak)) void io_exti_callback(uint8_t pin,exti_edge_t edge){}
 
 static void exti_io_handler(uint8_t port,uint8_t num)
@@ -1280,6 +1282,7 @@ static void exti_io_handler(uint8_t port,uint8_t num)
     EXTI->EICR = 1<<num;
     io_wkup_en_clr_set(pin);
     io_exti_callback(pin,INT_EDGE_UNKNOWN);
+    _arduino_exti_callback(pin,INT_EDGE_UNKNOWN);    
 }
 
 void EXTI_Handler(void)
