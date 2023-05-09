@@ -288,7 +288,8 @@ static void process_setup_packet(uint8_t rhport)
     p[1]        = USB0->FIFO0_WORD;
 #else
     /* Remove unaligned access warning for GCC. By mzhou. */
-    void *p = (void*)&_dcd.setup_packet;
+    void *pkt = (void*)&_dcd.setup_packet;
+    uint8_t *p = pkt;
     uint32_t data_word = USB0->FIFO0_WORD;
     memcpy(p, (void*)&data_word, sizeof(uint32_t));
     data_word = USB0->FIFO0_WORD;
@@ -320,13 +321,13 @@ static bool handle_xfer_in(uint_fast8_t ep_addr)
     volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
     const unsigned mps = regs->TXMAXP;
     const unsigned len = TU_MIN(mps, rem);
-    void          *buf = pipe->buf;
+    uint8_t       *buf = pipe->buf;
 
     regs->TXCSRH |= USB_TXCSRH1_MODE;
     // TU_LOG1("   %p mps %d len %d rem %d\n", buf, mps, len, rem);
     if (len) {
         if (_dcd.pipe_buf_is_fifo[TUSB_DIR_IN] & TU_BIT(epnum_minus1)) {
-            pipe_read_write_packet_ff(buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_IN);
+            pipe_read_write_packet_ff((tu_fifo_t *)buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_IN);
         } else {
             pipe_write_packet(buf, &USB0->FIFO1_WORD + epnum_minus1, len);
             pipe->buf       = buf + len;
@@ -350,7 +351,7 @@ static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
     const unsigned rem = pipe->remaining;
     const unsigned vld = regs->RXCOUNT;
     const unsigned len = TU_MIN(TU_MIN(rem, mps), vld);
-    void          *buf = pipe->buf;
+    uint8_t       *buf = pipe->buf;
 
     /* Delay handling out data in FIFO if stack has't configured the buffer. By mzhou. */
     if (NULL == buf)
@@ -362,7 +363,7 @@ static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
 
     if (len) {
         if (_dcd.pipe_buf_is_fifo[TUSB_DIR_OUT] & TU_BIT(epnum_minus1)) {
-            pipe_read_write_packet_ff(buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_OUT);
+            pipe_read_write_packet_ff((tu_fifo_t *)buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_OUT);
         } else {
             pipe_read_packet(buf, &USB0->FIFO1_WORD + epnum_minus1, len);
             pipe->buf       = buf + len;

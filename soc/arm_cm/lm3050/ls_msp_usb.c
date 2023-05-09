@@ -53,6 +53,7 @@ void HAL_USB_MSP_Host_Setup(void *param)
     io_pull_write(PA12,IO_PULL_DOWN);
 }
 
+__attribute__((weak)) void hcd_event_handler(hcd_event_t const* event, bool in_isr){}
 void HAL_USB_MSP_Host_Discon_Hook()
 {
     if((USB0->DEVCTL & USB_DEVCTL_HOST) == 0)

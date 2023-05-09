@@ -33,7 +33,7 @@ def progen(target,source,env):
     root_relpath = os.path.relpath(env['SDK_ROOT'].abspath,os.path.join(os.path.join(env['IC'],env['IDE'])))
     project_data['tool_specific'] = {
         'uvision5':{'misc':{
-                        'c_flags':['--diag_suppress=1,61,68,188,1295'],
+                        'c_flags':['--diag_suppress=1,61,66,68,188,1295,1296'],
                         'asm_flags':['--diag_suppress=1'],
                         'ld_flags':['--datacompressor=off','--diag_suppress=L6314,L6329']
                     },
