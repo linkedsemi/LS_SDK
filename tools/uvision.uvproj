@@ -355,6 +355,7 @@
 						<uThumb>0</uThumb>
 						<uSurpInc>0</uSurpInc>
 						<uC99>1</uC99>
+					    <uGnu>1</uGnu>
 						<useXO>0</useXO>
 						<VariousControls>
 							<MiscControls></MiscControls>
