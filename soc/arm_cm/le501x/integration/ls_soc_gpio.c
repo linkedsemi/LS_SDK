@@ -1102,7 +1102,7 @@ void io_clr_pin(uint8_t pin)
 
 void io_write_pin(uint8_t pin, uint8_t val)
 {
-    if(val)
+    if(val & 0x1)
     {
         io_set_pin(pin);
     }else
