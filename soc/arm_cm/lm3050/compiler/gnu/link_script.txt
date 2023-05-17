@@ -58,10 +58,17 @@ SECTIONS
 		*(.text* .rodata*)
 	}>FLASH
 
+	.ARM.extab : 
+	{
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} > FLASH
+
+	__exidx_start = .;
 	.ARM.exidx :
 	{
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 	} > FLASH
+	__exidx_end = .;
 
 	.bss (NOLOAD):
 	{
