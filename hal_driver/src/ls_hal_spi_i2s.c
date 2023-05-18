@@ -1,5 +1,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ls_hal_spi_i2s.h"
+#include <stdbool.h>
+#include "log.h"
+#include "systick.h"
+#include "ls_dbg.h"
+#include "common.h"
 
 #define SPI_I2S_TX_FIFO_DEPTH 16
 #define SPI_I2S_TX_FIFO_NOT_FULL(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_TXFLV) < SPI_I2S_TX_FIFO_DEPTH)
