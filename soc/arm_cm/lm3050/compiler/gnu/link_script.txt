@@ -23,7 +23,7 @@ SECTIONS
 	
 	__vector_lma__ = LOADADDR(.vectors);
 
-	.data 0x20000148 :
+	.data 0x20000134 :
 	{
 		. = ALIGN(4);
 		__data_start__ = .;

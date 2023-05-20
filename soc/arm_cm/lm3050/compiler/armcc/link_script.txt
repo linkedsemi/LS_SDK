@@ -13,7 +13,7 @@ LR_FLASH FLASH_BASE_APP FLASH_SIZE{
         *(RESET, +First)
     }
 
-    RAM_DATA_CODE 0x20000148 {
+    RAM_DATA_CODE 0x20000134 {
         *(.xip_banned.sleep_recover_asm,+First)
         *(+RW)
         *(.xip_banned*)
