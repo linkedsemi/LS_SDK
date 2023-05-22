@@ -15,12 +15,15 @@ static StackType_t timer_task_stack[TIMER_TASK_STACK_SIZE];
 static StaticTask_t timer_task_buf;
 static StackType_t idle_task_stack[IDLE_TASK_STACK_SIZE];
 static StaticTask_t idle_task_buf;
+void xPortPendSVHandler(void);
 
+#define LOW_SPEED_TIMER 1
+#define CORTEX_M_SYSTICK 0
+#define OS_TICK_SOURCE CORTEX_M_SYSTICK
+#if OS_TICK_SOURCE == LOW_SPEED_TIMER
 static TickType_t expected_idle_time;
 static uint32_t timer_target;
 static uint32_t accumulated_remainder_cyc;
-void xPortPendSVHandler(void);
-void xPortSysTickHandler( void );
 
 static void lstim_int_clr()
 {
@@ -64,6 +67,7 @@ void vPortSetupTimerInterrupt( void )
     LSTIM->TIM_CTRL = TIM_TIM_EN_MASK|TIM_TIM_INTR_EN_MASK;
     LSTIM->TIM_TGT = CYC_PER_TICK;
     lstim_int_clr();
+    __NVIC_SetPriority(LSTIM_IRQn,255);
     __NVIC_EnableIRQ(LSTIM_IRQn);
     V33_RG->WKUP_CTRL |= 0x4;
 }
@@ -92,6 +96,7 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
     expected_idle_time = xExpectedIdleTime;
     low_power_mode_sched();
 }
+#endif
 
 void rtos_init()
 {
