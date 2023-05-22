@@ -33,7 +33,7 @@
 	.syntax	unified
 	.arch	armv7-m
 
-	.section .stack
+	.section .stack,"a"
 	.align	3
 
 	.equ	Stack_Size, 0x1000
@@ -46,10 +46,10 @@ __StackLimit:
 __StackTop:
 	.size	__StackTop, . - __StackTop
 
-	.section .heap
+	.section .heap,"a"
 	.align	3
 
-	.equ	Heap_Size, 0x2000
+	.equ	Heap_Size, 0x800
 
 	.globl	__HeapBase
 	.globl	__HeapLimit
@@ -61,4 +61,4 @@ __HeapBase:
 __HeapLimit:
 	.size	__HeapLimit, . - __HeapLimit
 	
-
+  .end
