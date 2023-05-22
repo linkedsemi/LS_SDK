@@ -1,21 +1,24 @@
 if(CONFIG_SOC_LE5010)
 
   zephyr_include_directories(
-    .
     ../soc
     ../soc/arm_cm
     ../soc/arm_cm/le501x
     ../soc/arm_cm/le501x/integration
+    ../hal_driver/api
+    ../hal_driver/inc
+  )
+
+  zephyr_library_include_directories(
+    .
     ../module/common
     ../module/debug
     ../module/tinyfs
     ../module/ble
     ../module/static_buffer
-    ../hal_driver/api
-    ../hal_driver/inc
   )
 
-  zephyr_sources(
+  zephyr_library_sources(
     ../module/common/common.c
     ../module/debug/ls_dbg.c
     ../module/debug/log.c
