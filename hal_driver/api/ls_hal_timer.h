@@ -1444,6 +1444,13 @@ void HAL_TIMEx_CommutHalfCpltCallback(TIM_HandleTypeDef *htim);
 void HAL_TIMEx_BreakCallback(TIM_HandleTypeDef *htim);
 
 /**
+ * @brief  arduino timer callback in non-blocking mode
+ * @param  htim TIM handle
+ * @retval None
+ */
+void _arduino_timerISR(TIM_HandleTypeDef *htim);
+
+/**
  * @brief  Period elapsed callback in non-blocking mode
  * @param  htim TIM handle
  * @retval None

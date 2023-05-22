@@ -6,7 +6,8 @@
 #include "ls_soc_gpio.h"
 #include "common.h"
 #include "reg_sysc_awo_type.h"
-#define APP_ADDR 0x800200
+#include "reg_v33_rg_type.h"
+#define APP_ADDR 0x800300
 
 __NO_RETURN static void boot_app(uint32_t base)
 {
@@ -17,7 +18,26 @@ __NO_RETURN static void boot_app(uint32_t base)
     (*reset_handler)();
     while(1);
 }
+static void trim_val_load()
+{
+    uint32_t trim_value[8] = {0};
 
+    hal_flash_read_security_area(1,0x10,(uint8_t *)trim_value,sizeof(trim_value));
+    if(trim_value[0] == ~trim_value[1])
+    {
+        SYSC_AWO->PD_AWO_ANA1 = trim_value[0];
+    }
+
+    if(trim_value[2] == ~trim_value[3])
+    {
+        V33_RG->OP_CTRL = trim_value[2];
+    }
+
+    if(trim_value[6] == ~trim_value[7])
+    {
+        V33_RG->TRIM0 = trim_value[6];
+    }
+}
 __NO_RETURN void boot_ram_start()
 {
     __disable_irq();
@@ -26,5 +46,6 @@ __NO_RETURN void boot_ram_start()
     pinmux_hal_flash_quad_init();
     hal_flash_xip_start();
     lscache_cache_enable(1);
+    trim_val_load();
     boot_app(APP_ADDR);
 }

@@ -1030,7 +1030,7 @@ static inline void LL_I2C_DisableTimeExten(reg_i2c_t *I2Cx)
  */
 static inline uint32_t LL_I2C_IsEnableTimeExten(reg_i2c_t *I2Cx)
 {
-    return (READ_BIT(I2Cx->TIMEOUTR, I2C_TIMEOUTR_TEXTEN_MASK) == (I2C_TIMEOUTR_TEXTEN_MASK));
+    return (READ_BIT(I2Cx->TIMEOUTR, I2C_TIMEOUTR_TEXTEN_MASK) == ((uint32_t)I2C_TIMEOUTR_TEXTEN_MASK));
 }
 /******************************************SR******************************************/
 /*                                                                                    */

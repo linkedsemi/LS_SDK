@@ -6,14 +6,22 @@
 #include "dmac_config.h"
 #include "ls_msp_dmacv2.h"
 #include "reg_v33_rg_type.h"
+#include "ls_hal_flash.h"
 
 void HAL_LSDAC_MSP_Init(void)
 {
+    uint32_t dac_ana_trim_value[2] = {0};
     MODIFY_REG(V33_RG->MISC_CTRL1, V33_RG_PD_DAC12_MASK, 0 << V33_RG_PD_DAC12_POS);
     SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_CLR_DAC12_MASK;
     SYSC_PER->PD_PER_SRST3 = SYSC_PER_SRST_CLR_DAC12_N_MASK;
     SYSC_PER->PD_PER_SRST3 = SYSC_PER_SRST_SET_DAC12_N_MASK;
     SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_SET_DAC12_MASK;
+
+    hal_flash_read_security_area(1,0x20,(uint8_t *)dac_ana_trim_value,sizeof(dac_ana_trim_value));
+    if(dac_ana_trim_value[0]==~dac_ana_trim_value[1])
+    {
+        LSDAC12->DAC_ANA = dac_ana_trim_value[0];
+    }
 }
 void HAL_LSDAC_MSP_DeInit(void)
 {

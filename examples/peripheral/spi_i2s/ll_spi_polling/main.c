@@ -11,7 +11,7 @@
 #include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
 #include "systick.h"
-#include "ls_hal_spi_i2s.h"
+#include "ls_ll_spi.h"
 /******************************************************************************
  Macro definition
  ******************************************************************************/

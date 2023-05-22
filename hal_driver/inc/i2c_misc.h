@@ -100,9 +100,17 @@ enum
 #define I2C_MEM_ADD_LSB(__ADDRESS__)                  ((uint8_t)((uint16_t)((__ADDRESS__) & (uint16_t)0x00FF)))
 
 #define I2C_MIN_PCLK_FREQ_STANDARD       400000U      /*!< 400 kHz                     */
-#define I2C_MIN_PCLK_FREQ_FAST           1000000U     /*!< 1 MHz                     */
+#define I2C_MIN_PCLK_FREQ_FAST           1000000U     /*!< 1 MHz                     */ 
+
+#ifdef LE501X
 #define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
-                                       ((INSTANCE) == I2C2))
+                                       ((INSTANCE) == I2C2))        
+#elif defined LM3050
+#define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
+                                       ((INSTANCE) == I2C2) || \
+                                       ((INSTANCE) == I2C3))
+#endif          
+
 #define IS_I2C_ADDRESSING_MODE(ADDRESS) (((ADDRESS) == I2C_ADDRESSINGMODE_7BIT) || \
                                          ((ADDRESS) == I2C_ADDRESSINGMODE_10BIT))
 #define IS_I2C_DUAL_ADDRESS(ADDRESS) (((ADDRESS) == I2C_DUALADDRESS_DISABLE) || \

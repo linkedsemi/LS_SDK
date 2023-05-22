@@ -8,6 +8,10 @@
 #include "common.h"
 #include "log.h"
 
+// #define secp256r1   1
+#define sm2         1
+
+#if secp256r1
 // Base Point : G
 const static uint8_t Gx[32] = {
     0x96, 0xC2, 0x98, 0xD8, 0x45, 0x39, 0xA1, 0xF4,
@@ -20,6 +24,21 @@ const static uint8_t Gy[32] = {
     0xCE, 0x5E, 0x31, 0x6B, 0x57, 0x33, 0xCE, 0x2B,
     0x16, 0x9E, 0x0F, 0x7C, 0x4A, 0xEB, 0xE7, 0x8E,
     0x9B, 0x7F, 0x1A, 0xFE, 0xE2, 0x42, 0xE3, 0x4F};
+
+#elif sm2
+const static uint8_t Gx[32] = {
+    0xC7, 0x74, 0x4C, 0x33, 0x89, 0x45, 0x5A, 0x71,
+    0xE1, 0x0B, 0x66, 0xF2, 0xBF, 0x0B, 0xE3, 0x8F,
+    0x94, 0xC9, 0x39, 0x6A, 0x46, 0x04, 0x99, 0x5F,
+    0x19, 0x81, 0x19, 0x1F, 0x2C, 0xAE, 0xC4, 0x32};
+
+const static uint8_t Gy[32] = {
+    0xA0, 0xF0, 0x39, 0x21, 0xE5, 0x32, 0xDF, 0x02,
+    0x40, 0x47, 0x2A, 0xC6, 0x7C, 0x87, 0xA9, 0xD0,
+    0x53, 0x21, 0x69, 0x6B, 0xE3, 0xCE, 0xBD, 0x59,
+    0x9C, 0x77, 0xF6, 0xF4, 0xA2, 0x36, 0x37, 0xBC};
+
+#endif
 
 const static uint8_t *BasePoint[2] = {Gx, Gy};
 
@@ -53,6 +72,8 @@ int main(void)
 {
     sys_init_none();
     HAL_LSECC_Init();
+
+    #if secp256r1
     //Generate public key
     HAL_LSECC_PointMult(&secp256r1_param, pri_key1, BasePoint, pub_key1);  //aG
     HAL_LSECC_PointMult(&secp256r1_param, pri_key2, BasePoint, pub_key2);  //bG
@@ -61,6 +82,18 @@ int main(void)
     const static uint8_t *pubkey2[2] = {P2x, P2y};
     HAL_LSECC_PointMult(&secp256r1_param, pri_key1, pubkey2, share_key1);  //a * bG
     HAL_LSECC_PointMult(&secp256r1_param, pri_key2, pubkey1, share_key2);  //b * aG
+
+    #elif sm2
+    //Generate public key
+    HAL_LSECC_PointMult(&sm2_param, pri_key1, BasePoint, pub_key1);  //aG
+    HAL_LSECC_PointMult(&sm2_param, pri_key2, BasePoint, pub_key2);  //bG
+    //Generating shared key
+    const static uint8_t *pubkey1[2] = {P1x, P1y};
+    const static uint8_t *pubkey2[2] = {P2x, P2y};
+    HAL_LSECC_PointMult(&sm2_param, pri_key1, pubkey2, share_key1);  //a * bG
+    HAL_LSECC_PointMult(&sm2_param, pri_key2, pubkey1, share_key2);  //b * aG
+
+    #endif
     //compare
     if ((!memcmp(s1x, s2x, 32))&&(!memcmp(s1y, s2y, 32)))
     {

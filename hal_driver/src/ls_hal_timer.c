@@ -936,6 +936,7 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);
       HAL_TIM_PeriodElapsedCallback(htim);
+      _arduino_timerISR(htim);      
     }
   }
   /* TIM Break input event */
@@ -1570,6 +1571,16 @@ uint32_t HAL_TIM_ReadCapturedValue(TIM_HandleTypeDef *htim, uint32_t Channel)
   }
 
   return tmpreg;
+}
+
+__weak void _arduino_timerISR(TIM_HandleTypeDef *htim)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the _arduino_timerISR could be implemented in the user file
+   */
 }
 
 __weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)

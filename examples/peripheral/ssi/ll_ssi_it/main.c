@@ -63,7 +63,7 @@ static void ssi_test_init(void)
    /* MOSI------------PA07 */	
    /* MISO------------PA00 */	
 
-  pinmux_ssi_clk_init(PB09,INACTIVE_LOW); // The idle state of clock must correspond to the polarity	  	
+  pinmux_ssi_clk_init(PB09,0); // The idle state of clock must correspond to the polarity	  	
   pinmux_ssi_nss0_init(PB08); 
   pinmux_ssi_dq0_init(PA07);  
   pinmux_ssi_dq1_init(PA00); 

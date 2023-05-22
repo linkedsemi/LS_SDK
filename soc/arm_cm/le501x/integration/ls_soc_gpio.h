@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "ls_soc_pinmux.h"
+#include "reg_gpio_type.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -236,8 +237,16 @@ io_drive_type_t io_drive_capacity_read(uint8_t pin);
 void io_exti_config(uint8_t pin,exti_edge_t edge);
 
 /**
+  * @brief GPIO external interrupt callback for arduino
+  * @param pin specific GPIO pin
+  * @param edge edges for IO interrupts 
+  */
+void _arduino_exti_callback(uint8_t pin,exti_edge_t edge);
+
+/**
   * @brief GPIO external interrupt callback
   * @param pin specific GPIO pin
+  * @param edge edges for IO interrupts 
   */
 void io_exti_callback(uint8_t pin,exti_edge_t edge);
 
@@ -246,6 +255,24 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge);
   * @param pin specific GPIO pin
   */
 void set_gpio_mode(gpio_pin_t *pin);
+
+/**
+  * @brief Get GPIO Port
+  * @param  pin specific GPIO pin
+  * @retval This parameter can be a value of @ref reg_lsgpio_t    
+  */
+reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port);
+
+/**
+  * @brief  Set pin mux function to ana func1
+  * @param pin specific GPIO pin
+  */
+void pinmux_ana_func1_init(uint8_t ain);
+
+/**
+  * @brief  clear pin mux functions of ana
+  */
+void gpio_ana_deinit(uint8_t ain);
 
 
 /** @}*/

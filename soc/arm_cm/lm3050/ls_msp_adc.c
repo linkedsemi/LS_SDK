@@ -9,6 +9,7 @@
 #include "sys_stat.h"
 #include "reg_sysc_per_type.h"
 #include "reg_v33_rg_type.h"
+#include "ls_hal_flash.h"
 
 static ADC_HandleTypeDef *adc_inst_env[2];
 
@@ -19,6 +20,20 @@ void ADC1_Handler(void)
 void ADC2_Handler(void)
 {
     HAL_ADC_IRQHandler(adc_inst_env[1]);
+}
+
+static void load_trim_value(reg_adc_t* adc,uint16_t addr)
+{
+    uint32_t adc_trim_value[4] = {0};
+    hal_flash_read_security_area(1,addr,(uint8_t *)adc_trim_value,sizeof(adc_trim_value));
+    if(adc_trim_value[0]==~adc_trim_value[1])
+    {
+        adc->ADR = adc_trim_value[0];
+    }
+    if(adc_trim_value[2]==~adc_trim_value[3])
+    {
+        MODIFY_REG(adc->ADCH,ADC_ADCH_OS_CALV_MASK,(adc_trim_value[2]>>16)<<ADC_ADCH_OS_CALV_POS);
+    }
 }
 
 void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
@@ -35,6 +50,7 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
         adc_inst_env[0] = inst;
         __NVIC_ClearPendingIRQ(ADC1_IRQn);
         __NVIC_EnableIRQ(ADC1_IRQn);
+        load_trim_value(LSADC1,0x30);
         break;
     case (uint32_t)LSADC2:
         SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_ADC2_MASK;
@@ -45,6 +61,7 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
         adc_inst_env[1] = inst;
         __NVIC_ClearPendingIRQ(ADC2_IRQn);
         __NVIC_EnableIRQ(ADC2_IRQn);
+        load_trim_value(LSADC2,0x40);
         break;
     default:
         LS_ASSERT(0);
