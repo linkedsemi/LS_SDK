@@ -111,7 +111,7 @@ void XIP_BANNED_FUNC(do_hal_flash_write_reg_func,void *param)
     lsqspi_stig_write_register(ptr->opcode,ptr->buf,ptr->length);
 }
 
-void XIP_BANNED_FUNC(hal_flash_chip_erase,)
+void XIP_BANNED_FUNC(do_hal_flash_chip_erase_func,void *param)
 {
     lsqspi_stig_send_command(CHIP_ERASE_OPCODE);
 }
