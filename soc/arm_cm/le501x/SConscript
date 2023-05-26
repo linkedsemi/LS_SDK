@@ -156,6 +156,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
             rtos_adapt,
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
+        self.Append(CPPDEFINES = ['FREERTOS'])
     if self.get('STACK_LIB') is None:
         if mesh:
             self['STACK_LIB'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))

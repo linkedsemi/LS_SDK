@@ -6,6 +6,7 @@
 #include "reg_v33_rg_type.h"
 #include "field_manipulate.h"
 #include "sleep.h"
+#include "cpu.h"
 #define CYC_PER_TICK (SDK_LCLK_HZ/configTICK_RATE_HZ)
 #define REMAINDER_CYC_PER_TICK (SDK_LCLK_HZ%configTICK_RATE_HZ)
 #define TIMER_TASK_STACK_SIZE 100
@@ -17,9 +18,6 @@ static StackType_t idle_task_stack[IDLE_TASK_STACK_SIZE];
 static StaticTask_t idle_task_buf;
 void xPortPendSVHandler(void);
 
-#define LOW_SPEED_TIMER 1
-#define CORTEX_M_SYSTICK 0
-#define OS_TICK_SOURCE CORTEX_M_SYSTICK
 #if OS_TICK_SOURCE == LOW_SPEED_TIMER
 static TickType_t expected_idle_time;
 static uint32_t timer_target;
@@ -96,6 +94,22 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
     expected_idle_time = xExpectedIdleTime;
     low_power_mode_sched();
 }
+
+#else
+
+void systick_start(){}
+
+uint32_t systick_get_value()
+{
+    if(in_interrupt())
+    {
+        return xTaskGetTickCountFromISR();
+    }else
+    {
+        return xTaskGetTickCount();
+    }
+}
+
 #endif
 
 void rtos_init()
