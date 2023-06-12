@@ -46,7 +46,7 @@ typedef struct
 {
     uint8_t num:4,   /*!<gpio pin */   
             port:4;  /*!<gpio port */   
-}gpio_pin_t;
+}gpio_port_pin_t;
 
 //lsgpioa
 #define PA00 ((uint8_t)0x00)   /*!< GPIOA00 selected */     
@@ -246,7 +246,7 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge);
   * @brief Set GPIO mode
   * @param pin specific GPIO pin
   */
-void set_gpio_mode(gpio_pin_t *pin);
+void set_gpio_mode(gpio_port_pin_t *pin);
 
 
 /** @}*/
