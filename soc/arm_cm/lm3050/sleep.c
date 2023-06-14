@@ -187,6 +187,7 @@ static void deep_sleep_no_ble()
     memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,ARRAY_LEN(NVIC_EN));
     systick_start();
     SCB->SCR &= ~(1<<2);
+    deep_sleep_exit_hook();
     uart_log_resume();
 }
 
