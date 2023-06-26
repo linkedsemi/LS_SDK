@@ -96,8 +96,11 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
 }
 
 #else
+extern void xPortSysTickHandler(void);
 
-void systick_start(){}
+void systick_start(){
+    arm_cm_set_int_isr(SysTick_IRQn,xPortSysTickHandler);
+}
 
 uint32_t systick_get_value()
 {
