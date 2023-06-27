@@ -19,19 +19,5 @@ SWINT_C_Routine
 	bx r2
     ALIGN
     ENDP
-    
-#define FLASH_SWINT_FUNC do_hal_flash_program
-#include "flash_swint_asm.inc"
-	
-#define FLASH_SWINT_FUNC do_hal_flash_write_reg
-#include "flash_swint_asm.inc"
 
-#define FLASH_SWINT_FUNC do_hal_flash_read
-#include "flash_swint_asm.inc"
-
-#define FLASH_SWINT_FUNC do_hal_flash_read_reg
-#include "flash_swint_asm.inc"
-
-#define FLASH_SWINT_FUNC do_hal_flash_chip_erase
-#include "flash_swint_asm.inc"
 	END

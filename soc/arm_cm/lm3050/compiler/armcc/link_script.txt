@@ -19,12 +19,12 @@ LR_FLASH FLASH_BASE_APP FLASH_SIZE{
         *(.xip_banned*)
     }
 
-    FLASH_CODE FLASH_BASE_APP+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE) ALIGN 0x4{
+    FLASH_CODE AlignExpr(FLASH_BASE_APP+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE),8) FIXED {
         *(InRoot$$Sections)
         .ANY(+RO)
     }
     ScatterAssert(ImageLimit(FLASH_CODE) <= FLASH_END)
-    BSS ImageLimit(RAM_DATA_CODE) ALIGN 0x4
+    BSS AlignExpr(ImageLimit(RAM_DATA_CODE),8)
     {
         *(+ZI)
     }

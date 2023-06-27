@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stddef.h>
 #include "systick.h"
 #include "platform.h"
 #include "ls_soc_pinmux.h"
@@ -80,7 +81,6 @@ uint32_t board_button_read(void)
 }
 
 #if defined(__ICCARM__)
-extern int _write(int fd, char *ptr, int len)
 #define sys_write __write
 #define sys_read __read
 #elif defined(__GNUC__)
@@ -98,7 +98,7 @@ extern int _write(int fd, char *ptr, int len)
     //   return count;
     // }
 
-    int sys_read(int fhdl, char *buf, size_t count)
+int sys_read(int fhdl, char *buf, size_t count)
 {
   (void)fhdl;
   int rd = (int)SEGGER_RTT_Read(0, buf, count);
