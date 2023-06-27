@@ -12,6 +12,7 @@ src = [
     '../msc_fatfs_flash/diskio.c',
 
     '$SDK_ROOT/module/fatfs/source/ff.c',
+    '$SDK_ROOT/module/fatfs/source/ffunicode.c',
 ]
 inc = [
     '.',
