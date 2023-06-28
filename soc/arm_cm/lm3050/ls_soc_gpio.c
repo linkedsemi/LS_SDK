@@ -198,7 +198,7 @@ void EXTI_Handler(void)
     }
 }
 
-void io_init(void)
+__attribute__((weak)) void io_init(void)
 {
     SYSC_AWO->IO[0].IEN_OD = 0x9fff0000;
     SYSC_AWO->IO[0].OE_DOT= 0;
@@ -215,7 +215,8 @@ void io_init(void)
     __NVIC_EnableIRQ(EXTI_ASYNC_IRQn);
     arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
     __NVIC_ClearPendingIRQ(EXTI_IRQn);
-    __NVIC_EnableIRQ(EXTI_IRQn);}
+    __NVIC_EnableIRQ(EXTI_IRQn);
+}
 
 
 void io_cfg_output(uint8_t pin)

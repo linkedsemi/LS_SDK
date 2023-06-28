@@ -1048,7 +1048,7 @@ void pinmux_pdm_data1_deinit(void)
 }
 
 void EXTI_Handler(void);
-void io_init(void)
+__attribute__((weak)) void io_init(void)
 {
     RCC->AHBEN |= RCC_GPIOA_MASK | RCC_GPIOB_MASK | RCC_GPIOC_MASK;
     LSGPIOA->MODE = 0;
