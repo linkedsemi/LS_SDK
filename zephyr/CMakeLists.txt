@@ -1,6 +1,7 @@
 if(CONFIG_SOC_LE5010)
 
   zephyr_include_directories(
+    .
     ../soc
     ../soc/arm_cm
     ../soc/arm_cm/le501x
