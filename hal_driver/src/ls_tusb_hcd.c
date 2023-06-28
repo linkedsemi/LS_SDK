@@ -385,7 +385,7 @@ static bool pipe_xfer_in(uint_fast8_t pipenum)
   void          *buf = pipe->buf;
   if (len) {
     pipe_read_packet(buf, &USB0->FIFO0_WORD + pipenum, len);
-    pipe->buf       = buf + len;
+    pipe->buf       = (uint8_t *)buf + len;
     pipe->remaining = rem - len;
   }
   if ((len < mps) || (rem == len)) {

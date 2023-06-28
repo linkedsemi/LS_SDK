@@ -143,7 +143,7 @@ void jump_to_app(void)
     NVIC->ICER[0] = 0xFFFFFFFF;
     NVIC->ICPR[0] = 0xFFFFFFFF;
 #else
-    app_addr = (0x00800000 + APP_DATA_ADDR_BASE + 512); // skip Info Page , 0x200
+    app_addr = (0x00800000 + APP_DATA_ADDR_BASE + 256); 
     uint32_t i;
     for (i = 0; i < 8; i++)
     {

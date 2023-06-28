@@ -6,12 +6,12 @@
 
 static uint32_t total_ticks;
 
-void XIP_BANNED_FUNC(SysTick_Handler,)
+__attribute__((weak)) void XIP_BANNED_FUNC(SysTick_Handler,)
 {
     total_ticks += 1;
 }
 
-void systick_start()
+__attribute__((weak)) void systick_start()
 {
     total_ticks = 0;
     arm_cm_set_int_isr(SysTick_IRQn,SysTick_Handler);
@@ -22,12 +22,12 @@ void systick_start()
                      SysTick_CTRL_ENABLE_Msk;
 }
 
-uint32_t XIP_BANNED_FUNC(systick_get_value,)
+__attribute__((weak)) uint32_t XIP_BANNED_FUNC(systick_get_value,)
 {
     return total_ticks;
 }
 
-bool XIP_BANNED_FUNC(systick_poll_timeout,uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
+__attribute__((weak)) bool XIP_BANNED_FUNC(systick_poll_timeout,uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
 {
     va_list ap;
     uint32_t end_tick = start_tick + timeout;
@@ -44,7 +44,7 @@ bool XIP_BANNED_FUNC(systick_poll_timeout,uint32_t start_tick,uint32_t timeout,b
     return true;
 }
 
-void systick_stop()
+__attribute__((weak)) void systick_stop()
 {
     SysTick->CTRL = 0;
     SCB->ICSR = SCB_ICSR_PENDSTCLR_Msk;

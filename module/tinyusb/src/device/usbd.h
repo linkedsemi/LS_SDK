@@ -134,6 +134,15 @@ TU_ATTR_WEAK uint8_t const* tud_descriptor_device_qualifier_cb(void);
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 // Configuration descriptor in the other speed e.g if high speed then this is for full speed and vice versa
 TU_ATTR_WEAK uint8_t const* tud_descriptor_other_speed_configuration_cb(uint8_t index);
+#if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6100100)
+
+// Invoked when device is mounted (configured)
+void tud_mount_cb(void);
+
+// Invoked when device is unmounted
+void tud_umount_cb(void);
+
+#else
 
 // Invoked when device is mounted (configured)
 TU_ATTR_WEAK void tud_mount_cb(void);
@@ -141,6 +150,7 @@ TU_ATTR_WEAK void tud_mount_cb(void);
 // Invoked when device is unmounted
 TU_ATTR_WEAK void tud_umount_cb(void);
 
+#endif
 // Invoked when usb bus is suspended
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 TU_ATTR_WEAK void tud_suspend_cb(bool remote_wakeup_en);

@@ -55,6 +55,12 @@ extern "C" {
 #define LOG_UART_MSBEN 0
 #endif
 
+#define LOW_SPEED_TIMER 1
+#define CORTEX_M_SYSTICK 0
+#ifndef OS_TICK_SOURCE
+#define OS_TICK_SOURCE CORTEX_M_SYSTICK
+#endif
+
 #define SDK_PCLK_MHZ (SDK_HCLK_MHZ/SDK_PCLK_DIV)
 
 #ifndef SDK_SRAM1_PWR_DOWN

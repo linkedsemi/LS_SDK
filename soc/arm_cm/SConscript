@@ -15,7 +15,7 @@ elif tool == 'arm-llvm':
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
     env['ASFLAGS'] = ' -c ${CCFLAGS} '
-    env['LINKFLAGS'] = ' --config $LLVM_CFG -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--fatal-warnings '
+    env['LINKFLAGS'] = ' --config $LLVM_CFG -T ${LINKSCRIPT_PREPROCESSED} -Wl,-Map=${TARGET.base}.map -Wl,--fatal-warnings '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 else:
     env['COMPILER'] = 'gnu'
@@ -23,7 +23,7 @@ else:
     env['CFLAGS'] = ' -std=c11 '
     env['CXXFLAGS'] = ' -fno-exceptions '
     env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '
-    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,--print-memory-usage -Wl,-Map=${TARGET.base}.map -Wl,--fatal-warnings -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
+    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT_PREPROCESSED} -Wl,--print-memory-usage -Wl,-Map=${TARGET.base}.map -Wl,--fatal-warnings -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 SConscript(dirs=env['IC'],exports = ['env'])

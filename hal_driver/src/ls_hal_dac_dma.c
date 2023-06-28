@@ -54,7 +54,7 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
     {
         cfg.ctrl.peripheral_handshake = HAL_DAC_DMA_Handshake_Get(DAC1);
         SET_BIT(hdac->Instance->DAC_CR,DAC_DMA2N1_MASK);
-        if ((hdac->DACx == DAC1AndDAC2))
+        if (hdac->DACx == DAC1AndDAC2)
         {
             cfg.dst_addr += DAC_DHR12RD_ALIGNMENT(Alignment);
         }else{
@@ -68,7 +68,7 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
     {
         cfg.ctrl.peripheral_handshake = HAL_DAC_DMA_Handshake_Get(DAC2);
         SET_BIT(hdac->Instance->DAC_CR,DAC_DMAEN2_MASK);
-        if ((hdac->DACx == DAC1AndDAC2))
+        if (hdac->DACx == DAC1AndDAC2)
         {
             cfg.dst_addr += DAC_DHR12RD_ALIGNMENT(Alignment);
         }else

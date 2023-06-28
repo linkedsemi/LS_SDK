@@ -43,6 +43,11 @@ void hal_flash_read_reg_operation(void *param)
     FLASH_EXECUTE_NO_RETVAL(do_hal_flash_read_reg,param);
 }
 
+void hal_flash_chip_erase_operation(void *param)
+{
+    FLASH_EXECUTE_NO_RETVAL(do_hal_flash_chip_erase,param);
+}
+
 #ifndef __CC_ARM
 NOINLINE void do_hal_flash_program_swint(void *param)
 {
@@ -62,6 +67,11 @@ NOINLINE void do_hal_flash_read_swint(void *param)
 NOINLINE void do_hal_flash_read_reg_swint(void *param)
 {
     SWINT_FUNC_CALL_INLINE_ASM(do_hal_flash_read_reg,FLASH_SWINT_NUM);
+}
+
+NOINLINE void do_hal_flash_chip_erase_swint(void *param)
+{
+    SWINT_FUNC_CALL_INLINE_ASM(do_hal_flash_chip_erase,FLASH_SWINT_NUM);
 }
 
 #endif

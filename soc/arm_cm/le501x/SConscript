@@ -156,6 +156,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
             rtos_adapt,
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
+        self.Append(CPPDEFINES = ['FREERTOS'])
     if self.get('STACK_LIB') is None:
         if mesh:
             self['STACK_LIB'] = File(self.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libmesh.o'))
@@ -182,10 +183,14 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/ble.ld"))
         else:
             self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/mcu.ld"))
+    if not 'progen' in self['TOOLS']:
+        self['LINKSCRIPT_PREPROCESSED'] = self.Command('build/le501x/preprocessed_link_script.ld',self['LINKSCRIPT'],Action('$CC -E -P -x c $SOURCES > $TARGET'))
+    else:
+        self['LINKSCRIPT_PREPROCESSED'] = self['LINKSCRIPT']
     self.Append(LIBPATH = [self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/")])
     self.Append(CPPPATH = self.inc_dirs(inc_list))
     target = self.Program('build/le501x/'+name,self.variant_dir_source(sdk_src + start_src + app_src + rtos_src),OBJPREFIX = objprefix)
-    self.Depends(target,[self['LINKSCRIPT'],self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/common.ld")])
+    self.Depends(target,[self['LINKSCRIPT_PREPROCESSED'],self.subst("$SDK_ROOT/soc/arm_cm/le501x/compiler/$COMPILER/common.ld")])
     return target
 
 env.AddMethod(plf_postaction)

@@ -183,6 +183,16 @@ ROM_SYMBOL void do_hal_flash_write_reg(void *param)
     flash_writing_critical(do_hal_flash_write_reg_func,param);
 }
 
+ROM_SYMBOL void do_hal_flash_chip_erase(void *param)
+{
+    flash_writing_critical(do_hal_flash_chip_erase_func,param);
+}
+
+ROM_SYMBOL void hal_flash_chip_erase()
+{
+    hal_flash_chip_erase_operation(NULL);
+}
+
 ROM_SYMBOL void hal_flash_write_status_register(uint16_t status)
 {
     struct flash_wr_rd_reg_param param = {

@@ -62,6 +62,8 @@ __heap_limit
                 EXPORT   __Vectors
                 EXPORT   __Vectors_End
                 EXPORT   __Vectors_Size
+			    EXPORT   __initial_sp
+                IMPORT   SysTick_Handler
 
 __Vectors       DCD      __initial_sp                        ;     Top of Stack
                 DCD      Reset_Handler                       ;     Reset Handler
@@ -171,7 +173,6 @@ $Handler_Name   PROC
                 Set_Default_Handler  SVC_Handler
                 Set_Default_Handler  DebugMon_Handler
                 Set_Default_Handler  PendSV_Handler
-                Set_Default_Handler  SysTick_Handler
 
 Default_Handler PROC
                 B       .
@@ -181,15 +182,15 @@ Default_Handler PROC
 
 ; User setup Stack & Heap
 
-                IF       :LNOT::DEF:__MICROLIB
-                IMPORT   __use_two_region_memory
-                ENDIF
+;                IF       :LNOT::DEF:__MICROLIB
+;                IMPORT   __use_two_region_memory
+;                ENDIF
 
-                EXPORT   __stack_limit
-                EXPORT   __initial_sp
-                IF       Heap_Size != 0                      ; Heap is provided
+;                EXPORT   __stack_limit
+;                EXPORT   __initial_sp
+;                IF       Heap_Size != 0                      ; Heap is provided
                 EXPORT   __heap_base
                 EXPORT   __heap_limit
-                ENDIF
+;                ENDIF
 
                 END

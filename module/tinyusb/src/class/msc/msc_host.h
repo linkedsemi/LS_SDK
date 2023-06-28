@@ -102,12 +102,24 @@ bool tuh_msc_write10(uint8_t dev_addr, uint8_t lun, void const * buffer, uint32_
 bool tuh_msc_read_capacity(uint8_t dev_addr, uint8_t lun, scsi_read_capacity10_resp_t* response, tuh_msc_complete_cb_t complete_cb, uintptr_t arg);
 
 //------------- Application Callback -------------//
+#if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6100100)
+
+// Invoked when a device with MassStorage interface is mounted
+void tuh_msc_mount_cb(uint8_t dev_addr);
+
+// Invoked when a device with MassStorage interface is unmounted
+void tuh_msc_umount_cb(uint8_t dev_addr);
+
+#else
 
 // Invoked when a device with MassStorage interface is mounted
 TU_ATTR_WEAK void tuh_msc_mount_cb(uint8_t dev_addr);
 
 // Invoked when a device with MassStorage interface is unmounted
 TU_ATTR_WEAK void tuh_msc_umount_cb(uint8_t dev_addr);
+
+#endif
+
 
 //--------------------------------------------------------------------+
 // Internal Class Driver API

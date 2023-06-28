@@ -70,7 +70,7 @@ void uart_log_pause(){}
 void uart_log_resume(){}
 #endif
 
-#if defined(__CC_ARM)
+#if defined(__CC_ARM) || defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6100100)
 int fputc(int ch, FILE *f)
 {
     #if(LOG_BACKEND&JLINK_RTT)

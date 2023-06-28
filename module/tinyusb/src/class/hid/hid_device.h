@@ -116,7 +116,15 @@ TU_ATTR_WEAK bool tud_hid_set_idle_cb(uint8_t instance, uint8_t idle_rate);
 // Invoked when sent REPORT successfully to host
 // Application can use this to send the next report
 // Note: For composite reports, report[0] is report ID
+#if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6100100)
+
+void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint16_t len);
+
+#else
+
 TU_ATTR_WEAK void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint16_t len);
+
+#endif
 
 
 //--------------------------------------------------------------------+

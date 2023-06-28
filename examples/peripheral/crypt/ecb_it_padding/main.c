@@ -373,7 +373,7 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
         case LSCRYPT_ECB_ENCRYPT_128:
         {
-            if ((length == encrypt_expected_length))
+            if (length == encrypt_expected_length)
             {
                 LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO10126_TEST!------Length of encrypted data = %d",length);
             }

@@ -36,25 +36,25 @@ extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_lengt
 
 
 #if (LOG_LVL >= LVL_DBG) && (GLOBAL_OUTPUT_LVL >= LVL_DBG)
-    #define log_d(TAG, ...)           log_output_fn(true,"D/"TAG":"__VA_ARGS__)
+    #define log_d(TAG, ...)           log_output_fn(true,"D/" TAG":" __VA_ARGS__)
 #else
     #define log_d(TAG, ...)
 #endif
 
 #if (LOG_LVL >= LVL_INFO) && (GLOBAL_OUTPUT_LVL >= LVL_INFO)
-    #define log_i(TAG, ...)           log_output_fn(true,"I/"TAG":"__VA_ARGS__)
+    #define log_i(TAG, ...)           log_output_fn(true,"I/" TAG":" __VA_ARGS__)
 #else
     #define log_i(TAG, ...)
 #endif
 
 #if (LOG_LVL >= LVL_WARN) && (GLOBAL_OUTPUT_LVL >= LVL_WARN)
-    #define log_w(TAG, ...)           log_output_fn(true,"W/"TAG":"__VA_ARGS__)
+    #define log_w(TAG, ...)           log_output_fn(true,"W/" TAG":" __VA_ARGS__)
 #else
     #define log_w(TAG, ...)
 #endif 
 
 #if (LOG_LVL >= LVL_ERROR) && (GLOBAL_OUTPUT_LVL >= LVL_ERROR)
-    #define log_e(TAG, ...)           log_output_fn(true,"E/"TAG":"__VA_ARGS__)
+    #define log_e(TAG, ...)           log_output_fn(true,"E/" TAG":" __VA_ARGS__)
 #else
     #define log_e(TAG, ...)
 #endif 
