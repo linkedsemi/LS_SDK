@@ -26,7 +26,7 @@ HAL_StatusTypeDef HAL_RTC_DeInit(void)
 
 HAL_StatusTypeDef HAL_RTC_CalendarSet(calendar_cal_t *calendar_cal, calendar_time_t *calendar_time)
 {
-    MODIFY_REG(RTC->CTRL, RTC_CTRL_RTCEN_MASK | RTC_CTRL_TGGL_MASK, 0);
+    REG_FIELD_WR(RTC->CTRL, RTC_CTRL_RTCEN, 0);
     RTC->CAL = FIELD_BUILD(RTC_CAL_YEAR, calendar_cal->year) |
                FIELD_BUILD(RTC_CAL_MON, calendar_cal->mon) |
                FIELD_BUILD(RTC_CAL_WEEK, calendar_cal->week);
@@ -34,7 +34,7 @@ HAL_StatusTypeDef HAL_RTC_CalendarSet(calendar_cal_t *calendar_cal, calendar_tim
                 FIELD_BUILD(RTC_TIME_HOUR, calendar_time->hour + 1) |
                 FIELD_BUILD(RTC_TIME_MIN, calendar_time->min + 1) |
                 FIELD_BUILD(RTC_TIME_SEC, calendar_time->sec + 1);
-    REG_FIELD_WR(RTC->CTRL, RTC_CTRL_TGGL, 1);
+    REG_FIELD_WR(RTC->CTRL, RTC_CTRL_TGGL, !(RTC->CTRL & RTC_CTRL_TGGL_MASK));
     REG_FIELD_WR(RTC->CTRL, RTC_CTRL_RTCEN, 1);
     return HAL_OK;
 }
