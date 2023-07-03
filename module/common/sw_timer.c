@@ -114,7 +114,7 @@ struct sw_timer_env *sw_timer_list_pick()
     return hdr ? CONTAINER_OF(hdr,struct sw_timer_env,hdr) : NULL;
 }
 
-void sw_timer_module_init(void)
+__attribute__((weak)) void sw_timer_module_init(void)
 {
     timer_setup(sw_timer_isr);
 }
