@@ -307,16 +307,11 @@ static void process_setup_packet(uint8_t rhport)
     if (len && dir_in) USB0->CSRL0 = USB_CSRL0_RXRDYC;
 }
 
-static bool handle_xfer_in(uint_fast8_t ep_addr)
+static void handle_xfer_in(uint_fast8_t ep_addr)
 {
     unsigned epnum_minus1 = tu_edpt_number(ep_addr) - 1;
     pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epnum_minus1];
     const unsigned rem  = pipe->remaining;
-
-    if (!rem) {
-        pipe->buf = NULL;
-        return true;
-    }
 
     volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
     const unsigned mps = regs->TXMAXP;
@@ -336,7 +331,6 @@ static bool handle_xfer_in(uint_fast8_t ep_addr)
     }
     regs->TXCSRL = USB_TXCSRL1_TXRDY;
     // TU_LOG1(" TXCSRL%d = %x %d\n", epnum_minus1 + 1, regs->TXCSRL, rem - len);
-    return false;
 }
 
 static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
@@ -577,7 +571,12 @@ static void process_edpt_n(uint8_t rhport, uint_fast8_t ep_addr)
             regs->TXCSRL &= ~(USB_TXCSRL1_STALLED | USB_TXCSRL1_UNDRN);
             return;
         }
-        completed = handle_xfer_in(ep_addr);
+        pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epn_minus1];
+        completed = pipe->remaining ? false : true;
+        if (!completed)
+        {
+            handle_xfer_in(ep_addr);
+        }
     } else {
         // TU_LOG1(" RXCSRL%d = %x\n", epn_minus1 + 1, regs->RXCSRL);
         if (regs->RXCSRL & USB_RXCSRL1_STALLED) {
