@@ -90,7 +90,7 @@ static void timer_stop(void **timer_hdl)
 {
     taskENTER_CRITICAL();
     xTimerStop(*timer_hdl,portMAX_DELAY);
-    xTimerStart(*timer_hdl,portMAX_DELAY);
+    xTimerDelete(*timer_hdl,portMAX_DELAY);
     taskEXIT_CRITICAL();
 }
 
