@@ -19,7 +19,7 @@ LR_FLASH FLASH_BASE_APP FLASH_SIZE{
         *(.xip_banned*)
     }
 
-    FLASH_CODE AlignExpr(FLASH_BASE_APP+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE),8) FIXED {
+    FLASH_CODE AlignExpr(FLASH_BASE_APP+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE),16) FIXED {
         *(InRoot$$Sections)
         .ANY(+RO)
     }
