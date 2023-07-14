@@ -6,8 +6,8 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/iap/iap_bootloader/build/le501x/iap_bootloader.elf",
-            "name": "LE501X Debug iap_bootloader",
+            "executable": "examples/peripheral/iap/iap_application/build/le501x/iap_application_mcu.elf",
+            "name": "LE501X Debug iap_application",
             "device": "LE501X",
             "interface": "swd",
             "preLaunchCommands":[
@@ -20,8 +20,8 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/iap/iap_bootloader/build/le501x/iap_bootloader.elf",
-            "name": "LE501X Attach iap_bootloader",
+            "executable": "examples/peripheral/iap/iap_application/build/le501x/iap_application_mcu.elf",
+            "name": "LE501X Attach iap_application",
             "device": "LE501X",
             "interface": "swd",
             "preAttachCommands":[
@@ -34,8 +34,8 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/iap/iap_bootloader/build/lm3050/iap_bootloader_mcu.elf",
-            "name": "LM3050 Debug iap_bootloader"",
+            "executable": "examples/peripheral/iap/iap_application/build/lm3050/iap_application_mcu.elf",
+            "name": "LM3050 Debug iap_application"",
             "device": "LM3050",
             "interface": "swd",
             "preLaunchCommands":[
@@ -48,8 +48,8 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "examples/peripheral/iap/iap_bootloader/build/lm3050/iap_bootloader_mcu.elf",
-            "name": "LM3050 Attach iap_bootloader"",
+            "executable": "examples/peripheral/iap/iap_application/build/lm3050/iap_application_mcu.elf",
+            "name": "LM3050 Attach iap_application"",
             "device": "LM3050",
             "interface": "swd",
             "preAttachCommands":[
