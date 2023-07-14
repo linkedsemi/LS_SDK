@@ -33,6 +33,10 @@ void HAL_USB_MSP_Host_Setup(void *);
 
 void HAL_USB_MSP_Host_Discon_Hook();
 
+void HAL_USB_MSP_Busy_Set();
+
+void HAL_USB_MSP_Idle_Set();
+
 #ifdef __cplusplus
 }
 #endif
