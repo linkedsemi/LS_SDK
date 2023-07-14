@@ -634,6 +634,7 @@ void dcd_init(uint8_t rhport)
 {
     (void)rhport;
     HAL_USB_MSP_Init(USB_IRQHandler);
+    HAL_USB_MSP_Busy_Set();
     USB0->IE |= USB_IE_SUSPND;
 
     dcd_connect(rhport);
