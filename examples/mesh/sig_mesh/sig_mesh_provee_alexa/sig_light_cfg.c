@@ -189,18 +189,18 @@ void ls_mesh_pwm_init(void)
 void light_button_init(void)
 {
     io_cfg_input(LIGHT_BUTTON_1);
-    io_pull_write(LIGHT_BUTTON_1,IO_PULL_DOWN);
-    io_exti_config(LIGHT_BUTTON_1,INT_EDGE_RISING);
+    io_pull_write(LIGHT_BUTTON_1,IO_PULL_UP);
+    io_exti_config(LIGHT_BUTTON_1,INT_EDGE_FALLING);
     
 
     io_cfg_input(LIGHT_BUTTON_2);
-    io_pull_write(LIGHT_BUTTON_2,IO_PULL_DOWN);
-    io_exti_config(LIGHT_BUTTON_2,INT_EDGE_RISING);
+    io_pull_write(LIGHT_BUTTON_2,IO_PULL_UP);
+    io_exti_config(LIGHT_BUTTON_2,INT_EDGE_FALLING);
     
 
     io_cfg_input(LIGHT_BUTTON_3);
-    io_pull_write(LIGHT_BUTTON_3,IO_PULL_DOWN);
-    io_exti_config(LIGHT_BUTTON_3,INT_EDGE_RISING);
+    io_pull_write(LIGHT_BUTTON_3,IO_PULL_UP);
+    io_exti_config(LIGHT_BUTTON_3,INT_EDGE_FALLING);
     
 
     ls_uart_init();

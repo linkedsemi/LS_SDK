@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "reg_base_addr.h"
 #include "reg_usb_type.h"
+#include "common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,6 +11,10 @@ extern "C" {
 
 #ifdef LSUSB_BASE_ADDR
 #define USB0 ((volatile reg_usb_t*)(LSUSB_BASE_ADDR))
+#endif
+
+#if defined(__ICCARM__)
+#define __builtin_ctz count_trailing_zeros
 #endif
 
 void HAL_USB_MSP_Init(void (*)());
@@ -27,6 +32,10 @@ uint32_t HAL_USB_MSP_GetEnableIRQ();
 void HAL_USB_MSP_Host_Setup(void *);
 
 void HAL_USB_MSP_Host_Discon_Hook();
+
+void HAL_USB_MSP_Busy_Set();
+
+void HAL_USB_MSP_Idle_Set();
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include "field_manipulate.h"
 #include "ls_hal_spi_i2s.h"
+#include "sdk_config.h"
 
 __attribute__((weak)) void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi){}
 

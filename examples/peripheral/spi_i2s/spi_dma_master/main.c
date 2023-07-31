@@ -42,8 +42,8 @@
 #define SPI_MOSI_PIN       PB14 
 #define SPI_MISO_PIN       PB15 
 
-#define SPI_CS_LOW()      io_write_pin(SPI_CS_PIN,0);
-#define SPI_CS_HIGH()     io_write_pin(SPI_CS_PIN,1);
+#define SPI_CS_LOW()      io_write_pin(SPI_CS_PIN,0)
+#define SPI_CS_HIGH()     io_write_pin(SPI_CS_PIN,1)
 
 /* Size of buffer */
 #define BUFFERSIZE              20
@@ -131,8 +131,8 @@ int main(void)
     /* system init app     */
     sys_init_none();
     /* init spi and GPIO   */
-    spi_init();
     LED_init();
+    spi_init();
     spi_dma_channel_init();
 
     for (uint8_t i = 0; i < BUFFERSIZE; i++)

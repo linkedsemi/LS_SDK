@@ -395,10 +395,6 @@ HAL_I2C_ModeTypeDef HAL_I2C_GetMode(I2C_HandleTypeDef *hi2c);
   */
 uint32_t HAL_I2C_GetError(I2C_HandleTypeDef *hi2c);
 
-#ifdef __cplusplus
-}
-#endif
-
 /** @}*/
 
 

@@ -385,7 +385,7 @@ static bool pipe_xfer_in(uint_fast8_t pipenum)
   void          *buf = pipe->buf;
   if (len) {
     pipe_read_packet(buf, &USB0->FIFO0_WORD + pipenum, len);
-    pipe->buf       = buf + len;
+    pipe->buf       = (uint8_t *)buf + len;
     pipe->remaining = rem - len;
   }
   if ((len < mps) || (rem == len)) {
@@ -572,7 +572,7 @@ bool hcd_init(uint8_t rhport)
 {
   (void)rhport;
   HAL_USB_MSP_Init(USB_IRQHandler);
-  HAL_USB_MSP_ClearPendingIRQ();
+  HAL_USB_MSP_Busy_Set();
   _hcd.bmRequestType = REQUEST_TYPE_INVALID;
   USB0->IE = USB_IE_DISCON | USB_IE_CONN | USB_IE_BABBLE | USB_IE_RESUME;
   HAL_USB_MSP_Host_Setup(NULL);

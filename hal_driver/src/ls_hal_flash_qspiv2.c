@@ -258,7 +258,7 @@ ROM_SYMBOL void hal_flash_page_program(uint32_t offset,uint8_t *data,uint16_t le
     hal_flash_program_operation(&param);
 }
 
-ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_chip_erase,)
+ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_chip_erase_func,void *param)
 {
     lsqspiv2_stg_send_command(CHIP_ERASE_OPCODE);
 }

@@ -1,6 +1,7 @@
 #ifndef LS_SOC_PINMUX_H_
 #define LS_SOC_PINMUX_H_
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,6 +69,41 @@ void pinmux_ssi_dq2_init(uint8_t dq2);
   * @param  dq3   Specific GPIO pin
   */
 void pinmux_ssi_dq3_init(uint8_t dq3);
+
+/**
+  * @brief    DeInit SSI Clk IO
+  */
+void pinmux_ssi_clk_deinit(void);
+
+/**
+  * @brief    DeInit SSI nss0 IO
+  */
+void pinmux_ssi_nss0_deinit(void);
+
+/**
+  * @brief    DeInit SSI nss1 IO
+  */
+void pinmux_ssi_nss1_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq0 IO
+  */
+void pinmux_ssi_dq0_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq1 IO
+  */
+void pinmux_ssi_dq1_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq2 IO
+  */
+void pinmux_ssi_dq2_deinit(void);
+
+/**
+  * @brief  DeInit SSI dq3 IO
+  */
+void pinmux_ssi_dq3_deinit(void);
 
 /**
   * @brief  Set pin mux function to spi2 master clk

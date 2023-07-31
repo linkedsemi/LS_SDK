@@ -15,6 +15,7 @@
 #include "cpu.h"
 #include "ls_msp_qspiv2.h"
 #include "log.h"
+#include "ls_hal_cache.h"
 static uint32_t CPU_MSP;
 static uint32_t CPU_PSP;
 static uint8_t CPU_CONTROL;
@@ -168,6 +169,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     hal_flash_release_from_deep_power_down();
     DELAY_US(8);
     hal_flash_xip_start();
+    lscache_cache_enable(1);
 }
 
 __attribute__((weak)) void deep_sleep_exit_hook(){}
@@ -187,6 +189,7 @@ static void deep_sleep_no_ble()
     memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,ARRAY_LEN(NVIC_EN));
     systick_start();
     SCB->SCR &= ~(1<<2);
+    deep_sleep_exit_hook();
     uart_log_resume();
 }
 

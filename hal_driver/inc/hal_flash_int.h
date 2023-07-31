@@ -87,6 +87,8 @@ void hal_flash_read_operation(void *param);
 
 void hal_flash_read_reg_operation(void *param);
 
+void hal_flash_chip_erase_operation(void *param);
+
 void do_hal_flash_program_swint(void *param);
 
 void do_hal_flash_write_reg_swint(void *param);
@@ -94,6 +96,8 @@ void do_hal_flash_write_reg_swint(void *param);
 void do_hal_flash_read_swint(void *param);
 
 void do_hal_flash_read_reg_swint(void *param);
+
+void do_hal_flash_chip_erase_swint(void *param);
 
 void hal_flash_write_enable(void);
 
@@ -104,6 +108,8 @@ void do_hal_flash_read_func(void *param);
 void do_hal_flash_read_reg_func(void *param);
 
 void do_hal_flash_prog_func(void *param);
+
+void do_hal_flash_chip_erase_func(void *param);
 
 void flash_reading_critical(void (*func)(void *),void *param);
 
@@ -116,6 +122,8 @@ void do_hal_flash_program(void *param);
 void do_hal_flash_write_reg(void *param);
 
 void do_hal_flash_read_reg(void *param);
+
+void do_hal_flash_chip_erase(void *param);
 
 void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode);
 

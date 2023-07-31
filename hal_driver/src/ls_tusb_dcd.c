@@ -288,7 +288,8 @@ static void process_setup_packet(uint8_t rhport)
     p[1]        = USB0->FIFO0_WORD;
 #else
     /* Remove unaligned access warning for GCC. By mzhou. */
-    void *p = (void*)&_dcd.setup_packet;
+    void *pkt = (void*)&_dcd.setup_packet;
+    uint8_t *p = pkt;
     uint32_t data_word = USB0->FIFO0_WORD;
     memcpy(p, (void*)&data_word, sizeof(uint32_t));
     data_word = USB0->FIFO0_WORD;
@@ -306,27 +307,22 @@ static void process_setup_packet(uint8_t rhport)
     if (len && dir_in) USB0->CSRL0 = USB_CSRL0_RXRDYC;
 }
 
-static bool handle_xfer_in(uint_fast8_t ep_addr)
+static void handle_xfer_in(uint_fast8_t ep_addr)
 {
     unsigned epnum_minus1 = tu_edpt_number(ep_addr) - 1;
     pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epnum_minus1];
     const unsigned rem  = pipe->remaining;
 
-    if (!rem) {
-        pipe->buf = NULL;
-        return true;
-    }
-
     volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
     const unsigned mps = regs->TXMAXP;
     const unsigned len = TU_MIN(mps, rem);
-    void          *buf = pipe->buf;
+    uint8_t       *buf = pipe->buf;
 
     regs->TXCSRH |= USB_TXCSRH1_MODE;
     // TU_LOG1("   %p mps %d len %d rem %d\n", buf, mps, len, rem);
     if (len) {
         if (_dcd.pipe_buf_is_fifo[TUSB_DIR_IN] & TU_BIT(epnum_minus1)) {
-            pipe_read_write_packet_ff(buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_IN);
+            pipe_read_write_packet_ff((tu_fifo_t *)buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_IN);
         } else {
             pipe_write_packet(buf, &USB0->FIFO1_WORD + epnum_minus1, len);
             pipe->buf       = buf + len;
@@ -335,7 +331,6 @@ static bool handle_xfer_in(uint_fast8_t ep_addr)
     }
     regs->TXCSRL = USB_TXCSRL1_TXRDY;
     // TU_LOG1(" TXCSRL%d = %x %d\n", epnum_minus1 + 1, regs->TXCSRL, rem - len);
-    return false;
 }
 
 static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
@@ -350,7 +345,7 @@ static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
     const unsigned rem = pipe->remaining;
     const unsigned vld = regs->RXCOUNT;
     const unsigned len = TU_MIN(TU_MIN(rem, mps), vld);
-    void          *buf = pipe->buf;
+    uint8_t       *buf = pipe->buf;
 
     /* Delay handling out data in FIFO if stack has't configured the buffer. By mzhou. */
     if (NULL == buf)
@@ -362,7 +357,7 @@ static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
 
     if (len) {
         if (_dcd.pipe_buf_is_fifo[TUSB_DIR_OUT] & TU_BIT(epnum_minus1)) {
-            pipe_read_write_packet_ff(buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_OUT);
+            pipe_read_write_packet_ff((tu_fifo_t *)buf, &USB0->FIFO1_WORD + epnum_minus1, len, TUSB_DIR_OUT);
         } else {
             pipe_read_packet(buf, &USB0->FIFO1_WORD + epnum_minus1, len);
             pipe->buf       = buf + len;
@@ -576,7 +571,12 @@ static void process_edpt_n(uint8_t rhport, uint_fast8_t ep_addr)
             regs->TXCSRL &= ~(USB_TXCSRL1_STALLED | USB_TXCSRL1_UNDRN);
             return;
         }
-        completed = handle_xfer_in(ep_addr);
+        pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epn_minus1];
+        completed = pipe->remaining ? false : true;
+        if (!completed)
+        {
+            handle_xfer_in(ep_addr);
+        }
     } else {
         // TU_LOG1(" RXCSRL%d = %x\n", epn_minus1 + 1, regs->RXCSRL);
         if (regs->RXCSRL & USB_RXCSRL1_STALLED) {
@@ -634,6 +634,7 @@ void dcd_init(uint8_t rhport)
 {
     (void)rhport;
     HAL_USB_MSP_Init(USB_IRQHandler);
+    HAL_USB_MSP_Busy_Set();
     USB0->IE |= USB_IE_SUSPND;
 
     dcd_connect(rhport);

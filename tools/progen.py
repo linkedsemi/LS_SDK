@@ -8,6 +8,20 @@ from project_generator.project import ProjectTemplate
 from project_generator.project import Project
 from project_generator.settings import ProjectSettings
 
+def uvision5_misc_flags(ic):
+    if ic == 'le501x':
+        return {
+                        'c_flags':['--diag_suppress=1,61,66,68,188,1295,1296'],
+                        'asm_flags':['--diag_suppress=1'],
+                        'ld_flags':['--datacompressor=off','--diag_suppress=L6314,L6329']
+                }
+    else:
+        return {
+                        'c_flags':['-Wno-pointer-bool-conversion'],
+                        'asm_flags':[''],
+                        'ld_flags':['--datacompressor=off','--diag_suppress=L6314,L6329']
+                }
+
 def progen(target,source,env):
     project_data = {'common': {}}
     project_data['common'] = ProjectTemplate.get_project_template()
@@ -31,22 +45,20 @@ def progen(target,source,env):
     project_data['common']['macros'] = env['CPPDEFINES']
     project_data['common']['linker_file'] = os.path.relpath(env['LINKSCRIPT'].srcnode().abspath)
     root_relpath = os.path.relpath(env['SDK_ROOT'].abspath,os.path.join(os.path.join(env['IC'],env['IDE'])))
+    uvision5_cfg = {'misc': uvision5_misc_flags(env['IC']),
+                    'template': env['SDK_ROOT'].abspath+'/tools/uvision.uvproj'}
     project_data['tool_specific'] = {
-        'uvision5':{'misc':{
-                        'c_flags':['--diag_suppress=1,61,68,188,1295'],
-                        'asm_flags':['--diag_suppress=1'],
-                        'ld_flags':['--datacompressor=off','--diag_suppress=L6314,L6329']
-                    },
-                    'template': env['SDK_ROOT'].abspath+'/tools/uvision.uvproj',
-        },
+        'uvision5': uvision5_cfg,
+        'uvision5_armc6': uvision5_cfg,
         'iar':{'misc':{
-                    'c_flags':['--diag_suppress=Pa082,Pe188,Pa089,Pe068,Pa039','--warnings_are_errors'],
+                    'c_flags':['--diag_suppress=Pa082,Pe188,Pa089,Pe068,Pa039,Pa131,Pe111','--warnings_are_errors'],
                     'ld_flags':['--diag_suppress=Lt009','--warnings_are_errors','--config_search {}'.format(os.path.join(root_relpath,'soc/arm_cm/'+env['IC']+'/compiler/'+env['IDE']))]
 
             },
             'template': env['SDK_ROOT'].abspath+'/tools/iar.ewp',}
     }
     if env['IC'] == 'lm3050':
+        project_data['common']['target'] = 'cortex-m4-fpu'
         project_data['common']['sources']['soc'] += [os.path.relpath(os.path.join(env['SDK_ROOT'].abspath,'soc/arm_cm/lm3050/__info_array.c'),os.getcwd())]
         if env['IDE'] == 'uvision5':
             project_data['tool_specific']['uvision5']['misc']['ld_flags'].append(os.path.join(root_relpath,'soc/arm_cm/lm3050/compiler/armcc/rom_sym.txt'))
@@ -55,7 +67,10 @@ def progen(target,source,env):
         'export_dir':[os.path.join(env['IC'],env['IDE'])]
     })
     project = Project(name,[project_data],project_settings)
-    project.generate(env['IDE'])
+    if env['IC'] != 'le501x' and env['IDE'] == 'uvision5':
+        project.generate('uvision5_armc6')
+    else:
+        project.generate(env['IDE'])
     if env.get('STACK_HEX') is None:
         stack_path = ''
     else:
@@ -65,6 +80,8 @@ def progen(target,source,env):
         file = os.path.join(os.path.join(env['IC'],env['IDE']),"{}.uvprojx".format(name))
         et = xml.etree.ElementTree.parse(file)
         if env['IC'] == 'le501x':
+            uAC6 = et.getroot().find('Targets').find('Target').find('uAC6')
+            uAC6.text = "0"
             user_action1 = et.getroot().find('Targets').find('Target').find('TargetOption').find('TargetCommonOption').find('AfterMake').find('UserProg1Name')
             info_sbl_xml = os.path.join(env['SDK_ROOT'].abspath,'tools/le501x/hex_target.xml')
             info_sbl_et = xml.etree.ElementTree.parse(info_sbl_xml)
