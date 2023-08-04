@@ -32,7 +32,7 @@
 #include "ls_sys.h"
 #include "sys_stat.h"
 #include "swint_call_asm.h"
-#define XTAL_STB_VAL 20
+#define XTAL_STB_VAL 30
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
