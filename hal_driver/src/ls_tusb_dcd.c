@@ -672,7 +672,7 @@ void dcd_remote_wakeup(uint8_t rhport)
 
     // unsigned cnt = SystemCoreClock / 1000;
     // while (cnt--) __NOP();
-    DELAY_US(10000);
+    DELAY_US(1000);
 
     USB0->POWER &= ~USB_POWER_RESUME;
     dcd_event_bus_signal(rhport, DCD_EVENT_RESUME, false);
