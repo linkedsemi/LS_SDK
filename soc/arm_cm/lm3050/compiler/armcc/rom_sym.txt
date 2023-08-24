@@ -53,7 +53,7 @@
 0x00001ae7 T hal_flash_release_from_deep_power_down     
 0x00001efd T SVC_Handler_C                              
 0x000019d7 T hal_flash_read_status_register_1_ram           
-0x20000130 D flash_dual_mode_only                       
+0x20000144 D flash_dual_mode_only                       
 0x000019ba T do_hal_flash_prog_func                     
 0x000019be T do_hal_flash_program_security_area_func    
 0x000019b6 T do_hal_flash_read_security_area_func       
