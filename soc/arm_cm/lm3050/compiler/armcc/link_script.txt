@@ -1,7 +1,7 @@
 #! armcc -E
 
 #define FLASH_BASE 0x800000
-#define FLASH_BASE_APP 0x800300
+#define FLASH_BASE_APP 0x800500
 #define FLASH_SIZE 0x80000
 #define FLASH_END (FLASH_BASE + FLASH_SIZE)
 #define RAM_BASE 0x20000000
@@ -13,7 +13,7 @@ LR_FLASH FLASH_BASE_APP FLASH_SIZE{
         *(RESET, +First)
     }
 
-    RAM_DATA_CODE 0x20000134 {
+    RAM_DATA_CODE 0x20000148 {
         *(.xip_banned.sleep_recover_asm,+First)
         *(+RW)
         *(.xip_banned*)
