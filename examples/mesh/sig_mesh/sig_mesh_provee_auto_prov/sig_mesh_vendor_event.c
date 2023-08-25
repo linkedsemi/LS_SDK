@@ -15,6 +15,7 @@
 #define VENDOT_EVENT_DATA_LEN      UART_BUFFER_SIZE
 #define DATA_LEN_LEN               4
 #define DEMO_UART 0
+#define LP_MODE 0
 
 uint8_t vendor_event_data[DATA_LEN_LEN+VENDOT_EVENT_DATA_LEN];
 
@@ -91,17 +92,19 @@ void vendor_event_accept_info(uint8_t const *info, uint32_t info_len)
  #if (DEMO_UART == 0) 
 void vendor_event_timer_cb(void *param)
 {
-      cnt_vendor_event_info++;
-      SYSCFG->BKD[0] = cnt_vendor_event_info;
-     if (cnt_vendor_event_info%2==0)
+    cnt_vendor_event_info++;
+    #if (LP_MODE == 1)
+    SYSCFG->BKD[0] = cnt_vendor_event_info;
+    if (cnt_vendor_event_info % 2 == 0)
     {
-         SYSCFG->BKD[0] = cnt_vendor_event_info;
-         platform_reset(0);
-         while(1);
-     }
-      memcpy(&vendor_event_data[0],(uint8_t *)&cnt_vendor_event_info, DATA_LEN_LEN);
-      memcpy(&vendor_event_data[DATA_LEN_LEN],&uart_buf[0], uart_rx_index);
-      app_vendor_model_tx_message_handler(&vendor_event_data[0], DATA_LEN_LEN+uart_rx_index);
+      SYSCFG->BKD[0] = cnt_vendor_event_info;
+      platform_reset(0);
+      while (1);
+    }
+    #endif
+    memcpy(&vendor_event_data[0], (uint8_t *)&cnt_vendor_event_info, DATA_LEN_LEN);
+    memcpy(&vendor_event_data[DATA_LEN_LEN], &uart_buf[0], uart_rx_index);
+    app_vendor_model_tx_message_handler(&vendor_event_data[0], DATA_LEN_LEN + uart_rx_index);
     builtin_timer_start(vendor_event_timer, VENDOT_EVENT_TIMER_TIMEOUT, NULL);
 }
 #endif
@@ -119,7 +122,9 @@ void vendor_event_init(void)
     uart_buf[5]=0x06;
     uart_buf[6]=0x07;
     uart_rx_index =7;
+    #if (LP_MODE == 1)
     cnt_vendor_event_info = SYSCFG->BKD[0];
+    #endif
     vendor_event_timer = builtin_timer_create(vendor_event_timer_cb);
     builtin_timer_start(vendor_event_timer, VENDOT_EVENT_TIMER_TIMEOUT, NULL);
  #endif

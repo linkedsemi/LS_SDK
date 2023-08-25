@@ -247,7 +247,8 @@ void io_exti_callback(uint8_t pin,exti_edge_t edge) // override io_exti_callback
           button3_valid =true;
           app_generic_onoff_status_report(ls_mesh_light_get_onoff(LIGHT_LED_2));          
        }       
-    }    
+    }
+    break;   
     default:
         break;
     } 
