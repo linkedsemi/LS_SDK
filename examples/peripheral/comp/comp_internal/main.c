@@ -4,11 +4,13 @@
 #include "ls_soc_gpio.h"
 #include "ls_soc_pinmux.h"
 
+#define PIN_OUTPUT  (PA00)
+
 static COMP_HandleTypeDef COMP_Config;
 
 static void comp_init()
 {
-    pinmux_comp1_init(PA00);
+    pinmux_comp1_init(PIN_OUTPUT);      // The output pin of the comparator
     COMP_Config.COMP = LSCOMP1;
     HAL_COMP_Init(&COMP_Config);
 }
@@ -20,7 +22,7 @@ static void test_comp1()
     param.fallingintr_en        = ENABLE;
     param.flt_byp               = COMP_FLT_ENABLE;
     param.flt_prd               = ENABLE;
-    param.input                 = INPUT_COMP1_PC00;
+    param.input                 = INPUT_IOVIP1;
     param.vrefsel               = VREFSEL_INTERNAL_REFERENCE_VOLTAGE;
     param.vrefctl               = VREFCTL_900MV;
     param.hysteresis            = HYS_HS_21P9MV;
