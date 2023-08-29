@@ -267,7 +267,6 @@ static void ls_uart_server_data_length_update(uint8_t con_idx);
 static void ls_multi_server_init(void)
 {
     ls_multi_server_timer_inst = builtin_timer_create(ls_multi_server_timer_cb);        // 创建 builtin timer，并注册回调处理函数
-    builtin_timer_start(ls_multi_server_timer_inst, MULTI_SERVER_TIMEOUT, NULL);        // 开启软件定时器，定时周期为 MULTI_SERVER_TIMEOUT 300ms
 }
 
 static void ls_multi_server_timer_cb(void *param)       // builtin timer 定时回调处理函数
@@ -429,7 +428,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     {
         case CONNECTED:             // CONNECTED 连接建立事件
             connect_id = con_idx;   // 记录当前连接的 CONNECT_ID
-            ls_multi_server_init();     // 连接建立以后创建一个 300ms 的builtin timer，上报电池电量，并且如果使能了Private server的Notify CCCD，就Notify上报测试数据
+            builtin_timer_start(ls_multi_server_timer_inst, MULTI_SERVER_TIMEOUT, NULL);        // 开启软件定时器，定时周期为 MULTI_SERVER_TIMEOUT 300ms
             LOG_I("connected!");
         break;
         case DISCONNECTED:
@@ -609,6 +608,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
             LOG_I("type:%d,addr:",type);
             LOG_HEX(addr,sizeof(addr));
             
+            ls_multi_server_init();     // 创建一个 300ms 的builtin timer，上报电池电量，并且如果使能了Private server的Notify CCCD，就Notify上报测试数据
             dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);             // 服务添加步骤1：添加第一个 uart server 服务
         }
         break;
