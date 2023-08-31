@@ -22,7 +22,7 @@ static void Basic_PWM_Output_Cfg(void)
     pinmux_gptimb1_ch3_init(PB14, true, 0);
     pinmux_gptimb1_ch4_init(PB15, true, 0);
     /*##-1- Configure the TIM peripheral #######################################*/
-    TimHandle.Instance = LSGPTIMB;
+    TimHandle.Instance = LSGPTIMA;
     TimHandle.Init.Prescaler = TIM_PRESCALER; 
     TimHandle.Init.Period = TIM_PERIOD;
     TimHandle.Init.ClockDivision = 0;
