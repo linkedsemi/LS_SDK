@@ -119,7 +119,8 @@ static void ls_uart_server_data_length_update(uint8_t con_idx);
 
 #if UART_SERVER_WITH_OTA == 1
 #if FW_ECC_VERIFY
-extern const uint8_t fotas_pub_key[64];
+#include "uECC.h"
+const uint8_t fotas_pub_key[64] = {0};
 bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
 {
     return uECC_verify(fotas_pub_key, digest->data, sizeof(digest->data), signature->data, uECC_secp256r1());
