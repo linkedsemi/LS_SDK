@@ -415,6 +415,26 @@ static void ls_uart_server_data_length_update(uint8_t con_idx)
     gap_manager_set_pkt_size(con_idx, &dlu_param);
 }
 
+static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_name_ptr);
+    dev_name_ptr->value = (uint8_t*)UART_SVC_ADV_NAME;
+    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME);
+}
+static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_appearance_ptr);
+    dev_appearance_ptr->appearance = 0;
+}
+static void get_slv_pref_param(struct gap_dev_info_slave_pref_param *dev_slv_pref_param_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_slv_pref_param_ptr);
+    dev_slv_pref_param_ptr->con_intv_min  = 8;
+    dev_slv_pref_param_ptr->con_intv_max  = 20;
+    dev_slv_pref_param_ptr->slave_latency =  0;
+    dev_slv_pref_param_ptr->conn_timeout  = 200;
+}
+
 /*
 *   GAP 事件处理函数； 处理连接、断连、配对绑定和连接参数更新等事件；
 *   参数说明：
@@ -442,6 +462,15 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         break;
         case CONN_PARAM_UPDATED:        // 连接参数已经更新事件，打印当前的连接参数
             LOG_I("conn param updata  interval = %d  latency = %d  sup_to = %d",evt->conn_param_updated.con_interval,evt->conn_param_updated.con_latency,evt->conn_param_updated.sup_to);
+        break;
+        case GET_DEV_INFO_DEV_NAME:
+            get_dev_name((struct gap_dev_info_dev_name*)evt, con_idx);
+        break;
+        case GET_DEV_INFO_APPEARANCE:
+            get_appearance((struct gap_dev_info_appearance*)evt, con_idx);
+        break;
+        case GET_DEV_INFO_SLV_PRE_PARAM:
+            get_slv_pref_param((struct gap_dev_info_slave_pref_param*)evt, con_idx);
         break;
         default:
 
