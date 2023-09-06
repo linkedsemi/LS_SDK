@@ -857,7 +857,10 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
             __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_STOPIC_MASK);
-            I2C_STOPF(hi2c);
+            if ((sr1itflags & I2C_SR_BUSY_MASK) != 0)
+            {
+                I2C_STOPF(hi2c);
+            }
         }/* Slave transmit */
         else if (CurrentState == HAL_I2C_STATE_BUSY_TX)
         {
