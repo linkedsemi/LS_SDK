@@ -47,7 +47,7 @@ int main(void)
   /* Configure the GPIO AF */
   /* SDA-------------PB12 */
   /* SCL-------------PB13 */
-  pinmux_iic1_init(PB13, PB12);
+  pinmux_iic1_init(PB09, PB08);
 
   LL_I2C1_MSP_Init();
   /* Disable the selected I2Cx Peripheral */
@@ -57,7 +57,7 @@ int main(void)
   LL_I2C_SetDigitalFilter(I2C1, 0);
 
   /*---------------------------- I2Cx SCL Clock Speed Configuration ------------*/
-  LL_I2C_SetClockPeriod(I2C1, 100000);
+  LL_I2C_SetClockPeriod(I2C1, I2C_SPEED_FAST_400K);
 
   /*---------------------------- I2Cx OAR1 Configuration -----------------------*/
   LL_I2C_SetOwnAddress1(I2C1, I2C_ADDRESS, LL_I2C_OWNADDRESS1_7BIT);
@@ -85,10 +85,6 @@ int main(void)
   while (LL_I2C_Master_Rx(I2C1, (uint16_t)I2C_ADDRESS, (uint8_t *)aRxBuffer, 10) != SUCCESS)
   {
     Error_Handler();
-  }
-    for (uint16_t i = 0; i < 10; i++)
-  {
-    LOG_I("%d", aRxBuffer[i]);
   }
   while (Buffercmp(aTxBuffer + 2, aRxBuffer, 10))
   {
