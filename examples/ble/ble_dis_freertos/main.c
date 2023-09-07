@@ -8,11 +8,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #define APP_DIS_DEV_NAME                ("LS Dis Server")
-#define APP_DIS_DEV_NAME_LEN            (sizeof(APP_DIS_DEV_NAME))
+#define APP_DIS_DEV_NAME_LEN            (sizeof(APP_DIS_DEV_NAME) - 1)
 
 /// Manufacturer Name Value
 #define APP_DIS_MANUFACTURER_NAME       ("LinkedSemi")
-#define APP_DIS_MANUFACTURER_NAME_LEN   (sizeof(APP_DIS_MANUFACTURER_NAME))
+#define APP_DIS_MANUFACTURER_NAME_LEN   (sizeof(APP_DIS_MANUFACTURER_NAME) - 1)
 
 /// ADV Data
 #define APP_DIS_ADV_DATA                ("LS Dis Server")
