@@ -826,6 +826,7 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_ADDRIE_MASK) != RESET)
         {
             I2C_ADDR(hi2c, sr1itflags);
+            SET_BIT(hi2c->Instance->IER, I2C_IER_STOPIE_MASK);
         }
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
@@ -853,14 +854,12 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_ADDRIE_MASK) != RESET)
         {
             I2C_ADDR(hi2c, sr1itflags);
+            SET_BIT(hi2c->Instance->IER, I2C_IER_STOPIE_MASK);
         }
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
             __HAL_I2C_CLEAR_IF(hi2c, I2C_ICR_STOPIC_MASK);
-            if ((sr1itflags & I2C_SR_BUSY_MASK) != 0)
-            {
-                I2C_STOPF(hi2c);
-            }
+            I2C_STOPF(hi2c);
         }/* Slave transmit */
         else if (CurrentState == HAL_I2C_STATE_BUSY_TX)
         {
@@ -1025,7 +1024,7 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
 {
     HAL_I2C_StateTypeDef CurrentState = hi2c->State;
     HAL_I2C_ModeTypeDef CurrentMode = hi2c->Mode;
-    __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR);
+    __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR | I2C_FLAG_STOPF);
     __HAL_I2C_CLEAR_STOPFLAG(hi2c);
 
     bool tx_dma_en = LL_I2C_IsEnabledDMAReq_TX(hi2c->Instance);

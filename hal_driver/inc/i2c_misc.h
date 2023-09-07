@@ -54,7 +54,7 @@ enum
 #define I2C_IT_TXE                      I2C_IER_TXEIE_MASK
 #define I2C_IT_TC                       I2C_IER_TCIE_MASK
 #define I2C_IT_TCR                      I2C_IER_TCRIE_MASK
-#define I2C_IT_EVT                      I2C_IER_ADDRIE_MASK | I2C_IER_NACKIE_MASK | I2C_IER_STOPIE_MASK
+#define I2C_IT_EVT                      I2C_IER_ADDRIE_MASK | I2C_IER_NACKIE_MASK
 #define I2C_IT_ERR                      I2C_IER_BERRIE_MASK
 #define I2C_FLAG_TXE                    I2C_SR_TXE_MASK
 #define I2C_FLAG_RXNE                   I2C_SR_RXNE_MASK
