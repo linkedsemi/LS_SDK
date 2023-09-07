@@ -149,7 +149,7 @@ static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con
 {
     LS_ASSERT(dev_name_ptr);
     dev_name_ptr->value = (uint8_t*)"FOTA";
-    dev_name_ptr->length = sizeof("FOTA");
+    dev_name_ptr->length = sizeof("FOTA") - 1;
 }
 static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
 {
