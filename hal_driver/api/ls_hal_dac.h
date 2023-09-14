@@ -156,11 +156,11 @@ uint32_t HAL_DAC_GetValue(DAC_HandleTypeDef *hdac);
  * @param hdac DAC handle.
  * @param Alignment Specifies the data alignment.
  * @param pData The source Buffer address.
- * @param Length The length of data to be transferred from memory to DAC peripheral.
+ * @param Byte_Count The length of bytes to be transferred from memory to DAC peripherals
  * @param Callback function pointer.
  * @return HAL status
  */
-HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, const uint32_t* pData, uint32_t Length,void (*Callback)(DAC_HandleTypeDef* hdac));
+HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, const uint32_t* pData, uint32_t Byte_Count,void (*Callback)(DAC_HandleTypeDef* hdac));
 
 /**
  * @brief 
