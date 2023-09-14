@@ -3,7 +3,8 @@ env = Environment(ENV = os.environ)
 env['SDK_ROOT'] = Dir('../../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [    
-    'main.c'
+    'main.c',
+    'sine_wave.c'
 ]
 inc = [
     '.'
