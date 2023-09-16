@@ -12,8 +12,9 @@ sbl_file = open(sys.argv[1],'rb')
 sbl_data = sbl_file.read()
 test_word0 = 0xa5a53c3c
 test_word1 = 0x5a5ac3c3
-sbl_offset = 32
+sbl_offset = 0x80
 sbl_length = len(sbl_data)
+dummy_array = struct.pack('32B', *[0xff] * 32)
 sbl_crc = zlib.crc32(sbl_data)
 sbl_crc_bytes = struct.pack("I",sbl_crc)
 sbl_dst = 0x20001000
@@ -23,9 +24,13 @@ info_head = struct.pack('IIIIIII',test_word0,test_word1,sbl_offset,sbl_length,sb
 head_crc = zlib.crc32(info_head)
 head_crc_bytes = struct.pack("I",head_crc)
 
+key_array = struct.pack('64B', *[0xff] * 64)
+
 with open(sys.argv[2],'wb') as out:
     out.write(info_head)
     out.write(head_crc_bytes)
+    out.write(dummy_array)
+    out.write(key_array)
     out.write(sbl_data)
     out.write(sbl_crc_bytes)
     out.close()

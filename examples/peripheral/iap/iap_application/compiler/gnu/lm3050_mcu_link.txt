@@ -1,0 +1,100 @@
+MEMORY
+{
+  RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x20000
+  FLASH (rx) : ORIGIN = 0x805000, LENGTH = 0x80000
+}
+
+SECTIONS
+{
+    .__user_info_config :
+    {
+        KEEP(*(.rodata.__user_info_config))
+        . = ALIGN(0x100);
+    } >FLASH
+	__image_lma__ = LOADADDR(.__user_info_config);
+	
+	.vectors : ALIGN(4)
+	{
+		__vector_start__ = .;
+		KEEP(*(.vectors))
+		__vector_end__ = .;
+	} >RAM AT>FLASH
+	
+	__vector_lma__ = LOADADDR(.vectors);
+
+	.data 0x20000134 :
+	{
+		. = ALIGN(4);
+		__data_start__ = .;
+		*(.xip_banned.sleep_recover_asm)
+		*(.xip_banned*)
+		*(.data*)
+		__data_end__ = ALIGN(4);
+	}>RAM AT>FLASH
+
+	__data_lma__ = LOADADDR(.data);
+
+	.text :
+	{
+	
+		KEEP(*(.init))
+		KEEP(*(.fini))
+
+		*crtbegin.o(.ctors)
+		*crtbegin?.o(.ctors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+		*(SORT(.ctors.*))
+		*(.ctors)
+
+
+		*crtbegin.o(.dtors)
+		*crtbegin?.o(.dtors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+		*(SORT(.dtors.*))
+		*(.dtors)
+
+		*(.eh_frame*)
+		*(.text* .rodata*)
+	}>FLASH
+
+	.ARM.extab : 
+	{
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} > FLASH
+
+	__exidx_start = .;
+	.ARM.exidx :
+	{
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+	} > FLASH
+	__exidx_end = .;
+
+	.bss (NOLOAD):
+	{
+		__bss_start__ = .;
+		*(.bss*)
+		*(COMMON)
+		__bss_end__ = ALIGN(4);
+	}>RAM
+
+    .heap (NOLOAD):
+    {
+        __end__ = .;
+        PROVIDE(end = .);
+        KEEP(*(.heap*))
+    } > RAM
+
+	/* .stack_dummy section doesn't contains any symbols. It is only
+	 * used for linker to calculate size of stack sections, and assign
+	 * values to stack symbols later */
+	.stack_dummy (NOLOAD):
+	{
+		*(.stack*)
+	} > RAM
+
+	PROVIDE(__stack = __StackTop);
+	
+	/* Check if data + heap + stack exceeds RAM limit */
+	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+	
+}

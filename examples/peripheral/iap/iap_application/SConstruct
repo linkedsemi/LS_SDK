@@ -3,9 +3,17 @@ env = Environment(ENV = os.environ)
 env['SDK_ROOT'] = Dir('../../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [    
-    'main.c'
+    'main.c',
+    'user_info_config.c'
 ]
 inc = [
     '.'
 ]
+
+#le501x
+env['LINKSCRIPT'] = File(env.subst('compiler/$COMPILER/le501x_mcu_link.txt'))
 env.app_build('iap_application',src,inc,ble = False)
+
+#lm3050
+# env['LINKSCRIPT'] = File(env.subst('compiler/$COMPILER/lm3050_mcu_link.txt'))
+# env.app_build('iap_application',src,inc,ble = False)

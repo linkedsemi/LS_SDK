@@ -79,9 +79,10 @@ static bool I2C_speed_config_calc_master_dft(uint8_t speed, struct i2c_speed_con
     if (0 == speed_config->role)
     {
         uint32_t speed_array[I2C_SPEED_MAX] = {100*1000, 400*1000, 1000*1000};
-        uint16_t cycle_count = I2C_CLOCK / speed_array[speed];
+        uint8_t prescaler = 1;
+        uint16_t cycle_count = I2C_CLOCK / speed_array[speed]/ (prescaler + 1);
         int16_t scll, sclh, scldel, sdadel;
-        uint8_t prescaler = 0;
+
         if (cycle_count > 256)
         {
             for (uint8_t i = 1; prescaler < 16; i++)
@@ -125,10 +126,10 @@ static bool I2C_speed_config_calc_master_dft(uint8_t speed, struct i2c_speed_con
             scldel = 5;
         }
         sdadel = scldel - 4;
-        if (sdadel > 4)
+        if (sdadel > 10)
         {
             /* We should set a ceiling for SDADEL. This is unnecessary, and will reduce compatibility if we are IIC slave */
-            sdadel = 4;
+            sdadel = 10;
         }
         else if (sdadel < 1)
         {
@@ -826,6 +827,7 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_ADDRIE_MASK) != RESET)
         {
             I2C_ADDR(hi2c, sr1itflags);
+            SET_BIT(hi2c->Instance->IER, I2C_IER_STOPIE_MASK);
         }
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
@@ -853,6 +855,7 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_ADDRIE_MASK) != RESET)
         {
             I2C_ADDR(hi2c, sr1itflags);
+            SET_BIT(hi2c->Instance->IER, I2C_IER_STOPIE_MASK);
         }
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
@@ -1022,7 +1025,7 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
 {
     HAL_I2C_StateTypeDef CurrentState = hi2c->State;
     HAL_I2C_ModeTypeDef CurrentMode = hi2c->Mode;
-    __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR);
+    __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR | I2C_FLAG_STOPF);
     __HAL_I2C_CLEAR_STOPFLAG(hi2c);
 
     bool tx_dma_en = LL_I2C_IsEnabledDMAReq_TX(hi2c->Instance);

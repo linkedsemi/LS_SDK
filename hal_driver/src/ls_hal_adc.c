@@ -366,6 +366,7 @@ HAL_StatusTypeDef HAL_ADC_DeInit(ADC_HandleTypeDef* hadc)
   if (tmp_hal_status == HAL_OK)
   {
     adc_channel_vbat_disable();
+    adc_channel_tempsensor_disable();
     HAL_ADC_MSP_DeInit(hadc);
     HAL_ADC_MSP_Idle_Set(hadc);  
 

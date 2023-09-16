@@ -66,3 +66,13 @@ void HAL_USB_MSP_Host_Discon_Hook()
         hcd_event_handler(&event,true);
     }
 }
+
+void HAL_USB_MSP_Busy_Set()
+{
+    usb_status_set(true);
+}
+
+void HAL_USB_MSP_Idle_Set()
+{
+    usb_status_set(false);
+}

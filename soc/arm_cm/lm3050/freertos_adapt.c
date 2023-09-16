@@ -20,7 +20,7 @@ void xPortPendSVHandler(void);
 
 #if OS_TICK_SOURCE == LOW_SPEED_TIMER
 static TickType_t expected_idle_time;
-static uint32_t timer_target;
+static uint32_t prev_target;
 static uint32_t accumulated_remainder_cyc;
 
 static void lstim_int_clr()
@@ -34,12 +34,11 @@ static void os_tick_handler()
 {
     portDISABLE_INTERRUPTS();
     lstim_int_clr();
-    uint32_t tick_inc = (LSTIM->TIM_CNT - timer_target)/CYC_PER_TICK + 1;
-    accumulated_remainder_cyc += REMAINDER_CYC_PER_TICK*tick_inc;
-    tick_inc += accumulated_remainder_cyc/CYC_PER_TICK;
-    accumulated_remainder_cyc %= CYC_PER_TICK;
-    timer_target += tick_inc*CYC_PER_TICK;
-    LSTIM->TIM_TGT = timer_target + 1;
+    uint32_t tick_inc = (LSTIM->TIM_CNT - prev_target)/CYC_PER_TICK;
+    accumulated_remainder_cyc += tick_inc*REMAINDER_CYC_PER_TICK;
+    prev_target += tick_inc*CYC_PER_TICK + accumulated_remainder_cyc/configTICK_RATE_HZ;
+    accumulated_remainder_cyc %= configTICK_RATE_HZ;
+    LSTIM->TIM_TGT = prev_target + CYC_PER_TICK + 2;
     portENABLE_INTERRUPTS();
     while(tick_inc--)
     {
@@ -74,8 +73,7 @@ bool deep_sleep_prepare()
 {
     if(expected_idle_time>MIN_DEEP_SLEEP_TICKS)
     {
-        timer_target += (expected_idle_time-1) * CYC_PER_TICK;
-        LSTIM->TIM_TGT = timer_target;
+        LSTIM->TIM_TGT = prev_target + expected_idle_time * CYC_PER_TICK;
         lstim_int_clr();
         return true;
     }else
@@ -137,3 +135,5 @@ void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
     *ppxTimerTaskStackBuffer = timer_task_stack;
     *pulTimerTaskStackSize = TIMER_TASK_STACK_SIZE;
 }
+
+void sw_timer_module_init(void){}

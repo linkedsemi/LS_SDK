@@ -5,12 +5,17 @@
 #define SDK_HCLK_MHZ (16)
 
 #if defined(LE501X)
-#define APP_CONFIG_ADDR_BASE     0x18008000     //0x18000000 + 0x2000 + 0x6000
-#define APP_DATA_ADDR_BASE       0x18009000     //0x18000000 + 0x2000 + 0x7000
+#define APP_FLASH_ADDR_BASE     0x18007000
+#define APP_CONFIG_ADDR_BASE    0x18007000
+#define APP_DATA_ADDR_BASE      0x18007100
+#define APP_DATA_ADDR_BASE_END  0x1807F000
+#elif defined(LM3050)
+#define APP_FLASH_ADDR_BASE     0x5000     // 0x00800000 + 0x5000
+#define APP_CONFIG_ADDR_BASE    0x5000    // 0x00800000 + 0x5000
+#define APP_DATA_ADDR_BASE      0x5100      // 0x00800000 + 0x5100
+#define APP_DATA_ADDR_BASE_END  0x80000 // 0x00800000 + 0x80000
 #else
-#define APP_CONFIG_ADDR_BASE     0x4000         //0x00800000 + 0x4000
-#define APP_DATA_ADDR_BASE       0x5000         //0x00800000 + 0x5000
+#error "error config for chip."
 #endif
-
 
 #endif

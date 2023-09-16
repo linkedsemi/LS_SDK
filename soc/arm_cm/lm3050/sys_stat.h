@@ -60,7 +60,7 @@ void sha_status_set(bool);
 
 void bxcan_status_set(bool);
 
-void app_status_set(bool);
+void usb_status_set(bool);
 
 bool peri_status_busy(void);
 

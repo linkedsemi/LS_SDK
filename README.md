@@ -68,6 +68,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/dac/single_dac_channel_sine_wave                               |        |  √     |
 | peripheral/dac/single_dac_channel_voltage                                 |        |  √     |
 | peripheral/dac/single_dac_channel_wave                                    |        |  √     |
+| peripheral/ecc/ecdh_it                                                    |  √     |  √     |
+| peripheral/ecc/ecdh_polling                                               |  √     |  √     |
 | peripheral/gpio                                                           |  √     |  √     |
 | peripheral/i2c/i2c_dma                                                    |  √     |  √     |
 | peripheral/i2c/i2c_it                                                     |  √     |  √     |
@@ -75,8 +77,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/i2c/ll_i2c_it                                                  |  √     |  √     |
 | peripheral/i2c/ll_i2c_polling                                             |  √     |  √     |
 | peripheral/iap/iap_application                                            |  √     |  √     |
-| peripheral/iap/iap_bootloader                                             |  √     |  √     |           
-| peripheral/pdm_pingpong_dma                                               |  √     |        |           
+| peripheral/iap/iap_bootloader                                             |  √     |  √     |
+| peripheral/pdm_pingpong_dma                                               |  √     |        |
 | peripheral/pdm_it                                                         |  √     |  √     |
 | peripheral/rtc                                                            |  √     |        |
 | peripheral/rtcv2                                                          |        |  √     |

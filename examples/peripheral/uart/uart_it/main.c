@@ -13,13 +13,20 @@ uint8_t test_zone_a[BUF_SIZE];
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    HAL_UART_Receive_IT(&UART_Config,test_zone_a,1);
+    if(huart->UARTX == UART1)
+    {    
+        HAL_UART_Receive_IT(&UART_Config,test_zone_a,1);
+    }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    HAL_UART_Transmit_IT(&UART_Config,test_zone_a,1);
+    if(huart->UARTX == UART1)
+    {
+        HAL_UART_Transmit_IT(&UART_Config,test_zone_a,1);       
+    }
 }
+
 static void uart_rx_test()
 {
     HAL_UART_Receive_IT(&UART_Config,test_zone_a,1);

@@ -37,7 +37,7 @@ static void test_comp1_dac()
     param.fallingintr_en        = ENABLE;
     param.flt_byp               = COMP_FLT_ENABLE;
     param.flt_prd               = ENABLE;
-    param.input                 = INPUT_COMP1_PC00;
+    param.input                 = INPUT_IOVIP1;
     param.vrefsel               = VREFSEL_DAC2;
     param.vrefctl               = DISABLE;
     param.hysteresis            = HYS_MS_5P4MV;
@@ -50,8 +50,8 @@ int main(void)
 {
     sys_init_none();
     comp_init();
-    test_comp1_dac();
     dac_init();
+    test_comp1_dac();
     while (1)
     {
     }

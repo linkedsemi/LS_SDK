@@ -13,7 +13,8 @@ def plf_postaction(self,target):
         return
     self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     target_path = str(target[0]).replace('.elf','')
-    app_hex = self.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+    app_hex = self.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex --gap-fill 0 $SOURCES $TARGET'))
+    app_bin = self.Command(target_path+'.bin', target[0], Action('$OBJCOPY -O binary $SOURCES $TARGET'))
     info_sbl_bin = self.Command('build/$IC/info_sbl.bin','$SDK_ROOT/soc/arm_cm/lm3050/bin/bram.bin',Action(self.subst('python $SDK_ROOT/tools/lm3050/info_sbl_merge.py')+' $SOURCE $TARGET'))
     info_array_c = self.Command('$SDK_ROOT/soc/arm_cm/lm3050/__info_array.c',info_sbl_bin,Action(self.subst('python $SDK_ROOT/tools/bin2c/bin2c.py')+ ' $SOURCE __info_array 80 4 > $TARGET'))
     info_obj = self.Object(self.variant_dir_source(['$SDK_ROOT/soc/arm_cm/lm3050/__info_array.c']))

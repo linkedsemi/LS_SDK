@@ -307,16 +307,11 @@ static void process_setup_packet(uint8_t rhport)
     if (len && dir_in) USB0->CSRL0 = USB_CSRL0_RXRDYC;
 }
 
-static bool handle_xfer_in(uint_fast8_t ep_addr)
+static void handle_xfer_in(uint_fast8_t ep_addr)
 {
     unsigned epnum_minus1 = tu_edpt_number(ep_addr) - 1;
     pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epnum_minus1];
     const unsigned rem  = pipe->remaining;
-
-    if (!rem) {
-        pipe->buf = NULL;
-        return true;
-    }
 
     volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
     const unsigned mps = regs->TXMAXP;
@@ -336,7 +331,6 @@ static bool handle_xfer_in(uint_fast8_t ep_addr)
     }
     regs->TXCSRL = USB_TXCSRL1_TXRDY;
     // TU_LOG1(" TXCSRL%d = %x %d\n", epnum_minus1 + 1, regs->TXCSRL, rem - len);
-    return false;
 }
 
 static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
@@ -577,7 +571,12 @@ static void process_edpt_n(uint8_t rhport, uint_fast8_t ep_addr)
             regs->TXCSRL &= ~(USB_TXCSRL1_STALLED | USB_TXCSRL1_UNDRN);
             return;
         }
-        completed = handle_xfer_in(ep_addr);
+        pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epn_minus1];
+        completed = pipe->remaining ? false : true;
+        if (!completed)
+        {
+            handle_xfer_in(ep_addr);
+        }
     } else {
         // TU_LOG1(" RXCSRL%d = %x\n", epn_minus1 + 1, regs->RXCSRL);
         if (regs->RXCSRL & USB_RXCSRL1_STALLED) {
@@ -635,6 +634,7 @@ void dcd_init(uint8_t rhport)
 {
     (void)rhport;
     HAL_USB_MSP_Init(USB_IRQHandler);
+    HAL_USB_MSP_Busy_Set();
     USB0->IE |= USB_IE_SUSPND;
 
     dcd_connect(rhport);
@@ -675,6 +675,7 @@ void dcd_remote_wakeup(uint8_t rhport)
     DELAY_US(1000);
 
     USB0->POWER &= ~USB_POWER_RESUME;
+    dcd_event_bus_signal(rhport, DCD_EVENT_RESUME, false);
 }
 
 // Connect by enabling internal pull-up resistor on D+/D-
@@ -929,6 +930,7 @@ void dcd_int_handler(uint8_t rhport)
         dcd_event_bus_signal(rhport, DCD_EVENT_SOF, true);
     }
     if (is & USB_IS_RESET) {
+        USB0->POWER |= USB_POWER_PWRDNPHY;
         process_bus_reset(rhport);
     }
     if (is & USB_IS_RESUME) {

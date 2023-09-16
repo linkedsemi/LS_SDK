@@ -39,6 +39,7 @@ static void log_uart_tx(char *ptr,int len)
 static void log_uart_init()
 {
     pinmux_uart3_init(LOG_UART_TXD, LOG_UART_RXD);
+    io_pull_write(LOG_UART_RXD, IO_PULL_UP);
     LL_UART3_MSP_Init();
     REG_FIELD_WR(UART3->LCR, UART_LCR_BRWEN, 1);
     UART3->BRR = LOG_UART_BAUDRATE;

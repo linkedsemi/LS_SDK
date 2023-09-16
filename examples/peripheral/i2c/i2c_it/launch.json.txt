@@ -29,5 +29,33 @@
                 //"add-symbol-file stack/build/le501x/fw.elf",  
             ]
         },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/i2c/i2c_it/build/lm3050/i2c_it.elf",
+            "name": "LM3050 Debug IIC_IT",
+            "device": "LM3050",
+            "interface": "swd",
+            "preLaunchCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/i2c/i2c_it/build/lm3050/i2c_it.elf",
+            "name": "LM3050 Attach IIC_IT",
+            "device": "LM3050",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/lm3050/fw.elf",  
+            ]
+        },
     ]
 }

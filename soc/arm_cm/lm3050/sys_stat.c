@@ -31,6 +31,7 @@
 #define TK_STAT_BIT 26
 #define SHA_STAT_BIT 27
 #define BXCAN_STAT_BIT 28
+#define USB_STAT_BIT 29
 
 uint32_t peri_stat;
 
@@ -169,6 +170,11 @@ void sha_status_set(bool stat)
 void bxcan_status_set(bool stat)
 {
     *SRAM_BIT_BAND_ADDR(&peri_stat,BXCAN_STAT_BIT) = stat;
+}
+
+void usb_status_set(bool stat)
+{
+    *SRAM_BIT_BAND_ADDR(&peri_stat,USB_STAT_BIT) = stat;
 }
 
 bool peri_status_busy()

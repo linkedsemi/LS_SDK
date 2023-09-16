@@ -625,8 +625,7 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
          LOG_I("PARAM_REQ!");
         break;
     case CONN_PARAM_UPDATED:
-       LOG_I("PARAM_UPDATED!");
-       gatt_manager_client_mtu_exch_send(connect_id);
+        LOG_I("PARAM_UPDATED!");
         break;
     default:
 

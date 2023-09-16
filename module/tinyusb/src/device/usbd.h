@@ -142,6 +142,12 @@ void tud_mount_cb(void);
 // Invoked when device is unmounted
 void tud_umount_cb(void);
 
+// Invoked when usb bus is suspended
+// Within 7ms, device must draw an average of current less than 2.5 mA from bus
+void tud_suspend_cb(bool remote_wakeup_en);
+
+// Invoked when usb bus is resumed
+void tud_resume_cb(void);
 #else
 
 // Invoked when device is mounted (configured)
@@ -150,13 +156,15 @@ TU_ATTR_WEAK void tud_mount_cb(void);
 // Invoked when device is unmounted
 TU_ATTR_WEAK void tud_umount_cb(void);
 
-#endif
 // Invoked when usb bus is suspended
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 TU_ATTR_WEAK void tud_suspend_cb(bool remote_wakeup_en);
 
 // Invoked when usb bus is resumed
 TU_ATTR_WEAK void tud_resume_cb(void);
+
+#endif
+
 
 // Invoked when received control request with VENDOR TYPE
 TU_ATTR_WEAK bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request);

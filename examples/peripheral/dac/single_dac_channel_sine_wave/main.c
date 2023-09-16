@@ -12,8 +12,6 @@ static DAC_HandleTypeDef DACx_Hdl;
 #define TIM_PRESCALER     (8-1)
 #define TIM_PERIOD        (4) /* Period Value  */
 
-static DAC_HandleTypeDef DACx_Hdl;
-
 TIM_HandleTypeDef TimHandle;
 
 void Basic_Timer_Cfg(void)

@@ -588,6 +588,27 @@ static void disconnect_pattern_send_prepare(uint8_t con_idx, uint8_t role)
 #endif        
     }   
 }
+
+static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_name_ptr);
+    dev_name_ptr->value = (uint8_t*)UART_SVC_ADV_NAME;
+    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME);
+}
+static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_appearance_ptr);
+    dev_appearance_ptr->appearance = 0;
+}
+static void get_slv_pref_param(struct gap_dev_info_slave_pref_param *dev_slv_pref_param_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_slv_pref_param_ptr);
+    dev_slv_pref_param_ptr->con_intv_min  = 8;
+    dev_slv_pref_param_ptr->con_intv_max  = 20;
+    dev_slv_pref_param_ptr->slave_latency =  0;
+    dev_slv_pref_param_ptr->conn_timeout  = 200;
+}
+
 static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uint8_t con_idx)
 {
     switch(type)
@@ -642,6 +663,15 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     break;
     case CONN_PARAM_UPDATED:
 
+    break;
+    case GET_DEV_INFO_DEV_NAME:
+        get_dev_name((struct gap_dev_info_dev_name*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_APPEARANCE:
+        get_appearance((struct gap_dev_info_appearance*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_SLV_PRE_PARAM:
+        get_slv_pref_param((struct gap_dev_info_slave_pref_param*)evt, con_idx);
     break;
     default:
 

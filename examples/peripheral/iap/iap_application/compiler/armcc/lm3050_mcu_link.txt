@@ -1,0 +1,48 @@
+#! armcc -E
+
+#define FLASH_BASE 0x800000
+#define FLASH_BASE_INFO 0x805000
+#define FLASH_BASE_APP 0x805100
+#define FLASH_SIZE 0x7B000
+#define FLASH_END (FLASH_BASE + FLASH_SIZE)
+#define RAM_BASE 0x20000000
+#define RAM_SIZE 0x20000
+#define RAM_END (RAM_BASE + RAM_SIZE)
+
+LR_USER_INFO_CONFIG FLASH_BASE_INFO{
+	USER_INFO_CONFIG +0 {
+        *(:gdef:__user_info_config,+First)
+    }
+}
+
+LR_FLASH FLASH_BASE_APP FLASH_SIZE{
+    VECTOR_CODE RAM_BASE{
+        *(RESET, +First)
+    }
+
+    RAM_DATA_CODE 0x20000134 {
+        *(.xip_banned.sleep_recover_asm,+First)
+        *(+RW)
+        *(.xip_banned*)
+    }
+
+    FLASH_CODE FLASH_BASE_APP+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE) ALIGN 0x4{
+        *(InRoot$$Sections)
+        .ANY(+RO)
+    }
+    ScatterAssert(ImageLimit(FLASH_CODE) <= FLASH_END)
+    BSS ImageLimit(RAM_DATA_CODE) ALIGN 0x4
+    {
+        *(+ZI)
+    }
+    HEAP +0 UNINIT
+    {
+        *(HEAP)
+    }
+    STACK +0 UNINIT
+    {
+        *(STACK)
+    }
+    ScatterAssert(ImageLimit(STACK)<=RAM_END)
+}
+
