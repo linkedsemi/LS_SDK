@@ -73,7 +73,6 @@ typedef void (*KS_KEY_CALLBACK)(uint16_t );
 
 bool keyscan_Start(bool scan);
 void keyscan_Create_Keyboard( void (*keyscan_callback)(uint16_t));
-void keyscan_Light_Sleep(void);
 
 #ifdef	__cplusplus
 }

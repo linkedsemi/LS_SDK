@@ -70,11 +70,6 @@ int main(void)
   while (1)
   {
     tud_task(); // tinyusb device task
-    if(g_light_sleep_flag)
-    {
-      g_light_sleep_flag = false;
-      keyscan_Light_Sleep();
-    }
   }
 
   return 0;
@@ -103,7 +98,6 @@ void tud_suspend_cb(bool remote_wakeup_en)
 {
   (void)remote_wakeup_en;
   blink_interval_ms = BLINK_SUSPENDED;
-  g_light_sleep_flag = true;
 }
 
 // Invoked when usb bus is resumed
@@ -157,16 +151,14 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
 void hid_task(uint16_t ShortKey_Press)
 {
   // Remote wakeup
-  if ( tud_suspended() && ShortKey_Press )
+  if ( tud_suspended()&&(ShortKey_Press))
   {
     // Wake up host if we are in suspend mode
     // and REMOTE_WAKEUP feature is enabled by host
     tud_remote_wakeup();
-  }else
-  {
+  }
     // Send the 1st of report chain, the rest will be sent by tud_hid_report_complete_cb()
     send_hid_report(REPORT_ID_KEYBOARD, ShortKey_Press);
-  }
 }
 
 // Invoked when sent REPORT successfully to host
