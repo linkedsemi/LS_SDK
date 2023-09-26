@@ -39,9 +39,10 @@ def progen(target,source,env):
         project_data['common']['sources'][src[0]] += [src[1]]
     project_data['common']['sources']['libs'] = []
 
-    if 'LIBS' in  env:
+    if 'LIBS' in env:
         for lib in env['LIBS']:
-            project_data['common']['sources']['libs'] += [os.path.relpath(lib.srcnode().abspath)]
+            if type(lib) != str:
+                project_data['common']['sources']['libs'] += [os.path.relpath(lib.srcnode().abspath)]
     project_data['common']['macros'] = env['CPPDEFINES']
     project_data['common']['linker_file'] = os.path.relpath(env['LINKSCRIPT'].srcnode().abspath)
     root_relpath = os.path.relpath(env['SDK_ROOT'].abspath,os.path.join(os.path.join(env['IC'],env['IDE'])))
