@@ -30,6 +30,18 @@ typedef struct
     at_cmd_handler_t   cmd_handler;
 } at_cmd_attr_t;
 
+typedef struct at_adv_report
+{
+    uint8_t data[0x1F];
+    struct adv_report_info evt_type;
+    struct dev_addr adv_addr;
+    uint8_t adv_addr_type;
+    uint8_t data_len;
+    int8_t  rssi;
+}adv_report_t;
+
+adv_report_t adv_rpt[ADV_REPORT_NUM];
+
 static const at_cmd_attr_t at_cmd_attr_table[] =
 {
     {"NAME",     4, at_gap_name_handler},
@@ -107,19 +119,19 @@ void gap_adv_report_ind(struct adv_report_evt *param)
     uint8_t free_rpt_idx = 0xff;
     for(uint8_t idx = 0; idx<ADV_REPORT_NUM; idx++)
     {
-        if(ls_at_buff_env.adv_rpt[idx].adv_addr_type==0xFF && free_rpt_idx == 0xff)
+        if(adv_rpt[idx].adv_addr_type==0xFF && free_rpt_idx == 0xff)
             free_rpt_idx = idx;
-        if(memcmp(ls_at_buff_env.adv_rpt[idx].adv_addr.addr,param->adv_addr->addr,BLE_ADDR_LEN) == 0 )
+        if(memcmp(adv_rpt[idx].adv_addr.addr,param->adv_addr->addr,BLE_ADDR_LEN) == 0 )
             return;
     }
     if(param->info.connectable){
-        ls_at_buff_env.adv_rpt[free_rpt_idx].evt_type = param->info;
-        ls_at_buff_env.adv_rpt[free_rpt_idx].adv_addr_type = param->adv_addr_type;
-        memcpy(ls_at_buff_env.adv_rpt[free_rpt_idx].adv_addr.addr,param->adv_addr->addr,BLE_ADDR_LEN);
-        ls_at_buff_env.adv_rpt[free_rpt_idx].rssi = param->rssi;
-        ls_at_buff_env.adv_rpt[free_rpt_idx].data_len = param->length;
-        memcpy(ls_at_buff_env.adv_rpt[free_rpt_idx].data,param->data,param->length);
-        LOG_HEX(ls_at_buff_env.adv_rpt[free_rpt_idx].data,param->length);
+        adv_rpt[free_rpt_idx].evt_type = param->info;
+        adv_rpt[free_rpt_idx].adv_addr_type = param->adv_addr_type;
+        memcpy(adv_rpt[free_rpt_idx].adv_addr.addr,param->adv_addr->addr,BLE_ADDR_LEN);
+        adv_rpt[free_rpt_idx].rssi = param->rssi;
+        adv_rpt[free_rpt_idx].data_len = param->length;
+        memcpy(adv_rpt[free_rpt_idx].data,param->data,param->length);
+        LOG_HEX(adv_rpt[free_rpt_idx].data,param->length);
     }
 }
 
@@ -133,12 +145,12 @@ void gap_scaning_cmp_ind(void)
 
     for(uint8_t idx = 0; idx<ADV_REPORT_NUM; idx++)
     {
-        if(ls_at_buff_env.adv_rpt[idx].evt_type.connectable)
+        if(adv_rpt[idx].evt_type.connectable)
         {
-            hex_arr_to_str(addr_str,ls_at_buff_env.adv_rpt[idx].adv_addr.addr,BLE_ADDR_LEN);
+            hex_arr_to_str(addr_str,adv_rpt[idx].adv_addr.addr,BLE_ADDR_LEN);
             addr_str[BLE_ADDR_LEN * 2] = 0;
 
-            msg_len = sprintf((char *)msg_rsp,"\r\nNo: %d Addr:%s Rssi:%ddBm\r\n",idx,addr_str,(signed char)ls_at_buff_env.adv_rpt[idx].rssi);
+            msg_len = sprintf((char *)msg_rsp,"\r\nNo: %d Addr:%s Rssi:%ddBm\r\n",idx,addr_str,(signed char)adv_rpt[idx].rssi);
             uart_write(msg_rsp,msg_len);
         }
     }
@@ -314,7 +326,7 @@ static void at_scan_handler(uint8_t *p_cmd_parse)
         }
         break;
     }
-    memset(&(ls_at_buff_env.adv_rpt[0]),0xff,sizeof(struct at_adv_report)*ADV_REPORT_NUM);
+    memset(&(adv_rpt[0]),0xff,sizeof(struct at_adv_report)*ADV_REPORT_NUM);
     if(ls_at_ctl_env.scan_duration == 0)
         start_scan(500);
     else
@@ -345,8 +357,8 @@ static void at_connect_handler(uint8_t *p_cmd_parse)
     case '=':
     {
         uint8_t idx = atoi((const char *)p_cmd_parse);
-        start_init(ls_at_buff_env.adv_rpt[idx].adv_addr.addr,ls_at_buff_env.adv_rpt[idx].adv_addr_type);
-        hex_arr_to_str(peer_dev_addr_str,ls_at_buff_env.adv_rpt[idx].adv_addr.addr,BLE_ADDR_LEN);
+        start_init(adv_rpt[idx].adv_addr.addr,adv_rpt[idx].adv_addr_type);
+        hex_arr_to_str(peer_dev_addr_str,adv_rpt[idx].adv_addr.addr,BLE_ADDR_LEN);
     }
     break;
     }
