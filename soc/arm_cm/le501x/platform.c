@@ -360,10 +360,10 @@ static void module_init()
     irq_init();
     modem_rf_init();
     systick_start();
-    rco_freq_counting_start();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
+    rco_freq_counting_start();
 }
 
 void XIP_BANNED_FUNC(LVD33_Handler,)
