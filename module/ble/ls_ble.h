@@ -479,7 +479,8 @@ enum gap_evt_type
     GET_DEV_INFO_APPEARANCE,                        /*!< Get appearance Icon of device information*/
     GET_DEV_INFO_SLV_PRE_PARAM,                     /*!< Get slave preferred parameters of device information*/
     GET_DEV_INFO_PEER_RSSI,                         /*!< Get connection RSSI indication*/
-    PHY_UPDATED,										                /*!< PHY updated event*/
+    PHY_UPDATED,								    /*!< PHY updated event*/
+    LTK_REQ,                                        /*!< Encryption information LTK request event*/
 };
 /**
   * @brief BLE roles enumeration.
@@ -707,6 +708,18 @@ struct gap_dev_info_peer_rssi
     int8_t rssi;                            /**< The RSSI value of the current connection(master or slave) */
 };
 /**
+  * @brief LTK information structure.
+  */
+struct gap_ltk_req
+{
+    uint8_t *found;
+    /// Long Term Key
+    uint8_t *ltk;
+    /// LTK Key Size
+    uint8_t *key_size;
+};
+
+/**
   * @brief GAP event union definition.
   */
 union gap_evt_u
@@ -728,6 +741,7 @@ union gap_evt_u
     struct gap_dev_info_slave_pref_param slv_pref_param;       /*!< Get slave preferred parameters*/
     struct gap_dev_info_peer_rssi peer_rssi;                   /*!< Get RSSI value of the current connection*/
     struct gap_phy_updated phy_updated;                        /*!< PHY updated event*/
+    struct gap_ltk_req ltk_req;                                /*!< LTK request event*/
 };
 /**
   * @brief Connection parameter update.
