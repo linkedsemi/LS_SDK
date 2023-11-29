@@ -184,6 +184,7 @@ static void deep_sleep_no_ble()
     uint32_t NVIC_IP[CEILING(IRQn_Max,4)];
     memcpy32(NVIC_IP,(uint32_t *)NVIC->IP,ARRAY_LEN(NVIC_IP));
     cpu_flash_deep_sleep_and_recover();
+    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
     memcpy32((uint32_t *)NVIC->IP,NVIC_IP,ARRAY_LEN(NVIC_IP));
     memcpy32((uint32_t *)NVIC->ISER,NVIC_EN,ARRAY_LEN(NVIC_EN));
