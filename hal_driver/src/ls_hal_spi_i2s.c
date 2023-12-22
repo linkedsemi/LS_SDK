@@ -177,16 +177,21 @@ static HAL_StatusTypeDef spi_data_transfer(SPI_HandleTypeDef *hspi, uint32_t Tim
     uint32_t tickstart = systick_get_value();
     uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
     uint32_t end_tick = tickstart + timeout;
+    uint32_t txallowed = 0U;
 
     while ((hspi->Tx_Env.Interrupt.Count > 0U) || (hspi->Rx_Env.Interrupt.Count > 0U))
     {
-        if (SPI_I2S_TX_FIFO_NOT_FULL(hspi) && (hspi->Tx_Env.Interrupt.Count > 0U))
+        if (SPI_I2S_TX_FIFO_NOT_FULL(hspi) && (hspi->Tx_Env.Interrupt.Count > 0U) && (txallowed == 1U))
         {
             hspi->Tx_Env.Interrupt.transfer_Fun(hspi);
+            /* Next Data is a reception (Rx). Tx not allowed */
+            txallowed = 0U;
         }
         if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->Rx_Env.Interrupt.Count > 0U))
         {
             hspi->Rx_Env.Interrupt.transfer_Fun(hspi);
+            /* Next Data is a Transmission (Tx). Tx is allowed */
+            txallowed = 1U;
         }
         if (hspi->Init.Mode == SPI_MODE_SLAVE)
         {
@@ -215,7 +220,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pTxData, ui
 HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
 {
     HAL_StatusTypeDef hal_status;
-    SET_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
+    CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
     tx_para_init(hspi, NULL, Size);
     rx_para_init(hspi, pRxData, Size);
     spi_config(hspi,false);
@@ -290,7 +295,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pTxData,
 
 HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pRxData, uint16_t Size)
 {
-    SET_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
+    CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
     tx_para_init(hspi, NULL, Size);
     rx_para_init(hspi, pRxData, Size);
     spi_config(hspi,true);
