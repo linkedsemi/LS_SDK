@@ -93,32 +93,47 @@ NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flash_reading_critical,void (*func)(voi
 
 #if SUSPEND_WORKAROUND == PUYA_FLASH_WORKAROUND
 #include "systick.h"
+extern bool flash_55nm;
 ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void *param)
 {
-    if(GLOBAL_INT_MASK_STATUS())
-    {
-        hal_flash_xip_stop();
-        hal_flash_write_enable();
-        func(param);
-        hal_flash_write_status_check();
-        hal_flash_xip_start();
+    if(flash_55nm){
+        if(GLOBAL_INT_MASK_STATUS())
+        {
+            hal_flash_xip_stop();
+            hal_flash_write_enable();
+            func(param);
+            hal_flash_write_status_check();
+            hal_flash_xip_start();
+        }else
+        {
+            uint32_t cpu_stat = ENTER_CRITICAL();
+            hal_flash_xip_stop();
+            hal_flash_write_enable();
+            func(param);
+            uint32_t writing_end_time = systick_get_value();
+            DELAY_US(500);
+            flash_stat.writing = true;
+            EXIT_CRITICAL(cpu_stat);
+            systick_poll_timeout(writing_end_time,func == do_hal_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
+            cpu_stat = ENTER_CRITICAL();
+            hal_flash_write_status_check();
+            EXIT_CRITICAL(cpu_stat);
+            flash_stat.writing = false;
+            hal_flash_xip_start();
+        }
     }else
     {
         uint32_t cpu_stat = ENTER_CRITICAL();
         hal_flash_xip_stop();
         hal_flash_write_enable();
         func(param);
-        uint32_t writing_end_time = systick_get_value();
-        DELAY_US(500);
         flash_stat.writing = true;
         EXIT_CRITICAL(cpu_stat);
-        systick_poll_timeout(writing_end_time,func == do_hal_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
-        cpu_stat = ENTER_CRITICAL();
         hal_flash_write_status_check();
-        EXIT_CRITICAL(cpu_stat);
         flash_stat.writing = false;
         hal_flash_xip_start();
     }
+
 }
 
 #elif SUSPEND_WORKAROUND == TSINGTENG_FLASH_WORKAROUND
