@@ -581,7 +581,7 @@ void XIP_BANNED_FUNC(BLE_Handler,)
     if(flash_writing_status)
     {
         hal_flash_prog_erase_resume();
-        DELAY_US(8);
+        DELAY_US(20);
     }
 }
 
