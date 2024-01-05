@@ -103,11 +103,14 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define LIGHT_CTL_TEMP_STATUS            (0x6682) /*!< Opcdoe of light ctl temperature status 0x6682*/
 
 // tmall Vendor        
-#define APP_MESH_VENDOR_SET              (0x0001A8d1)  /*!< Vendor opcdoe of tmall genie set 0x0001A8d1*/
-#define APP_MESH_VENDOR_SET_UNAK         (0x0001A8d2)  /*!< Vendor opcdoe of tmall genie set unacknowleged 0x0001A8d2*/
-#define APP_MESH_VENDOR_STATUES          (0x0001A8d3)  /*!< Vendor opcdoe of tmall genie status 0x0001A8d3*/
+#define APP_MESH_VENDOR_GET              (0x0001A8d0)  /*!< Vendor opcdoe of tmall genie get 0x0001A8d0*/
+#define APP_MESH_VENDOR_SET_ACK          (0x0001A8d1)  /*!< Vendor opcdoe of tmall genie set 0x0001A8d1*/
+#define APP_MESH_VENDOR_SET_UNACK        (0x0001A8d2)  /*!< Vendor opcdoe of tmall genie set unacknowleged 0x0001A8d2*/
+#define APP_MESH_VENDOR_STATUS           (0x0001A8d3)  /*!< Vendor opcdoe of tmall genie status 0x0001A8d3*/
 #define APP_MESH_VENDOR_INDICATION       (0x0001A8d4)  /*!< Vendor opcdoe of tmall genie indication 0x0001A8d4*/
 #define APP_MESH_VENDOR_CONFIRMATION     (0x0001A8d5)  /*!< Vendor opcdoe of tmall genie confirmation 0x0001A8d5*/
+#define APP_MESH_VENDOR_INDICATE_TG      (0x0001A8de)  /*!< Vendor opcdoe of tmall genie indication_tag 0x0001A8de*/
+#define APP_MESH_VENDOR_CONFIME_TG       (0x0001A8df)  /*!< Vendor opcdoe of tmall genie confime_tag 0x0001A8df*/
 #define APP_MESH_VENDOR_TRANSPARENT_MSG  (0x0001A8cf)  /*!< Vendor opcdoe of tmall genie transparent message 0x0001A8cf*/
 
 // linkedsemi Vendor
@@ -149,6 +152,7 @@ enum mesh_evt_type
     MESH_GENIE_PROV_COMP,            /*!<To be reported this event type after all requested models were automatically bound AppKey, only for genie lower power*/
     MESH_ADV_REPORT,                 /*!<To be reported this event type when the device scaned an adv message*/
     MESH_STATE_UPD_IND,              /*!<To be reported this event type when sig model recevied messages*/
+    MESH_STATE_CLI_ACK_RX_IND,      /*!<To be reported this event type when sig model recevied client ack messages*/
     MESH_ACTIVE_GLP_START,           /*!<To be reported this event type when each time the node was restarted and enabled genie lower power*/
     MESH_ACTIVE_GLP_STOP,            /*!<To be reported this event type when the node was stopped genie lower power*/
     MESH_ACTIVE_AUTO_PROV,           /*!<To be reported this event type when automatic provisioning was enabled on the device*/
@@ -409,6 +413,16 @@ struct model_cli_set_state_info
     uint8_t app_key_lid;                 /*!< App key local index*/
 };
 /**
+  * @brief Get state message structure - for Client SIG model
+  */
+struct model_cli_get_state_info
+{
+    uint16_t dest_address;               /*!< Destination address*/ 
+    uint16_t get_info;                   /*!< get_info*/ 
+    uint8_t  client_mdl_lid;             /*!< Client Model local index*/
+    uint8_t  app_key_lid;                /*!< App key local index*/
+};
+/**
   * @brief Start transition to a new state message structure - for Client SIG model
   */
 struct model_cli_trans_info
@@ -487,6 +501,19 @@ struct model_state_upd
     uint32_t state;                  /*!<  New state value or targeted state value depending on transition time*/
     uint32_t trans_time_ms;          /*!<  Transition time in milliseconds*/
 };
+
+/**
+  * @brief  a state value has been received Allocate for SIG Model
+  */
+struct model_client_ack_state_ind
+{
+    uint16_t src_address;              /*!< Soucrce Address*/
+    uint16_t state_id;                /*!< State identifier,  num mesh_state_idx*/
+    uint32_t state_value1;               /*!< fisrt state value for sig model*/
+    uint32_t state_value2;               /*!< second state valuefor sig model*/
+    uint32_t trans_time_ms;          /*!<  Transition time in milliseconds*/
+};
+
 /**
   * @brief Report provisioning state
   */
@@ -570,6 +597,7 @@ union ls_sig_mesh_evt_u {
     struct report_mesh_timer_state_info mesh_timer_state;          /*!< Report mesh timer state,  struct report_mesh_timer_state_info*/
     struct adv_report_evt adv_report;                              /*!< Report adv information,  struct adv_report_evt*/
     struct model_state_upd mdl_state_upd_ind;                      /*!< State update indication structure for SIG Model,  struct model_state_upd*/
+    struct model_client_ack_state_ind client_ack_state_ind;        /*!< Client Ack State indication structure for SIG Model,  struct model_client_ack_state_ind*/
     struct mesh_model_info sig_mdl_info;                           /*!< Registered Model all informations structure for node,  struct mesh_model_info*/
     struct mesh_publish_info_ind mesh_publish_info;                /*!< Report new publication parameters for a model,  struct mesh_publish_info_ind*/
     struct mesh_auto_prov_info mesh_auto_prov_param;               /*!< Auto provisioning information for node,  struct mesh_auto_prov_info*/
@@ -713,6 +741,20 @@ void model_send_info_handler(struct model_send_info *param);
  * @param param struct model_cli_set_state_info
  */
 void mesh_model_client_set_state_handler(struct model_cli_set_state_info *param);
+
+/**
+ * @brief Set current onoff state to mesh stack 
+ * 
+ * @param model_lid onoff model local id
+ * @param state 1:on  0:off
+ */
+void app_set_onoff_current_state(uint8_t model_lid, uint8_t state);
+/**
+ * @brief Get state to other nodes by Sig Client Model
+ * 
+ * @param param struct model_cli_get_state_info
+ */
+void mesh_model_client_get_state_handler(struct model_cli_get_state_info *param);
 /**
  * @brief Publish message to other nodes by by Sig Client Model
  * 
@@ -854,6 +896,23 @@ void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot);
  */
 void prov_foundation_mdl_cfg_svr_rsp(uint32_t opcode,uint16_t status);
 
+/**
+ * @brief Inform tmall mesh Application to add subscription for each model in the same element
+ * 
+ * @param element
+ * @param model_lid
+ * @param group_address 
+ */
+void tmall_mesh_add_subscription(uint16_t element, uint8_t model_lid, uint16_t group_address);
+
+/**
+ * @brief Inform tmall mesh Application to delete subscription for each model in the same element
+ * 
+ * @param element
+ * @param model_lid
+ * @param group_address
+ */
+void tmall_mesh_delete_subscription(uint16_t element, uint8_t model_lid, uint16_t group_address);
 /** @} */
 
 #ifdef __cplusplus
