@@ -5,17 +5,18 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "tinycrypt/sha256.h"
-#include "tinycrypt/constants.h"
-#include "tinycrypt/aes.h"
+#include "sha256.h"
+#include "constants.h"
+#include "aes.h"
 #include "genie_triple.h"
+#include "tmall_genie_triple_handle.h"
 
 #define LOG_I_ENABLED IS_ENABLED(CONFIG_BT_MESH_DEBUG_GENIE_CRYPTO)
 
 
 #include "genie_crypto.h"
 #include "log.h"
-#include "tmall_ais_main.h"
+#include "tmall_genie_ais_main_handle.h"
 
 static uint8_t g_auth[32];
 static uint8_t g_ble_key[32];

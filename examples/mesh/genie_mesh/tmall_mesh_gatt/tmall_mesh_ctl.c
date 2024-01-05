@@ -48,12 +48,12 @@ void tmall_mesh_recv_vendor_msg(struct model_rx_info *msg)
 {
     struct mesh_vendor_model_set *vendor_set;
     vendor_set = (struct mesh_vendor_model_set *)msg->info;
-    if (msg->opcode == APP_MESH_VENDOR_SET)
+    if (msg->opcode == APP_MESH_VENDOR_SET_ACK)
     {
         vendor_set = (struct mesh_vendor_model_set *)msg->info;
         LOG_I("attr_type:%x",vendor_set->attr_type);
         
-        dev_mesh_status_rsp(msg,APP_MESH_VENDOR_STATUES,(uint8_t *)vendor_set,msg->rx_info_len);
+        dev_mesh_status_rsp(msg,APP_MESH_VENDOR_STATUS,(uint8_t *)vendor_set,msg->rx_info_len);
     }
     else if(msg->opcode == APP_MESH_VENDOR_CONFIRMATION)
     {

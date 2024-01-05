@@ -5,7 +5,7 @@
 #include "tmall_genie_ota.h"
 #include "log.h"
 #include "ls_ble.h"
-#include "tmall_ais_main.h"
+#include "tmall_genie_ais_main_handle.h"
 #include "ali_dfu_port.h"
 
 extern genie_ota_ctx_t genie_ota_ctx;

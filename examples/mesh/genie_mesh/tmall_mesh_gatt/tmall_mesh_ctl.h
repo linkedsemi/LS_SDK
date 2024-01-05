@@ -40,6 +40,12 @@
 #define VENDOR_ATTR_TYPE_holdingTemp        0x015b
 #define VENDOR_ATTR_TYPE_errorCode          0x0000
 
+#define VENDOR_ATTR_TYPE_powerstate        0x0100
+#define VENDOR_ATTR_TYPE_curtainConrtol    0x0547
+#define VENDOR_ATTR_TYPE_curtainPosition   0x0548
+#define VENDOR_ATTR_TYPE_attrparastep      0xf00b
+#define VENDOR_ATTR_TYPE_curtainmode       0xf004
+
 #define RECORD_PRESET_SCENCE_BASE           0X2710          //10000
 #define RECORD_PRESET_SCENCE_NUM            9
 #define RECORD_CONFIG_SCENCE_BASE           0X2774          //10100

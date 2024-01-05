@@ -5,11 +5,11 @@
 #include "log.h"
 #include "ali_dfu_port.h"
 #include "platform.h"
-#include "tmall_ais_main.h"
+#include "tmall_genie_ais_main_handle.h"
 #include "ota_settings.h"
 
 genie_ota_ctx_t genie_ota_ctx;
-#define  AIS_OTA_FLASH_BASE_ADDRESS   0x18064000
+#define  AIS_OTA_FLASH_BASE_ADDRESS   0x18068000
 #define  AIS_APP_FLASH_BASE_ADDRESS   0x18056000
 
 

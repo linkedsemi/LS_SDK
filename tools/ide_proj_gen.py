@@ -46,7 +46,6 @@ if __name__ == '__main__':
     le501x_proj_gen('examples/ble/fota')
     le501x_proj_gen('examples/ble/host_test')
     
-    le501x_proj_gen('examples/mesh/genie_mesh/tmall_mesh')
     le501x_proj_gen('examples/mesh/genie_mesh/tmall_mesh_gatt')
     le501x_proj_gen('examples/mesh/genie_mesh/tmall_mesh_gatt_ls_ota')
     le501x_proj_gen('examples/mesh/genie_mesh/tmall_mesh_gatt_glp')
