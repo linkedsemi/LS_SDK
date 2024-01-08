@@ -280,10 +280,23 @@ uint8_t io_get_output_val(uint8_t pin)
     return SYSC_AWO->IO[x->port].OE_DOT >> x->num & 0x1;
 }
 
-uint8_t io_read_pin(uint8_t pin)
+uint8_t io_get_input_val(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     return SYSC_AWO->IO[x->port].DIN >> x->num & 0x1;
+}
+
+uint8_t io_read_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (SYSC_AWO->IO[x->port].OE_DOT & (1<<16<<x->num))
+    {
+        return io_get_output_val(pin);
+    }
+    else
+    {
+        return io_get_input_val(pin);
+    }
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)
