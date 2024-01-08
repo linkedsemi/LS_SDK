@@ -30,7 +30,6 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | ble/ble_uart_server_mult_link                                             |  √     |        |
 | ble/fota                                                                  |  √     |        |
 | ble/host_test                                                             |  √     |        |
-| mesh/genie_mesh/tmall_mesh                                                |  √     |        |
 | mesh/genie_mesh/tmall_mesh_gatt                                           |  √     |        |
 | mesh/genie_mesh/tmall_mesh_gatt_glp                                       |  √     |        |
 | mesh/genie_mesh/tmall_mesh_gatt_ls_ota                                    |  √     |        |
