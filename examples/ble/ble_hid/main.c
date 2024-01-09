@@ -319,6 +319,8 @@ static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt
         break;
     case HID_REPORT_WRITE:
         LOG_I("HID REPORT WRITE");
+        LOG_I("hid_idx = %d type = %d  idx = %d ",evt->write_report_req.hid_idx,evt->write_report_req.type,evt->write_report_req.idx);
+		LOG_HEX(evt->write_report_req.value,evt->write_report_req.length);
         break;
     default:
         break;
@@ -378,9 +380,13 @@ static void prf_added_handler(struct profile_added_evt *evt)
         struct hid_db_cfg db_cfg = {0};   
         db_cfg.hids_nb = 1;
         db_cfg.cfg[0].svc_features = HID_KEYBOARD;
-        db_cfg.cfg[0].report_nb = 1;
+        db_cfg.cfg[0].report_nb = 2;
+
         db_cfg.cfg[0].report_id[0] = 0;
         db_cfg.cfg[0].report_cfg[0] = HID_REPORT_IN;
+        db_cfg.cfg[0].report_id[1] = 0;
+        db_cfg.cfg[0].report_cfg[1] = HID_REPORT_OUT;
+
         db_cfg.cfg[0].info.bcdHID = 0X0111;
         db_cfg.cfg[0].info.bCountryCode = 0;
         db_cfg.cfg[0].info.flags = HID_WKUP_FOR_REMOTE | HID_NORM_CONN;
