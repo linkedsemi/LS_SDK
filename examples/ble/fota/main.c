@@ -17,6 +17,8 @@
 #include "common.h"
 #include "systick.h"
 #include "ota_settings.h"
+#include "uECC.h"
+
 #define FW_ECC_VERIFY (0)
 
 static uint8_t adv_obj_hdl;

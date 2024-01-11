@@ -15,6 +15,7 @@
 #include "SEGGER_RTT.h"
 
 #define UART_SERVER_WITH_OTA 0
+#define FW_ECC_VERIFY 0
 
 #if UART_SERVER_WITH_OTA == 1
 #define UART_SVC_ADV_NAME "LS Uart Server ota prf"
