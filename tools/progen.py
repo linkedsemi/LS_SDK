@@ -52,7 +52,7 @@ def progen(target,source,env):
         'uvision5': uvision5_cfg,
         'uvision5_armc6': uvision5_cfg,
         'iar':{'misc':{
-                    'c_flags':['--diag_suppress=Pa082,Pe188,Pa089,Pe068,Pa039,Pa131,Pe111','--warnings_are_errors'],
+                    'c_flags':['--diag_suppress=Pa082,Pe188,Pa089,Pe068,Pa039,Pa131,Pe111,Pe301','--warnings_are_errors'],
                     'ld_flags':['--diag_suppress=Lt009','--warnings_are_errors','--config_search {}'.format(os.path.join(root_relpath,'soc/arm_cm/'+env['IC']+'/compiler/'+env['IDE']))]
 
             },
