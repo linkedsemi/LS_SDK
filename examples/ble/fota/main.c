@@ -10,7 +10,6 @@
 #include "reg_syscfg.h"
 #include "reg_rf.h"
 #include "prf_fotas.h"
-#include "tinycrypt/ecc_dsa.h"
 #include "ls_ble.h"
 #include "ls_dbg.h"
 #include "log.h"
