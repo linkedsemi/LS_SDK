@@ -3005,4 +3005,117 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Chan
   return HAL_OK;
 }
 
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Init(TIM_HandleTypeDef *htim, TIM_HallSensor_InitTypeDef *sConfig)
+{
+  TIM_OC_InitTypeDef OC_Config;
+
+  /* Check the TIM handle allocation */
+  if (htim == NULL)
+  {
+    return HAL_ERROR;
+  }
+
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_HALL_SENSOR_INTERFACE_INSTANCE(htim->Instance));
+  LS_ASSERT(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
+  LS_ASSERT(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
+  LS_ASSERT(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
+  LS_ASSERT(IS_TIM_IC_POLARITY(sConfig->IC1Polarity));
+  LS_ASSERT(IS_TIM_IC_PRESCALER(sConfig->IC1Prescaler));
+  LS_ASSERT(IS_TIM_IC_FILTER(sConfig->IC1Filter));
+
+  if (htim->State == HAL_TIM_STATE_RESET)
+  {
+    /* Allocate lock resource and initialize it */
+    htim->Lock = HAL_UNLOCKED;
+    /* Init the low level hardware : GPIO, CLOCK, NVIC and DMA */
+    HAL_TIM_MSP_Init(htim);
+    HAL_TIM_MSP_Busy_Set(htim);
+  }
+
+  /* Set the TIM state */
+  htim->State = HAL_TIM_STATE_BUSY;
+
+  /* Configure the Time base in the Encoder Mode */
+  TIM_Base_SetConfig(htim->Instance, &htim->Init);
+
+  /* Configure the Channel 1 as Input Channel to interface with the three Outputs of the  Hall sensor */
+  TIM_TI1_SetConfig(htim->Instance, sConfig->IC1Polarity, TIM_ICSELECTION_TRC, sConfig->IC1Filter);
+
+  /* Reset the IC1PSC Bits */
+  htim->Instance->CCMR1 &= ~TIMER_CCMR1_IC1PSC;
+  /* Set the IC1PSC value */
+  htim->Instance->CCMR1 |= sConfig->IC1Prescaler;
+
+  /* Enable the Hall sensor interface (XOR function of the three inputs) */
+  htim->Instance->CR2 |= TIMER_CR2_TI1S;
+
+  /* Select the TIM_TS_TI1F_ED signal as Input trigger for the TIM */
+  htim->Instance->SMCR &= ~TIMER_SMCR_TS;
+  htim->Instance->SMCR |= TIM_TS_TI1F_ED;
+
+  /* Use the TIM_TS_TI1F_ED signal to reset the TIM counter each edge detection */
+  htim->Instance->SMCR &= ~TIMER_SMCR_SMS;
+  htim->Instance->SMCR |= TIM_SLAVEMODE_RESET;
+
+  /* Program channel 2 in PWM 2 mode with the desired Commutation_Delay*/
+  OC_Config.OCFastMode = TIM_OCFAST_DISABLE;
+  OC_Config.OCIdleState = TIM_OCIDLESTATE_RESET;
+  OC_Config.OCMode = TIM_OCMODE_PWM2;
+  OC_Config.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+  OC_Config.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+  OC_Config.OCPolarity = TIM_OCPOLARITY_HIGH;
+  OC_Config.Pulse = sConfig->Commutation_Delay;
+
+  TIM_OC2_SetConfig(htim->Instance, &OC_Config);
+
+  /* Select OC2REF as trigger output on TRGO: write the MMS bits in the TIMx_CR2
+    register to 101 */
+  htim->Instance->CR2 &= ~TIMER_CR2_MMS;
+  htim->Instance->CR2 |= TIM_TRGO_OC2REF;
+
+  /* Initialize the TIM state*/
+  htim->State = HAL_TIM_STATE_READY;
+
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start(TIM_HandleTypeDef *htim)
+{
+  uint32_t tmpsmcr;
+
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_HALL_SENSOR_INTERFACE_INSTANCE(htim->Instance));
+
+  /* Enable the Input Capture channel 1
+    (in the Hall Sensor Interface the three possible channels that can be used are TIM_CHANNEL_1, TIM_CHANNEL_2 and TIM_CHANNEL_3) */
+  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+
+  /* Enable the Peripheral, except in trigger mode where enable is automatically done with trigger */
+  tmpsmcr = htim->Instance->SMCR & TIMER_SMCR_SMS;
+  if (!IS_TIM_SLAVEMODE_TRIGGER_ENABLED(tmpsmcr))
+  {
+    __HAL_TIM_ENABLE(htim);
+  }
+
+  /* Return function status */
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop(TIM_HandleTypeDef *htim)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_HALL_SENSOR_INTERFACE_INSTANCE(htim->Instance));
+
+  /* Disable the Input Capture channels 1, 2 and 3
+    (in the Hall Sensor Interface the three possible channels that can be used are TIM_CHANNEL_1, TIM_CHANNEL_2 and TIM_CHANNEL_3) */
+  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_DISABLE);
+
+  /* Disable the Peripheral */
+  __HAL_TIM_DISABLE(htim);
+
+  /* Return function status */
+  return HAL_OK;
+}
+
 /************************ (C) COPYRIGHT Linkedsemi *****END OF FILE****/
