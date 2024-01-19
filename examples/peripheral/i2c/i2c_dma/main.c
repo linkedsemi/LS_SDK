@@ -9,6 +9,8 @@
 #include "log.h"
 #if DMACV2
 #include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
 #else
 #include "ls_hal_dmac.h"
 #endif
@@ -22,6 +24,11 @@
 #define DEBUG_IO_HIGH (*(volatile uint32_t*)0x48000404 |= 1 << 0xE)
 #define DEBUG_IO_LOW (*(volatile uint32_t*)0x48000404 &= ~(1 << 0xE))
 #elif defined LM3050
+#define LED_IO PB06
+// Set PA15 as debug IO
+#define DEBUG_IO_HIGH (*(volatile uint32_t*)0x4000d064 |= 1 << 15)
+#define DEBUG_IO_LOW (*(volatile uint32_t*)0x4000d064 &= ~(1 << 15))
+#elif defined LEO
 #define LED_IO PB06
 // Set PA15 as debug IO
 #define DEBUG_IO_HIGH (*(volatile uint32_t*)0x4000d064 |= 1 << 15)
@@ -168,6 +175,8 @@ static void toggle_debug_IO_init(void)
     *(volatile uint32_t*)0x48000418 |= 1 << 0xE; // Set PB14 as debug IO
 #elif defined LM3050
     *(volatile uint32_t*)0x4000d064 |= 1 << 31; // Set PA15 as debug IO
+#elif defined LEO
+    *(volatile uint32_t*)0x4000d064 |= 1 << 31; // Set PA15 as debug IO
 #else
 #error "Error config for platform!"
 #endif
@@ -180,6 +189,9 @@ void XIP_BANNED_FUNC(toggle_debug_IO, uint16_t num)
         DEBUG_IO_HIGH;
         DEBUG_IO_LOW;
     #elif defined LM3050
+        DEBUG_IO_HIGH;
+        DEBUG_IO_LOW;
+    #elif defined LEO
         DEBUG_IO_HIGH;
         DEBUG_IO_LOW;
     #else

@@ -357,7 +357,7 @@ io_drive_type_t io_drive_capacity_read(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     uint32_t tmp = READ_REG(SYSC_AWO->IO[x->port].DS);
-    return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16))<<1)?0x2:0);
+    return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
 }
 
 static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)

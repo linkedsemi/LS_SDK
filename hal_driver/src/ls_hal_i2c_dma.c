@@ -26,6 +26,7 @@ static void I2C_transmit_init(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint8_t S
 static void I2C_receive_init(I2C_HandleTypeDef *hi2c, uint8_t Size)
 {
     REG_FIELD_WR(hi2c->Instance->CR1, I2C_CR1_RXDMAEN, 1);
+    __HAL_I2C_RXFTH_SET(hi2c,0);
     __HAL_I2C_ENABLE(hi2c);
     hi2c->State       = HAL_I2C_STATE_BUSY_RX;
     hi2c->Mode        = HAL_I2C_MODE_MASTER;
@@ -178,6 +179,88 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t D
     return HAL_OK;
 }
 
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+static void I2C_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        I2C_HandleTypeDef *hi2c = (I2C_HandleTypeDef *)param;
+        /* Enable stop irq */
+        __HAL_I2C_ENABLE_IT(hi2c, I2C_IER_STOPIE_MASK);
+    }
+}
+
+static void I2C_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        I2C_HandleTypeDef *hi2c = (I2C_HandleTypeDef *)param;
+        /* Enable stop irq */
+        __HAL_I2C_ENABLE_IT(hi2c, I2C_IER_STOPIE_MASK);
+    }   
+}
+
+HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size)
+{
+    if (pData == NULL || Size == 0 )
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+    I2C_transmit_init(hi2c, pData, Size);
+    if (!I2C_addr_claim(hi2c, DevAddress, false))
+    {
+        return HAL_ERROR;
+    }
+    if (Size > 1)
+    {
+        struct ch_reg cfg;
+        DMA_CHANNEL_CFG(cfg,
+            hi2c->Tx_Env.DMA.DMA_Channel,
+            (uint32_t)&pData[1],
+            (uint32_t)&hi2c->Instance->TXDR,
+            TRANSFER_WIDTH_8BITS,
+            Size-1,
+            M2P,
+            0,
+            HAL_I2C_TX_DMA_Handshake_Get(hi2c),
+            0,0,0,0);
+        HAL_DMA_Channel_Start_IT(hi2c->DMAC_Instance, &cfg, I2C_Transmit_DMA_Callback, (uint32_t)hi2c);
+    }else
+    {
+        /* Enable stop irq */
+        __HAL_I2C_ENABLE_IT(hi2c, I2C_IER_STOPIE_MASK);
+    }
+    
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size)
+{
+    if (pData == NULL || Size == 0 )
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+    I2C_receive_init(hi2c, Size);
+    if (!I2C_addr_claim(hi2c, DevAddress, true))
+    {
+        return HAL_ERROR;
+    }
+
+    struct  ch_reg cfg;
+    DMA_CHANNEL_CFG(cfg,
+        hi2c->Rx_Env.DMA.DMA_Channel,
+        (uint32_t)&hi2c->Instance->RXDR,
+        (uint32_t)pData,
+        TRANSFER_WIDTH_8BITS,
+        Size,
+        P2M,
+        0,
+        HAL_I2C_RX_DMA_Handshake_Get(hi2c),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hi2c->DMAC_Instance, &cfg, I2C_Receive_DMA_Callback, (uint32_t)hi2c);
+    return HAL_OK;
+}
 #else
 #include "ls_hal_dmac.h"
 static void I2C_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)

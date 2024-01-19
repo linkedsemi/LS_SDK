@@ -1,8 +1,10 @@
 #include "ls_hal_dac.h"
-#include "ls_hal_dmacv2.h"
 #include "ls_msp_dac.h"
 #include "field_manipulate.h"
+#include "sdk_config.h"
 
+#if DMACV2
+#include "ls_hal_dmacv2.h"
 struct DMA_Channel_Config cfg;
 
 void DAC1_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel)
@@ -70,6 +72,80 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
     }
     return status;
 }
+
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+
+void DAC1_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        DAC_HandleTypeDef *hdac = (DAC_HandleTypeDef *)param;
+        CLEAR_BIT(hdac->Instance->DAC_CR,DAC_DMA2N1_MASK);
+        hdac->Env.DMA.Callback(hdac);
+    }
+}
+
+void DAC2_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        DAC_HandleTypeDef *hdac = (DAC_HandleTypeDef *)param;
+        CLEAR_BIT(hdac->Instance->DAC_CR,DAC_DMAEN2_MASK);
+        hdac->Env.DMA.Callback(hdac);
+    }
+}
+
+HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment, const uint32_t* pData, uint32_t Byte_Count,void (*Callback)(DAC_HandleTypeDef* hdac))
+{
+    struct ch_reg cfg;
+    HAL_StatusTypeDef status = HAL_OK;
+    uint32_t dst_addr = (uint32_t)hdac->Instance;
+    hdac->Env.DMA.Callback = Callback;
+
+    if(READ_BIT(hdac->Instance->DAC_ANA,DAC_EN_DAC1_MASK))
+    {
+        SET_BIT(hdac->Instance->DAC_CR, DAC_DMA2N1_MASK);
+        if ((hdac->DACx == DAC1AndDAC2))
+        {
+            dst_addr += DAC_DHR12RD_ALIGNMENT(Alignment);
+        }
+        else
+        {
+            dst_addr += DAC_DHR12R1_ALIGNMENT(Alignment);
+        }
+        DMA_CHANNEL_CFG(cfg,
+            hdac->Env.DMA.DMA_Channel,
+            (uint32_t)pData,
+            dst_addr,
+            TRANSFER_WIDTH_32BITS,
+            Byte_Count/4,
+            M2P,
+            0,
+            HAL_DAC_DMA_Handshake_Get(DAC1),
+            0,0,0,0);
+        HAL_DMA_Channel_Start_IT(hdac->DMAC_Instance, &cfg, DAC1_DMA_Callback, (uint32_t)hdac);  
+    }
+
+    else if(READ_BIT(hdac->Instance->DAC_ANA,DAC_EN_DAC2_MASK))
+    {
+        SET_BIT(hdac->Instance->DAC_CR,DAC_DMAEN2_MASK);
+        dst_addr += DAC_DHR12R2_ALIGNMENT(Alignment);
+        DMA_CHANNEL_CFG(cfg,
+            hdac->Env.DMA.DMA_Channel,
+            (uint32_t)pData,
+            dst_addr,
+            TRANSFER_WIDTH_32BITS,
+            Byte_Count/4,
+            M2P,
+            0,
+            HAL_DAC_DMA_Handshake_Get(DAC2),
+            0,0,0,0);
+        HAL_DMA_Channel_Start_IT(hdac->DMAC_Instance, &cfg, DAC2_DMA_Callback, (uint32_t)hdac);
+    }
+    return status;
+}
+#endif
 
 HAL_StatusTypeDef HAL_DAC_Stop_DMA(DAC_HandleTypeDef *hdac, uint32_t Channel)
 {

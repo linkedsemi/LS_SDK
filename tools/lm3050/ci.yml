@@ -1,7 +1,17 @@
-le3050_boot_ram_build:
+lm3050_boot_ram_build:
   stage: build
   script:
     - cd bootloader/boot_ram/lm3050 && scons flags=-Werror ic=lm3050
+
+lm3050_flash_prog_build:
+  stage: build
+  script:
+    - cd examples/utility/flash_prog/cmsis && scons flags=-Werror ic=lm3050
+
+lm3050_flash_prog_openocd_build:
+  stage: build
+  script:
+    - cd examples/utility/flash_prog/openocd && scons flags=-Werror ic=lm3050
 
 lm3050_ecb_cbc_it_build:
   stage: build

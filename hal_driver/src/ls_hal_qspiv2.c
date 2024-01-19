@@ -2,6 +2,15 @@
 #include "compile_flag.h"
 #include "field_manipulate.h"
 #include "hal_flash_int.h"
+
+#if FLASH_PROG_ALGO==1
+#define QSPIV2_ENTER_CRITICAL ENTER_CRITICAL
+#define QSPIV2_EXIT_CRITICAL EXIT_CRITICAL
+#else
+#define QSPIV2_ENTER_CRITICAL qspiv2_global_int_disable_fn
+#define QSPIV2_EXIT_CRITICAL qspiv2_global_int_restore_fn
+#endif
+
 #define LSQSPIV2_FIFO_DEPTH 8
 
 ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_init)
@@ -15,7 +24,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_init)
 static void XIP_BANNED_FUNC(lsqspiv2_xip_mode_start)
 {
     LSQSPIV2->DAC_CMD = FIELD_BUILD(LSQSPIV2_DAC_CMD_EN,0);
-    LSQSPIV2->DAC_CA_LOW = 0x20<<24;
+    LSQSPIV2->DAC_CA_LOW = XIP_MODE_BITS<<24;
     REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,1);
 }
 
@@ -118,7 +127,7 @@ static void XIP_BANNED_FUNC(read_data_from_fifo,struct lsqspiv2_stg_cfg *cfg)
 
 ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,struct lsqspiv2_stg_cfg *cfg)
 {
-    uint32_t cpu_stat = ENTER_CRITICAL();
+    uint32_t cpu_stat = QSPIV2_ENTER_CRITICAL();
     LSQSPIV2->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
     REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
     uint32_t *ctrl = (uint32_t *)&cfg->ctrl;
@@ -141,7 +150,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,struct lsqspiv2_stg_cfg 
             read_data_from_fifo(cfg);
         }
     }
-    EXIT_CRITICAL(cpu_stat);
+    QSPIV2_EXIT_CRITICAL(cpu_stat);
 }
 
 ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_send_command,uint8_t opcode)

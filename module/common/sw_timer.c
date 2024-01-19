@@ -6,28 +6,28 @@
 
 static struct cdll sw_timer_list;
 
-void sw_timer_callback_set(struct sw_timer_env *timer,bool (*func)(void *),void *param)
+ROM_SYMBOL void sw_timer_callback_set(struct sw_timer_env *timer,bool (*func)(void *),void *param)
 {
     timer->callback = func;
     timer->cb_param = param;
 }
 
-void sw_timer_period_set(struct sw_timer_env *timer,sw_timer_time_t period)
+ROM_SYMBOL void sw_timer_period_set(struct sw_timer_env *timer,sw_timer_time_t period)
 {
     timer->period = period;
 }
 
-sw_timer_time_t sw_timer_period_get(struct sw_timer_env *timer)
+ROM_SYMBOL sw_timer_time_t sw_timer_period_get(struct sw_timer_env *timer)
 {
     return timer->period;
 }
 
-void sw_timer_target_set(struct sw_timer_env *timer,sw_timer_time_t target)
+ROM_SYMBOL void sw_timer_target_set(struct sw_timer_env *timer,sw_timer_time_t target)
 {
     timer->target = target;
 }
 
-sw_timer_time_t sw_timer_target_get(struct sw_timer_env *timer)
+ROM_SYMBOL sw_timer_time_t sw_timer_target_get(struct sw_timer_env *timer)
 {
     return timer->target;
 }
@@ -44,7 +44,7 @@ static void timer_insert(struct sw_timer_env *timer)
     cdll_insert(&sw_timer_list,&timer->hdr,insertion_compare);
 }
 
-void sw_timer_update()
+ROM_SYMBOL void sw_timer_update()
 {
     timer_irq_mask();
     while(1)
@@ -74,7 +74,7 @@ void sw_timer_update()
     }
 }
 
-void sw_timer_insert(struct sw_timer_env *timer)
+ROM_SYMBOL void sw_timer_insert(struct sw_timer_env *timer)
 {
     uint32_t cpu_stat = ENTER_CRITICAL();
     timer_insert(timer);
@@ -82,7 +82,7 @@ void sw_timer_insert(struct sw_timer_env *timer)
     EXIT_CRITICAL(cpu_stat);
 }
 
-sw_timer_time_t sw_timer_start(struct sw_timer_env *timer)
+ROM_SYMBOL sw_timer_time_t sw_timer_start(struct sw_timer_env *timer)
 {
     sw_timer_time_t current = timer_time_get();
     timer->target = timer_time_add(current,timer->period);
@@ -90,7 +90,7 @@ sw_timer_time_t sw_timer_start(struct sw_timer_env *timer)
     return current;
 }
 
-void sw_timer_stop(struct sw_timer_env *timer)
+ROM_SYMBOL void sw_timer_stop(struct sw_timer_env *timer)
 {
     uint32_t cpu_stat = ENTER_CRITICAL();
     cdll_extract(&sw_timer_list,&timer->hdr);
@@ -98,28 +98,28 @@ void sw_timer_stop(struct sw_timer_env *timer)
     EXIT_CRITICAL(cpu_stat);
 }
 
-bool sw_timer_active(struct sw_timer_env *timer)
+ROM_SYMBOL bool sw_timer_active(struct sw_timer_env *timer)
 {
     return cdll_is_elem_linked(&timer->hdr);
 }
 
-LL_EVT_ISR void sw_timer_isr()
+ROM_SYMBOL LL_EVT_ISR void sw_timer_isr()
 {
     sw_timer_update();
 }
 
-struct sw_timer_env *sw_timer_list_pick()
+ROM_SYMBOL struct sw_timer_env *sw_timer_list_pick()
 {
     struct cdll_hdr *hdr = cdll_first(&sw_timer_list);
     return hdr ? CONTAINER_OF(hdr,struct sw_timer_env,hdr) : NULL;
 }
 
-__attribute__((weak)) void sw_timer_module_init(void)
+ROM_SYMBOL void sw_timer_module_init(void)
 {
     timer_setup(sw_timer_isr);
 }
 
-void sw_timer_module_reset(void)
+ROM_SYMBOL void sw_timer_module_reset(void)
 {
     cdll_init(&sw_timer_list);
 }

@@ -1,9 +1,10 @@
 #include <stddef.h>
 #include "ls_hal_pdm.h"
-#include "ls_hal_dmac.h"
 #include "field_manipulate.h"
 #include "ls_msp_pdm.h"
 
+#if defined(LE501X)
+#include "ls_hal_dmac.h"
 static void DMA_Channel_PingPong_Update(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,uint32_t *ctrl_data)
 {
     struct DMA_Channel_Config cfg;
@@ -134,3 +135,105 @@ void HAL_PDM_PingPong_Transfer_Abort(PDM_HandleTypeDef *hpdm,bool stereo)
     }
 }
 
+#elif defined(LEO)
+#include "ls_hal_dmacv3.h"
+
+static void PDM_DMA_CH0_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
+        hpdm->Env.DMA.Channel_Done[0] = true;
+        if(hpdm->Env.DMA.Channel_Done[1])
+        {
+            HAL_PDM_DMA_CpltCallback(hpdm,ch_idx,lli==(void *)&hpdm->Env.DMA.LLI[0][1]);
+        }
+    }
+}
+
+static void PDM_DMA_CH1_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
+        hpdm->Env.DMA.Channel_Done[1] = true;
+        if(hpdm->Env.DMA.Channel_Done[0])
+        {
+            HAL_PDM_DMA_CpltCallback(hpdm,ch_idx,lli==(void *)&hpdm->Env.DMA.LLI[1][1]);
+        }
+    }
+}
+
+HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,struct PDM_PingPong_Bufptr *CH0_Buf,struct PDM_PingPong_Bufptr *CH1_Buf,uint16_t FrameNum)
+{
+    hpdm->Env.DMA.Channel_Done[0] = false;
+    struct dma_lli (*lli)[2] = hpdm->Env.DMA.LLI;
+    DMA_LLI_CFG(lli[0][1],        
+        hpdm->Env.DMA.Channel[0],
+        &hpdm->Instance->DATA0,
+        CH0_Buf->Bufptr[1],
+        TRANSFER_WIDTH_16BITS,
+        FrameNum,
+        P2M,
+        &lli[0][0]);
+    DMA_LLI_CFG(lli[0][0],
+        hpdm->Env.DMA.Channel[0],
+        &hpdm->Instance->DATA0,
+        CH0_Buf->Bufptr[0],
+        TRANSFER_WIDTH_16BITS,
+        FrameNum,
+        P2M,
+        &lli[0][1]);
+    struct ch_reg cfg;
+    DMA_CHANNEL_CFG(cfg,
+        hpdm->Env.DMA.Channel[0],
+        &hpdm->Instance->DATA0,
+        CH0_Buf->Bufptr[0],
+        TRANSFER_WIDTH_16BITS,
+        FrameNum,
+        P2M,
+        &lli[0][1],
+        HAL_PDM_CH0_Handshake_Get(hpdm),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hpdm->DMAC_Instance,&cfg,PDM_DMA_CH0_Callback,(uint32_t)hpdm);
+    if(REG_FIELD_RD(hpdm->Instance->CR,PDM_CR_CHN))
+    {
+        hpdm->Env.DMA.Channel_Done[1] = false;
+        DMA_LLI_CFG(lli[1][1],        
+            hpdm->Env.DMA.Channel[1],
+            &hpdm->Instance->DATA1,
+            CH1_Buf->Bufptr[1],
+            TRANSFER_WIDTH_16BITS,
+            FrameNum,
+            P2M,
+            &lli[1][0]);
+        DMA_LLI_CFG(lli[1][0],
+            hpdm->Env.DMA.Channel[1],
+            &hpdm->Instance->DATA1,
+            CH1_Buf->Bufptr[0],
+            TRANSFER_WIDTH_16BITS,
+            FrameNum,
+            P2M,
+            &lli[1][1]);
+        DMA_CHANNEL_CFG(cfg,
+            hpdm->Env.DMA.Channel[1],
+            &hpdm->Instance->DATA1,
+            CH1_Buf->Bufptr[0],
+            TRANSFER_WIDTH_16BITS,
+            FrameNum,
+            P2M,
+            &lli[1][0],
+            HAL_PDM_CH1_Handshake_Get(hpdm),
+            0,0,0,0);
+        HAL_DMA_Channel_Start_IT(hpdm->DMAC_Instance,&cfg,PDM_DMA_CH1_Callback,(uint32_t)hpdm);
+        REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,3);
+    }else
+    {
+        hpdm->Env.DMA.Channel_Done[1] = true;
+        REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,1);
+    }
+    return HAL_OK;
+}
+
+
+#endif

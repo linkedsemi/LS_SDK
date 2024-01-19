@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "LEO DEBUG PWM",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/pwm/build/leo/pwm.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "reset",
+                "interrupt",
+            ],
+        },
+        {
+            "name": "LEO ATTACH PWM",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/pwm/build/leo/pwm.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "interrupt",
+            ],
+        },
+    ]
+}

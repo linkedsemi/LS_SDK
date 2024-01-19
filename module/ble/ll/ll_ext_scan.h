@@ -8,7 +8,6 @@
 
 struct prim_scan_rx_env
 {
-    struct co_list_hdr hdr;
     uint32_t timestamp;
     struct scan_evt_rx_data data;
     uint8_t rx_rssi;
@@ -23,6 +22,7 @@ struct second_scan_buf_env
     struct bd_addr AdvA;
     struct bd_addr TargetA;
     struct ADI_field ADI;
+    uint16_t interval;
     uint8_t evt_type;
     uint8_t AdvA_Type;
     uint8_t TargetA_Type;
@@ -53,6 +53,13 @@ enum scan_rsp_status
     SCAN_RSP_CHAIN_RECEIVING,
 };
 
+enum conn_req_sent_status
+{
+    NO_CONN_REQ_SENT,
+    PRIM_CONN_REQ_SENT,
+    SECOND_CONN_REQ_SENT,
+};
+
 struct ll_ext_scan_env
 {
     struct ll_evt prim_evt;
@@ -73,7 +80,7 @@ struct ll_ext_scan_env
             uint32_t conn_req_end_time;
             struct conn_req_data_env conn_req_data;
             struct ext_create_con_param param;
-            uint8_t conn_req_sent;
+            enum conn_req_sent_status conn_req_sent;
         }init;
     }u;
     struct adv_scan_header_lsb prim_adv_header_lsb;

@@ -8,6 +8,8 @@
 #define DTC_PWM_TIMER LSADTIM
 #elif defined(LM3050)
 #define DTC_PWM_TIMER LSADTIM1
+#elif defined(LEO)
+#define DTC_PWM_TIMER LSADTIM
 #endif
 
 #define TIM_PRESCALER     (SDK_HCLK_MHZ-1)

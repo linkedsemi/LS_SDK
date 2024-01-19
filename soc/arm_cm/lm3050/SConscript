@@ -190,7 +190,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
     rtos_src = []
-    if not rtos is None:
+    if rtos == 'freertos':
         rtos_src = list(map(lambda x:os.path.join('$SDK_ROOT/rtos/freertos/',x),[
             'croutine.c',
             'event_groups.c',
@@ -208,6 +208,23 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
         self.Append(CPPDEFINES = ['FREERTOS'])
+    elif rtos == 'liteos':
+        sdk_root_abs = env['SDK_ROOT'].abspath
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/src/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/src/mm/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//utils/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//third_party/bounds_checking_function/src/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/arch/arm/cortex-m4/gcc/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/arch/arm/cortex-m4/gcc/*.S', strings=True)
+        inc_list += [
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/utils',
+            '$SDK_ROOT/rtos/kernel_liteos_m/third_party/bounds_checking_function/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/third_party/bounds_checking_function/src',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/arm/cortex-m4/gcc/',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/arm/cortex-m4/gcc/asm',
+        ]
     if self.get('LINKSCRIPT') is None:
         self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/link_script.txt"))
     if not 'progen' in self['TOOLS']:

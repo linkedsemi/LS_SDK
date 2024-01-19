@@ -1552,7 +1552,12 @@ le501x_coremark_build:
 le501x_flash_prog_build:
   stage: build
   script:
-    - cd examples/utility/flash_prog/arm_cm && scons flags=-Werror
+    - cd examples/utility/flash_prog/cmsis && scons flags=-Werror
+
+le501x_flash_prog_openocd_build:
+  stage: build
+  script:
+    - cd examples/utility/flash_prog/openocd && scons flags=-Werror
 
 le501x_ram_test_build:
   stage: build

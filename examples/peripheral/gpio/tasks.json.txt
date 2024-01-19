@@ -1,0 +1,116 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "JLinkRTTClient",
+            "type": "process",
+            "command": "JLinkRTTClient",
+            "group": "none",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenOCD Server",
+            "type": "process",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "${input:ic_name}.cfg",
+            ],
+        },
+        {
+            "group": "build",
+            "label": "GPIO LE501x build",
+            "type": "shell",
+            "command": "scons",
+            "options": {
+                "cwd": "${workspaceFolder}/examples/peripheral/gpio"
+            },
+        },
+        {
+            "group": "build",
+            "label": "GPIO LM3050 build",
+            "type": "shell",
+            "command": "scons",
+            "options": {
+                "cwd": "${workspaceFolder}/examples/peripheral/gpio"
+            },
+            "args": [
+                "ic=lm3050",
+            ],
+        },
+        {
+            "group": "build",
+            "label": "GPIO LEO build",
+            "type": "shell",
+            "command": "scons",
+            "options": {
+                "cwd": "${workspaceFolder}/examples/peripheral/gpio"
+            },
+            "args": [
+                "ic=leo",
+            ],
+        },
+        {
+            "group": "build",
+            "label": "GPIO LM3050 download",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "lm3050.cfg",
+                "-c",
+                "program examples/peripheral/gpio/build/lm3050/gpio.bin verify reset exit 0x800000"
+            ],
+            "dependsOn" : ["GPIO LM3050 build"],
+        },
+        {
+            "group": "build",
+            "label": "GPIO LE501x download",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "le501x.cfg",
+                "-c",
+                "program examples/peripheral/gpio/build/le501x/gpio.bin verify reset exit 0x18000000"
+            ],
+            "dependsOn" : ["GPIO LM3050 build"],
+        },
+        {
+            "group": "build",
+            "label": "GPIO LEO download",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "ls1010.cfg",
+                "-c",
+                "program examples/peripheral/gpio/build/leo/gpio.bin verify reset exit 0x8000000"
+            ],
+            "dependsOn" : ["GPIO LEO build"],
+        },
+    ],
+    "inputs": [
+        {
+            "id": "ic_name",
+            "description": "请选择芯片型号",
+            "type": "pickString",
+            "default": "le501x",
+            "options": [
+                "le501x", 
+                "lm3050",
+                "leo"
+            ]
+        }
+    ]
+}s
