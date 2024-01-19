@@ -1,9 +1,15 @@
 #include "platform.h"
 #include "ls_soc_gpio.h"
 #include "ls_hal_dac.h"
-#include "ls_hal_dmacv2.h"
 #include "ls_hal_timer.h"
 #include "log.h"
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+#else
+#include "ls_hal_dmac.h"
+#endif
 
 #define TIM_PRESCALER     (8-1)
 #define TIM_PERIOD        (4) /* Period Value  */
@@ -17,7 +23,11 @@ DMA_RAM_ATTR uint32_t single_dac_channel_value[numeric_quantities_count]={0xfff,
 
 static void pinmux_dac_init(void)
 {
+    #ifdef LM3050
     pinmux_dac2_init();         // PC04
+    #elif defined LEO
+    pinmux_dac2_out1_init();    // PA03
+    #endif
 }
 
 void Error_Handler(void)

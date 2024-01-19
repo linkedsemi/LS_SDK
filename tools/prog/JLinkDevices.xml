@@ -15,4 +15,8 @@
     <ChipInfo Vendor="LinkedSemi" Name="LM3050" Core="JLINK_CORE_CORTEX_M4" WorkRAMAddr="0x20000148" WorkRAMSize="0x1000"/>
     <FlashBankInfo Name="SPI Flash" BaseAddr="0x00800000" MaxSize="0x80000" Loader="LinkedSemi/lm3050_flash_algo.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
+  <Device>
+    <ChipInfo Vendor="LinkedSemi" Name="LS1010" Core="JLINK_CORE_RV32" WorkRAMAddr="0x10001000" WorkRAMSize="0x1000" JLinkScriptFile="LinkedSemi/LS1010.jlinkscript"/>
+    <FlashBankInfo Name="SPI Flash" BaseAddr="0x08000000" MaxSize="0x80000" Loader="LinkedSemi/leo_flash_algo.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+  </Device>
 </DataBase>

@@ -295,20 +295,6 @@ struct conn_data_header
     struct cte_info cte;
 }__attribute__((packed));
 
-struct conn_data
-{
-    struct conn_header_lsb header_lsb;
-    uint8_t length;
-    uint8_t buf_idx;
-    uint8_t offset;
-};
-
-struct conn_txrx_data
-{
-    struct co_list_hdr hdr;
-    struct conn_data buf;
-};
-
 struct conn_rx_ctrl_pdu
 {
     enum llcp_opcode opcode;
@@ -346,10 +332,28 @@ enum tx_ctrl_buf_idx
     LLCP_TX_BUF_TERMINATE_IND,
     LLCP_TX_BUF_LOCAL_PROCEDURE,
     LLCP_TX_BUF_PEER_PROCEDURE,
+    LLCP_TX_BUF_MAX,
 };
+
+enum llcp_tx_ctrl_status
+{
+    LLCP_TX_IDLE,
+    LLCP_TX_ONGOING,
+    LLCP_TX_ACKED,
+};
+
+struct hci_air_tx_type
+{
+    struct co_list_hdr hdr;
+    uint16_t type;
+    enum llcp_tx_ctrl_status status;
+};
+
+#define LLCP_AIR_TX_TYPE (0xffff)
 
 struct llcp_tx_pdu_env
 {
+    struct hci_air_tx_type llcp_tx[LLCP_TX_BUF_MAX];
     struct llcp_termination_pdu terminate;
     struct llcp_normal_pdu local_proc;
     struct llcp_normal_pdu peer_proc;
@@ -363,14 +367,11 @@ struct ll_ctrl_procedure
 };
 
 struct ll_conn_env{
-    struct co_list_hdr hdr;
     struct ll_evt evt;
     struct co_list pending_tx;
     struct co_list received;
-    struct co_list sent;
-    struct co_list tx_release;
     struct co_list rx_acl_data;
-    struct conn_txrx_data *tx;
+    struct hci_air_tx_type *tx;
     struct hci_acl_air_rx_data *rx;
     timer_t supv_to_timer;
     struct ll_ctrl_procedure local;
@@ -391,6 +392,7 @@ struct ll_conn_env{
     struct le_chnl_map channel_map;
     struct conn_data_header rx_header;
     struct conn_header_lsb prev_rx_header;
+    uint8_t tx_data_offset;
     uint8_t unmapped_channel;
     uint8_t disconnect_reason;
     uint8_t force_disconnect;
@@ -399,6 +401,7 @@ struct ll_conn_env{
     uint8_t prev_rx_crc_valid;
     uint8_t nesn;
     uint8_t sn;
+    bool tx_retry;
     enum conn_encryption_status encrypted;
     uint8_t master;
     uint8_t peer_version_valid;
@@ -438,7 +441,7 @@ uint16_t get_ll_conn_env_idx(struct ll_conn_env *env);
 
 struct ll_conn_env *get_ll_conn_env_by_idx(uint16_t idx);
 
-void ll_hci_rx_air_tx_start(struct ll_conn_env *env,struct hci_acl_air_tx_data *buf);
+void ll_conn_acl_air_tx(struct hci_acl_air_tx_data *buf);
 
 void ll_conn_env_init(struct ll_conn_env *env,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2,enum ble_phy phy);
 
@@ -455,8 +458,6 @@ bool htimer_conn_evt_header_rx(struct ll_evt *evt,bool third_byte,uint8_t *remai
 enum ll_evt_transition_type htimer_conn_tx_end(struct ll_evt *evt);
 
 void rx_buf_release_protected_swint(struct hci_acl_air_rx_data *ptr);
-
-uint8_t hci_acl_data_rx_buf_release(struct hci_acl_air_tx_data *ptr);
 
 struct hci_acl_air_tx_data *hci_acl_data_rx_buf_alloc(void);
 

@@ -92,7 +92,7 @@ void uart_send(uint8_t *data, uint16_t data_len)
     }
     #if defined(LE501X)
     HAL_UART_Transmit_IT(&UART_Config, data, data_len);
-    #elif defined(LM3050)
+    #elif defined(LM3050)||defined(LEO)
     HAL_UART_Transmit(&UART_Config, data, data_len,1000);
     #endif
     

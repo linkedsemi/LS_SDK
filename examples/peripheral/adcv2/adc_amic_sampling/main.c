@@ -6,7 +6,7 @@
 #include "log.h"
 
 static ADC_HandleTypeDef ADCx_Hdl;
-void pinmux_amic_init(void);
+void pinmux_amic_init(void); // LM3050:PB10; LS1010:PA00
 void Error_Handler(void)
 {
     while(1);
