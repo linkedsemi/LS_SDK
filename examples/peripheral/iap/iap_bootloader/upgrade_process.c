@@ -131,14 +131,12 @@ bool check_application(void)
 void jump_to_app(void)
 {
     APP_FUNC jump2app;
+#if defined(LE501X) || defined(LM3050)
     uint32_t app_addr;
-
-
-
+#endif
     disable_global_irq();
     systick_stop();
 #if defined(LE501X)
-    // app_addr = (APP_DATA_ADDR_BASE + 0x2000);           //skip Info Page & Second Bootloader , 0x2000
     app_addr = (APP_DATA_ADDR_BASE);
     NVIC->ICER[0] = 0xFFFFFFFF;
     NVIC->ICPR[0] = 0xFFFFFFFF;
@@ -151,10 +149,7 @@ void jump_to_app(void)
         NVIC->ICPR[i] = 0xFFFFFFFF;
     }
 #endif
-
     enable_global_irq();
-
-    // DELAY_US(500000);
     #if defined(LEO)
     // __set_SP((uint32_t)&app_addr);
     #else
@@ -168,8 +163,6 @@ void jump_to_app(void)
     SCB->VTOR = *(__IO uint32_t *)app_addr;
 #endif
 
-    
-    // jump2app = (APP_FUNC)app_addr;
 #if defined(LE501X)
     jump2app = (APP_FUNC) * (uint32_t *)(APP_DATA_ADDR_BASE + 4);
 #elif defined(LM3050)
