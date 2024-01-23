@@ -109,6 +109,7 @@ int main(void)
         HAL_I2S_Receive_DMA(&I2sHandle, (uint16_t *)aRxBuffer,BUFFERSIZE);
         while(ComState != COM_COMPLETE);
     }
+    LOG_I("receive success!---");
 
     /* Infinite loop */
     while (1)
@@ -120,5 +121,8 @@ int main(void)
 void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s) 
 {
     ComState = COM_COMPLETE;
-    LOG_HEX(aRxBuffer,2*BUFFERSIZE);
+    for (uint8_t j = 0; j < BUFFERSIZE; j++)
+    {
+        LOG_I("%d ", aRxBuffer[j]);
+    }
 }

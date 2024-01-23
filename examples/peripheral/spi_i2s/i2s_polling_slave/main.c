@@ -30,6 +30,8 @@
 #include "SEGGER_RTT.h"
 #include "ls_hal_spi_i2s.h"
 
+#define LED_IO PA01
+
 #define     I2S_CK_PIN        PB12 
 #define     I2S_WS_PIN        PB13 
 #define     I2S_SD_PIN        PB14 
@@ -42,6 +44,20 @@ static I2S_HandleTypeDef I2sHandle;
 /* Buffer used for transmission */
 uint16_t aTxBuffer[BUFFERSIZE];
 uint16_t aRxBuffer[BUFFERSIZE];
+static void Error_Handler(void);
+static uint16_t Buffercmp(uint16_t* pBuff1, uint16_t* pBuff2, uint16_t Length);
+
+void LED_init(void)
+{
+    io_cfg_output(LED_IO);   
+    io_write_pin(LED_IO,1);  
+}
+
+void LED_flicker(void)
+{
+    io_toggle_pin(LED_IO);
+	DELAY_US(500*1000);
+}
 
 static void i2s_init(void)
 {
@@ -78,8 +94,9 @@ int main(void)
     sys_init_none();
     /* init I2S and GPIO   */
     i2s_init();
+    LED_init();
 
-    for (uint8_t i = 0; i < BUFFERSIZE; i++)
+    for (uint16_t i = 0; i < BUFFERSIZE; i++)
     {
         aTxBuffer[i] = i;
     } 
@@ -87,9 +104,17 @@ int main(void)
     for (uint8_t i = 0; i < 10; i++)
     {
         uint8_t status = HAL_I2S_Receive(&I2sHandle, (uint16_t *)aRxBuffer, BUFFERSIZE, 10000);
-        if (status == HAL_OK)
+
+        if(status == HAL_OK)
         {
-            LOG_HEX(aRxBuffer,2*BUFFERSIZE);
+            if(Buffercmp((uint16_t *)aTxBuffer, (uint16_t *)aRxBuffer, BUFFERSIZE))
+            {
+                Error_Handler();
+            }
+            if (i == 9)
+            {
+                LOG_I("receive success!---");
+            }
         }
     }
 
@@ -100,5 +125,25 @@ int main(void)
     }
 }
 
+static uint16_t Buffercmp(uint16_t* pBuff1, uint16_t* pBuff2, uint16_t Length)
+{
+    while (Length--)
+    {
+        if((*pBuff1) != *pBuff2)
+        {
+            return Length;
+        }
+        pBuff1++;
+        pBuff2++;
+    }
 
- 
+    return 0;
+}
+
+static void Error_Handler(void)
+{
+    while (1)
+    {
+        LED_flicker();
+    }
+}

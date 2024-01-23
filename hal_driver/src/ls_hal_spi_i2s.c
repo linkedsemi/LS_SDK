@@ -501,7 +501,6 @@ static HAL_StatusTypeDef i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
 
 static void i2s_disable(I2S_HandleTypeDef *hi2s)
 {
-    while (REG_FIELD_RD(hi2s->Instance->SR,SPI_SR_BSY) == 1U);
     CLEAR_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
 }
 
@@ -546,6 +545,7 @@ static void I2S_Tx_ISR(I2S_HandleTypeDef *hi2s)
     if (hi2s->Tx_Env.Interrupt.Count == 0U)
     {
         hi2s->Instance->IDR = SPI_IT_TXE;
+        while (REG_FIELD_RD(hi2s->Instance->SR,SPI_SR_BSY) == 1U);
         i2s_disable(hi2s);
         HAL_I2S_TxCpltCallback(hi2s);
     }

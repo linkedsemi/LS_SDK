@@ -367,12 +367,10 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
     if(hi2s->Init.DataFormat  == I2S_DATAFORMAT_16BIT)
     {
         data_width = TRANSFER_WIDTH_16BITS;
-        Count /= 2;
     }
     else
     {
         data_width = TRANSFER_WIDTH_32BITS;
-        Count /= 4;
     }
 
     struct ch_reg cfg;
@@ -396,7 +394,7 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
         (uint32_t)RX_Data,
         data_width,
         Count,
-        M2P,
+        P2M,
         0,
         HAL_I2S_RX_DMA_Handshake_Get(hi2s),
         0,0,0,0);

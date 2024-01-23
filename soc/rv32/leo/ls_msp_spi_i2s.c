@@ -171,6 +171,9 @@ void HAL_I2S_MSP_Init(I2S_HandleTypeDef *inst)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)SPI2:
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI2_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_SPI2_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_SPI2_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI2_MASK;
         rv_set_int_isr(SPI2_IRQn, I2S2_Handler);
         i2s_inst_env[0] = inst;
@@ -178,7 +181,10 @@ void HAL_I2S_MSP_Init(I2S_HandleTypeDef *inst)
         csi_vic_enable_irq(SPI2_IRQn);
         break;
     case (uint32_t)SPI3:
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI3_MASK;
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_SPI3_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_SPI3_N_MASK;
+        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_SPI3_N_MASK;
+        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_SPI3_MASK;        
         rv_set_int_isr(SPI3_IRQn, I2S3_Handler);
         i2s_inst_env[1] = inst;
         csi_vic_clear_pending_irq(SPI3_IRQn);
