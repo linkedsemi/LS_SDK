@@ -33,20 +33,20 @@ void enable_global_irq()
 
 void clr_pending_irq(int32_t irq)
 {
-
+    csi_vic_clear_pending_irq(irq);
 }
 
 uint32_t get_pending_irq(int32_t irq)
 {
-    return 0;
+    return (uint32_t)csi_vic_get_pending_irq(irq);
 }
 
 void enable_irq(int32_t irq)
 {
-
+    csi_vic_enable_irq(irq);
 }
 
 void disable_irq(int32_t irq)
 {
-
+    csi_vic_disable_irq(irq);
 }
