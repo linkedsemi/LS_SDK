@@ -509,6 +509,7 @@ HAL_StatusTypeDef HAL_I2S_Transmit(I2S_HandleTypeDef *hi2s, uint16_t *pTxData, u
     HAL_StatusTypeDef hal_status;
     i2s_config(hi2s, pTxData, NULL, Size, false);
     hal_status = i2s_tx_data(hi2s, Timeout);
+    while (REG_FIELD_RD(hi2s->Instance->SR,SPI_SR_BSY) == 1U);
     i2s_disable(hi2s);
     return hal_status;
 }
