@@ -66,7 +66,7 @@ static void trim_val_load()
     }
     if(trim_value[6] == ~trim_value[7])
     {
-        MODIFY_REG(V33_RG->SFT_CTRL01,0x70000000,trim_value[6]<<28);
+        MODIFY_REG(V33_RG->SFT_CTRL01,0x70000000,trim_value[6]);
     }
     if(trim_value[8] == ~trim_value[9])
     {
