@@ -40,8 +40,8 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define LIGHTS_HSLSAT_SERVER             (0x130B)  /*!< SIG Model Index of light HSL saturation server 0x130B*/
 #define LIGHTS_XYL_CLIENT                (0x130E)  /*!< SIG Model Index of light XYL server 0x130C*/
 #define VENDOR_TMALL_SERVER              (0x01A80000) /*!< Vendor Model Index of tmall genie server 0x01A80000*/
-#define VENDOR_USER_SERVER               (0x093A0001) /*!< Vendor Model Index of linkedsemi server 0x093A0001*/
-#define VENDOR_USER_CLIENT               (0x093A0002)  /*!< Vendor Model Index of linkedsemi client 0x093A0002*/
+#define VENDOR_USER_SERVER               (0x0001093A) /*!< Vendor Model Index of linkedsemi server  0x0001093A*/
+#define VENDOR_USER_CLIENT               (0x0002093A)  /*!< Vendor Model Index of linkedsemi client 0x0002093A*/
         
  //foundation model status opcode
 #define FOUNDATION_MDL_CONFG_APPKEY_STATUS                     (0x0380)  /*!< Application key status*/
