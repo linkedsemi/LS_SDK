@@ -15,9 +15,9 @@
 #define UART_TX_IO PA09
 #define UART_RX_IO PA10
 #elif defined(LEO)
-#define LED_IO PE07
-#define UART_TX_IO PA11
-#define UART_RX_IO PA12
+#define LED_IO PC03
+#define UART_TX_IO PH05
+#define UART_RX_IO PH04
 #endif
 
 void LED_init(void)

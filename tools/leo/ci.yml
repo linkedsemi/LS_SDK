@@ -263,6 +263,46 @@ leo_uart_polling_build:
   script:
     - cd examples/peripheral/uart/uart_polling && scons flags=-Werror ic=leo
 
+leo_usbd_cdc_msc_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc && scons flags=-Werror ic=leo
+
+leo_usbd_cdc_msc_fatfs_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs && scons flags=-Werror ic=leo
+
+leo_usbd_cdc_msc_fatfs_upgrade_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs_upgrade && scons flags=-Werror ic=leo
+
+leo_usbd_hid_composite_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite && scons flags=-Werror ic=leo
+
+leo_usbd_hid_iap_app_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_iap_app && scons flags=-Werror ic=leo
+
+leo_usbd_hid_iap_bootloader_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_iap_bootloader && scons flags=-Werror ic=leo
+
+leo_usbd_hid_keyboard_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_keyboard && scons flags=-Werror ic=leo
+
+leo_usbh_msc_file_explorer_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbh_msc_file_explorer && scons flags=-Werror ic=leo
+
 leo_adc_amic_sampling_build:
   stage: build
   script:
@@ -307,6 +347,11 @@ leo_dual_dac_channel_wave_build:
   stage: build
   script:
     - cd examples/peripheral/dac/dual_dac_channel_wave && scons flags=-Werror ic=leo
+
+leo_single_dac_adpcm_audio_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_adpcm_audio && scons flags=-Werror ic=leo
 
 leo_single_dac_channel_dma_voltage_build:
   stage: build
