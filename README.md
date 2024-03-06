@@ -68,6 +68,7 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/dac/dual_dac_channel_dma_voltage                               |        |  √     |  √     |
 | peripheral/dac/dual_dac_channel_voltage                                   |        |  √     |  √     |
 | peripheral/dac/dual_dac_channel_wave                                      |        |  √     |  √     |
+| peripheral/dac/single_dac_adpcm_audio                                     |        |  √     |  √     |
 | peripheral/dac/single_dac_channel_dma_voltage                             |        |  √     |  √     |
 | peripheral/dac/single_dac_channel_sine_wave                               |        |  √     |  √     |
 | peripheral/dac/single_dac_channel_voltage                                 |        |  √     |  √     |
@@ -144,6 +145,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/usb/usbd_cdc_msc_fatfs                                         |        |  √     |  √     |
 | peripheral/usb/usbd_cdc_msc_fatfs_upgrade                                 |        |  √     |  √     |
 | peripheral/usb/usbd_hid_composite                                         |        |  √     |  √     |
+| peripheral/usb/usbd_hid_iap_app                                           |        |  √     |  √     |
+| peripheral/usb/usbd_hid_iap_bootloader                                    |        |  √     |  √     |
 | peripheral/usb/usbd_hid_keyboard                                          |        |  √     |  √     |
 | peripheral/usb/usbh_msc_file_explorer                                     |        |  √     |  √     |
 | peripheral/wdg/iwdg                                                       |  √     |  √     |  √     |

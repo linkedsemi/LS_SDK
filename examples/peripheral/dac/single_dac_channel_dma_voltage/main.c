@@ -24,9 +24,9 @@ DMA_RAM_ATTR uint32_t single_dac_channel_value[numeric_quantities_count]={0xfff,
 static void pinmux_dac_init(void)
 {
     #ifdef LM3050
-    pinmux_dac2_init();         // PC04
+    pinmux_dac1_init();         // PA07
     #elif defined LEO
-    pinmux_dac2_out1_init();    // PA03
+    pinmux_dac1_out1_init();    // PA02
     #endif
 }
 
@@ -54,7 +54,7 @@ void DAC_Init_Func(void)
     DACx_Hdl.DMAC_Instance = &dmac1_inst;
 
     DACx_Hdl.Instance           = LSDAC12;
-    DACx_Hdl.DACx               = DAC2;
+    DACx_Hdl.DACx               = DAC1;
     DACx_Hdl.DAC2_Trigger       = GENERAL_TimerA_TRGO;
     DACx_Hdl.DAC2_wave          = No_Wave;
     DACx_Hdl.DAC2_Mamp          = triangle_amplitude_4095;
