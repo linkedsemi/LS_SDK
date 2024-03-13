@@ -120,7 +120,7 @@ extern "C" {
 
 #define PS2H2_BASE_ADDR            (0x4008E400)
 
-#define PS2H3_BASE_ADDR            (0x4008EB00)
+#define PS2H3_BASE_ADDR            (0x4008E800)
 
 #define PS2H4_BASE_ADDR            (0x4008EC00)
 
