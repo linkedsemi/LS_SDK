@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 
-#ifdef PS2H2_BASE_ADDR
+#ifdef PS2H1_BASE_ADDR
 #define PS2H1 ((reg_ps2h_t *) PS2H1_BASE_ADDR)
 #endif
 #ifdef PS2H2_BASE_ADDR
