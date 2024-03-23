@@ -1,57 +1,76 @@
 #include "ls_hal_ps2h.h"
 #include "ls_msp_ps2h.h"
+#include "ls_hal_uart.h"
 #include "ls_soc_gpio.h"
 #include "ls_soc_pinmux.h"
 #include "platform.h"
 #include "log.h"
 
 static PS2H_HandleTypeDef PS2H_Config;
-static uint8_t test_zone[16] = {0};
-static void led_breathe();
+static UART_HandleTypeDef UART_Config;
+static uint8_t ps2h_data; 
+static uint8_t uart_data; 
+static volatile bool flag;
 
 static void ps2h_init(void)
 {
-    pinmux_ps2h1_init(PH06, PH07);
-    LOG_I("ps2_polling init started");
+    LOG_I("demo ps2h_polling start!");
+    flag = false;
+    pinmux_ps2h1_init(PA06, PA07);
     PS2H_Param param;
-    param.err_mode             = PS2_TO_IDLE_SATE;
+    param.err_mode             = PS2_TO_IDLE_STATE;
     param.flt_num              = PS2_FLTNUM_5CLK;
     param.tx_mode              = PS2_TXMODE_WAIT_RXEND;
     PS2H_Config.PS2HX          = PS2H1;
     HAL_PS2H_Init(&PS2H_Config, &param);
+    DELAY_MS(10);
+    UART_Config.UARTX = UART3;
+    UART_Config.RTOValue = 5;
+    UART_Config.Init.BaudRate = UART_BAUDRATE_921600;
+    UART_Config.Init.MSBEN = 0;
+    UART_Config.Init.Parity = UART_NOPARITY;
+    UART_Config.Init.StopBits = UART_STOPBITS1;
+    UART_Config.Init.WordLength = UART_BYTESIZE8;
+    HAL_UART_Init(&UART_Config);
 }
 
-static void ps2h_test(void)
+static void ps2h_test()
 {
-    HAL_StatusTypeDef status = HAL_PS2H_Receive(&PS2H_Config, test_zone, 1, HAL_MAX_DELAY);
-    if (status != HAL_OK)
+    HAL_StatusTypeDef rs;
+    
+    LOG_I("transmit data: 0x%x", uart_data);
+    rs  = HAL_PS2H_Transmit(&PS2H_Config, uart_data);
+    if (rs != HAL_OK)
     {
-        led_breathe();
+        LOG_I("tx error code: 0x%x", rs);
+        return;
     }
-    LOG_I("receive data:  0x%x", test_zone[0]);
-    status = HAL_PS2H_Transmit(&PS2H_Config, test_zone, 1);
-    if (status != HAL_OK)
-    {
-        led_breathe();
-    }
+    LOG_I("transmit ok");
+
+    rs = HAL_PS2H_Receive(&PS2H_Config, &ps2h_data, HAL_MAX_DELAY);
+    if (rs != HAL_OK)
+        LOG_I("rx error code: 0x%x", rs);
+    else
+        LOG_I("receive data: 0x%x", ps2h_data);
 }
 
 int main()
 {
     sys_init_none();
     ps2h_init();
+    HAL_UART_Receive_IT(&UART_Config, &uart_data, 1);
     while (1)
     {
-        ps2h_test();
+        if (flag)
+        {
+            flag = false;
+            ps2h_test();
+        }
     }
 }
 
-static void led_breathe()
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    io_cfg_output(PH04);
-    while (1)
-    {
-        io_toggle_pin(PH04);
-        DELAY_MS(500);
-    }
+    HAL_UART_Receive_IT(&UART_Config, &uart_data, 1);
+    flag = true;
 }
