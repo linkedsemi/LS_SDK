@@ -7,6 +7,7 @@
 			<TargetName>tmall_mesh_gatt</TargetName>
 			<ToolsetNumber>0x4</ToolsetNumber>
 			<ToolsetName>ARM-ADS</ToolsetName>
+			<uAC6>0</uAC6>
 			<TargetOption>
 				<TargetCommonOption>
 					<Device>LE501X</Device>
@@ -47,7 +48,7 @@
 					<OutputName>tmall_mesh_gatt</OutputName>
 					<CreateExecutable>1</CreateExecutable>
 					<CreateLib>0</CreateLib>
-					<CreateHexFile>1</CreateHexFile>
+					<CreateHexFile>0</CreateHexFile>
 					<DebugInformation>1</DebugInformation>
 					<BrowseInformation>1</BrowseInformation>
 					<ListingPath>.\UVBuild\</ListingPath>
@@ -357,12 +358,15 @@
 						<uThumb>0</uThumb>
 						<uSurpInc>0</uSurpInc>
 						<uC99>1</uC99>
+						<uGnu>0</uGnu>
 						<useXO>0</useXO>
+						<v6Lang>5</v6Lang>
+						<v6LangP>4</v6LangP>
 						<VariousControls>
-							<MiscControls> --diag_suppress=1,61,68,188,1295</MiscControls>
+							<MiscControls> --diag_suppress=1,61,66,68,188,1295,1296</MiscControls>
 							<Define>LE501X</Define>
 							<Undefine></Undefine>
-							<IncludePath>..\..\Include; ..\..; ..\..\..\genie_ota; ..\..\..\..\..\..\hal_driver\inc; ..\..\..\..\..\..\hal_driver\api; ..\..\..\..\..\..\module\common; ..\..\..\..\..\..\module\crc; ..\..\..\..\..\..\module\debug; ..\..\..\..\..\..\module\debug\RTT; ..\..\..\..\..\..\module\static_buffer; ..\..\..\..\..\..\module\tinyfs; ..\..\..\..\..\..\module\tinycrypt\lib\include; ..\..\..\..\..\..\module\ble; ..\..\..\..\..\..\module\ble\prf; ..\..\..\..\..\..\module\settings; ..\..\..\..\..\..\soc; ..\..\..\..\..\..\soc\arm_cm; ..\..\..\..\..\..\soc\arm_cm\cmsis; ..\..\..\..\..\..\soc\arm_cm\le501x; ..\..\..\..\..\..\soc\arm_cm\le501x\integration</IncludePath>
+							<IncludePath>..\..\Include; ..\..; ..\..\..\genie_files; ..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt; ..\..\..\..\..\..\hal_driver\inc; ..\..\..\..\..\..\hal_driver\api; ..\..\..\..\..\..\module\common; ..\..\..\..\..\..\module\crc; ..\..\..\..\..\..\module\debug; ..\..\..\..\..\..\module\debug\RTT; ..\..\..\..\..\..\module\static_buffer; ..\..\..\..\..\..\module\tinyfs; ..\..\..\..\..\..\module\tinycrypt\lib\include; ..\..\..\..\..\..\module\ble; ..\..\..\..\..\..\module\ble\prf; ..\..\..\..\..\..\module\settings; ..\..\..\..\..\..\soc; ..\..\..\..\..\..\soc\arm_cm; ..\..\..\..\..\..\soc\arm_cm\cmsis; ..\..\..\..\..\..\soc\arm_cm\le501x; ..\..\..\..\..\..\soc\arm_cm\le501x\integration</IncludePath>
 						</VariousControls>
 					</Cads>
 					<Aads>
@@ -375,6 +379,7 @@
 						<NoWarn>0</NoWarn>
 						<uSurpInc>0</uSurpInc>
 						<useXO>0</useXO>
+						<ClangAsOpt>1</ClangAsOpt>
 						<VariousControls>
 							<MiscControls>--cpreproc --cpreproc_opts=-DLE501X --diag_suppress=1</MiscControls>
 							<Define></Define>
@@ -403,11 +408,17 @@
 			</TargetOption>
 			<Groups>
 				<Group>
+					<GroupName>default</GroupName>
 					<Files>
 						<File>
 							<FileType>5</FileType>
+							<FileName>aes.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\aes.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>ali_dfu_port.h</FileName>
-							<FilePath>..\..\..\genie_ota\ali_dfu_port.h</FilePath>
+							<FilePath>..\..\..\genie_files\ali_dfu_port.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -461,8 +472,23 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
+							<FileName>cbc_mode.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\cbc_mode.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ccm_mode.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ccm_mode.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>circular_doubly_linked_list.h</FileName>
 							<FilePath>..\..\..\..\..\..\module\common\circular_doubly_linked_list.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>cmac_mode.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\cmac_mode.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -523,6 +549,11 @@
 							<FileType>5</FileType>
 							<FileName>compile_flag.h</FileName>
 							<FilePath>..\..\..\..\..\..\soc\compile_flag.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>constants.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\constants.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -611,8 +642,38 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
+							<FileName>ctr_mode.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ctr_mode.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ctr_prng.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ctr_prng.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>dmac_config.h</FileName>
 							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\integration\dmac_config.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ecc.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ecc.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ecc_dh.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ecc_dh.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ecc_dsa.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ecc_dsa.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>ecc_platform_specific.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\ecc_platform_specific.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -626,23 +687,23 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>flash_svcall_int.h</FileName>
-							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\flash_svcall_int.h</FilePath>
-						</File>
-						<File>
-							<FileType>5</FileType>
 							<FileName>genie_crc16.h</FileName>
-							<FilePath>..\..\..\genie_ota\genie_crc16.h</FilePath>
+							<FilePath>..\..\..\genie_files\genie_crc16.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
 							<FileName>genie_crypto.h</FileName>
-							<FilePath>..\..\..\genie_ota\genie_crypto.h</FilePath>
+							<FilePath>..\..\..\genie_files\genie_crypto.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>genie_time_v2.h</FileName>
+							<FilePath>..\..\..\genie_files\genie_time_v2.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
 							<FileName>genie_triple.h</FileName>
-							<FilePath>..\..\..\genie_ota\genie_triple.h</FilePath>
+							<FilePath>..\..\..\genie_files\genie_triple.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -661,8 +722,13 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>hal_flash_svcall.h</FileName>
-							<FilePath>..\..\..\..\..\..\hal_driver\inc\hal_flash_svcall.h</FilePath>
+							<FileName>hmac.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\hmac.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>hmac_prng.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\hmac_prng.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -1046,6 +1112,11 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
+							<FileName>musb_type.h</FileName>
+							<FilePath>..\..\..\..\..\..\hal_driver\inc\musb_type.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>ota_settings.h</FileName>
 							<FilePath>..\..\..\..\..\..\module\settings\ota_settings.h</FilePath>
 						</File>
@@ -1356,18 +1427,23 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
+							<FileName>sha256.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\sha256.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>sleep.h</FileName>
 							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\sleep.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>ssi_misc.h</FileName>
-							<FilePath>..\..\..\..\..\..\hal_driver\inc\ssi_misc.h</FilePath>
+							<FileName>slist.h</FileName>
+							<FilePath>..\..\..\genie_files\slist.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>svcall.h</FileName>
-							<FilePath>..\..\..\..\..\..\soc\arm_cm\svcall.h</FilePath>
+							<FileName>ssi_misc.h</FileName>
+							<FilePath>..\..\..\..\..\..\hal_driver\inc\ssi_misc.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -1431,18 +1507,33 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>tmall_ais_main.h</FileName>
-							<FilePath>..\..\..\genie_ota\tmall_ais_main.h</FilePath>
+							<FileName>tmall_curtain_cfg.h</FileName>
+							<FilePath>..\..\Include\tmall_curtain_cfg.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
 							<FileName>tmall_genie_ais.h</FileName>
-							<FilePath>..\..\..\genie_ota\tmall_genie_ais.h</FilePath>
+							<FilePath>..\..\..\genie_files\tmall_genie_ais.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>tmall_genie_ais_main_handle.h</FileName>
+							<FilePath>..\..\..\genie_files\tmall_genie_ais_main_handle.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>tmall_genie_log.h</FileName>
+							<FilePath>..\..\..\genie_files\tmall_genie_log.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
 							<FileName>tmall_genie_ota.h</FileName>
-							<FilePath>..\..\..\genie_ota\tmall_genie_ota.h</FilePath>
+							<FilePath>..\..\..\genie_files\tmall_genie_ota.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>tmall_genie_triple_handle.h</FileName>
+							<FilePath>..\..\..\genie_files\tmall_genie_triple_handle.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -1459,6 +1550,11 @@
 							<FileName>tz_context.h</FileName>
 							<FilePath>..\..\..\..\..\..\soc\arm_cm\cmsis\tz_context.h</FilePath>
 						</File>
+						<File>
+							<FileType>5</FileType>
+							<FileName>utils.h</FileName>
+							<FilePath>..\..\..\..\..\..\module\tinycrypt\lib\include\tinycrypt\utils.h</FilePath>
+						</File>
 					</Files>
 				</Group>
 				<Group>
@@ -1467,22 +1563,27 @@
 						<File>
 							<FileType>1</FileType>
 							<FileName>ali_dfu_port.c</FileName>
-							<FilePath>..\..\..\genie_ota\ali_dfu_port.c</FilePath>
+							<FilePath>..\..\..\genie_files\ali_dfu_port.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
 							<FileName>genie_crc16.c</FileName>
-							<FilePath>..\..\..\genie_ota\genie_crc16.c</FilePath>
+							<FilePath>..\..\..\genie_files\genie_crc16.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
 							<FileName>genie_crypto.c</FileName>
-							<FilePath>..\..\..\genie_ota\genie_crypto.c</FilePath>
+							<FilePath>..\..\..\genie_files\genie_crypto.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>genie_time_v2.c</FileName>
+							<FilePath>..\..\..\genie_files\genie_time_v2.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
 							<FileName>genie_triple.c</FileName>
-							<FilePath>..\..\..\genie_ota\genie_triple.c</FilePath>
+							<FilePath>..\..\..\genie_files\genie_triple.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
@@ -1491,13 +1592,28 @@
 						</File>
 						<File>
 							<FileType>1</FileType>
+							<FileName>tmall_curtain_cfg.c</FileName>
+							<FilePath>..\..\Source\tmall_curtain_cfg.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
 							<FileName>tmall_genie_ais.c</FileName>
-							<FilePath>..\..\..\genie_ota\tmall_genie_ais.c</FilePath>
+							<FilePath>..\..\..\genie_files\tmall_genie_ais.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>tmall_genie_ais_main_handle.c</FileName>
+							<FilePath>..\..\..\genie_files\tmall_genie_ais_main_handle.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
 							<FileName>tmall_genie_ota.c</FileName>
-							<FilePath>..\..\..\genie_ota\tmall_genie_ota.c</FilePath>
+							<FilePath>..\..\..\genie_files\tmall_genie_ota.c</FilePath>
+						</File>
+						<File>
+							<FileType>1</FileType>
+							<FileName>tmall_genie_triple_handle.c</FileName>
+							<FilePath>..\..\..\genie_files\tmall_genie_triple_handle.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
@@ -1561,8 +1677,8 @@
 						</File>
 						<File>
 							<FileType>1</FileType>
-							<FileName>ls_hal_flash_svcall.c</FileName>
-							<FilePath>..\..\..\..\..\..\hal_driver\src\ls_hal_flash_svcall.c</FilePath>
+							<FileName>ls_hal_flash_swint.c</FileName>
+							<FilePath>..\..\..\..\..\..\hal_driver\src\ls_hal_flash_swint.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
@@ -1911,23 +2027,13 @@
 						</File>
 						<File>
 							<FileType>1</FileType>
-							<FileName>svcall.c</FileName>
-							<FilePath>..\..\..\..\..\..\soc\arm_cm\svcall.c</FilePath>
-						</File>
-						<File>
-							<FileType>2</FileType>
-							<FileName>svcall_asm.S</FileName>
-							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.S</FilePath>
-						</File>
-						<File>
-							<FileType>1</FileType>
 							<FileName>sw_timer_port.c</FileName>
 							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\sw_timer_port.c</FilePath>
 						</File>
 						<File>
-							<FileType>1</FileType>
-							<FileName>swint_handler.c</FileName>
-							<FilePath>..\..\..\..\..\..\soc\arm_cm\swint_handler.c</FilePath>
+							<FileType>2</FileType>
+							<FileName>swint_asm.S</FileName>
+							<FilePath>..\..\..\..\..\..\soc\arm_cm\le501x\compiler\armcc\swint_asm.S</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>

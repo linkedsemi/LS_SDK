@@ -18,6 +18,7 @@
 #include "reg_gpio.h"
 #include "sys_stat.h"
 #include "ls_hal_iwdg.h"
+#include "log.h"
 
 const uint16_t wkup_delay_us = 1500;
 static uint32_t CPU_PSP;
@@ -306,6 +307,7 @@ void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,struct deep_sleep_wakeup *w
 
 void deep_sleep()
 {
+    uart_log_pause();
     NVIC->ICER[0] = ~(1<<LPWKUP_IRQn|1<<EXTI_IRQn|1 << RTC_IRQn);
     SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
     systick_stop();
@@ -317,10 +319,9 @@ void deep_sleep()
     ble_wkup_status_set(true);
     ble_radio_en_sync();
     systick_start();
+    uart_log_resume();
 }
 
-void uart_log_pause(void);
-void uart_log_resume(void);
 __attribute__((weak)) bool mac_sleep_check(){return false;}
 
 __attribute((weak)) void check_and_sleep()
@@ -334,29 +335,25 @@ __attribute((weak)) void check_and_sleep()
 void sleep_process()
 {
     uint32_t cpu_stat = enter_critical();
-    uart_log_pause();
     if((peri_status_busy() || app_event_status_busy())==false)
     {
         check_and_sleep();
     }
-    uart_log_resume();
     exit_critical(cpu_stat);
 }
 
 bool timer_sleep(void);
 void low_power_mode_sched()
 {
+    uint32_t cpu_stat = enter_critical();
     if (!peri_status_busy() && !app_event_status_busy())
     {
-        uint32_t cpu_stat = enter_critical();
-        uart_log_pause();
         if(timer_sleep())
         {
             deep_sleep();
         }
-        uart_log_resume();
-        exit_critical(cpu_stat);
     }
+    exit_critical(cpu_stat);
 }
 
 bool ble_wkup_status_get(void)
@@ -386,6 +383,8 @@ static bool exti_int_pending(uint8_t pin)
     }
     return false;
 }
+
+__attribute__((weak)) void rtc_wkup_callback(void){}
 
 void LPWKUP_Handler(void)
 {

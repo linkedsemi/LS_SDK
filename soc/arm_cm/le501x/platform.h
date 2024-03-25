@@ -5,6 +5,11 @@
 #include "sdk_config.h"
 #include "compile_flag.h"
 #include "le501x.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
@@ -89,8 +94,16 @@ void lvd33_disable(void);
 
 void mesh_stack_data_bss_init(void);
 
+#define FLASH_SWINT_NUM QSPI_IRQn
+#define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
+
 #define OSTICK_HS_INC(Hz) (2000*1000/(Hz)/625)
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))
 #define OSTICK_HS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step)/625)
 #define OSTICK_HUS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step) - 625*OSTICK_HS_STEP_INC(Hz,step))
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

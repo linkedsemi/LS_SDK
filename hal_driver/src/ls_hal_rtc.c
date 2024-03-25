@@ -97,7 +97,8 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
 {
     HAL_StatusTypeDef result = HAL_OK;
     REG_FIELD_WR(RTC->BKEN, RTC_BKEN_BKEN, 1); // set bken to update data immediately
-    DELAY_US(1);
+    DELAY_US(20); // wait at least 19 pclks for hw sync
+    
     #if SDK_LSI_USED
     calendar_cal_t prev_cal;
     calendar_time_t prev_time;
@@ -105,14 +106,20 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     load_calendar_init_val((uint32_t*)&prev_cal, (uint32_t*)&prev_time);
     load_calendar_raw_val(&prev_raw_val);
     #endif
-
-    calendar_cal->year  = REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_U);
-    calendar_cal->mon   = REG_FIELD_RD(RTC->CAL,RTC_CAL_MON_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_MON_U); 
-    calendar_cal->date  = REG_FIELD_RD(RTC->CAL,RTC_CAL_DATE_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_DATE_U);     
-    calendar_time->week = REG_FIELD_RD(RTC->TIME,RTC_TIME_WEEK);
-    calendar_time->hour = REG_FIELD_RD(RTC->TIME,RTC_TIME_HOUR_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_HOUR_U); 
-    calendar_time->min  = REG_FIELD_RD(RTC->TIME,RTC_TIME_MIN_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_MIN_U);     
-    calendar_time->sec  = REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_U);
+    uint32_t reg_time, reg_cal;
+    do
+    {
+        reg_time = RTC->TIME;
+        reg_cal = RTC->CAL;
+    } while (RTC->TIME != reg_time);
+    
+    calendar_cal->year  = REG_FIELD_RD(reg_cal,RTC_CAL_YEAR_T)*10 + REG_FIELD_RD(reg_cal,RTC_CAL_YEAR_U);
+    calendar_cal->mon   = REG_FIELD_RD(reg_cal,RTC_CAL_MON_T)*10 + REG_FIELD_RD(reg_cal,RTC_CAL_MON_U); 
+    calendar_cal->date  = REG_FIELD_RD(reg_cal,RTC_CAL_DATE_T)*10 + REG_FIELD_RD(reg_cal,RTC_CAL_DATE_U);     
+    calendar_time->week = REG_FIELD_RD(reg_time,RTC_TIME_WEEK);
+    calendar_time->hour = REG_FIELD_RD(reg_time,RTC_TIME_HOUR_T)*10 + REG_FIELD_RD(reg_time,RTC_TIME_HOUR_U); 
+    calendar_time->min  = REG_FIELD_RD(reg_time,RTC_TIME_MIN_T)*10 + REG_FIELD_RD(reg_time,RTC_TIME_MIN_U);     
+    calendar_time->sec  = REG_FIELD_RD(reg_time,RTC_TIME_SEC_T)*10 + REG_FIELD_RD(reg_time,RTC_TIME_SEC_U);
     #if SDK_LSI_USED
     struct tm prev_tm;
     memset(&prev_tm, 0, sizeof(prev_tm));
@@ -194,4 +201,4 @@ void RTC_wkuptime_clr(void)
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKCAL, 0);
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKSEL, 0);
 }
-__attribute__((weak)) void rtc_wkup_callback(void){}
+

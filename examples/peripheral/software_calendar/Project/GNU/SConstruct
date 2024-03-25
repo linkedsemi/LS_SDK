@@ -3,12 +3,12 @@ env = Environment(ENV = os.environ)
 env['SDK_ROOT'] = Dir('../../../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
-    '$SDK_ROOT/module/calendar/calendar.c',
+    '../../$SDK_ROOT/module/calendar/calendar.c',
     '../../Source/main.c',
 ]
 inc = [
     '../../Include/.',
-    '$SDK_ROOT/module/calendar/',
+    '../../$SDK_ROOT/module/calendar/',
     '../../.',
 ]
 env.app_build('software_calendar',src,inc,ble = False)

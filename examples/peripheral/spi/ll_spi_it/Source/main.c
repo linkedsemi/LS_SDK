@@ -10,7 +10,7 @@
 #include "co_math.h"
 #include "ls_soc_gpio.h"
 #include "SEGGER_RTT.h"
-#include "ls_hal_spi_i2s.h"
+#include "ls_ll_spi.h"
 /******************************************************************************
  Macro definition
  ******************************************************************************/
@@ -92,7 +92,7 @@ static void spi_init(void)
   /* MISO------------PA03 */
 
 #if MASTER_BOARD
-  pinmux_spi2_master_clk_init(PA00);
+  pinmux_spi2_master_clk_init(PA00,LL_SPI_POLARITY_HIGH);  // The idle state of clock must correspond to the polarity
   pinmux_spi2_master_nss_init(PA01);
   pinmux_spi2_master_mosi_init(PA02);
   pinmux_spi2_master_miso_init(PA03);

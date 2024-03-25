@@ -2,6 +2,10 @@
 #define REG_RTC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CTRL;
@@ -419,6 +423,10 @@ enum RTC_REG_BKEN_FIELD
 	RTC_BKEN_BKEN_MASK = 0x00000001,
     RTC_BKEN_BKEN_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

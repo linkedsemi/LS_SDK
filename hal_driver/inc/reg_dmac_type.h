@@ -2,6 +2,10 @@
 #define REG_DMAC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t SR;      //0x0
@@ -344,6 +348,10 @@ enum DMA_REG_CHMUX2_FIELD
     DMA_CHMUX2_CH7SEL_POS = 24,
     DMA_CHMUX2_CH7SEL = DMA_CHMUX2_CH7SEL_MASK
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

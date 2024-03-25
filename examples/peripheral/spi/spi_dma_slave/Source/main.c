@@ -119,8 +119,8 @@ int main(void)
     /* system init app     */
     sys_init_none();
     /* init spi and GPIO   */
-    spi_init();
     LED_init();
+    spi_init();
     spi_dma_channel_init();
 
     for (uint8_t i = 0; i < BUFFERSIZE; i++)

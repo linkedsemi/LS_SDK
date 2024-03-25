@@ -75,6 +75,7 @@ struct node_element_id_info node_elt;
 
 static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt, uint8_t con_idx){}
 static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx){}
+void auto_check_unbind(void);
 
 static void prover_mesh_manager_rx_ind_callback(enum mesh_provisioner_rx_ind_type type, union ls_sig_mesh_provisioner_rx_info_u *evt)
 {
@@ -252,6 +253,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     case MESH_ACTIVE_MODEL_PUBLISH:
     break;
     case MESH_ACTIVE_STORAGE_LOAD:
+      ls_sig_mesh_prover_config_reg_model(PROVER_UNICAST_ADDR/*dev primary unicast address*/); 
     break;
     case MESH_GET_PROV_INFO:
     break;
@@ -338,9 +340,8 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[PROVER_MODEL0_VENDOR_SVR].model_id = VENDOR_USER_SERVER;
 
         ls_sig_mesh_provisioner_init(PROVER_UNICAST_ADDR);
-//        ls_sig_mesh_init(&model_env);
-        ls_sig_mesh_prover_config_reg_model(PROVER_UNICAST_ADDR/*dev primary unicast address*/); 
-         ls_sig_mesh_init(&model_env);
+        ls_sig_mesh_init(&model_env);
+        auto_check_unbind();
     }
     break;
     case ADV_OBJ_CREATED:
@@ -439,9 +440,8 @@ int main()
 {
     sys_init_app();
     mesh_stack_data_bss_init();
-    tinyfs_mkdir(&ls_sigmesh_provision_dir, ROOT_DIR, 5);   
     ble_init();
-    auto_check_unbind();
+    tinyfs_mkdir(&ls_sigmesh_provision_dir, ROOT_DIR, 5);   
     at_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);

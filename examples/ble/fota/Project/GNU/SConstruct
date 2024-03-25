@@ -5,10 +5,11 @@ env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
     '../../Source/main.c',
     '../../Source/pub_key.c',
+    '../../../../../module/micro-ecc/uECC.c',
 ]
 inc = [
     '../../Include/.',
     '../../.',
+    '../../../../../module/micro-ecc/',
 ]
-env['LINKSCRIPT'] = File(env.subst('../../compiler/$COMPILER/single_bank_fota_link.txt'))
 env.app_build('fota',src,inc)

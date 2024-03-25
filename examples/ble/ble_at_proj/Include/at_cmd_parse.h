@@ -17,16 +17,6 @@ struct at_ctrl
     uint8_t one_slot_send_start;
 };
 
-typedef struct at_adv_report
-{
-    uint8_t data[0x1F];
-    struct adv_report_info evt_type;
-    struct dev_addr adv_addr;
-    uint8_t adv_addr_type;
-    uint8_t data_len;
-    int8_t  rssi;
-}adv_report_t;
-
 typedef struct _at_recv_cmd
 {
     uint8_t recv_data[RECV_MAX_LEN];
@@ -44,7 +34,6 @@ typedef struct at_defualt_info
 struct at_buff_env
 {
     default_info_t default_info;
-    adv_report_t adv_rpt[ADV_REPORT_NUM];
 };
 extern struct at_ctrl ls_at_ctl_env;
 extern struct at_buff_env ls_at_buff_env;

@@ -95,7 +95,7 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_IT(SSI_HandleTypeDef *hssi,void *TX_Da
 
 static void ssi_disable(SSI_HandleTypeDef *hssi)
 {
-    while(REG_FIELD_RD(hssi->REG->SR,SSI_BUSY) == SSI_Busy);
+    while((hssi->REG->SR & (SSI_TFE_MASK|SSI_BUSY_MASK)) != SSI_TFE_MASK);
     hssi->REG->SSIENR = SSI_Disabled;
     hssi->REG->SER = 0;
 }

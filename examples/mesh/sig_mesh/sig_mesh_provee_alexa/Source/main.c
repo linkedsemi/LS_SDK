@@ -456,6 +456,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[MODEL5_LIGHT_HSL_SVC].model_id = LIGHTS_HSL_SERVER;
 
         ls_sig_mesh_init(&model_env);
+        auto_check_unbind();
     }
     break;
     case ADV_OBJ_CREATED:
@@ -473,11 +474,10 @@ int main()
 {
     sys_init_app();
     mesh_stack_data_bss_init();
+    ble_init();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
     ls_mesh_pwm_init();
     light_button_init();
-    ble_init();
-    auto_check_unbind();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);

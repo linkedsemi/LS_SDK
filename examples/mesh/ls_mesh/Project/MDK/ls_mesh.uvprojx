@@ -7,6 +7,7 @@
 			<TargetName>ls_mesh</TargetName>
 			<ToolsetNumber>0x4</ToolsetNumber>
 			<ToolsetName>ARM-ADS</ToolsetName>
+			<uAC6>0</uAC6>
 			<TargetOption>
 				<TargetCommonOption>
 					<Device>LE501X</Device>
@@ -47,7 +48,7 @@
 					<OutputName>ls_mesh</OutputName>
 					<CreateExecutable>1</CreateExecutable>
 					<CreateLib>0</CreateLib>
-					<CreateHexFile>1</CreateHexFile>
+					<CreateHexFile>0</CreateHexFile>
 					<DebugInformation>1</DebugInformation>
 					<BrowseInformation>1</BrowseInformation>
 					<ListingPath>.\UVBuild\</ListingPath>
@@ -357,9 +358,12 @@
 						<uThumb>0</uThumb>
 						<uSurpInc>0</uSurpInc>
 						<uC99>1</uC99>
+						<uGnu>0</uGnu>
 						<useXO>0</useXO>
+						<v6Lang>5</v6Lang>
+						<v6LangP>4</v6LangP>
 						<VariousControls>
-							<MiscControls> --diag_suppress=1,61,68,188,1295</MiscControls>
+							<MiscControls> --diag_suppress=1,61,66,68,188,1295,1296</MiscControls>
 							<Define>LE501X</Define>
 							<Undefine></Undefine>
 							<IncludePath>..\..\Include; ..\..; ..\..\..\..\..\hal_driver\inc; ..\..\..\..\..\hal_driver\api; ..\..\..\..\..\module\common; ..\..\..\..\..\module\crc; ..\..\..\..\..\module\debug; ..\..\..\..\..\module\debug\RTT; ..\..\..\..\..\module\static_buffer; ..\..\..\..\..\module\tinyfs; ..\..\..\..\..\module\tinycrypt\lib\include; ..\..\..\..\..\module\ble; ..\..\..\..\..\module\ble\prf; ..\..\..\..\..\module\settings; ..\..\..\..\..\soc; ..\..\..\..\..\soc\arm_cm; ..\..\..\..\..\soc\arm_cm\cmsis; ..\..\..\..\..\soc\arm_cm\le501x; ..\..\..\..\..\soc\arm_cm\le501x\integration</IncludePath>
@@ -375,6 +379,7 @@
 						<NoWarn>0</NoWarn>
 						<uSurpInc>0</uSurpInc>
 						<useXO>0</useXO>
+						<ClangAsOpt>1</ClangAsOpt>
 						<VariousControls>
 							<MiscControls>--cpreproc --cpreproc_opts=-DLE501X --diag_suppress=1</MiscControls>
 							<Define></Define>
@@ -403,6 +408,7 @@
 			</TargetOption>
 			<Groups>
 				<Group>
+					<GroupName>default</GroupName>
 					<Files>
 						<File>
 							<FileType>5</FileType>
@@ -621,11 +627,6 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>flash_svcall_int.h</FileName>
-							<FilePath>..\..\..\..\..\soc\arm_cm\le501x\flash_svcall_int.h</FilePath>
-						</File>
-						<File>
-							<FileType>5</FileType>
 							<FileName>gpio_mode.h</FileName>
 							<FilePath>..\..\..\..\..\soc\arm_cm\le501x\integration\gpio_mode.h</FilePath>
 						</File>
@@ -638,11 +639,6 @@
 							<FileType>5</FileType>
 							<FileName>hal_flash_int.h</FileName>
 							<FilePath>..\..\..\..\..\hal_driver\inc\hal_flash_int.h</FilePath>
-						</File>
-						<File>
-							<FileType>5</FileType>
-							<FileName>hal_flash_svcall.h</FileName>
-							<FilePath>..\..\..\..\..\hal_driver\inc\hal_flash_svcall.h</FilePath>
 						</File>
 						<File>
 							<FileType>5</FileType>
@@ -1031,6 +1027,11 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
+							<FileName>musb_type.h</FileName>
+							<FilePath>..\..\..\..\..\hal_driver\inc\musb_type.h</FilePath>
+						</File>
+						<File>
+							<FileType>5</FileType>
 							<FileName>ota_settings.h</FileName>
 							<FilePath>..\..\..\..\..\module\settings\ota_settings.h</FilePath>
 						</File>
@@ -1351,11 +1352,6 @@
 						</File>
 						<File>
 							<FileType>5</FileType>
-							<FileName>svcall.h</FileName>
-							<FilePath>..\..\..\..\..\soc\arm_cm\svcall.h</FilePath>
-						</File>
-						<File>
-							<FileType>5</FileType>
 							<FileName>sw_timer.h</FileName>
 							<FilePath>..\..\..\..\..\module\common\sw_timer.h</FilePath>
 						</File>
@@ -1481,8 +1477,8 @@
 						</File>
 						<File>
 							<FileType>1</FileType>
-							<FileName>ls_hal_flash_svcall.c</FileName>
-							<FilePath>..\..\..\..\..\hal_driver\src\ls_hal_flash_svcall.c</FilePath>
+							<FileName>ls_hal_flash_swint.c</FileName>
+							<FilePath>..\..\..\..\..\hal_driver\src\ls_hal_flash_swint.c</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>
@@ -1821,23 +1817,13 @@
 						</File>
 						<File>
 							<FileType>1</FileType>
-							<FileName>svcall.c</FileName>
-							<FilePath>..\..\..\..\..\soc\arm_cm\svcall.c</FilePath>
-						</File>
-						<File>
-							<FileType>2</FileType>
-							<FileName>svcall_asm.S</FileName>
-							<FilePath>..\..\..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.S</FilePath>
-						</File>
-						<File>
-							<FileType>1</FileType>
 							<FileName>sw_timer_port.c</FileName>
 							<FilePath>..\..\..\..\..\soc\arm_cm\le501x\sw_timer_port.c</FilePath>
 						</File>
 						<File>
-							<FileType>1</FileType>
-							<FileName>swint_handler.c</FileName>
-							<FilePath>..\..\..\..\..\soc\arm_cm\swint_handler.c</FilePath>
+							<FileType>2</FileType>
+							<FileName>swint_asm.S</FileName>
+							<FilePath>..\..\..\..\..\soc\arm_cm\le501x\compiler\armcc\swint_asm.S</FilePath>
 						</File>
 						<File>
 							<FileType>1</FileType>

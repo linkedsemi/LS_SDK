@@ -6,6 +6,10 @@
 #include "ls_dbg.h"
 #include "ls_ll_i2c.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -391,14 +395,14 @@ HAL_I2C_ModeTypeDef HAL_I2C_GetMode(I2C_HandleTypeDef *hi2c);
   */
 uint32_t HAL_I2C_GetError(I2C_HandleTypeDef *hi2c);
 
+/** @}*/
+
+
+/** @}*/
+
 #ifdef __cplusplus
 }
 #endif
-
-/** @}*/
-
-
-/** @}*/
 
 #endif /* __le501x_HAL_I2C_H */
 

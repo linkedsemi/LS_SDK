@@ -1,6 +1,10 @@
 #ifndef SSI_MISC_H_
 #define SSI_MISC_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum{
 	Standard_SPI_Format = 0,
 	Dual_SPI_Format = 1,
@@ -169,5 +173,9 @@ typedef enum
 	Instruction_Standard_Address_Specific,
 	Both_Specific_Mode,
 }SPI_CTRLR0_TRANS_TYPE_FIELD;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

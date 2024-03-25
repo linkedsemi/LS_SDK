@@ -29,13 +29,19 @@ static void uart_dma_channel_init(void)
 void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     // LOG_I("%s",__FUNCTION__);
-    HAL_UART_Receive_DMA(&UART_Config,test_zone_a,1);
+    if(huart->UARTX == UART1)
+    {
+        HAL_UART_Receive_DMA(&UART_Config,test_zone_a,1);
+    }
 }
 
 void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     // LOG_I("%s",__FUNCTION__);
-    HAL_UART_Transmit_DMA(&UART_Config,test_zone_a,1);
+    if(huart->UARTX == UART1)
+    {
+        HAL_UART_Transmit_DMA(&UART_Config,test_zone_a,1);
+    }
 }
 
 static void uart_rx_dma_test()

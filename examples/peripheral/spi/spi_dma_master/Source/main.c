@@ -42,8 +42,8 @@
 #define SPI_MOSI_PIN       PB14 
 #define SPI_MISO_PIN       PB15 
 
-#define SPI_CS_LOW()      io_write_pin(SPI_CS_PIN,0);
-#define SPI_CS_HIGH()     io_write_pin(SPI_CS_PIN,1);
+#define SPI_CS_LOW()      io_write_pin(SPI_CS_PIN,0)
+#define SPI_CS_HIGH()     io_write_pin(SPI_CS_PIN,1)
 
 /* Size of buffer */
 #define BUFFERSIZE              20
@@ -89,14 +89,14 @@ static void spi_init(void)
 {
     /* Configure the GPIO AF */
     /* CLK-------------PB12 */	
-    /* CS--------------PB13  */	
+    /* CS--------------PB13 */	
     /* MOSI------------PB14 */	
     /* MISO------------PB15 */	
-
-    pinmux_spi2_master_clk_init(SPI_CLK_PIN);
+	
+    spi2_master_cs_init(SPI_CS_PIN);
+    pinmux_spi2_master_clk_init(SPI_CLK_PIN,SPI_POLARITY_LOW);  // The idle state of clock must correspond to the polarity
     pinmux_spi2_master_mosi_init(SPI_MOSI_PIN); 
     pinmux_spi2_master_miso_init(SPI_MISO_PIN);
-    spi2_master_cs_init(SPI_CS_PIN);
 
     /* Set the SPI parameters */
     SpiHandle.Instance               = SPI2;
@@ -131,8 +131,8 @@ int main(void)
     /* system init app     */
     sys_init_none();
     /* init spi and GPIO   */
-    spi_init();
     LED_init();
+    spi_init();
     spi_dma_channel_init();
 
     for (uint8_t i = 0; i < BUFFERSIZE; i++)

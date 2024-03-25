@@ -2,6 +2,10 @@
 #define REG_WWDG_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t WWDG_LOAD; //0x0
@@ -51,5 +55,9 @@ enum REG_WWDG_RIS_FIELD
     REG_WWDG_RIF_POS = 0,
 };
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup BLE
  *  @{
  */
@@ -274,6 +278,7 @@ struct profile_added_evt
   */
 struct service_added_evt
 {
+    struct gatt_svc_env *env;
     uint16_t start_hdl;                             /*!< Start handle of the Service*/ 
     uint8_t status;                                 /*!< Status of the service add action*/ 
 };
@@ -474,7 +479,8 @@ enum gap_evt_type
     GET_DEV_INFO_APPEARANCE,                        /*!< Get appearance Icon of device information*/
     GET_DEV_INFO_SLV_PRE_PARAM,                     /*!< Get slave preferred parameters of device information*/
     GET_DEV_INFO_PEER_RSSI,                         /*!< Get connection RSSI indication*/
-    PHY_UPDATED,										                /*!< PHY updated event*/
+    PHY_UPDATED,								    /*!< PHY updated event*/
+    LTK_REQ,                                        /*!< Encryption information LTK request event*/
 };
 /**
   * @brief BLE roles enumeration.
@@ -702,6 +708,18 @@ struct gap_dev_info_peer_rssi
     int8_t rssi;                            /**< The RSSI value of the current connection(master or slave) */
 };
 /**
+  * @brief LTK information structure.
+  */
+struct gap_ltk_req
+{
+    uint8_t *found;
+    /// Long Term Key
+    uint8_t *ltk;
+    /// LTK Key Size
+    uint8_t *key_size;
+};
+
+/**
   * @brief GAP event union definition.
   */
 union gap_evt_u
@@ -723,6 +741,7 @@ union gap_evt_u
     struct gap_dev_info_slave_pref_param slv_pref_param;       /*!< Get slave preferred parameters*/
     struct gap_dev_info_peer_rssi peer_rssi;                   /*!< Get RSSI value of the current connection*/
     struct gap_phy_updated phy_updated;                        /*!< PHY updated event*/
+    struct gap_ltk_req ltk_req;                                /*!< LTK request event*/
 };
 /**
   * @brief Connection parameter update.
@@ -797,6 +816,7 @@ enum svc_get_value_status
 struct gatt_svc_env
 {
     void *hdr;                         /*!< Pointer to next gatt_svc_env*/
+    struct svc_decl *decl;
     uint16_t start_hdl;                /*!< Start handle of the service*/
     uint8_t att_num;                   /*!< Attributes number in the service*/
 };
@@ -1027,6 +1047,9 @@ void dev_manager_add_service_with_start_handle(struct svc_decl *svc, uint16_t st
  ****************************************************************************************
  */
 void dev_manager_add_service(struct svc_decl *svc);
+
+void dev_manager_register_gatt_service(struct gatt_svc_env *svc_env);
+
 /**
  ****************************************************************************************
  * \brief Set value for specified attribute.
@@ -1379,6 +1402,9 @@ void gap_manager_set_pkt_size(uint8_t con_idx, struct gap_set_pkt_size *p_param)
  ****************************************************************************************
  */
 void gap_manager_delete_bonding(uint8_t peer_id);
+
+void gap_manager_delete_bonding_all(void);
+
 /**
  ****************************************************************************************
  * \brief Gets the pairing ID of the bound device. 
@@ -1607,6 +1633,10 @@ void gatt_manager_client_mtu_exch_send(uint8_t con_idx);
 void gatt_manager_client_read(uint8_t con_idx,uint16_t handle);
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

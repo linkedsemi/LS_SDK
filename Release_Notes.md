@@ -1,3 +1,151 @@
+# v2.1.0 发布公告
+
+## 更新内容
+
+| 版本SHA                                  | 变更简介                        |
+|------------------------------------------|---------------------------------|
+| b9c6498096a56682500418283fbc88dfac8207b6 | flash swint实现                 |
+| 2245909af638a0080178344e7ce0d58d44a447a6 | ll协议栈更新                    |
+| 9f8dc7269629a806d40ac0bffb2c507573ea2f1d | win scons编译命令行过长         |
+| 76e8866f90bfa43a6821001b9439e47e9311c451 |  flash头文件优化                |
+| 64c679a350ca4e2aa94e62752b7c9972a9439eed | CEILING宏实现优化               |
+| a18825b99153f5523f22ab0800e4ee7d98489cb1 | flash驱动结构简化               |
+| 37eb010714caf6fedd2042b2271e573584a4efb6 | flash驱动bugfix                 |
+| ef80c19bc9c27e686f5bd464705c630cc3037f13 | flash驱动bugfix                 |
+| d64cf7c4dd00ba388fe22ae9ed17487fae5e11e7 | ble注册服务api增强              |
+| a18f6842d907b2b39284e443863d947bf0ea58bc | flash swint bugfix              |
+| 29783dcfb3427a77c2b96bcd8c8f38f28645a29e | lm3050 boot ram ci              |
+| 8881f9076efb39d027fa3687ffcd3f633ea4c549 | rtc bugfix                      |
+| 8a909b8330fec814e90258a5b1ed8e4b402e22c7 | rtcv2例程更新                   |
+| 98b4d1586ad998535810f6acbacaba4c6bb92ad1 | rtc bugfix                      |
+| 606bd93b55397a64bf03b2e219f04dfc17448011 | ci gcc所有告警报错              |
+| 7408c360e88592f45293b7a1aa62cf6156e5059e | 增加pdm中断模式例程             |
+| ab556f7b465124322e45004a64bc8bea7aedabee | tmall mesh更新                  |
+| e265a41a91852f25efef202c399261a91c45a61e | 增加ecdh例程                    |
+| b6af000757dba8e3d50a706abeec8ba1f4eb66dc | 增加zephyr宏                    |
+| 36af70040c7301cbf5399cdbdacab4f9cb74d97a | uart log更新                    |
+| d92d4c0d470c8bb496c9b438d70340c090b8069b | lm3050唤醒bugfix                |
+| 5a7e8279c4559582122ce2a7ead996a4e2f26827 | lm3050唤醒bugfix                |
+| 86bace223e8d091dce877131157cb9838fa6c534 | usb device                      |
+| 088c2742274d461ff8ebadaf17a67b14bb5da244 | mesh例程自动解绑                |
+| 2c0f170aaf3c1f963706ad66b715fc41cc1b137d | usb host                        |
+| b953884afc0fa77a6381a054f2352cf2a0567f22 | usb管脚配置                     |
+| da4ec9fc2cc1575e680e6bccd1bcaf3c25d25c4c | 头文件cpp兼容                   |
+| ec49e1550260fdc74213d2f11353962d65f487f3 | usb host管脚                    |
+| 8189f01004f8d9ca7aa301f550f7dd9c20bbe5b1 | timer编码器例程                 |
+| b349a1e6fb9e1916c12db6df68cb529cbba9763a | timer编码器例程更新             |
+| 780f934af8a4618c4142254dc93e3e01d8f4637e | usb cdc msc fatfs例程           |
+| 51e56dc075f02eb26cf5312f134e9457c48e4c63 | arm swint os兼容                |
+| c71c15cb1330ba669e1efed4eb1b19a5a1e8be1e | usb hid keyboard例程            |
+| 3dbb7e2f3dfda63e153be02ac71a7a6413050780 | mijia ble适配                   |
+| 406c08ef4f3107d4f624c8b2466c6e89708aeb76 | usb例程更新                     |
+| 41e9d2cb9e0c518515bd77be46f0d4d5852c9f51 | 休眠串口log处理                 |
+| 779f3c935763068d98ba8306c5fdf72cad426998 | usb例程更新                     |
+| a861802d983fac2462c7634348cdbc28044826c2 | 简化flash驱动结构               |
+| f50565d9f68dfe6c502351b377bc39852c57e444 | lm3050 freertos适配             |
+| d63175df2c1a1ed678c6c6cc57670998b401077c | flash驱动更新                   |
+| c803dacbe552c4f868dd0aaf6c5393f60a965718 | spi bugfix                      |
+| 8845e96daa391491352bed47c116def6a9f78ec8 | le5010 adc bugfix               |
+| 73f8746c5ccbb91d90750a7e4a7698b3ecb7f939 | mesh publish更新                |
+| 119ade3a80a23b84de1470cb006af6b84dde1cd8 | spi 更新                        |
+| 377eca0a06aba53a77b4b1ed167dde00945ef524 | io驱动能力读取bugfix            |
+| 02678edc35289e781ffcce7f503cf4ab081400b2 | io驱动能力读取bugfix            |
+| 662c5722fb183dfe7357b43853db96c7eb108d33 | ecdh例程更新                    |
+| 12e6b93b8596b10e4704dda8a2446bddf30c1a6a | flash驱动bugfix                 |
+| 675702f6c68628051779099778f376b8e56800b5 | spi驱动更新                     |
+| 350887a047dba497216d4f597f94b6c70caa6239 | iic驱动更新                     |
+| 19d338d15bac91f129fd631d1fa827feaa06faff | lm3050头文件更新                |
+| c6a6ed3a506f99924e0e6b234376632c5f9c1bca | lm3050加载trim值                |
+| 1e094f625cc6a3c4274b9b6ac819accae5ac817f | mesh协议栈和mible库更新         |
+| fbdd3ae708de793e85ae275a08c304e56d17f251 | arduino适配更新                 |
+| c681c57ad3ef8ef669d55a7bf739a2231ea78124 | timer寄存器描述更新             |
+| 44b183977034b696ebcabf19988f9dcfd1a55f27 | lm3050链接脚本更新              |
+| 7f0738298353e771e2bae7a94f30590085118b59 | usb例程ide工程生成              |
+| 7a704e626344c4b441c70942ed3d35fbc900a17b | io驱动更新                      |
+| 4fa84ff2a969f4f66dcefc2cb127bb7ead280bbb | lm3050链接脚本支持cpp           |
+| 6a790f4c51a9f62cfb9735483d03855b03ae7835 | spi示例更新                     |
+| 4cdecc80c5493472cf19d40b198329ced4049748 | lm3050 rom symbol更新           |
+| 8a8a2839480184314955141818babe44f0ee437c | lm3050链接脚本更新              |
+| 8878419283a72d3361fdfafdb2c3795479a48c6e | lm3050 freertos tick source     |
+| cd078fa5cdc59c1a0a423cd8e263452a105b6073 | flash erase chip api bugfix     |
+| ea668384ebff4f1a317e19c375b3b039b41b14fa | systick驱动兼容freertos         |
+| 87f16f535d258ec5953385ae24ab58f581830f04 | log兼容cpp11                    |
+| aaaee1385f73786f22f6d8d3cc05d3efd834172a | boot ram更新                    |
+| 5eb82b0ed93715f00430711590b20f10964183df | 预处理ld文件                    |
+| e10cba762fddcec53df0617f566c3501248cd812 | 库添加5020支持                  |
+| 1d6dd95d78e9d6d7be5368bdf5b5bc77add01998 | gpio驱动命名更新                |
+| cd938edd7ae0dbf7883f360aa911304e71cd47a7 | lm3050 deep sleep exit hook     |
+| 99eb021d3e05609465cb5a71912f18ad0baceb24 | freertos适配bugfix              |
+| 09756c9de5a1b9f8677bae4dba37f90213b6530e | keil工程兼容性问题修复          |
+| d8026e34e43a441f226e71910f84e8cc0444d990 | gpio驱动更新                    |
+| dbacd10ee5a5b1597f44803dcc81857540e05baa | rtcv2驱动更新                   |
+| 34b06be80099bc6659ec246edff290418e302642 | lm3050唤醒后使能cache           |
+| b5b81eb7efb4ba9fbe5f7b8ac2bbe7e6939b4a79 | lm3050 freertos tickless bugfix |
+| bbb2977b86ee121dac3856d36f2d8edd2b9d4500 | usb bugfix                      |
+| 24edfc20ed7ff9132d7c19ea399150f8618c505c | ble freertos bugfix             |
+| 2b555072e6ee504fb1445bafe1fce753d9ba296a | lm3050 keil支持                 |
+| f76b8e6ecf762543e0fcc93fd60da3c012115fd7 | readme更新                      |
+| 2a4acaa12fad70185195ea5e008ba4ec2975bc31 | le5010 lvd默认最高档            |
+| 4fa301cfef2d879bf1d0d03f5a61c4c10a134344 | iap例程更新                     |
+| 35c2d411d27a8746f871a76f9f50a15234f81ad5 | sigmesh例程更新                 |
+| ede88f04642eb44b137e8a3a1e0e7660b30a3f18 | usb忙状态注册                   |
+| 3bfbdffd8d7eae35c95db816fb2761b6187d8a3e | ssi bugfix                      |
+| 7778c9d0d8b7157a11a508538d6c2c0b4864e1e0 | le5010 rco校准bugfix            |
+| a7f01cc25b6edc10c50bd2b157958d0dc01bf5a0 | usb bugfix                      |
+| 596855a1a6e16b306f8051dd4c9da7afb5de42da | le5010 xtal稳定时间bugfix       |
+| ba9a3c98970fa30132312eaab84921e7fc6dbd57 | usb keyboard例程更新            |
+| 96dd8b0a399055c76f8e62440fdd4a4c37b61d55 | usb bugfix                      |
+| 19528f56dd0f04575557ac321a2085eefeb5bed8 | lm3050固件签名                  |
+| 78bc5a912d16046956a6d37e911626abbadfe727 | sig mesh bugfix                 |
+| 0b79f6e7675d2e2634d04721a18a2f3c4c27bbdb | ble协议栈固件更新               |
+| ab136ff3095a7f87a9552e29734b97ba29d40ff6 | comparator驱动例程更新          |
+| 83ae173ad6e1258f20a61cb4c1ec007ba3c3813c | uart例程更新                    |
+| c8a087240a88dd9d0de78679dcda19db769cb169 | ble例程更新                     |
+| 5d3f73482c417f9836c25342fd2f77a0582c0185 | timer例程更新                   |
+| 99a3d6f90faba56abf9ae10fc651dc04d5452f43 | uart log更新                    |
+| bb2ff551bda5412347deac76badcf45f26ac971c | adc例程更新                     |
+| f44cbf0ff73e12a7697c5d950ee8dacd5462bba9 | ble例程更新                     |
+| e4cde63f7cc95dae46735a72038b81e2092376c2 | adc驱动更新                     |
+| 4eef9941f777ce50c4bb9523aa1a20f87b90ed5f | ble例程更新                     |
+| 4cedf200a03728c1fe252fadeef53360f361b1fd | iic驱动更新                     |
+| 3740c4c49f5cd684adb04228f0ae6b6f800603e5 | ble例程更新                     |
+| 1aab9bae9b3986312a2d6a90468b4036d4f1353a | iic驱动更新                     |
+| 65392142e8d0282c894cc6c1079a22943c360993 | iic驱动更新                     |
+| d9d483597a6b4addc7c2d840d8d29e7f2a247e1c | iic驱动更新                     |
+| c89b1ca08373e0b4ed8b1f2ce3d938c094eed4ac | dac驱动例程更新                 |
+| 63415ba060bba6827e395315850d0a9eb7763408 | dac例程更新                     |
+| a7552eb1d269db2f88f07f559a26a52aafdce297 | usb例程更新                     |
+| c054bbb383fd66866ab9f0b4692c311b1cf380de | progen脚本更新                  |
+| 35274d0100eb8070f37ffea456217715a9dfee6a | ble例程更新                     |
+| 93b5e2f0a5ec1f312799eeb7788df6fbdff06587 | ble rco校准 bugfix              |
+| 1d0c6db04d98667c479ef0b61229d42f9e3b6cea | ble LTK_REQ api                 |
+| a0e515cde51b7b87cd881faf07d3fa6e2b9a200d | lm3050烧录算法文件更新          |
+| e2e96a095275e74459b86d6e0bcb95fb3265030b | lm3050 io驱动能力bugfix         |
+| 72e1f228015904f5a3e4f1c2dc49e29bdeb8e4c5 | crc驱动更新                     |
+| db07f1a4441f76df9235c852ffc668fd02e2026e | ble非标多次mtu交换              |
+| 0258be47afa4bb19043e068caa4e496bef04c8ee | timer例程更新                   |
+| d25f4223005025ed585bdbe7dc52ff245982cea4 | serialport web工具              |
+| 14c8c3d0c517b5818880b96d8201c720f1ea8e67 | mijia freertos适配              |
+| 09a127050e3084c91e3641318d4c804ceaf76a3a | lstim bugfix                    |
+| d78232261755cad7698c3d3eaf10e3648bc8dd65 | lm3050唤醒bugfix                |
+| aecba3d4ed0f76bf50f9a4452700b66102eef6b1 | sha hmac api                    |
+| 86c1d904e8618dd07212cff9db5da59569ef1167 | spi驱动更新                     |
+| 966e32ccc02bc6d629bb06cfe00fa135e9f3f73b | le5010 40nm flash支持           |
+| aef39817c72bbcc8234dbf24f9ff2a3777bf2edf | flash驱动更新                   |
+| e2e2b0ba65c72464e8a41f3e8f54e6cef6132f16 | flash驱动更新                   |
+| ab199184288690f70fb13ce5c632f1c141e8afcf | sig mesh更新                    |
+| 9582464d57d0fe8c735af90911795e2d63ab0abe | io驱动更新                      |
+| e3a8f00ed952912491c5c2c4a626d8dd6ba144a6 | ble库更新                       |
+| e915e410af6a92858b32b9e1d60936f073c60ef2 | iap例程更新                     |
+| 8b2237196613302464ae91531eeebbffedb2909f | iap例程更新                     |
+| 1b5f3b26a1f2f69300b8de29864d86e8b6ad7998 | ble例程更新                     |
+| d24ad832677332ff9d591064ab4eeefcaebe5884 | ble例程更新                     |
+| b26c0b173c0f4f437a12324e81cbc8a77d938804 | ble例程更新                     |
+| 1ab188f013f607bc47eb23b37b97d11b6b08177f | le501x链接脚本更新              |
+
+
+
+
 # v2.0.0 发布公告    
     
 ## Highlights    

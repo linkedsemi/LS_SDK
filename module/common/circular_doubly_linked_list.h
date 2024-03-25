@@ -2,6 +2,11 @@
 #define CIRCULAR_DOUBLY_LINKED_LIST_H_
 #include <stddef.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct cdll_hdr
 {
 	struct cdll_hdr *next;
@@ -36,4 +41,9 @@ struct cdll_hdr *cdll_next(struct cdll_hdr *hdr);
 struct cdll_hdr *cdll_prev(struct cdll_hdr *hdr);
 
 bool cdll_is_elem_linked(struct cdll_hdr *hdr);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

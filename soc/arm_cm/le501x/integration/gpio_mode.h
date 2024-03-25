@@ -1,6 +1,10 @@
 #ifndef GPIO_MODE_H_
 #define GPIO_MODE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SET_GPIO_MODE_GPIO 0x00000000u /*!< gpio Mode    */
 #define SET_GPIO_MODE_ANALOG 0x00000001u   /*!< Analog Mode  */
 #define SET_GPIO_MODE_AF 0x00000002u       /*!< Alternate Function Mode  */
@@ -101,5 +105,9 @@ enum GPIO_ANA_FUNC
     ANA_FUNC1,
     ANA_FUNC2
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -2,6 +2,10 @@
 #define LS_HAL_ECC_H_
 #include "ls_msp_ecc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ecc_curve_param
 {
     const uint32_t p[8];
@@ -27,5 +31,9 @@ void HAL_LSECC_PointMult_IT(const struct ecc_curve_param *curve,const uint8_t *p
 void HAL_LSECC_PointMult_Complete_Callback(void);
 
 void LSECC_IRQHandler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

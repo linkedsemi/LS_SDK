@@ -1,6 +1,10 @@
 #ifndef __I2C_MISC_H
 #define __I2C_MISC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum
 {
   HAL_I2C_MODE_NONE               = 0x00U,   /*!< No I2C communication on going             */
@@ -50,7 +54,7 @@ enum
 #define I2C_IT_TXE                      I2C_IER_TXEIE_MASK
 #define I2C_IT_TC                       I2C_IER_TCIE_MASK
 #define I2C_IT_TCR                      I2C_IER_TCRIE_MASK
-#define I2C_IT_EVT                      I2C_IER_ADDRIE_MASK | I2C_IER_NACKIE_MASK | I2C_IER_STOPIE_MASK
+#define I2C_IT_EVT                      I2C_IER_ADDRIE_MASK | I2C_IER_NACKIE_MASK
 #define I2C_IT_ERR                      I2C_IER_BERRIE_MASK
 #define I2C_FLAG_TXE                    I2C_SR_TXE_MASK
 #define I2C_FLAG_RXNE                   I2C_SR_RXNE_MASK
@@ -96,9 +100,17 @@ enum
 #define I2C_MEM_ADD_LSB(__ADDRESS__)                  ((uint8_t)((uint16_t)((__ADDRESS__) & (uint16_t)0x00FF)))
 
 #define I2C_MIN_PCLK_FREQ_STANDARD       400000U      /*!< 400 kHz                     */
-#define I2C_MIN_PCLK_FREQ_FAST           1000000U     /*!< 1 MHz                     */
+#define I2C_MIN_PCLK_FREQ_FAST           1000000U     /*!< 1 MHz                     */ 
+
+#ifdef LE501X
 #define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
-                                       ((INSTANCE) == I2C2))
+                                       ((INSTANCE) == I2C2))        
+#elif defined LM3050
+#define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
+                                       ((INSTANCE) == I2C2) || \
+                                       ((INSTANCE) == I2C3))
+#endif          
+
 #define IS_I2C_ADDRESSING_MODE(ADDRESS) (((ADDRESS) == I2C_ADDRESSINGMODE_7BIT) || \
                                          ((ADDRESS) == I2C_ADDRESSINGMODE_10BIT))
 #define IS_I2C_DUAL_ADDRESS(ADDRESS) (((ADDRESS) == I2C_DUALADDRESS_DISABLE) || \
@@ -127,6 +139,9 @@ enum
 #define I2C_CHECK_FLAG(__ISR__, __FLAG__)         ((((__ISR__) & (__FLAG__)) == (__FLAG__)) ? SET : RESET)
 #define I2C_CHECK_IT_SOURCE(__CR1__, __IT__)      ((((__CR1__) & (__IT__)) == (__IT__)) ? SET : RESET)
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

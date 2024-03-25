@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "ls_hal_spi_i2s.h"
 #include "log.h"
 #include "systick.h"
+#include "ls_ll_spi.h"
 
 extern void LL_SPI_TxCpltCallback(void);
 extern void LL_SPI_RxCpltCallback(void);

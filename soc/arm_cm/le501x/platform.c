@@ -31,7 +31,8 @@
 #include "sw_timer.h"
 #include "ls_sys.h"
 #include "sys_stat.h"
-#define XTAL_STB_VAL 20
+#include "swint_call_asm.h"
+#define XTAL_STB_VAL 30
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
@@ -47,6 +48,8 @@ void main_task_app_init(void);
 
 void main_task_itf_init(void);
 
+void SWINT_Handler_ASM(void);
+
 __attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}    
 
 static void bb_mem_clr(void)
@@ -56,11 +59,11 @@ static void bb_mem_clr(void)
 
 static void irq_priority()
 {
-    __NVIC_SetPriority(SVCall_IRQn,2);
+    __NVIC_SetPriority(SVCall_IRQn,3);
     __NVIC_SetPriority(SysTick_IRQn, 1);
     __NVIC_SetPriority(PendSV_IRQn,3);
     NVIC->IP[0] = IRQ_NVIC_PRIO(EXTI_IRQn,3) | IRQ_NVIC_PRIO(WWDT_IRQn,3) | IRQ_NVIC_PRIO(LPWKUP_IRQn,2) | IRQ_NVIC_PRIO(BLE_IRQn,1);
-    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,3) | IRQ_NVIC_PRIO(ECC_IRQn,3);
+    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,2) | IRQ_NVIC_PRIO(ECC_IRQn,3);
     NVIC->IP[2] = IRQ_NVIC_PRIO(CACHE_IRQn,3) | IRQ_NVIC_PRIO(TRNG_IRQn,3) | IRQ_NVIC_PRIO(IWDT_IRQn,3) | IRQ_NVIC_PRIO(CRYPT_IRQn,3);
     NVIC->IP[3] = IRQ_NVIC_PRIO(PDM_IRQn,3) | IRQ_NVIC_PRIO(BLE_WKUP_IRQn,1) | IRQ_NVIC_PRIO(ADC_IRQn,3) | IRQ_NVIC_PRIO(ADTIM1_IRQn,3);
     NVIC->IP[4] = IRQ_NVIC_PRIO(BSTIM1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMA1_IRQn,3) | IRQ_NVIC_PRIO(GPTIMB1_IRQn,3) | IRQ_NVIC_PRIO(BLE_ERR_IRQn,1);
@@ -143,7 +146,7 @@ static void lvd33_irq_enable()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
+    NVIC->ISER[0] = 1<<QSPI_IRQn|1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
     lvd33_irq_enable();
 }
 
@@ -339,6 +342,19 @@ uint32_t get_trng_value()
     HAL_TRNG_DeInit();
     return random32bit;
 }
+bool flash_55nm;
+void get_flash_process(void)
+{
+    uint16_t f_info = 0;
+    hal_flash_read_sfdp(0x68,(uint8_t *)&f_info,2);
+    if(f_info == 0xe8d9)
+    {
+        flash_55nm = false;
+    }else
+    {
+        flash_55nm = true;
+    }
+}
 
 static void module_init()
 {
@@ -354,13 +370,14 @@ static void module_init()
     calc_acc_init();
     cpu_sleep_recover_init();
     mac_init();
-    modem_rf_init();
     irq_init();
+    modem_rf_init();
+    get_flash_process();
     systick_start();
-    rco_freq_counting_start();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
+    rco_freq_counting_start();
 }
 
 void XIP_BANNED_FUNC(LVD33_Handler,)
@@ -373,7 +390,7 @@ void XIP_BANNED_FUNC(LVD33_Handler,)
 
 void lvd33_config()
 {
-    REG_FIELD_WR(SYSCFG->ANACFG0,SYSCFG_LVD_CTL,1);
+    REG_FIELD_WR(SYSCFG->ANACFG0,SYSCFG_LVD_CTL,7);
     REG_FIELD_WR(SYSCFG->CFG,SYSCFG_LVD33_INTE,1);
 }
 
@@ -389,8 +406,10 @@ void lvd33_disable()
 
 static void lsi_calib()
 {
+    MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_RCO_CAL_START_MASK|SYSCFG_EN_RCO_DIG_PWR_MASK,0);
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_RCO_MODE_SEL_MASK|SYSCFG_RCO_CAL_START_MASK|SYSCFG_EN_RCO_DIG_PWR_MASK,
-        0<<SYSCFG_RCO_MODE_SEL_POS|1<<SYSCFG_RCO_CAL_START_POS|1<<SYSCFG_EN_RCO_DIG_PWR_POS);
+        0<<SYSCFG_RCO_MODE_SEL_POS|1<<SYSCFG_EN_RCO_DIG_PWR_POS);   
+    REG_FIELD_WR(SYSCFG->ANACFG1,SYSCFG_RCO_CAL_START,1);
     while(REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_DONE)==0)
     {
         uint16_t cal_code = REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_CODE);
@@ -412,12 +431,18 @@ static void analog_init()
     arm_cm_set_int_isr(LVD33_IRQn,LVD33_Handler);
 }
 
+static void flash_swint_init()
+{
+    arm_cm_set_int_isr(QSPI_IRQn,SWINT_Handler_ASM);
+}
+
 static void var_init()
 {
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init();
 }
 
 void sys_init_itf()
@@ -441,11 +466,13 @@ void sys_init_none()
     analog_init();
     HAL_PIS_Init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init();
     cpu_sleep_recover_init();
     calc_acc_init();
     mac_init();
     io_init();
     irq_init();
+    get_flash_process();
     systick_start();
     LOG_INIT();
     rco_freq_counting_init();
@@ -468,6 +495,7 @@ static void ll_var_init()
     bb_mem_clr();
     ll_stack_var_ptr_init();
     hal_flash_drv_var_init(true,false);
+    flash_swint_init();
 }
 
 void sys_init_ll()
@@ -480,8 +508,8 @@ void sys_init_ll()
     calc_acc_init();
     cpu_sleep_recover_init();
     mac_init();
-    modem_rf_init();
     irq_init();
+    modem_rf_init();
     systick_start();
 }
 
@@ -538,7 +566,7 @@ void XIP_BANNED_FUNC(BLE_Handler,)
         hal_flash_prog_erase_suspend();
         uint8_t status_reg1;
         do{
-            hal_flash_read_status_register_1(&status_reg1);
+            hal_flash_read_status_register_1_ram(&status_reg1);
         }while(hal_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
     }
     if(xip == false)
@@ -553,7 +581,7 @@ void XIP_BANNED_FUNC(BLE_Handler,)
     if(flash_writing_status)
     {
         hal_flash_prog_erase_resume();
-        DELAY_US(8);
+        DELAY_US(20);
     }
 }
 
@@ -678,4 +706,9 @@ void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t
     HAL_LSECC_PointMult(&secp256r1_param,secret_key,pk,rslt);
     HAL_LSECC_DeInit();
     cb(param);
+}
+
+void SWINT_Handler_C(uint32_t *args,uint32_t (*func)(uint32_t,uint32_t,uint32_t,uint32_t))
+{
+    args[0] = func(args[0],args[1],args[2],args[3]);
 }

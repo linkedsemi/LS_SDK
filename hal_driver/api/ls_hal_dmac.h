@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include "ls_msp_dmac.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DMA_RAM_ATTR __attribute__((section("DMARAM")))
 typedef struct __DMA_Controller_HandleTypeDef
 {
@@ -117,5 +121,8 @@ void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx);
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

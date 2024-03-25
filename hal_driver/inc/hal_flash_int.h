@@ -5,23 +5,31 @@
 #include <stddef.h>
 #include "sdk_config.h"
 #include "ls_hal_flash.h"
-#include "hal_flash_svcall.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(FLASH_PROG_ALGO) && __arm__
 #define HAL_FLASH_C_MERGED
 #endif
 #define PUYA_FLASH_WORKAROUND 1
 #define TSINGTENG_FLASH_WORKAROUND 2
+
+#ifndef SUSPEND_WORKAROUND 
 #if (defined(FLASH_PROG_ALGO) || BOOT_RAM==1)
 #define SUSPEND_WORKAROUND 0
-#else
-#ifndef SUSPEND_WORKAROUND 
+#elif defined(LE501X)
 #define SUSPEND_WORKAROUND PUYA_FLASH_WORKAROUND
+#else
+#define SUSPEND_WORKAROUND 0
 #endif
 #endif
+
 #if defined(LM3050)
 #define DUAL_CONTINUOUS_MODE_OFF 1
 #else
@@ -66,38 +74,44 @@ enum mw_wid_type
     QUAD_WIRE,
 };
 
-struct flash_erase_param
-{
-    uint8_t addr[3];
-    uint8_t opcode;
-};
-
-struct flash_read_reg_param
+struct flash_wr_rd_reg_param
 {
     uint8_t *buf;
     uint8_t opcode;
-    uint8_t length;    
+    uint8_t length;
 };
+
+void hal_flash_program_operation(void *param);
+
+void hal_flash_write_reg_operation(void *param);
+
+void hal_flash_read_operation(void *param);
+
+void hal_flash_read_reg_operation(void *param);
+
+void hal_flash_chip_erase_operation(void *param);
+
+void do_hal_flash_program_swint(void *param);
+
+void do_hal_flash_write_reg_swint(void *param);
+
+void do_hal_flash_read_swint(void *param);
+
+void do_hal_flash_read_reg_swint(void *param);
+
+void do_hal_flash_chip_erase_swint(void *param);
 
 void hal_flash_write_enable(void);
 
-void do_hal_flash_write_status_reg_func(void * param);
-
-void do_hal_flash_erase_func(void *param);
-
-void do_hal_flash_chip_erase_func(void *param);
+void do_hal_flash_write_reg_func(void * param);
 
 void do_hal_flash_read_func(void *param);
 
 void do_hal_flash_read_reg_func(void *param);
 
-void do_hal_flash_erase_security_area_func(void *param);
-
-void do_hal_flash_program_security_area_func(void *param);
-
-void do_hal_flash_read_security_area_func(void *param);
-
 void do_hal_flash_prog_func(void *param);
+
+void do_hal_flash_chip_erase_func(void *param);
 
 void flash_reading_critical(void (*func)(void *),void *param);
 
@@ -105,24 +119,21 @@ void flash_writing_critical(void (*func)(void *),void *param);
 
 void do_hal_flash_read(void *param);
 
-void do_hal_flash_erase(uint32_t offset,uint8_t opcode);
+void do_hal_flash_program(void *param);
 
-void do_hal_flash_program(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type);
-
-void do_hal_flash_chip_erase(void);
-
-void do_hal_flash_write_status_reg(uint16_t status);
-
-void do_hal_flash_erase_security_area(uint8_t idx);
-
-void do_hal_flash_program_security_area(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
-
-void do_hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
+void do_hal_flash_write_reg(void *param);
 
 void do_hal_flash_read_reg(void *param);
+
+void do_hal_flash_chip_erase(void *param);
 
 void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode);
 
 void sync_for_xip_stop(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

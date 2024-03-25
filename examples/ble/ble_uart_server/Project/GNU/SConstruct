@@ -4,9 +4,11 @@ env['SDK_ROOT'] = Dir('../../../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
     '../../Source/main.c',
+    '../../../../../module/micro-ecc/uECC.c',
 ]
 inc = [
     '../../Include/.',
     '../../.',
+    '../../../../../module/micro-ecc/',
 ]
 env.app_build('ble_uart_server',src,inc)

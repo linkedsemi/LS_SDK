@@ -4,6 +4,7 @@ env['SDK_ROOT'] = Dir('../../../../../../')
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
     '../../Source/main.c',
+    '../../Source/user_info_config.c',
 ]
 inc = [
     '../../Include/.',

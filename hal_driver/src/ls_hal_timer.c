@@ -936,6 +936,7 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);
       HAL_TIM_PeriodElapsedCallback(htim);
+      _arduino_timerISR(htim);      
     }
   }
   /* TIM Break input event */
@@ -1570,6 +1571,16 @@ uint32_t HAL_TIM_ReadCapturedValue(TIM_HandleTypeDef *htim, uint32_t Channel)
   }
 
   return tmpreg;
+}
+
+__weak void _arduino_timerISR(TIM_HandleTypeDef *htim)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(htim);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the _arduino_timerISR could be implemented in the user file
+   */
 }
 
 __weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -2734,6 +2745,264 @@ static void TIM_CCxNChannelCmd(reg_timer_t *TIMx, uint32_t Channel, uint32_t Cha
 
   /* Set or reset the CCxNE Bit */
   TIMx->CCER |= (uint32_t)(ChannelNState << (Channel & 0x1FU)); /* 0x1FU = 31 bits max shift */
+}
+
+HAL_StatusTypeDef HAL_TIM_Encoder_Init(TIM_HandleTypeDef *htim,  TIM_Encoder_InitTypeDef *sConfig)
+{
+  uint32_t tmpsmcr;
+  uint32_t tmpccmr1;
+  uint32_t tmpccer;
+
+  /* Check the TIM handle allocation */
+  if (htim == NULL)
+  {
+    return HAL_ERROR;
+  }
+
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
+  LS_ASSERT(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
+  LS_ASSERT(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
+  LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+  LS_ASSERT(IS_TIM_ENCODER_MODE(sConfig->EncoderMode));
+  LS_ASSERT(IS_TIM_IC_SELECTION(sConfig->IC1Selection));
+  LS_ASSERT(IS_TIM_IC_SELECTION(sConfig->IC2Selection));
+  LS_ASSERT(IS_TIM_IC_POLARITY(sConfig->IC1Polarity));
+  LS_ASSERT(IS_TIM_IC_POLARITY(sConfig->IC2Polarity));
+  LS_ASSERT(IS_TIM_IC_PRESCALER(sConfig->IC1Prescaler));
+  LS_ASSERT(IS_TIM_IC_PRESCALER(sConfig->IC2Prescaler));
+  LS_ASSERT(IS_TIM_IC_FILTER(sConfig->IC1Filter));
+  LS_ASSERT(IS_TIM_IC_FILTER(sConfig->IC2Filter));
+
+  if (htim->State == HAL_TIM_STATE_RESET)
+  {
+    /* Allocate lock resource and initialize it */
+    htim->Lock = HAL_UNLOCKED;
+
+    /* Init the low level hardware : GPIO, CLOCK, NVIC and DMA */
+    HAL_TIM_MSP_Init(htim);
+    HAL_TIM_MSP_Busy_Set(htim);
+  }
+
+  /* Set the TIM state */
+  htim->State = HAL_TIM_STATE_BUSY;
+
+  /* Reset the SMS and ECE bits */
+  htim->Instance->SMCR &= ~(TIMER_SMCR_SMS | TIMER_SMCR_ECE);
+
+  /* Configure the Time base in the Encoder Mode */
+  TIM_Base_SetConfig(htim->Instance, &htim->Init);
+
+  /* Get the TIMx SMCR register value */
+  tmpsmcr = htim->Instance->SMCR;
+
+  /* Get the TIMx CCMR1 register value */
+  tmpccmr1 = htim->Instance->CCMR1;
+
+  /* Get the TIMx CCER register value */
+  tmpccer = htim->Instance->CCER;
+
+  /* Set the encoder Mode */
+  tmpsmcr |= sConfig->EncoderMode;
+
+  /* Select the Capture Compare 1 and the Capture Compare 2 as input */
+  tmpccmr1 &= ~(TIMER_CCMR1_CC1S | TIMER_CCMR1_CC2S);
+  tmpccmr1 |= (sConfig->IC1Selection | (sConfig->IC2Selection << 8U));
+
+  /* Set the Capture Compare 1 and the Capture Compare 2 prescalers and filters */
+  tmpccmr1 &= ~(TIMER_CCMR1_IC1PSC | TIMER_CCMR1_IC2PSC);
+  tmpccmr1 &= ~(TIMER_CCMR1_IC1F | TIMER_CCMR1_IC2F);
+  tmpccmr1 |= sConfig->IC1Prescaler | (sConfig->IC2Prescaler << 8U);
+  tmpccmr1 |= (sConfig->IC1Filter << 4U) | (sConfig->IC2Filter << 12U);
+
+  /* Set the TI1 and the TI2 Polarities */
+  tmpccer &= ~(TIMER_CCER_CC1P | TIMER_CCER_CC2P);
+  tmpccer |= sConfig->IC1Polarity | (sConfig->IC2Polarity << 4U);
+
+  /* Write to TIMx SMCR */
+  htim->Instance->SMCR = tmpsmcr;
+
+  /* Write to TIMx CCMR1 */
+  htim->Instance->CCMR1 = tmpccmr1;
+
+  /* Write to TIMx CCER */
+  htim->Instance->CCER = tmpccer;
+
+  /* Initialize the TIM state*/
+  htim->State = HAL_TIM_STATE_READY;
+
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIM_Encoder_DeInit(TIM_HandleTypeDef *htim)
+{
+  htim->State = HAL_TIM_STATE_BUSY;
+
+  /* Disable the TIM Peripheral Clock */
+  __HAL_TIM_DISABLE(htim);
+
+  /* DeInit the low level hardware: GPIO, CLOCK, NVIC */
+  HAL_TIM_MSP_DeInit(htim);
+  HAL_TIM_MSP_Idle_Set(htim);
+
+  /* Change TIM state */
+  htim->State = HAL_TIM_STATE_RESET;
+
+  /* Release Lock */
+  __HAL_UNLOCK(htim);
+
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIM_Encoder_Start(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+
+  /* Enable the encoder interface channels */
+  switch (Channel)
+  {
+    case TIM_CHANNEL_1:
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+      break;
+    }
+
+    case TIM_CHANNEL_2:
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_ENABLE);
+      break;
+    }
+
+    default :
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_ENABLE);
+      break;
+    }
+  }
+  /* Enable the Peripheral */
+  __HAL_TIM_ENABLE(htim);
+
+  /* Return function status */
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIM_Encoder_Stop(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+
+  /* Disable the Input Capture channels 1 and 2
+    (in the EncoderInterface the two possible channels that can be used are TIM_CHANNEL_1 and TIM_CHANNEL_2) */
+  switch (Channel)
+  {
+    case TIM_CHANNEL_1:
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_DISABLE);
+      break;
+    }
+
+    case TIM_CHANNEL_2:
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_DISABLE);
+      break;
+    }
+
+    default :
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_DISABLE);
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_DISABLE);
+      break;
+    }
+  }
+
+  /* Disable the Peripheral */
+  __HAL_TIM_DISABLE(htim);
+
+  /* Return function status */
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIM_Encoder_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+
+  /* Enable the encoder interface channels */
+  /* Enable the capture compare Interrupts 1 and/or 2 */
+  switch (Channel)
+  {
+    case TIM_CHANNEL_1:
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+      __HAL_TIM_ENABLE_IT(htim, TIM_IT_CC1);
+      break;
+    }
+
+    case TIM_CHANNEL_2:
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_ENABLE);
+      __HAL_TIM_ENABLE_IT(htim, TIM_IT_CC2);
+      break;
+    }
+
+    default :
+    {
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+      TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_ENABLE);
+      __HAL_TIM_ENABLE_IT(htim, TIM_IT_CC1);
+      __HAL_TIM_ENABLE_IT(htim, TIM_IT_CC2);
+      break;
+    }
+  }
+
+  /* Enable the Peripheral */
+  __HAL_TIM_ENABLE(htim);
+
+  /* Return function status */
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_TIM_Encoder_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_CC2_INSTANCE(htim->Instance));
+
+  /* Disable the Input Capture channels 1 and 2
+    (in the EncoderInterface the two possible channels that can be used are TIM_CHANNEL_1 and TIM_CHANNEL_2) */
+  if (Channel == TIM_CHANNEL_1)
+  {
+    TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_DISABLE);
+
+    /* Disable the capture compare Interrupts 1 */
+    __HAL_TIM_DISABLE_IT(htim, TIM_IT_CC1);
+  }
+  else if (Channel == TIM_CHANNEL_2)
+  {
+    TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_DISABLE);
+
+    /* Disable the capture compare Interrupts 2 */
+    __HAL_TIM_DISABLE_IT(htim, TIM_IT_CC2);
+  }
+  else
+  {
+    TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_DISABLE);
+    TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_DISABLE);
+
+    /* Disable the capture compare Interrupts 1 and 2 */
+    __HAL_TIM_DISABLE_IT(htim, TIM_IT_CC1);
+    __HAL_TIM_DISABLE_IT(htim, TIM_IT_CC2);
+  }
+
+  /* Disable the Peripheral */
+  __HAL_TIM_DISABLE(htim);
+
+  /* Change the htim state */
+  htim->State = HAL_TIM_STATE_READY;
+
+  /* Return function status */
+  return HAL_OK;
 }
 
 /************************ (C) COPYRIGHT Linkedsemi *****END OF FILE****/

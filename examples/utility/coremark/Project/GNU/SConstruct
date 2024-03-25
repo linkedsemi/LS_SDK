@@ -1,0 +1,17 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../../Source/core_list_join.c',
+    '../../Source/core_main.c',
+    '../../Source/core_matrix.c',
+    '../../Source/core_portme.c',
+    '../../Source/core_state.c',
+    '../../Source/core_util.c',
+]
+inc = [
+    '../../Include/.',
+    '../../.',
+]
+env.app_build('coremark',src,inc,ble = False)
