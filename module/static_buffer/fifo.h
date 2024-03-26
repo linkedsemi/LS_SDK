@@ -40,6 +40,8 @@ bool general_fifo_get(struct fifo_env *ptr,void *data);
 
 bool dword_fifo_get(struct fifo_env *ptr,void *data);
 
+void *sw_fifo_peek(struct fifo_env *ptr);
+
 #ifdef __cplusplus
 }
 #endif

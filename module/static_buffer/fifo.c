@@ -94,6 +94,17 @@ ROM_SYMBOL bool general_fifo_get(struct fifo_env *ptr,void *data)
     }
 }
 
+ROM_SYMBOL void *sw_fifo_peek(struct fifo_env *ptr)
+{
+    if(sw_fifo_empty(ptr))
+    {
+        return NULL;
+    }else
+    {
+        return (uint8_t *)ptr->buf + ptr->item_size * GET_RD_IDX(ptr);
+    }
+}
+
 ROM_SYMBOL bool dword_fifo_get(struct fifo_env *ptr,void *data)
 {
     if(sw_fifo_empty(ptr))
