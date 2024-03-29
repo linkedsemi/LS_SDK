@@ -4,15 +4,20 @@
 #include "ls_hal_uart.h"
 #include "ls_soc_gpio.h"
 #include "sdk_config.h"
+#if __riscv
+#include "semihosting.h"
+#endif
 
 #define JLINK_RTT           1
 #define UART_LOG           2
 #define RAM_LOG             4
+#define SEMIHOSTING         8
+
 #ifndef LOG_BACKEND
 #if __arm__ || __ICCARM__
 #define LOG_BACKEND (JLINK_RTT)
 #elif __riscv
-#define LOG_BACKEND (UART_LOG)
+#define LOG_BACKEND (SEMIHOSTING | UART_LOG)
 #else
 #error arch not supported
 #endif
@@ -111,6 +116,13 @@ int _write (int fd, char *ptr, int len)
 //        ram_log_print(linefeed,format,&args);
     }
     #endif
+    #if(LOG_BACKEND&SEMIHOSTING)
+    {
+        if (get_semihosting_state()){
+            semihosting_puts(ptr, len);
+        }
+    }
+    #endif
     return len;
 }
 #endif
@@ -160,6 +172,13 @@ void ls_log_init()
     #if(LOG_BACKEND&UART_LOG)
     {
         log_uart_init();
+    }
+    #endif
+    #if(LOG_BACKEND&SEMIHOSTING)
+    {
+        if (semihosting_enabled()){
+		    semihosting_init();
+        }
     }
     #endif
     #if(LOG_BACKEND&RAM_LOG)
