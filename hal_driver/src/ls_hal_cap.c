@@ -91,7 +91,7 @@ void HAL_LSCAP_IRQHandler()
                     capcount.cap_high = CAP->CAP_COUNT[(j)*2];
                     capcount.cap_low = CAP->CAP_COUNT[(j)*2 + 1];
                 } while (capcount.cap_high != CAP->CAP_COUNT[(j)*2]);
-                HAL_CAP_END_Callback(j + 1, capcount);
+                HAL_CAP_END_Callback(j, capcount);
             }
         }
     }
@@ -102,7 +102,7 @@ void HAL_LSCAP_IRQHandler()
             if (CO_BIT(j) & (isrflags>>8))
             {
                 CAP->INTR_CLR = CO_BIT(j + 8);
-                HAL_CAP_ERR_HIGH_Callback(j + 1);
+                HAL_CAP_ERR_HIGH_Callback(j);
             }
         }
     }
@@ -113,7 +113,7 @@ void HAL_LSCAP_IRQHandler()
             if (CO_BIT(j) & (isrflags >> 16))
             {
                 CAP->INTR_CLR = CO_BIT(j + 16);
-                HAL_CAP_ERR_HIGH_Callback(j + 1);
+                HAL_CAP_ERR_HIGH_Callback(j);
             }
         }
     }
