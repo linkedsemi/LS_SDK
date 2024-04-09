@@ -113,7 +113,7 @@ void HAL_LSCAP_IRQHandler()
             if (CO_BIT(j) & (isrflags >> 16))
             {
                 CAP->INTR_CLR = CO_BIT(j + 16);
-                HAL_CAP_ERR_HIGH_Callback(j);
+                HAL_CAP_ERR_LOW_Callback(j);
             }
         }
     }
