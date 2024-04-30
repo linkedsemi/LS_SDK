@@ -47,7 +47,7 @@ void HAL_PS2H_MSP_Init(PS2H_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST3 = SYSC_PER_SRST_SET_PS2H2_MASK;
         SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_SET_PS2H2_MASK;
         rv_set_int_isr(PS2H2_IRQn,PS2H2_IRQHandler);
-        PS2H_inst_env[0] = inst;
+        PS2H_inst_env[1] = inst;
         csi_vic_clear_pending_irq(PS2H2_IRQn);
         csi_vic_enable_irq(PS2H2_IRQn);
         break;
@@ -57,7 +57,7 @@ void HAL_PS2H_MSP_Init(PS2H_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST3 = SYSC_PER_SRST_SET_PS2H3_MASK;
         SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_SET_PS2H3_MASK;
         rv_set_int_isr(PS2H3_IRQn,PS2H3_IRQHandler);
-        PS2H_inst_env[0] = inst;
+        PS2H_inst_env[2] = inst;
         csi_vic_clear_pending_irq(PS2H3_IRQn);
         csi_vic_enable_irq(PS2H3_IRQn);
         break;
@@ -67,7 +67,7 @@ void HAL_PS2H_MSP_Init(PS2H_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST3 = SYSC_PER_SRST_SET_PS2H4_MASK;
         SYSC_PER->PD_PER_CLKG3 = SYSC_PER_CLKG_SET_PS2H4_MASK;
         rv_set_int_isr(PS2H4_IRQn,PS2H4_IRQHandler);
-        PS2H_inst_env[0] = inst;
+        PS2H_inst_env[3] = inst;
         csi_vic_clear_pending_irq(PS2H4_IRQn);
         csi_vic_enable_irq(PS2H4_IRQn);
         break;
