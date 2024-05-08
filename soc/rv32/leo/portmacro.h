@@ -108,6 +108,8 @@ extern void vTaskExitCritical( void );
 #define portENABLE_INTERRUPTS()		__asm volatile( "csrs mstatus, 8" )
 #define portENTER_CRITICAL()	vTaskEnterCritical()
 #define portEXIT_CRITICAL()		vTaskExitCritical()
+#define configMTIME_BASE_ADDRESS            ( 0xE0007FFCUL )
+#define configMTIMECMP_BASE_ADDRESS         ( 0xE0004000UL )
 
 /*-----------------------------------------------------------*/
 
