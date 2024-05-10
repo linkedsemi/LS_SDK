@@ -230,29 +230,31 @@ if(CONFIG_SOC_LS1010)
   zephyr_linker_sources(ROM_START SORT_KEY -1vectors leo_sbl.ld)
 
   zephyr_compile_definitions(LEO)
-  # message("ZEPHYR_CURRENT_MODULE_DIR: ${ZEPHYR_CURRENT_MODULE_DIR}  ${ZEPHYR_CURRENT_MODULE_DIR}/tools/leo/info_sbl_merge.py")
+  message("ZEPHYR_CURRENT_MODULE_DIR: ${ZEPHYR_CURRENT_MODULE_DIR}  ${ZEPHYR_CURRENT_MODULE_DIR}/tools/leo/info_sbl_merge.py")
+  message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
   add_custom_command(
-    OUTPUT ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/info_sbl.bin
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/info_sbl.bin
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/leo/info_sbl_merge.py 
     ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/leo/bin/bram.bin 
-    ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/info_sbl.bin
+    ${CMAKE_CURRENT_BINARY_DIR}/info_sbl.bin
     DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/tools/leo/info_sbl_merge.py ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/leo/bin/bram.bin
   )
   add_custom_command(
-      OUTPUT ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/__info_array.c
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/__info_array.c
       COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/bin2c/bin2c.py
-      ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/info_sbl.bin __info_array 80 4 > ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/__info_array.c
-      DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/tools/bin2c/bin2c.py  ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/info_sbl.bin
+      ${CMAKE_CURRENT_BINARY_DIR}/info_sbl.bin __info_array 80 4 > ${CMAKE_CURRENT_BINARY_DIR}/__info_array.c
+      DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/tools/bin2c/bin2c.py  ${CMAKE_CURRENT_BINARY_DIR}/info_sbl.bin
   )
   add_custom_target(
       build_info_obj
-      DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/info_sbl.bin ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/__info_array.c
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/info_sbl.bin ${CMAKE_CURRENT_BINARY_DIR}/__info_array.c
   )
   # add_library(info_obj OBJECT ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/__info_array.c)
   # add_dependencies(info_obj build_info_obj)
 
   zephyr_library_sources(
-    ${ZEPHYR_CURRENT_MODULE_DIR}/zephyr/leo_build_info/__info_array.c
+    ${CMAKE_CURRENT_BINARY_DIR}/__info_array.c
   )
 
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
