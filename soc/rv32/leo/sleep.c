@@ -195,11 +195,11 @@ static void deep_sleep_no_ble()
     uart_log_pause();
     cpu_sleep_mode_config(1);
     systick_stop();
-    CLIC_INT_Control clicint[64];
-    memcpy32((uint32_t*)clicint,(uint32_t*)&CLIC->CLICINT[16],ARRAY_LEN(clicint));
+    CLIC_INT_Control clicint[80];
+    memcpy32((uint32_t*)clicint,(uint32_t*)&CLIC->CLICINT[0],ARRAY_LEN(clicint));
     cpu_flash_deep_sleep_and_recover();
     MODIFY_REG(CLIC->CLICCFG,CLIC_CLICCFG_NLBIT_Msk,0xf<<CLIC_CLICCFG_NLBIT_Pos);
-    memcpy32((uint32_t*)&CLIC->CLICINT[16],(uint32_t*)clicint,ARRAY_LEN(clicint));
+    memcpy32((uint32_t*)&CLIC->CLICINT[0],(uint32_t*)clicint,ARRAY_LEN(clicint));
     systick_start();
     uart_log_resume();
 }
