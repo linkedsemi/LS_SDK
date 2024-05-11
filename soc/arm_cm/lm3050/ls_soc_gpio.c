@@ -551,6 +551,7 @@ static void per_func_disable(uint8_t func_io_num)
     {
         SYSC_AWO->PIN_SEL1 &= ~(1<<func_io_num);
     }
+    MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),0);
 }
 
 static void iic_io_cfg(uint8_t scl,uint8_t sda)

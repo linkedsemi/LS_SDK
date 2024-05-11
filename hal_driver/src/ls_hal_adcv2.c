@@ -109,10 +109,6 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
     HAL_ADC_MSP_Init(hadc);
     HAL_ADC_MSP_Busy_Set(hadc); 
 
-    hadc->Instance->ADCH = FIELD_BUILD(ADC_ADCH_GE_CALV,1)|
-                           FIELD_BUILD(ADC_ADCH_OS_CALV,0xA0)|
-                           FIELD_BUILD(ADC_ADCH_TRIM_EN,0);
-
     tmp_misc_ctrl |= hadc->Init.DataAlign;
     tmp_misc_ctrl |= hadc->Init.AdcCkDiv << ADC_ADC_DIV_POS;
     tmp_misc_ctrl |= ADC_ADC_RES_MASK; 

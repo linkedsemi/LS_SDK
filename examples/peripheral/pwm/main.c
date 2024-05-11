@@ -15,7 +15,7 @@ static void pwm_init()
     PWM_Param param;
     param.pwm_cyc = 1000;
     param.pwm_high = 250;
-    param.pwm_num = 0;
+    param.pwm_num = 1;
     param.pol = PWM_POLARITY_NOINVERTED;
     param.cmp = PWM_CMP_OUTVALUE_HIGH;
     param.mode = PWM_MODE_ONLY_COUNTSUP;

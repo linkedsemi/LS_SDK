@@ -32,19 +32,19 @@ int main(void)
 
 void HAL_CAP_ERR_HIGH_Callback(uint8_t channel)
 {
-    LOG_I("Channel %d capture high pulse error interrupt",channel);
+    LOG_I("Channel %d capture high pulse error interrupt",channel + 1);
     while (1);
 }
 
 void HAL_CAP_ERR_LOW_Callback(uint8_t channel)
 {
-    LOG_I("Channel %d capture low pulse error interrupt", channel);
+    LOG_I("Channel %d capture low pulse error interrupt", channel + 1);
     while (1);
 }
 
 void HAL_CAP_END_Callback(uint8_t channel, cap_count_t cap_count)
 {
-    LOG_I("Channel %d capture end interrupt", channel);
+    LOG_I("Channel %d capture end interrupt", channel + 1);
     LOG_I("GetCount = %x\n ", cap_count);
     uint32_t gerfreq =  CAP_GET_FREQ(cap_param.cap_pre_div, cap_count.cap_low, cap_count.cap_high);
     LOG_I("gerfreq = %x\n" ,gerfreq);

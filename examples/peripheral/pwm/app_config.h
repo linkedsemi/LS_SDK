@@ -3,6 +3,5 @@
 
 
 
-#define LOG_UART_TXD PC05
 
 #endif

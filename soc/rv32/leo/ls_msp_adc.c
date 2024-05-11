@@ -34,7 +34,7 @@ static void load_trim_value(reg_adc_t* adc,uint16_t addr)
     }
     if(adc_trim_value[4]==~adc_trim_value[5])
     {
-        MODIFY_REG(adc->ADCH,ADC_ADCH_OS_CALV_MASK,(adc_trim_value[2]>>16)<<ADC_ADCH_OS_CALV_POS);
+        MODIFY_REG(adc->ADCH,ADC_ADCH_OS_CALV_MASK,(adc_trim_value[4]>>16)<<ADC_ADCH_OS_CALV_POS);
     }
 }
 
@@ -69,6 +69,8 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
         LS_ASSERT(0);
         break;
     }
+
+    REG_FIELD_WR(inst->Instance->ADCH,ADC_ADCH_TRIM_EN,1);
 }
 
 void HAL_ADC_MSP_DeInit(ADC_HandleTypeDef *inst)
@@ -110,10 +112,10 @@ static void adc_status_set(ADC_HandleTypeDef *inst, bool status)
     switch ((uint32_t)inst->Instance)
     {
     case (uint32_t)LSADC1:
-        adc1_status_set(true);
+        adc1_status_set(status);
         break;
     case (uint32_t)LSADC2:
-        adc2_status_set(false);
+        adc2_status_set(status);
         break;
     default:
         LS_ASSERT(0);

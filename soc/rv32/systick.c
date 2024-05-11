@@ -16,7 +16,7 @@ void XIP_BANNED_FUNC(SysTick_Handler)
     }while(target<CORET->MTIME);
 }
 
-void systick_start(void)
+__attribute__((weak)) void systick_start(void)
 {
     total_ticks = 0;
     rv_set_int_isr(RV_TIME_IRQ_IDX,SysTick_Handler);
