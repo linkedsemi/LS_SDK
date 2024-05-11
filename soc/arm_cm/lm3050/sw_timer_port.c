@@ -16,7 +16,12 @@ int timer_time_compare(sw_timer_time_t a,sw_timer_time_t b)
 
 sw_timer_time_t timer_time_get()
 {
-    return LSTIM->TIM_CNT;
+    uint32_t val1,val2;
+    do{
+        val1 = LSTIM->TIM_CNT;
+        val2 = LSTIM->TIM_CNT;
+    }while(val1!=val2);
+    return val1;
 }
 
 void timer_match_set(sw_timer_time_t match)

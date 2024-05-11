@@ -1,0 +1,244 @@
+import os
+import sys
+Import('env')
+env['ABI'] = 'ilp32f'
+env['ARCH'] = 'rv32imafdc_xtheade'
+if not 'DEFAULT_OPT_LVL' in env:
+    env['DEFAULT_OPT_LVL'] = '-Os'
+
+def plf_postaction(self,target):
+    self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+    self.AddPostAction(target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.bin'))
+    self.AddPostAction(target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
+    self.AddPostAction(target,Action('python $SDK_ROOT/tools/leo/fw_desc_gen.py ${TARGET.base}.bin'))
+    info_sbl_bin = self.Command('build/$IC/info_sbl.bin','$SDK_ROOT/soc/rv32/leo/bin/bram.bin',Action(self.subst('python $SDK_ROOT/tools/leo/info_sbl_merge.py')+' $SOURCE $TARGET'))
+    info_array_c = self.Command('$SDK_ROOT/soc/rv32/leo/__info_array.c',info_sbl_bin,Action(self.subst('python $SDK_ROOT/tools/bin2c/bin2c.py')+ ' $SOURCE __info_array 80 4 > $TARGET'))
+    info_obj = self.Object(self.variant_dir_source(['$SDK_ROOT/soc/rv32/leo/__info_array.c']))
+    self.Depends(info_obj,[info_array_c])
+    self.Append(LIBS = [info_obj])
+
+def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
+    start_src = []
+    if with_startup:
+        start_src = ['$SDK_ROOT/soc/rv32/startup.c']
+    sdk_src = []
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+        'rv32/systick.c',
+        'rv32/int_call_asm.S',
+        'rv32/leo/cpu.c',
+        'rv32/leo/sleep_asm.S',
+        'rv32/leo/exception_entry.S',
+        'rv32/leo/delay_asm.S',
+        'rv32/leo/ls_msp_qspiv2.c',
+        'rv32/leo/ls_msp_uart.c',
+        'rv32/leo/ls_msp_comp.c',
+        'rv32/leo/ls_msp_crc.c',
+        'rv32/leo/ls_msp_sha.c',
+        'rv32/leo/ls_msp_sm4.c',
+        'rv32/leo/ls_msp_trngv2.c',
+        'rv32/leo/ls_msp_touchkey.c',
+        'rv32/leo/ls_msp_crypt.c',
+        'rv32/leo/ls_msp_adc.c',
+        'rv32/leo/ls_msp_ecc.c',
+        'rv32/leo/ls_msp_dac.c',
+        'rv32/leo/ls_msp_can.c',
+        'rv32/leo/ls_msp_fdcan.c',
+        'rv32/leo/ls_msp_spi_i2s.c',
+        'rv32/leo/ls_msp_spis.c',
+        'rv32/leo/ls_soc_gpio.c',
+        # 'rv32/leo/exception_isr.c',
+        'rv32/leo/sys_stat.c',
+        'rv32/leo/platform.c',
+        'rv32/leo/efuse.c',
+        'rv32/leo/sleep.c',
+        'rv32/leo/ls_msp_ssi.c',
+        'rv32/leo/ls_msp_timer.c',
+        'rv32/leo/ls_msp_i2c.c',
+        'rv32/leo/ls_msp_kscan.c',
+        'rv32/leo/ls_msp_rtc.c',
+        'rv32/leo/ls_msp_pwm.c',
+        'rv32/leo/ls_msp_dmacv3.c',
+        'rv32/leo/ls_msp_pdm.c',
+        'rv32/leo/ls_msp_cec.c',
+        'rv32/leo/ls_msp_owm.c',
+	    'rv32/leo/ls_msp_cap.c',
+	    'rv32/leo/sw_timer_port.c',
+        'rv32/leo/ls_msp_iwdg.c',
+        'rv32/leo/ls_msp_wwdg.c',
+        'rv32/leo/ls_msp_ps2h.c',
+        'rv32/leo/ls_msp_cache.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+        'src/ls_hal_flash_swint.c',
+        'src/ls_hal_sha.c',
+        'src/ls_hal_sm4.c',
+        'src/ls_hal_crc.c',
+        'src/ls_hal_ecc.c',
+        'src/ls_hal_can.c',
+        'src/ls_hal_fdcan.c',
+        'src/ls_hal_trngv2.c',
+        'src/ls_hal_crypt.c',
+        'src/ls_hal_qspiv2.c',
+        'src/ls_hal_flash_qspiv2.c',
+        'src/ls_hal_flash.c',
+        'src/ls_hal_cache.c',
+        'src/ls_hal_comp.c',
+        'src/ls_hal_uart.c',
+        'src/ls_hal_dwuart.c',
+        'src/ls_hal_dwuart_dma.c',
+        'src/ls_hal_adcv2.c',
+        'src/ls_hal_adcv2_dma.c',
+        'src/ls_hal_dac.c',
+        'src/ls_hal_dac_dma.c',
+        'src/ls_hal_uart_dma.c',
+        'src/ls_hal_ssi.c',
+        'src/ls_hal_spi_i2s.c',
+        'src/ls_hal_spi_i2s_dma.c',
+        'src/ls_hal_spis.c',
+        'src/ls_hal_spis_dma.c',
+        'src/ls_hal_timer.c',
+        'src/ls_hal_touchkey.c',
+        'src/ls_hal_i2c.c',
+        'src/ls_hal_kscan.c',
+        'src/ls_hal_rtcv2.c',
+        'src/ls_hal_pwm.c',
+        'src/ls_hal_pdm.c',
+        'src/ls_hal_pdm_dma.c',
+        'src/ls_hal_dmacv3.c',
+        'src/ls_hal_cec.c',
+        'src/ls_hal_owm.c',
+        'src/ls_hal_cap.c',
+        'src/ls_hal_i2c_dma.c',
+        'src/ls_hal_ssi_dma.c',
+        'src/ls_hal_wwdg.c',
+        'src/ls_hal_iwdgv2.c',
+        'src/ls_hal_ps2h.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
+        'common/common.c',
+        'common/circular_doubly_linked_list.c',
+        'common/linked_async_framework.c',
+        'common/async_call.c',
+        'common/sw_timer.c',
+        #'calendar/calendar.c',
+        'crc/crc16.c',
+        'debug/log.c',
+        'debug/ls_dbg.c',
+        'debug/RTT/SEGGER_RTT.c',
+        'static_buffer/linked_buffer.c',
+        'static_buffer/fifo.c',
+        #'tinyfs/tinyfs_nvm.c',
+        #'tinyfs/tinyfs_write_cache.c',
+        #'tinyfs/tinyfs.c',
+        #'tinycrypt/lib/source/sha256.c',
+        #'tinycrypt/lib/source/utils.c',
+    ]))
+    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),[
+        'hal_driver/inc',
+        'hal_driver/api',
+        'module/common',
+        #'module/calendar',
+        'module/crc',
+        'module/debug',
+        'module/debug/RTT',
+        'module/static_buffer',
+        'module/tinyfs',
+        'module/tinycrypt/lib/include',
+        #'module/micro-ecc',
+        #'module/adpcm',
+        #'module/ble',
+        #'module/ble/prf',
+        'soc',
+        'soc/rv32',
+        'soc/rv32/leo',
+    ]))
+    if usb:
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+            'rv32/leo/ls_msp_usb.c',
+        ]))
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+            'src/ls_tusb_dcd.c',
+            'src/ls_tusb_hcd.c'
+        ]))
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/tinyusb',x),[
+            'src/tusb.c',
+            'src/device/usbd.c',
+            'src/device/usbd_control.c',
+            'src/common/tusb_fifo.c',
+            'src/host/hub.c',
+            'src/host/usbh.c',
+            'src/class/audio/audio_device.c',
+            'src/class/bth/bth_device.c',
+            'src/class/cdc/cdc_device.c',
+            'src/class/cdc/cdc_host.c',
+            'src/class/cdc/cdc_rndis_host.c',
+            'src/class/dfu/dfu_device.c',
+            'src/class/dfu/dfu_rt_device.c',
+            'src/class/hid/hid_device.c',
+            'src/class/hid/hid_host.c',
+            'src/class/midi/midi_device.c',
+            'src/class/msc/msc_device.c',
+            'src/class/msc/msc_host.c',
+            'src/class/net/ecm_rndis_device.c',
+            'src/class/net/ncm_device.c',
+            'src/class/usbtmc/usbtmc_device.c',
+            'src/class/vendor/vendor_device.c',
+            'src/class/vendor/vendor_host.c',
+            'src/class/video/video_device.c',
+        ]))
+        inc_list += list(map(lambda x:os.path.join('$SDK_ROOT/module/tinyusb',x),[
+            'src',
+            'src/common',
+            'src/device',
+            'src/host',
+            'src/osal',
+            'hw'
+        ]))
+        self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LEO'])
+    rtos_src = []
+    if rtos == 'freertos':
+        rtos_src = list(map(lambda x:os.path.join('$SDK_ROOT/rtos/freertos/',x),[
+            'croutine.c',
+            'event_groups.c',
+            'list.c',
+            'queue.c',
+            'stream_buffer.c',
+            'tasks.c',
+            'timers.c',
+            'heap_4.c',
+        ]))
+        rtos_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+            'rv32/leo/port.c',
+            'rv32/leo/portasm.S',
+            'rv32/leo/freertos_adapt.c',
+        ]))
+        inc_list += ['$SDK_ROOT/rtos/freertos/include']
+        self.Append(CPPDEFINES = ['FREERTOS','__riscv_xlen=32'])
+    elif rtos == 'liteos':
+        sdk_root_abs = env['SDK_ROOT'].abspath
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m/kernel/src/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m/kernel/src/mm/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m/utils/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m/third_party/bounds_checking_function/src/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m/kernel/arch/risc-v/E906/gcc/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m/kernel/arch/risc-v/E906/gcc/*.S', strings=True)
+        inc_list += [
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/utils',
+            '$SDK_ROOT/rtos/kernel_liteos_m/third_party/bounds_checking_function/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/third_party/bounds_checking_function/src',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/risc-v/E906/gcc/'
+        ]
+    if self.get('LINKSCRIPT') is None:
+        # self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/leo/leo_link.txt"))
+        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/leo/link_script.txt"))
+    self.Append(CPPPATH = self.inc_dirs(inc_list))
+    if not 'FLASH_PROG_ALGO=1' in self['CPPDEFINES']:
+        self.Append(LINKFLAGS = '-T $SDK_ROOT/soc/rv32/leo/rom_sym.txt')
+    target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src + rtos_src),OBJPREFIX = objprefix)
+    self.Depends(target,[self['LINKSCRIPT']])
+    return target
+
+env.AddMethod(plf_postaction)
+env.AddMethod(plf_build)

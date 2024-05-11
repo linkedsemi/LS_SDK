@@ -12,6 +12,7 @@
 #include "ls_hal_sha.h"
 #endif
 #include "log.h"
+#include "cpu.h"
 
 void get_app_config(uint8_t *buffer)
 {
@@ -130,16 +131,16 @@ bool check_application(void)
 void jump_to_app(void)
 {
     APP_FUNC jump2app;
+#if defined(LE501X) || defined(LM3050)
     uint32_t app_addr;
-
-    __disable_irq();
+#endif
+    disable_global_irq();
     systick_stop();
 #if defined(LE501X)
-    // app_addr = (APP_DATA_ADDR_BASE + 0x2000);           //skip Info Page & Second Bootloader , 0x2000
     app_addr = (APP_DATA_ADDR_BASE);
     NVIC->ICER[0] = 0xFFFFFFFF;
     NVIC->ICPR[0] = 0xFFFFFFFF;
-#else
+#elif defined(LM3050)
     app_addr = (0x00800000 + APP_DATA_ADDR_BASE); // skip Info Page , 0x200
     uint32_t i;
     for (i = 0; i < 8; i++)
@@ -148,27 +149,27 @@ void jump_to_app(void)
         NVIC->ICPR[i] = 0xFFFFFFFF;
     }
 #endif
-
-    __enable_irq();
-
-    // DELAY_US(500000);
-
+    enable_global_irq();
+    #if defined(LEO)
+    // __set_SP((uint32_t)&app_addr);
+    #else
     __set_PSP(*(uint32_t *)(app_addr));
     __set_MSP(*(uint32_t *)app_addr);
+    #endif
 
 #if defined(LE501X)
     memcpy((void *)0x20000000, (void *)app_addr, 188);
-#else
+#elif defined(LM3050)
     SCB->VTOR = *(__IO uint32_t *)app_addr;
 #endif
 
-    app_addr = *(__IO uint32_t *)(app_addr + 4);
-    // jump2app = (APP_FUNC)app_addr;
-    #if defined(LE501X)
-    jump2app = (APP_FUNC)*(uint32_t *)( APP_DATA_ADDR_BASE + 4);
-    #else
-    jump2app = (APP_FUNC)*(uint32_t *)(0x00800000 + APP_DATA_ADDR_BASE + 4);
-    #endif
-    
+#if defined(LE501X)
+    jump2app = (APP_FUNC) * (uint32_t *)(APP_DATA_ADDR_BASE + 4);
+#elif defined(LM3050)
+    jump2app = (APP_FUNC) * (uint32_t *)(0x00800000 + APP_DATA_ADDR_BASE + 4);
+#elif defined(LEO)
+    jump2app = (APP_FUNC)(uint32_t *)(0x008000000 + APP_DATA_ADDR_BASE);
+#endif
+
     jump2app();
 }

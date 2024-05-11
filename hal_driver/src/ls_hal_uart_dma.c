@@ -94,7 +94,64 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
     HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, huart->Rx_Env.DMA.DMA_Channel, &prim, UART_Recevie_DMA_Callback, (uint32_t)huart);
     return HAL_OK;
 }
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+static void UART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+{
+    if (tfr_end == false)
+    {
+        UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
+        HAL_UART_DMA_TxCpltCallback(huart);
+    }
+}
 
+static void UART_Recevie_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+{
+    if (tfr_end == false)
+    {
+        UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
+        HAL_UART_DMA_RxCpltCallback(huart);
+    }
+}
+
+HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+{
+    huart->UARTX->ICR = UART_IT_TC| UART_IT_TXS;
+    LL_UART_SetTXTL(huart->UARTX,FIFO_TRABSMIT_TRIGGER_0BYTE);
+    REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_DMAEN,1);
+    struct ch_reg cfg;
+    DMA_CHANNEL_CFG(cfg,
+                      huart->Tx_Env.DMA.DMA_Channel,
+                      pData,
+                      &huart->UARTX->TBR,
+                      TRANSFER_WIDTH_8BITS,
+                      Size,
+                      M2P,
+                      0,
+                      HAL_UART_TX_DMA_Handshake_Get(huart),
+                      0, 0, 0, 0);
+    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, &cfg, UART_Transmit_DMA_Callback, (uint32_t)huart);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+{
+    LL_UART_SetRXTL(huart->UARTX,FIFO_RECEIVE_TRIGGER_14BYTE);
+    REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_DMAEN,1);
+    struct ch_reg cfg;
+    DMA_CHANNEL_CFG(cfg,
+                      huart->Rx_Env.DMA.DMA_Channel,
+                      &huart->UARTX->RBR,
+                      pData,
+                      TRANSFER_WIDTH_8BITS,
+                      Size,
+                      P2M,
+                      0,
+                      HAL_UART_RX_DMA_Handshake_Get(huart),
+                      0, 0, 0, 0);
+    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance, &cfg, UART_Recevie_DMA_Callback, (uint32_t)huart);
+    return HAL_OK;
+}
 #else
 #include "ls_hal_dmac.h"
 static void UART_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
@@ -166,4 +223,10 @@ void UART_Transmit_IT_DMA(UART_HandleTypeDef *huart)
 {
     huart->UARTX->IDR = UART_IT_TXS;
     HAL_UART_DMA_TxCpltCallback(huart);
+}
+
+uint32_t HAL_UART_Receive_DMA_Abort(UART_HandleTypeDef *huart)
+{
+    REG_FIELD_WR(huart->UARTX->MCR, UART_MCR_DMAEN, 0);
+    return HAL_DMA_Channel_Abort(huart->DMAC_Instance, huart->Rx_Env.DMA.DMA_Channel);
 }

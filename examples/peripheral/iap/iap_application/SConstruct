@@ -10,10 +10,5 @@ inc = [
     '.'
 ]
 
-#le501x
-env['LINKSCRIPT'] = File(env.subst('compiler/$COMPILER/le501x_mcu_link.txt'))
+env['LINKSCRIPT'] = File(env.subst('compiler/$COMPILER/${IC}_mcu_link.txt'))
 env.app_build('iap_application',src,inc,ble = False)
-
-#lm3050
-# env['LINKSCRIPT'] = File(env.subst('compiler/$COMPILER/lm3050_mcu_link.txt'))
-# env.app_build('iap_application',src,inc,ble = False)

@@ -30,11 +30,21 @@ static void lstim_int_clr()
     REG_FIELD_WR(LSTIM->TIM_CTRL,TIM_TIM_INTR_CLR,0);
 }
 
+static uint32_t lstim_cnt_get()
+{
+    uint32_t val1,val2;
+    do{
+        val1 = LSTIM->TIM_CNT;
+        val2 = LSTIM->TIM_CNT;
+    }while(val1!=val2);
+    return val1;
+}
+
 static void os_tick_handler()
 {
     portDISABLE_INTERRUPTS();
     lstim_int_clr();
-    uint32_t tick_inc = (LSTIM->TIM_CNT - prev_target)/CYC_PER_TICK;
+    uint32_t tick_inc = (lstim_cnt_get() - prev_target)/CYC_PER_TICK;
     accumulated_remainder_cyc += tick_inc*REMAINDER_CYC_PER_TICK;
     prev_target += tick_inc*CYC_PER_TICK + accumulated_remainder_cyc/configTICK_RATE_HZ;
     accumulated_remainder_cyc %= configTICK_RATE_HZ;

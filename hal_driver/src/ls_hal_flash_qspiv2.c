@@ -26,7 +26,7 @@ static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_enter,)
     cfg.ctrl.reserved3 = 0;
     cfg.ctrl.reserved4 = 0;
     cfg.ca_high = QUAD_IO_READ_OPCODE<<24;
-    cfg.ca_low = 0x20<<24;
+    cfg.ca_low = XIP_MODE_BITS<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
     cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
@@ -92,7 +92,7 @@ static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
     cfg.ctrl.reserved3 = 0;
     cfg.ctrl.reserved4 = 0;
     cfg.ca_high = DUAL_IO_READ_OPCODE<<24;
-    cfg.ca_low = 0x20<<24;
+    cfg.ca_low = XIP_MODE_BITS<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
     cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
@@ -449,6 +449,7 @@ ROM_SYMBOL void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *
     cfg.ctrl.reserved3 = 0;
     cfg.ctrl.reserved4 = 0;
     cfg.ca_high = READ_SECURITY_AREA_OPCODE << 24 | idx<<12 | addr;
+    cfg.ca_low = 0;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_bytes = length - 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;

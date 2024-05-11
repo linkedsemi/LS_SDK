@@ -23,7 +23,7 @@ extern "C" {
 #define UART_CLOCK (SDK_PCLK_MHZ * 1000000)
 #endif
 /// Baud rate calculation
-#define UART_BUADRATE_ENUM_GEN(BAUD) ((((UART_CLOCK << 4) / BAUD) + 8) >> 4)
+#define UART_BUADRATE_ENUM_GEN(BAUD) ((((uint32_t)(UART_CLOCK << 4) / BAUD) + 8) >> 4)
 
 typedef enum LL_uart_baudrate_t
 {

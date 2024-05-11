@@ -1,6 +1,6 @@
 #include "platform.h"
 #include "ls_hal_pdm.h"
-#include "ls_hal_dmac.h"
+
 #include "log.h"
 #include "ls_soc_gpio.h"
 #include "ls_hal_uart.h"
@@ -8,7 +8,14 @@
 #define PDM_CLK_KHZ 1024
 #define PDM_SAMPLE_RATE_HZ 16000
 #define FRAME_BUF_SIZE 256
-DEF_DMA_CONTROLLER(dmac1_inst,DMAC1);
+
+#if DMACV3
+#include "ls_hal_dmacv3.h"
+#else
+#include "ls_hal_dmac.h"
+#endif
+
+DEF_DMA_CONTROLLER(dmac1_inst,DMAC1)
 PDM_HandleTypeDef pdm;
 DMA_RAM_ATTR uint16_t Buf0[FRAME_BUF_SIZE];
 DMA_RAM_ATTR uint16_t Buf1[FRAME_BUF_SIZE];

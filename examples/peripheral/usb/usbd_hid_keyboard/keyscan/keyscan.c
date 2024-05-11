@@ -51,7 +51,6 @@ typedef struct keyscan
 static void _vKeyboard_Init(void);
 static void _vScan_Key(void);
 static void _vBasic_Timer_Cfg(uint32_t period_ms);
-static void _vSleep_KeyScan_Config(bool sleep_wkup_flag);
 /******************************************************************************
  Local Variable Definition
  ******************************************************************************/
@@ -113,27 +112,6 @@ static void _vKeyboard_Init(void)
 /******************************************************************************
  * Function:
  * PreCondition:
- * Input:sleep_flag: 0-wkup  1-sleep
- * Output:
- * Return:
- * Side Effects:
- * Overview:
- * Note:
- ******************************************************************************/
-static void _vSleep_KeyScan_Config(bool sleep_flag)
-{
-    for (uint8_t i = 0; i < KEYSCAN_COL_NUM; i++)
-    {
-        io_exti_config(_KEYSCAN_Controller.colPinArray[i], sleep_flag);
-    }
-    for (uint8_t i = 0; i < KEYSCAN_ROW_NUM; i++)
-    {
-        io_write_pin(_KEYSCAN_Controller.rowPinArray[i],!sleep_flag);
-    }
-}
-/******************************************************************************
- * Function:
- * PreCondition:
  * Input:
  * Output:
  * Return:
@@ -175,17 +153,6 @@ bool keyscan_Start(bool scan)
 		res = true;
 	}
 	return res;
-}
-
-void keyscan_Light_Sleep(void)
-{
-    keyscan_Start(false);
-    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-    _vSleep_KeyScan_Config(true);
-    low_power_mode_sched();
-    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
-    _vSleep_KeyScan_Config(false);
-    keyscan_Start(true);
 }
 
 /******************************************************************************

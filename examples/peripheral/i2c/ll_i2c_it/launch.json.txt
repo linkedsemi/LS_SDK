@@ -57,5 +57,38 @@
                 //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
+        {
+            "name": "LEO DEBUG LL_I2C_IT",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/i2c/ll_i2c_it/build/leo/ll_i2c_it.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "reset",
+                "interrupt",
+            ],
+        },
+        {
+            "name": "LEO ATTACH LL_I2C_IT",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/i2c/ll_i2c_it/build/leo/ll_i2c_it.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "interrupt",
+            ],
+        },
     ]
 }

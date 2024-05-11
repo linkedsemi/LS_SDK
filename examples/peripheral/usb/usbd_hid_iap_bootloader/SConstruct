@@ -1,0 +1,20 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    '../bsp.c',
+    'main.c',
+    'usb_descriptors.c',
+    './usb_command/usb_command.c',
+    './usb_command/usb_packet_hid_data.c',
+    './usb_command/upgrade_process.c',
+]
+inc = [
+    '.',
+    './usb_command/',
+]
+#env.Append(CPPDEFINES=['CFG_TUSB_DEBUG=3'])
+env.app_build('usbd_hid_iap_bootloader',src,inc, ble = False,usb = True)
+
+

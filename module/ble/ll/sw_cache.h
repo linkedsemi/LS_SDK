@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include "co_list.h"
 #include "linked_buffer.h"
 
@@ -13,12 +14,13 @@ struct sw_cache
 };
 
 #define DEF_SW_CACHE(cache_hdl,type,size) \
+    _Static_assert(offsetof(type,hdr)==0,"type of sw_cache must has hdr as the first member");\
     DEF_LINKED_BUF(_##cache_hdl##_cache_buf,type,size); \
     struct sw_cache cache_hdl
 
 #define INIT_SW_CACHE(cache_hdl) \
     INIT_LINKED_BUF(_##cache_hdl##_cache_buf);\
-    sw_cache_init(&cache_hdl,&_##cache_hdl##_cache_buf);
+    sw_cache_init(&cache_hdl,&_##cache_hdl##_cache_buf)
 
 void sw_cache_init(struct sw_cache *ptr,linked_buffer_t *buf);
 

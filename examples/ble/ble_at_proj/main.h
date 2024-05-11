@@ -24,7 +24,6 @@ uint8_t get_adv_status(void);
 void at_start_adv(void);
 void start_scan(uint16_t scan_duration);
 uint8_t get_ble_con_num(void);
-uint8_t get_ble_con_num(void);
 void update_conn_param(uint8_t conidx,uint16_t latency);
 void update_adv_intv(uint32_t new_adv_intv);
 

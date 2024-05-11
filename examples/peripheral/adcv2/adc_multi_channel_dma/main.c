@@ -3,8 +3,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ls_hal_adcv2.h"
-#include "ls_hal_dmacv2.h"
 #include "log.h"
+
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+#endif
 
 DEF_DMA_CONTROLLER(dmac1_inst,DMAC1);
 static ADC_HandleTypeDef ADCx_Hdl;
@@ -14,10 +19,10 @@ DMA_RAM_ATTR uint16_t Loop_adc_value[ADC_CHANNLE_NUM];
 
 static void pinmux_adc_init(void)
 {
-    pinmux_adc1_in4_init();// PA00
-    pinmux_adc1_in5_init();// PA01
-    pinmux_adc1_in6_init();// PA02
-    pinmux_adc1_in7_init();// PA03
+    pinmux_adc1_in4_init();// LM3050:PA00; LS1010:PA13
+    pinmux_adc1_in5_init();// LM3050:PA01; LS1010:PA14
+    pinmux_adc1_in6_init();// LM3050:PA02; LS1010:PA15
+    pinmux_adc1_in7_init();// LM3050:PA03; LS1010:PB00
 }
 
 void Error_Handler(void)

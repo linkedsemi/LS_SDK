@@ -401,6 +401,22 @@ HAL_StatusTypeDef HAL_SPI_Transmit_DMA(SPI_HandleTypeDef *hspi,void *Data,uint16
 HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef *hspi,void *Data,uint16_t Count);
 
 /**
+  * @brief  Stop transmit data in DMA mode.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval The length of the data transmit
+  */
+uint32_t HAL_SPI_Transmit_DMA_Abort(SPI_HandleTypeDef *hspi);
+
+/**
+  * @brief  Stop receiving data in DMA mode.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval The length of the data received
+  */
+uint32_t HAL_SPI_Receive_DMA_Abort(SPI_HandleTypeDef *hspi);
+
+/**
   * @brief  Transmit and Receive an amount of data in DMA mode.
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
   *               the configuration information for SPI module.
@@ -541,6 +557,22 @@ HAL_StatusTypeDef HAL_I2S_Transmit_DMA(I2S_HandleTypeDef *hi2s, void *Data, uint
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_I2S_Receive_DMA(I2S_HandleTypeDef *hi2s, void *Data, uint16_t Count);
+
+/**
+  * @brief  Stop transmit data in DMA mode.
+  * @param  hi2s pointer to a I2S_HandleTypeDef structure that contains
+  *               the configuration information for I2S module.
+  * @retval The length of the data transmit
+  */
+uint32_t HAL_I2S_Transmit_DMA_Abort(I2S_HandleTypeDef *hi2s);
+
+/**
+  * @brief  Stop receiving data in DMA mode.
+  * @param  hi2s pointer to a I2S_HandleTypeDef structure that contains
+  *               the configuration information for I2S module.
+  * @retval The length of the data received
+  */
+uint32_t HAL_I2S_Receive_DMA_Abort(I2S_HandleTypeDef *hi2s);
 
 /**
   * @brief  This function handles I2S interrupt request.

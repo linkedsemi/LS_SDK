@@ -11,23 +11,31 @@
 #include "adv_report_cache.h"
 #include "async_call.h"
 #include "evt_ctrl.h"
-#define ADV_SETS_NUM 3
-#define LL_CONNECTION_MAX 5
-#define SCAN_RX_BUF_NUM (10)
-#define SECOND_SCAN_BUF_NUM (3)
+#define ADV_SETS_NUM 1
+#define LL_CONNECTION_MAX 1
+#define SCAN_RX_BUF_NUM (5)
+#define SECOND_SCAN_BUF_NUM (0)
 #define HCI_ACL_DATA_RX_BUFFER_NUM (2*LL_CONNECTION_MAX)  //tx_data_buf_num
 #define HCI_ACL_DATA_TX_BUFFER_NUM (2*LL_CONNECTION_MAX)
-#define BLE_CONNECTION_TX_DESC_NUM ((2*LL_CONNECTION_MAX) + 2)
-#define LL_SYNC_ENV_NUM 2
-#define SYNC_RX_BUF_NUM 2
-#define HCI_TX_ELEMENT_MAX_NUM 10
+#define LL_SYNC_ENV_NUM 0
+#define SYNC_RX_BUF_NUM 0
+#define HCI_TX_ELEMENT_MAX_NUM 5
 #define AES_128_CALC_ENV_BUF_SIZE 2
 #define LL_SCHED_BUF_NUM (10)
 #define SWINT_POST_BUF_NUM (10)
-#define WHITE_LIST_SIZE 2
-#define PER_ADV_LIST_SIZE 2
-#define ADV_REPORT_CACHE_SIZE 10
+#define WHITE_LIST_SIZE 1
+#define PER_ADV_LIST_SIZE 1
+#define ADV_REPORT_CACHE_SIZE 2
 #define SW_TIMER_BUF_NUM 5
+
+#define TX_RAMPUP_TIME (0x52)
+#define TX_RAMPDOWN_TIME (20)
+#define RX_RAMPUP_TIME (0x52)
+#define RX_PATH_DELAY_1M_PHY (28)
+#define RX_PATH_DELAY_2M_PHY (15)
+#define TX_PATH_DELAY_1M_PHY (2)
+#define TX_PATH_DELAY_2M_PHY (2)
+
 //ll_ext_adv
 struct adv_set_env adv_sets[ADV_SETS_NUM];
 extern struct adv_set_env *adv_sets_ptr;
@@ -49,11 +57,9 @@ extern linked_buffer_t *sync_rx_buf_ptr;
 //ll_conn
 DEF_LINKED_BUF(ll_conn_buf,struct ll_conn_env,LL_CONNECTION_MAX);
 DEF_LINKED_BUF(ll_conn_rx_buf, struct hci_acl_air_rx_data, HCI_ACL_DATA_TX_BUFFER_NUM);
-DEF_LINKED_BUF(ll_conn_tx_desc, struct conn_txrx_data, BLE_CONNECTION_TX_DESC_NUM);
 DEF_LINKED_BUF(hci_acl_data_rx_buf, struct hci_acl_air_tx_data, HCI_ACL_DATA_RX_BUFFER_NUM);
 extern linked_buffer_t *ll_conn_buf_ptr;
 extern linked_buffer_t *ll_conn_rx_buf_ptr;
-extern linked_buffer_t *ll_conn_tx_desc_ptr;
 extern linked_buffer_t *hci_acl_data_rx_buf_ptr;
 
 //ll_hci
@@ -116,16 +122,6 @@ static void rx_buf_list_init()
 static void rx_buf_list_reset()
 {
     INIT_LINKED_BUF(ll_conn_rx_buf);
-}
-
-static void tx_desc_list_init()
-{
-    ll_conn_tx_desc_ptr = &ll_conn_tx_desc;
-}
-
-static void tx_desc_list_reset()
-{
-    INIT_LINKED_BUF(ll_conn_tx_desc);
 }
 
 static void ll_conn_buf_init()
@@ -238,7 +234,7 @@ void hci_reset_reset_buf()
     adv_report_cache_reset();
     hci_acl_data_rx_buf_reset();
     rx_buf_list_reset();
-    tx_desc_list_reset();
+    //tx_desc_list_reset();
     ll_conn_buf_reset();
     ll_ext_scan_buf_reset();
     hci_tx_element_buf_reset();
@@ -252,6 +248,14 @@ void hci_reset_reset_buf()
 
 void ll_buf_init()
 {
+    tx_rampup_time = TX_RAMPUP_TIME;
+    tx_rampdown_time_minus_1 = TX_RAMPDOWN_TIME - 1;
+    rx_rampup_time = RX_RAMPUP_TIME;
+    rx_path_delay_1m_phy = RX_PATH_DELAY_1M_PHY;
+    rx_path_delay_2m_phy = RX_PATH_DELAY_2M_PHY;
+    tx_path_delay_1m_phy = TX_PATH_DELAY_1M_PHY;
+    tx_path_delay_2m_phy = TX_PATH_DELAY_2M_PHY;
+
     hci_reset_reset_buf_fn = hci_reset_reset_buf;
     adv_sets_ptr = adv_sets;
     adv_sets_num = ADV_SETS_NUM;
@@ -263,7 +267,6 @@ void ll_buf_init()
     adv_report_cache_init();
     hci_acl_data_rx_buf_init();
     rx_buf_list_init();
-    tx_desc_list_init();
     ll_conn_buf_init();
     ll_ext_scan_buf_init();
     hci_tx_element_buf_init();

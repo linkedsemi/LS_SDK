@@ -55,6 +55,7 @@ static struct DMA_Channel_Config *Get_DMA_CS_Base(DMA_Controller_HandleTypeDef *
 void HAL_DMA_Channel_Config_Set(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,struct DMA_Channel_Config *cfg)
 {
     struct DMA_Channel_Config *ptr = Get_DMA_CS_Base(hdma,alt);
+    hdma->channel_length[ch_idx] = cfg->ctrl_data.n_minus_1 + 1;
     ptr[ch_idx] = *cfg;
 }
 
@@ -71,10 +72,12 @@ static void DMA_Disable_IT(reg_dmac_t *reg,uint8_t ch_idx)
     exit_critical(cpu_stat);
 }
 
-void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx)
+uint32_t HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx)
 {
     hdma->Instance->ENCLR = 1<<ch_idx;
     DMA_Disable_IT(hdma->Instance,ch_idx);
+    struct DMA_Channel_Config *ptr = Get_DMA_CS_Base(hdma,false);
+    return hdma->channel_length[ch_idx] - (ptr[ch_idx].ctrl_data.n_minus_1 + 1);
 }
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)

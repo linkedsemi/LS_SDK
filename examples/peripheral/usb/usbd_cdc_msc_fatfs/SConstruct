@@ -19,5 +19,4 @@ inc = [
     '../msc_fatfs_flash//',
     '$SDK_ROOT/module/fatfs/source/',
 ]
-env.Append(CPPDEFINES=['CFG_TUSB_MCU=OPT_MCU_LM3050'])
 env.app_build('usbd_cdc_msc_fatfs', src, inc, ble=False, usb=True)

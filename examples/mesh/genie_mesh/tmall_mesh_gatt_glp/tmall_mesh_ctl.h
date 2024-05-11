@@ -4,6 +4,9 @@
 #include "ls_sig_mesh.h"
 #include "tinyfs.h"
 
+#define NODE_INITI_REPORT_TID_MIN            0x80
+#define NODE_INITI_REPORT_TID_MAX            0xBF
+
 #define MESH_VENDOR_ASKING_ATTR             0x0001A8de
 #define MESH_VENDOR_ASKING_ATTR_RET         0x0001A8df
 
@@ -36,6 +39,18 @@
 #define VENDOR_ATTR_TYPE_stirringSpeed		0x015a
 #define VENDOR_ATTR_TYPE_holdingTemp		0x015b
 #define VENDOR_ATTR_TYPE_errorCode			0x0000
+
+#define VENDOR_ATTR_TYPE_powerstate        0x0100
+#define VENDOR_ATTR_TYPE_curtainConrtol    0x0547
+#define VENDOR_ATTR_TYPE_curtainPosition   0x0548
+#define VENDOR_ATTR_TYPE_attrparastep      0xf00b
+#define VENDOR_ATTR_TYPE_curtainmode       0xf004
+
+#define RECORD_PRESET_SCENCE_BASE           0X2710          //10000
+#define RECORD_PRESET_SCENCE_NUM            9
+#define RECORD_CONFIG_SCENCE_BASE           0X2774          //10100
+#define RECORD_CONFIG_SCENCE_NUM            24
+#define NODE_HARDWARE_RST_EVENT             0x23 
 
 extern uint16_t mesh_key_lid;
 
@@ -136,4 +151,5 @@ void tmall_mesh_recv_lightness_msg(struct model_rx_info *info);
 void tmall_mesh_recv_light_ctl_msg(struct model_rx_info *msg);
 void tmall_mesh_recv_light_hsl_msg(struct model_rx_info *msg);
 void exti_gpio_init(void);
+uint8_t tmall_mesh_hardware_node_reset_ind(uint8_t model_lid, uint8_t app_key_lid, uint16_t dst_addr);
 #endif

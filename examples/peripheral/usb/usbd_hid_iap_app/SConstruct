@@ -1,0 +1,18 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    '../bsp.c',
+    'main.c',
+    'usb_descriptors.c',
+    './usb_command/usb_command.c',
+]
+inc = [
+    '.',
+    './usb_command/',
+]
+
+env['LINKSCRIPT'] = File(env.subst('compiler/$COMPILER//${IC}_mcu_link.txt'))
+env.app_build('usbd_hid_iap_app',src,inc,ble = False,usb = True)
+

@@ -342,6 +342,19 @@ uint32_t get_trng_value()
     HAL_TRNG_DeInit();
     return random32bit;
 }
+bool flash_55nm;
+void get_flash_process(void)
+{
+    uint16_t f_info = 0;
+    hal_flash_read_sfdp(0x68,(uint8_t *)&f_info,2);
+    if(f_info == 0xe8d9)
+    {
+        flash_55nm = false;
+    }else
+    {
+        flash_55nm = true;
+    }
+}
 
 static void module_init()
 {
@@ -359,11 +372,12 @@ static void module_init()
     mac_init();
     irq_init();
     modem_rf_init();
+    get_flash_process();
     systick_start();
-    rco_freq_counting_start();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
+    rco_freq_counting_start();
 }
 
 void XIP_BANNED_FUNC(LVD33_Handler,)
@@ -458,6 +472,7 @@ void sys_init_none()
     mac_init();
     io_init();
     irq_init();
+    get_flash_process();
     systick_start();
     LOG_INIT();
     rco_freq_counting_init();
@@ -566,7 +581,7 @@ void XIP_BANNED_FUNC(BLE_Handler,)
     if(flash_writing_status)
     {
         hal_flash_prog_erase_resume();
-        DELAY_US(8);
+        DELAY_US(20);
     }
 }
 

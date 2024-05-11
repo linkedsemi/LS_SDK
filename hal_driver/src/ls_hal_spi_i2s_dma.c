@@ -86,6 +86,73 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     MODIFY_REG(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
     SET_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
 }
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{ 
+    if(tfr_end == false)
+    {
+        SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
+        spi_tx_dma_cb(hspi);
+    }
+}
+
+static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+       SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param; 
+       spi_rx_dma_cb(hspi);
+    }
+}
+
+static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,uint16_t Count)
+{
+    uint8_t data_width;
+    uint8_t *pTxData, *pRxData; 
+    pTxData = TX_Data? TX_Data: &hspi->Tx_Env.DMA.dummy;
+    pRxData = RX_Data? RX_Data: &hspi->Rx_Env.DMA.dummy;
+
+    if(hspi->Init.DataSize == SPI_DATASIZE_16BIT)
+    {
+        data_width = TRANSFER_WIDTH_16BITS;
+        Count /= 2;
+    }
+    else
+    {
+        data_width = TRANSFER_WIDTH_8BITS;
+    }
+
+    struct ch_reg cfg;
+    /* Tx parameter initialize*/
+    DMA_CHANNEL_CFG(cfg,
+        hspi->Tx_Env.DMA.DMA_Channel,
+        (uint32_t)pTxData,
+        (uint32_t)&hspi->Instance->DR,
+        data_width,
+        Count,
+        M2P,
+        0,
+        HAL_SPI_TX_DMA_Handshake_Get(hspi),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance, &cfg, SPI_Transmit_DMA_Callback, (uint32_t)hspi);
+
+    /* Rx parameter initialize*/
+    DMA_CHANNEL_CFG(cfg,
+        hspi->Rx_Env.DMA.DMA_Channel,
+        (uint32_t)&hspi->Instance->DR,
+        (uint32_t)pRxData,
+        data_width,
+        Count,
+        P2M,
+        0,
+        HAL_SPI_RX_DMA_Handshake_Get(hspi),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hspi->DMAC_Instance, &cfg, SPI_Receive_DMA_Callback, (uint32_t)hspi);
+    
+    MODIFY_REG(hspi->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
+    SET_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
+}
 #else
 #include "ls_hal_dmac.h"
 static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
@@ -170,6 +237,18 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi,void *TX_D
 {
     spi_dma_config(hspi,TX_Data,RX_Data,Count);
     return HAL_OK;
+}
+
+uint32_t HAL_SPI_Transmit_DMA_Abort(SPI_HandleTypeDef *hspi)
+{
+    REG_FIELD_WR(hspi->Instance->CR2, SPI_CR2_TXDMAEN, 0);
+    return HAL_DMA_Channel_Abort(hspi->DMAC_Instance, hspi->Tx_Env.DMA.DMA_Channel);
+}
+
+uint32_t HAL_SPI_Receive_DMA_Abort(SPI_HandleTypeDef *hspi)
+{
+    REG_FIELD_WR(hspi->Instance->CR2, SPI_CR2_RXDMAEN, 0);
+    return HAL_DMA_Channel_Abort(hspi->DMAC_Instance, hspi->Rx_Env.DMA.DMA_Channel);
 }
 
 __attribute__((weak)) void HAL_I2S_TxDMACpltCallback(I2S_HandleTypeDef *hi2s){}
@@ -258,6 +337,73 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
     MODIFY_REG(hi2s->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
     SET_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
 }
+
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
+        i2s_tx_dma_cb(hi2s);
+    }
+}
+
+void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
+        i2s_rx_dma_cb(hi2s);
+    }
+}
+
+static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,uint16_t Count)
+{
+    uint8_t data_width;
+    uint16_t *pTxData; 
+    pTxData = TX_Data? TX_Data: &hi2s->Tx_Env.DMA.dummy;
+
+    if(hi2s->Init.DataFormat  == I2S_DATAFORMAT_16BIT)
+    {
+        data_width = TRANSFER_WIDTH_16BITS;
+    }
+    else
+    {
+        data_width = TRANSFER_WIDTH_32BITS;
+    }
+
+    struct ch_reg cfg;
+    /* Tx parameter initialize*/
+    DMA_CHANNEL_CFG(cfg,
+        hi2s->Tx_Env.DMA.DMA_Channel,
+        (uint32_t)pTxData,
+        (uint32_t)&hi2s->Instance->DR,
+        data_width,
+        Count,
+        M2P,
+        0,
+        HAL_I2S_TX_DMA_Handshake_Get(hi2s),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hi2s->DMAC_Instance, &cfg, I2S_Transmit_DMA_Callback, (uint32_t)hi2s);
+
+   /* Rx parameter initialize*/
+    DMA_CHANNEL_CFG(cfg,
+        hi2s->Rx_Env.DMA.DMA_Channel,
+        (uint32_t)&hi2s->Instance->DR,
+        (uint32_t)RX_Data,
+        data_width,
+        Count,
+        P2M,
+        0,
+        HAL_I2S_RX_DMA_Handshake_Get(hi2s),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hi2s->DMAC_Instance, &cfg, I2S_Receive_DMA_Callback, (uint32_t)hi2s);
+    
+    MODIFY_REG(hi2s->Instance->CR2, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK, SPI_CR2_TXDMAEN_MASK|SPI_CR2_RXDMAEN_MASK);
+    SET_BIT(hi2s->Instance->I2SCFGR, SPI_I2SCFGR_I2SE_MASK);
+}
+
 #else
 #include "ls_hal_dmac.h"
 void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
@@ -336,4 +482,16 @@ HAL_StatusTypeDef HAL_I2S_Receive_DMA(I2S_HandleTypeDef *hi2s,void *Data,uint16_
 {
     i2s_dma_config(hi2s,NULL,Data,Count);
     return HAL_OK;
+}
+
+uint32_t HAL_I2S_Transmit_DMA_Abort(I2S_HandleTypeDef *hi2s)
+{
+    REG_FIELD_WR(hi2s->Instance->CR2, SPI_CR2_TXDMAEN, 0);
+    return HAL_DMA_Channel_Abort(hi2s->DMAC_Instance, hi2s->Tx_Env.DMA.DMA_Channel);
+}
+
+uint32_t HAL_I2S_Receive_DMA_Abort(I2S_HandleTypeDef *hi2s)
+{
+    REG_FIELD_WR(hi2s->Instance->CR2, SPI_CR2_RXDMAEN, 0);
+    return HAL_DMA_Channel_Abort(hi2s->DMAC_Instance, hi2s->Rx_Env.DMA.DMA_Channel);
 }

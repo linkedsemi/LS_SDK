@@ -10,10 +10,14 @@
 #define LED_IO PA11
 #define UART_TX_IO PB00
 #define UART_RX_IO PB01
-#else
+#elif defined(LM3050)
 #define LED_IO PB05
 #define UART_TX_IO PA09
 #define UART_RX_IO PA10
+#elif defined(LEO)
+#define LED_IO PC03
+#define UART_TX_IO PH05
+#define UART_RX_IO PH04
 #endif
 
 void LED_init(void)
@@ -29,7 +33,9 @@ void LED_flicker(void)
 void System_Reset(void)
 {
     // __set_FAULTMASK(1);
+#if defined(LE501X) || defined(LM3050)
     __NVIC_SystemReset();
+#endif
 }
 uint8_t calc_checksum(const uint8_t *p_data, uint32_t data_size)
 {

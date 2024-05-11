@@ -1,0 +1,99 @@
+MEMORY
+{
+  RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 0x8000
+  FLASH (rx) : ORIGIN = 0x8005000, LENGTH = 0x7B000
+}
+
+SECTIONS
+{
+    .__user_info_config :
+    {
+        KEEP(*(.rodata.__user_info_config))
+        . = ALIGN(0x100);
+    } >FLASH
+	__image_lma__ = LOADADDR(.__user_info_config);
+	.text :
+    {
+		__text_start = .;
+        KEEP(*(.text.Reset_Handler))
+        KEEP(*(.init))
+        KEEP(*(.fini))
+
+/* 
+        *crtbegin.o(.ctors)
+        *crtbegin?.o(.ctors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+        *(SORT(.ctors.*))
+        *(.ctors)
+
+
+         *crtbegin.o(.dtors)
+         *crtbegin?.o(.dtors)
+         *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+         *(SORT(.dtors.*))
+         *(.dtors)
+*/
+        *(.eh_frame*)
+        *(.text* .rodata* .srodata*)
+		__text_end = .;
+    }>FLASH
+
+	.data 0x1000006c :
+	{
+		. = ALIGN(4);
+		__data_start__ = .;
+		*(.xip_banned.sleep_recover_asm)
+		*(.xip_banned*)
+		*(.data* .sdata*)
+		__data_end__ = ALIGN(4);
+	}>RAM AT>FLASH
+	
+	__data_lma__ = LOADADDR(.data);
+
+	.bss (NOLOAD):
+	{
+		__bss_start__ = ALIGN(4);
+        PROVIDE(_edata = __bss_start__);
+        *(.sbss*)
+        *(.bss*)
+        *(COMMON)
+        *(SECTION_RTT)
+		. = ALIGN(4);
+        __bss_end__ = .;
+        PROVIDE(_end = __bss_end__);
+        PROVIDE(end = .);
+	}>RAM 
+
+    .heap (NOLOAD):
+    {
+        __end__ = .;
+        PROVIDE(end = .);
+        *(.heap*)
+    } > RAM 
+
+    .reset_retain (COPY) :
+	{
+		*(.reset_retain)
+	}
+
+	/* .stack_dummy section doesn't contains any symbols. It is only
+	 * used for linker to calculate size of stack sections, and assign
+	 * values to stack symbols later */
+	.stack_dummy (COPY):
+	{
+		*(.stack*)
+	} > RAM AT>FLASH
+
+	/* Set stack top to end of RAM, and stack limit move down by
+	 * size of stack_dummy section */
+	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+	__except_stack_top = __StackTop;
+	__StackLimit = __StackTop - SIZEOF(.stack_dummy);
+	__start_and_irq_stack_top = __StackLimit;
+	PROVIDE(__stack = __StackTop);
+	
+	/* Check if data + heap + stack exceeds RAM limit */
+	/* ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack") */
+	PROVIDE(__global_pointer$ = __data_start__ + (4K / 2) );
+	
+}

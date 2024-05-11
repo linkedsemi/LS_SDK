@@ -58,5 +58,23 @@
                 //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
+        {
+            "name": "LEO ATTACH GPIO",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/gpio/build/leo/gpio.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x8000000 0xfffffff ro", 
+                // "reset",
+                "interrupt",
+                // "set $pc = 0x10000000",
+            ],
+        },
     ]
 }

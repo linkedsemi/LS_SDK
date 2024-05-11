@@ -14,6 +14,7 @@ typedef struct __DMA_Controller_HandleTypeDef
 {
     reg_dmac_t *Instance;
     uint32_t *channel_param;
+    uint32_t *channel_length;
 }DMA_Controller_HandleTypeDef;
 
 struct ctrl_data_config
@@ -99,9 +100,11 @@ enum HAL_DMA_CTRL_RPOWER
         struct DMA_Channel_Config alt[dmac_reg##_MAX_CHANNEL_NUM];\
     } dmac_inst##_cs;\
     static uint32_t dmac_inst##_ch_param[dmac_reg##_MAX_CHANNEL_NUM]; \
+    static uint32_t dmac_inst##_ch_length[dmac_reg##_MAX_CHANNEL_NUM]; \
     DMA_Controller_HandleTypeDef dmac_inst = { \
         .Instance = dmac_reg,\
         .channel_param = dmac_inst##_ch_param, \
+        .channel_length = dmac_inst##_ch_length, \
     };
 
 #define DMA_CONTROLLER_INIT(dmac_inst) HAL_DMA_Controller_Init(&dmac_inst,&dmac_inst##_cs)
@@ -117,7 +120,7 @@ void HAL_DMA_Channel_Config_Set(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_id
 
 void HAL_DMA_Channel_Config_Get(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,struct DMA_Channel_Config *cfg);
 
-void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx);
+uint32_t HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx);
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma);
 

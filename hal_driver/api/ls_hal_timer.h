@@ -215,6 +215,25 @@ typedef struct
 } TIM_Encoder_InitTypeDef;
 
 /**
+  * @brief  TIM Hall sensor Configuration Structure definition
+  */
+
+typedef struct
+{
+  uint32_t IC1Polarity;         /*!< Specifies the active edge of the input signal.
+                                     This parameter can be a value of @ref TIM_Input_Capture_Polarity */
+
+  uint32_t IC1Prescaler;        /*!< Specifies the Input Capture Prescaler.
+                                     This parameter can be a value of @ref TIM_Input_Capture_Prescaler */
+
+  uint32_t IC1Filter;           /*!< Specifies the input capture filter.
+                                     This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF */
+
+  uint32_t Commutation_Delay;   /*!< Specifies the pulse value to be loaded into the Capture Compare Register.
+                                     This parameter can be a number between Min_Data = 0x0000 and Max_Data = 0xFFFF */
+} TIM_HallSensor_InitTypeDef;
+
+/**
  * @brief  HAL State structures definition
  */
 typedef enum
@@ -1593,6 +1612,35 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Start_IT(TIM_HandleTypeDef *htim, uint32_t Cha
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_TIM_Encoder_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);
+
+/**
+  * @brief  Initializes the TIM Hall Sensor Interface and initialize the associated handle.
+  * @param  htim TIM Hall Sensor Interface handle
+  * @param  sConfig TIM Hall Sensor configuration structure
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Init(TIM_HandleTypeDef *htim, TIM_HallSensor_InitTypeDef *sConfig);
+
+/**
+  * @brief  DeInitializes the TIM Hall Sensor interface
+  * @param  htim TIM Hall Sensor Interface handle
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_DeInit(TIM_HandleTypeDef *htim);
+
+/**
+  * @brief  Starts the TIM Hall Sensor Interface.
+  * @param  htim TIM Hall Sensor Interface handle
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start(TIM_HandleTypeDef *htim);
+
+/**
+  * @brief  Stops the TIM Hall sensor Interface.
+  * @param  htim TIM Hall Sensor Interface handle
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop(TIM_HandleTypeDef *htim);
 
 #ifdef __cplusplus
 }

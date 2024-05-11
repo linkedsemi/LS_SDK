@@ -1,0 +1,18 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env['IC'] = 'leo'
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'driver.c',
+    'FlashDev.c',
+    'main.c',
+]
+inc = [
+    '.'
+]
+env['LINKSCRIPT'] = File(env.subst('flash_prog_link.txt'))
+env.Append(CPPDEFINES = ['GLOBAL_OUTPUT_LVL=0', 'FLASH_PROG_ALGO=2'])
+target = env.image_build('flash_prog',src,inc)
+env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+env.AddPostAction(target,Copy('${SDK_ROOT}/tools/prog/t-head/${IC}_flash_algo.elf','$TARGET'))

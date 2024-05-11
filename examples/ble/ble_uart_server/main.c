@@ -15,6 +15,7 @@
 #include "SEGGER_RTT.h"
 
 #define UART_SERVER_WITH_OTA 0
+#define FW_ECC_VERIFY 0
 
 #if UART_SERVER_WITH_OTA == 1
 #define UART_SVC_ADV_NAME "LS Uart Server ota prf"
@@ -316,6 +317,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     case DISCONNECTED:
         connect_id = 0xff;
         uart_server_mtu = UART_SERVER_MTU_DFT;
+        uart_server_ntf_done = true;
         LOG_I("disconnected!");
         start_adv();
     break;

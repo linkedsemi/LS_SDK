@@ -12,7 +12,6 @@ inc = [
     '.',
     'keyscan/'
 ]
-env.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
 env.app_build('usbd_hid_keyboard',src,inc, ble = False,usb = True)
 
 

@@ -44,12 +44,15 @@ uart_receive_data_t uart_cmd;
 #define LED_IO PA11
 #define UART_TX_IO PB00
 #define UART_RX_IO PB01
-#else
+#elif defined(LM3050)
 #define LED_IO PB14
 #define UART_TX_IO PA09
 #define UART_RX_IO PA10
+#elif defined(LEO)
+#define LED_IO PC03
+#define UART_TX_IO PH05
+#define UART_RX_IO PH04
 #endif
-
 void LED_init(void)
 {
     io_cfg_output(LED_IO);

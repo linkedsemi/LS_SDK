@@ -5,10 +5,12 @@
 #include "log.h"
 #include "cpu.h"
 
-#ifdef LE501X
-#include "ls_hal_dmac.h"
-#else
+#if DMACV2
 #include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+#else
+#include "ls_hal_dmac.h"
 #endif
 
 #define PDM_CLK_KHZ 1024

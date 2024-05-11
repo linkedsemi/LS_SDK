@@ -191,7 +191,16 @@ uint8_t io_get_output_val(uint8_t pin);
 /**
   * @brief get GPIO input level
   * @param  pin  Specific GPIO pin
-  * @retval GPIO output level
+  * @retval GPIO input level
+  *              0 means low level
+  *              1 means high level
+  */
+uint8_t io_get_input_val(uint8_t pin);
+
+/**
+  * @brief get GPIO level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO level
   *              0 means low level
   *              1 means high level
   */

@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "LEO ATTACH KSCAN",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/kscan/build/leo/kscan.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "load",
+                "reset",
+                "interrupt",
+                "set $pc = 0x10000000",
+            ],
+        },  
+    ]
+}

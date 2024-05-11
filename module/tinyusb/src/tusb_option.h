@@ -162,6 +162,7 @@
 
 // Linkedsemi
 #define OPT_MCU_LM3050           9900 ///< Linkedsemi LM3050
+#define OPT_MCU_LEO              9910 ///< Linkedsemi LEO
 
 // Helper to check if configured MCU is one of listed
 // Apply _TU_CHECK_MCU with || as separator to list of input

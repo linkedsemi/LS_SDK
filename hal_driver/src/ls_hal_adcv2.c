@@ -68,7 +68,8 @@ HAL_StatusTypeDef HAL_ADC_VrefType_SetConfig(ADC_HandleTypeDef *hadc,  enum ADC_
     }
 
     MODIFY_REG(hadc->Instance->ADR, 
-               ADC_ADC_MSB_CAL_MASK|ADC_ADR_LP_CTL_MASK|ADC_ADR_G_CAL_MASK|ADC_ADR_OS_CAL_MASK,
+               ADC_ADR_EN_INBUF_A_MASK|ADC_ADR_EN_INBUF_B_MASK|ADC_ADR_VREFBUF_EN_MASK|
+               ADC_ADR_BP_MASK|ADC_ADR_VCM_EN_MASK|ADC_ADR_VREF_EN_MASK|ADC_ADR_VRSEL_MASK,
                tmp_adr);
 
     return HAL_OK;

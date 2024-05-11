@@ -47,6 +47,7 @@ static uint8_t adv_obj_hdl;
 static bool mesh_node_prov_state = false;
 void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_indx);
 void app_generic_onoff_status_report(uint8_t onoff);
+static struct model_client_ack_state_ind node_onoff_state;
 
 void auto_check_unbind(void)
 {
@@ -107,7 +108,7 @@ void app_client_model_tx_message_handler(uint32_t tx_msg, uint8_t model_idx)
     param.state_1 = tx_msg;
     param.state_2 = 0x00;
     param.delay_ms = 50;
-    param.trans_info = (uint16_t)(model_tid << 8);
+    param.trans_info = (uint16_t)(model_tid << 8) | (uint16_t)(1 << 7) ; //bit7unAck :0 ; Ack ��1
     param.trans_time_ms = 100;
     mesh_standard_model_publish_message_handler(&param);
 }
@@ -158,6 +159,17 @@ void report_provisioner_unicast_address_ind(uint16_t unicast_address)
     tinyfs_write(ls_sigmesh_dir, RECORD_KEY2, (uint8_t *)&unicast_address, sizeof(unicast_address));
     tinyfs_write_through();
 }
+
+void client_get_onoff_model_state(void)
+{
+   struct model_cli_get_state_info req_param;
+   req_param.app_key_lid = model_env.app_key_lid;
+   req_param.client_mdl_lid = model_env.info[MODEL0_GENERIC_ONOFF_CLI].model_lid;
+   req_param.dest_address = 0x0002; //node unicast address
+   req_param.get_info =0;
+   mesh_model_client_get_state_handler(&req_param);
+}
+
 
 static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt_u *evt)
 {
@@ -308,6 +320,18 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         sig_mesh_mdl_state_upd_hdl(&evt->mdl_state_upd_ind);
     }
     break;
+    case MESH_STATE_CLI_ACK_RX_IND:
+    {
+        if (evt->client_ack_state_ind.state_id == MESH_STATE_GEN_ONOFF)
+        {
+           node_onoff_state.state_id = MESH_STATE_GEN_ONOFF;
+           node_onoff_state.src_address = evt->client_ack_state_ind.src_address;
+           node_onoff_state.state_value1 = evt->client_ack_state_ind.state_value1;  //present value
+           node_onoff_state.state_value2 = evt->client_ack_state_ind.state_value2;  //invalid value or target value
+           node_onoff_state.trans_time_ms = evt->client_ack_state_ind.trans_time_ms;
+        }
+    }
+    break;
     case MESH_REPORT_TIMER_STATE:
     {
         if (2 == evt->mesh_timer_state.timer_id)
@@ -449,10 +473,11 @@ int main()
 {
     sys_init_app();
     mesh_stack_data_bss_init();
+    ble_init();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
     ls_mesh_pwm_init();
     light_button_init();
-    ble_init();
+    memset((uint8_t *)&node_onoff_state,0xff,sizeof(struct model_client_ack_state_ind));
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);

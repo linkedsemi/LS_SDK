@@ -29,5 +29,38 @@
                 //"add-symbol-file stack/build/le501x/fw.elf",  
             ]
         },
+        {
+            "name": "EC DEBUG USBD_HID_COMPOSITE",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/usb/usbd_hid_composite/build/leo/usbd_hid_composite.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "reset",
+                "interrupt",
+            ],
+        },
+        {
+            "name": "EC ATTACH USBD_HID_COMPOSITE",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/usb/usbd_hid_composite/build/leo/usbd_hid_composite.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "interrupt",
+            ],
+        },
     ]
 }

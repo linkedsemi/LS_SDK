@@ -40,13 +40,13 @@ LR_FLASH FLASH_BASE_USER FLASH_SIZE{
         
     }
     ScatterAssert(ImageLimit(RESET_RETAIN_DATA)<=RESET_RETAIN_VALID_END_ADDR)
-    RW_IRAM6 (ImageLimit(RESET_RETAIN_DATA)>0x0000A000?AlignExpr(ImageLimit(RESET_RETAIN_DATA),1024):0xa000) UNINIT ALIGN 1024 0x2000 { 
-        *(DMAC1)
-        *(DMARAM)
-    }
     STACK +0 UNINIT
     {
         *(STACK)
-    } 
+    }
+    RW_IRAM6 (ImageLimit(STACK)>0x0000A000?AlignExpr(ImageLimit(STACK),1024):0xa000) UNINIT ALIGN 1024 0x2000 { 
+        *(DMAC1)
+        *(DMARAM)
+    }
     ScatterAssert(ImageLimit(STACK)<=RAM_END)
 }

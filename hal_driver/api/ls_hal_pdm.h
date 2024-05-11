@@ -64,6 +64,7 @@ typedef struct __PDM_Init_TypeDef
     PDM_MODE_TypeDef mode;      /**< ::PDM_MODE_TypeDef */
 } PDM_Init_TypeDef;
 
+#if defined(LE501X)
  /// PDM DMA Environment
 struct PDM_DMA_Env
 {
@@ -71,6 +72,20 @@ struct PDM_DMA_Env
     uint8_t Channel[2];             /**< Configure the number of DMA channels */
     bool Channel_Done[2];           /**< DMA channel completion flag */
 };
+#elif defined(LEO)
+#include "ls_hal_dmacv3.h"
+struct PDM_DMA_Env
+{
+    struct dma_lli LLI[2][2];
+    uint8_t Channel[2];             /**< Configure the number of DMA channels */
+    bool Channel_Done[2];           /**< DMA channel completion flag */
+};
+#else
+struct PDM_DMA_Env
+{
+    
+};
+#endif
 
 /// PDM Interrupt Environment
 struct PDM_Interrupt_Env

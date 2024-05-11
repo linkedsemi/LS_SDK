@@ -24,8 +24,13 @@ void Basic_Timer_Cfg(void)
 
 static void pinmux_dac_init(void)
 {
+    #ifdef LM3050
     pinmux_dac1_init();         // PA07
     pinmux_dac2_init();         // PC04
+    #elif defined LEO
+    pinmux_dac1_out2_init();    // PA04
+    pinmux_dac2_out2_init();    // PA05
+    #endif
 }
 
 void Error_Handler(void)

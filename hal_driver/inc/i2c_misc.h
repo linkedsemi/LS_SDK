@@ -109,7 +109,14 @@ enum
 #define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
                                        ((INSTANCE) == I2C2) || \
                                        ((INSTANCE) == I2C3))
-#endif          
+#elif defined LEO
+#define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
+                                       ((INSTANCE) == I2C2) || \
+                                       ((INSTANCE) == I2C3) || \
+                                       ((INSTANCE) == I2C4) || \
+                                       ((INSTANCE) == I2C5) || \
+                                       ((INSTANCE) == I2C6))
+#endif
 
 #define IS_I2C_ADDRESSING_MODE(ADDRESS) (((ADDRESS) == I2C_ADDRESSINGMODE_7BIT) || \
                                          ((ADDRESS) == I2C_ADDRESSINGMODE_10BIT))

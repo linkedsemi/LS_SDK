@@ -500,12 +500,12 @@ int main()
 {
     sys_init_app();
     mesh_stack_data_bss_init();
+    ble_init();
     tinyfs_mkdir(&ls_sigmesh_dir, ROOT_DIR, 5);
     #if (AUTO_SIG_MESH_LP_MODE == 0)
     io_cfg_output(PROV_SUCCESS_LED);
     io_write_pin(PROV_SUCCESS_LED,LED_OFF);
     #endif
-    ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);

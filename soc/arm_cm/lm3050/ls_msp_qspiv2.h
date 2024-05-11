@@ -10,6 +10,9 @@ extern "C" {
 
 #define LSQSPIV2 ((reg_lsqspiv2_t *)LSQSPIV2_BASE_ADDR)
 
+extern uint32_t (*qspiv2_global_int_disable_fn)();
+extern void (*qspiv2_global_int_restore_fn)(uint32_t);
+
 void lsqspiv2_msp_init(void);
 
 

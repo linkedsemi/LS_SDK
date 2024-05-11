@@ -1,10 +1,12 @@
 #include <stddef.h>
 #include "ls_hal_adcv2.h"
-#include "ls_hal_dmacv2.h"
 #include "ls_msp_adc.h"
 #include "field_manipulate.h"
+#include "sdk_config.h"
 #include "log.h"
 
+#if DMACV2 
+#include "ls_hal_dmacv2.h"
 /**
   * @brief  DMA transfer complete callback. 
   * @param  hdma: pointer to DMA handle.
@@ -75,4 +77,57 @@ HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc)
 
     return status;
 }
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
 
+void ADC_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        ADC_HandleTypeDef *hadc = (ADC_HandleTypeDef *)param;
+        CLEAR_BIT(hadc->Instance->MISC_CTRL, ADC_DMA_EN_MASK);
+        if (__HAL_ADC_GET_FLAG(hadc, ADC_INTR_FIF_OVR_MASK))
+        {
+            LOG_I("FIF Overrun %d", hadc->Instance->FIFO_FLVL);
+            __HAL_ADC_CLEAR_IT(hadc, ADC_INTR_FIF_OVR_MASK);
+            REG_FIELD_WR(hadc->Instance->FIF_CTRL0, ADC_FIFO_CLR, 1);
+        }
+        __HAL_ADC_DISABLE(hadc);
+        hadc->Env.DMA.Callback(hadc);
+    }
+}
+
+HAL_StatusTypeDef HAL_ADC_LoopChannel_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)(ADC_HandleTypeDef* hadc))
+{
+    HAL_StatusTypeDef status = HAL_OK;
+    status = ADC_Enable(hadc);
+    hadc->Env.DMA.Callback = Callback;
+    SET_BIT(hadc->Instance->MISC_CTRL,ADC_DMA_EN_MASK);
+
+    struct ch_reg cfg;
+    DMA_CHANNEL_CFG(cfg,
+        hadc->Env.DMA.DMA_Channel,
+        (uint32_t)&hadc->Instance->FIF_DAT,
+        (uint32_t)pData,
+        TRANSFER_WIDTH_16BITS,
+        Length,
+        P2M,
+        0,
+        HAL_ADC_DMA_Handshake_Get(hadc),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hadc->DMAC_Instance, &cfg, ADC_DMA_Callback, (uint32_t)hadc);
+    if(hadc->Init.TrigType == ADC_SOFTWARE_TRIGT)
+    {
+        REG_FIELD_WR(hadc->Instance->TRIG,ADC_FIF_TRIG,1);
+    }
+    return status;
+}
+
+HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc)
+{
+    HAL_StatusTypeDef status = HAL_OK;
+    CLEAR_BIT(hadc->Instance->MISC_CTRL,ADC_DMA_EN_MASK);
+    __HAL_ADC_DISABLE(hadc);
+    return status;
+}
+#endif

@@ -1,0 +1,5 @@
+int ConfigTargetSettings(void)
+{
+  JLINK_ExecCommand("SetcJTAGInitMode = 1");
+  return 0;
+}

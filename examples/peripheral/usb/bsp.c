@@ -11,53 +11,17 @@
 #define USB_HOST 0
 #endif
 
-#define LED_RED PB15
-#define LED_GREEN PB14
-#define LED_BLUE PB13
-
 uint8_t g_board_led_rgb_idx = 0;
 
 void board_init(void)
 {
   sys_init_none();
   pinmux_usb_init(USB_HOST);
-
-  // HIGH , LED OFF
-  io_cfg_output(LED_RED);
-  io_cfg_output(LED_GREEN);
-  io_cfg_output(LED_BLUE);
-
-  io_set_pin(LED_RED);
-  io_set_pin(LED_GREEN);
-  io_set_pin(LED_BLUE);
 }
 
 void board_led_write(bool state)
 {
-  uint8_t led_rgb;
-  switch (g_board_led_rgb_idx)
-  {
-  case 0:
-    led_rgb = LED_RED;
-    break;
-  case 1:
-    led_rgb = LED_GREEN;
-    break;
-  case 2:
-    led_rgb = LED_BLUE;
-    break;
-  default:
-    return;
-  }
-
-  if (state)
-  {
-    io_clr_pin(led_rgb);
-  }
-  else
-  {
-    io_set_pin(led_rgb);
-  }
+  ;
 }
 
 uint32_t board_millis(void)

@@ -24,6 +24,8 @@
 #include "ls_hal_ssi.h"
 #if DMACV2
 #include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
 #else
 #include "ls_hal_dmac.h"
 #endif

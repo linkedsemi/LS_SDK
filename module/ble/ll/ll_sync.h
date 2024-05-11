@@ -32,7 +32,6 @@ struct sync_adv_env
 
 struct sync_evt_rx_env
 {
-    struct co_list_hdr hdr;
     struct scan_aux_evt_rx_env data;
     int8_t tx_power;
     int8_t rssi;
@@ -40,7 +39,7 @@ struct sync_evt_rx_env
     uint8_t data_status;
     uint8_t adv_data_length;
     uint8_t sync_hdl;
-};
+}__attribute__((aligned(4)));
 
 struct sync_scan_env
 {
@@ -55,7 +54,6 @@ struct sync_scan_env
 
 struct sync_env
 {
-    struct co_list_hdr hdr;
     struct ll_evt evt;
     union
     {

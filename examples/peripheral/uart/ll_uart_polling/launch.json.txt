@@ -29,5 +29,38 @@
                 //"add-symbol-file stack/build/lm3050/fw.elf",  
             ]
         },
+        {
+            "name": "EC DEBUG LL_UART_POLLING",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/uart/ll_uart_polling/build/leo/ll_uart_polling.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "reset",
+                "interrupt",
+            ],
+        },
+        {
+            "name": "EC ATTACH LL_UART_POLLING",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/uart/ll_uart_polling/build/leo/ll_uart_polling.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro",
+                "interrupt",
+            ],
+        },
     ]
 }

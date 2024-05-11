@@ -9,6 +9,11 @@
 
 extern struct mesh_model_info model_env;
 
+static uint8_t tmall_hdw_rst_indicate_tid =NODE_INITI_REPORT_TID_MIN;
+static uint8_t cnt_report_hardware_node_rst=0;
+static bool genie_app_check_hdw_rst_flg=false;
+static bool app_hdw_rst_node_status=false;
+
 void dev_mesh_status_rsp(struct model_rx_info const *ind,uint32_t opcode,uint8_t *status,uint16_t cmd_len)
 {
     struct model_send_info rsp;
@@ -41,12 +46,20 @@ void tmall_mesh_recv_onoff_msg(struct model_rx_info *msg)
 void tmall_mesh_recv_vendor_msg(struct model_rx_info *msg)
 {
     struct mesh_vendor_model_set *vendor_set;
-    if (msg->opcode == APP_MESH_VENDOR_SET)
+    vendor_set = (struct mesh_vendor_model_set *)msg->info;
+    if (msg->opcode == APP_MESH_VENDOR_SET_ACK)
     {
         vendor_set = (struct mesh_vendor_model_set *)msg->info;
         LOG_I("attr_type:%x",vendor_set->attr_type);
         
-        dev_mesh_status_rsp(msg,APP_MESH_VENDOR_STATUES,(uint8_t *)vendor_set,msg->rx_info_len);
+        dev_mesh_status_rsp(msg,APP_MESH_VENDOR_STATUS,(uint8_t *)vendor_set,msg->rx_info_len);
+    }
+    else if(msg->opcode == APP_MESH_VENDOR_CONFIRMATION)
+    {
+       if ((vendor_set->tid >=NODE_INITI_REPORT_TID_MIN) && (vendor_set->tid <=NODE_INITI_REPORT_TID_MAX) && app_hdw_rst_node_status) 
+       {
+           genie_app_check_hdw_rst_flg = true;
+       }
     }
 }
 
@@ -108,4 +121,33 @@ void tmall_mesh_recv_light_hsl_msg(struct model_rx_info *msg)
     {
 
     }
+}
+
+uint8_t tmall_mesh_hardware_node_reset_ind(uint8_t model_lid, uint8_t app_key_lid, uint16_t dst_addr)
+{
+    struct model_send_info hardware_node_rst;
+     
+     app_hdw_rst_node_status = true;
+     if (((cnt_report_hardware_node_rst++) >6) || (genie_app_check_hdw_rst_flg == true))
+     {
+         ls_sig_mesh_disable();
+         cnt_report_hardware_node_rst=0;
+         genie_app_check_hdw_rst_flg = false;
+         app_hdw_rst_node_status = false;
+         return cnt_report_hardware_node_rst;        
+     }
+
+    tmall_hdw_rst_indicate_tid++;
+    cnt_report_hardware_node_rst++;
+    hardware_node_rst.ModelHandle = model_lid;
+    hardware_node_rst.opcode =  APP_MESH_VENDOR_INDICATION;
+    hardware_node_rst.app_key_lid = app_key_lid; 
+    hardware_node_rst.dest_addr = dst_addr;
+    hardware_node_rst.info[0] = ((tmall_hdw_rst_indicate_tid>NODE_INITI_REPORT_TID_MAX)?NODE_INITI_REPORT_TID_MIN:tmall_hdw_rst_indicate_tid);  //tid
+    hardware_node_rst.info[1] = (uint8_t)(VENDOR_ATTR_TYPE_EVENT & 0x00ff);
+    hardware_node_rst.info[2] = (uint8_t)((VENDOR_ATTR_TYPE_EVENT & 0xff00)>>8);
+    hardware_node_rst.info[3] = NODE_HARDWARE_RST_EVENT;
+    hardware_node_rst.len = 4; 
+    model_send_info_handler(&hardware_node_rst);
+   return cnt_report_hardware_node_rst;
 }

@@ -20,6 +20,15 @@ struct ll_crypto_env
 };
 
 extern uint8_t ll_default_tx_pwr;
+extern uint8_t tx_rampup_time;
+extern uint8_t tx_rampdown_time_minus_1;
+extern uint8_t rx_rampup_time;
+extern uint8_t rx_path_delay_1m_phy;
+extern uint8_t rx_path_delay_2m_phy;
+extern uint8_t tx_path_delay_1m_phy;
+extern uint8_t tx_path_delay_2m_phy;
+extern void (*rf_tx_cfg_fn)(enum ble_phy phy,uint8_t ch,uint8_t tx_pwr);
+extern void (*rf_rx_cfg_fn)(enum ble_phy phy,uint8_t ch);
 
 void mac_hw_init(void);
 
@@ -58,8 +67,6 @@ bool event_limit_get(uint32_t *limit);
 void tx_fifo_fill_bd_addr(struct bd_addr *addr);
 
 void tx_fifo_set(uint8_t data);
-
-void pkt_transmit(uint8_t header_lsb,uint8_t payload_total_length,uint8_t *cte_info,void (*data_fill_func)(void *),void *param,uint8_t *remaining,uint8_t remaining_length);
 
 void pkt_transmit_specific(uint8_t header_lsb,uint8_t payload_total_length,uint8_t *cte_info,void (*data_fill_func)(void *),void *param,uint8_t (*specific_tx_data_set)(uint8_t,void *),void *tx_data_set_param);
 
@@ -102,5 +109,8 @@ void ble_timer2_irq2_unmask(void);
 void ble_timer2_irq2_mask(void);
 
 void aes_128_req(uint8_t *data,uint8_t *key);
+
+void ifs_transition_set(bool);
+
 #endif
 

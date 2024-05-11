@@ -10,7 +10,7 @@ extern "C" {
 #define SHA256_WORDS_NUM 8
 #define SHA224_WORDS_NUM 7
 #define SM3_WORDS_NUM 8
-
+#define SHA_SECTOR_NUM_MAX 4
 
 HAL_StatusTypeDef HAL_LSSHA_Init(void);
 
@@ -27,6 +27,16 @@ HAL_StatusTypeDef HAL_LSSHA_SHA256_IT(const uint8_t *data,uint32_t length,uint32
 HAL_StatusTypeDef HAL_LSSHA_SHA224_IT(const uint8_t *data,uint32_t length,uint32_t sha224[SHA224_WORDS_NUM]);
 
 HAL_StatusTypeDef HAL_LSSHA_SM3_IT(const uint8_t *data,uint32_t length,uint32_t sm3[SM3_WORDS_NUM]);
+
+HAL_StatusTypeDef HAL_LSSHA_SHA_Update(uint8_t *data, uint32_t length);
+
+HAL_StatusTypeDef HAL_LSSHA_SHA224_Final(uint32_t sha224[SHA224_WORDS_NUM]);
+
+HAL_StatusTypeDef HAL_LSSHA_SHA256_Final(uint32_t sha256[SHA256_WORDS_NUM]);
+
+HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
+
+HAL_StatusTypeDef HAL_HMAC_SHA224(uint32_t out[SHA224_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
 void HAL_LSSHA_SHA256_Complete_Callback(void);
 

@@ -1,6 +1,5 @@
 #include "ls_hal_dac.h"
 #include "ls_msp_dac.h"
-#include "ls_hal_dmacv2.h"
 #include "field_manipulate.h"
 #include "platform.h"
 #include "systick.h"

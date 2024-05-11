@@ -121,6 +121,8 @@ typedef struct __UART_HandleTypeDef
                                                                 This parameter can be a value of @ref HAL_UART_StateTypeDef */
 
     HAL_UART_StateTypeDef         RxState;          /*!< UART state information related to Rx operations.*/
+
+    uint32_t                      RTOValue;
         
 } UART_HandleTypeDef;
 
@@ -156,6 +158,19 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
 
 /**
+ * @brief  Receives an amount of data in blocking mode and enable RTOEN
+ * 
+ * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+ *               the configuration information for the specified UART module.
+ * @param  pData Pointer to data buffer (uint8_t data elements).
+ * @param  Size  Amount of data elements (uint8_t) to be received.
+ * @param  RxLen  The actual length of data received
+ * @param  Timeout Timeout duration
+ * @return HAL_StatusTypeDef 
+ */
+HAL_StatusTypeDef HAL_UART_ReceiveToIdle(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint16_t *RxLen, uint32_t Timeout);
+
+/**
   * @brief  Sends an amount of data in non blocking mode.
   * @param  huart Pointer to a UART_HandleTypeDef structure that contains
   *               the configuration information for the specified UART module.int_t
@@ -174,6 +189,18 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+/**
+ * @brief Receive an amount of data in interrupt mode till either the expected number of data is received or an DLE event occurs.
+ *        the expected number of data is received or an DLE event occurs.
+ *
+ * @param huart Pointer to a UART_HandleTypeDef structure that contains
+ *               the configuration information for the specified UART module.
+ * @param pData Pointer to data buffer (uint8_t data elements). 
+ * @param Size  Amount of data elements (uint8_t) to be received.
+ * @return HAL_StatusTypeDef
+ */
+HAL_StatusTypeDef HAL_UART_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
 /**
   * @brief  Sends an amount of data in DMA mode.
@@ -195,6 +222,14 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pDat
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+/**
+  * @brief  Stop receiving data in DMA mode.
+  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+  *               the configuration information for the specified UART module.
+  * @retval The length of the data received
+  */
+uint32_t HAL_UART_Receive_DMA_Abort(UART_HandleTypeDef *huart);
 
 /**
   * @brief  Initializes the UART mode according to the specified parameters in
@@ -237,6 +272,16 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
   *                the configuration information for the specified UART module.
   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+
+/**
+ * @brief  Rx Transfer timeout completed callbacks.
+ * @note   This function needs to be implemented when the callback is needed,
+           the HAL_UART_RxToIdleCpltCallback could be implemented in the user file
+ * @param huart Pointer to a UARTx_HandleTypeDef structure that contains
+ *             the configuration information for the specified UART module.
+ * @param loseLength The length of the data not received
+ */
+void HAL_UART_RxToIdleCpltCallback(UART_HandleTypeDef *huart, uint16_t loseLength);
 
 /**
   * @brief  DMA UART Tx Transfer completed callbacks.

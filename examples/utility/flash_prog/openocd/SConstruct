@@ -1,0 +1,22 @@
+import os
+import shutil
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    'FlashPrg.c',
+]
+inc = [
+    '.'
+]
+
+env['LINKSCRIPT'] = File(env.subst('flash_prog_link.txt'))
+env.Append(CPPDEFINES = ['GLOBAL_OUTPUT_LVL=0', 'FLASH_PROG_ALGO=1'])
+env.Append(CCFLAGS = ['-fPIE','-fno-jump-tables'])
+env.Append(LINKFLAGS = ' -nostartfiles -Wl,-n')
+
+target = env.image_build('${IC}_flash_prog_openocd',src,inc)
+env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+target_path = str(target[0]).replace('.elf','')
+binfile = env.Command(target_path+'.bin',target,Action('$OBJCOPY -O binary $SOURCES $TARGET'))
+arrfile = env.Command(target_path+'_array.c',binfile,Action(env.subst('python $SDK_ROOT/tools/bin2c/bin2c.py')+ ' $SOURCE __flash_prog_algo_array 80 4 > $TARGET'))

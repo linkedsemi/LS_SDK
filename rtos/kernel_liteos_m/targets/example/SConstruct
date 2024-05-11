@@ -1,0 +1,26 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'main.c',
+    'task_sample.c',
+]
+# src += (Glob('../../components/power/*.c', strings=True))
+# src += (Glob('../../components/backtrace/*.c', strings=True))
+# src += (Glob('../../components/trace/*.c', strings=True))
+# src += (Glob('../../components/trace/cnv/*.c', strings=True))
+# src += (Glob('../../components/trace/pipeline/*.c', strings=True))
+# src += (Glob('../../components/trace/pipeline/serial/*.c', strings=True))
+inc = [
+    '.',
+    # '../../components/power',
+    # '../../components/backtrace',
+    # '../../components/trace',
+    # '../../components/trace/cnv',
+    # '../../components/trace/pipeline',
+    # '../../components/trace/pipeline/serial',
+]
+
+
+env.app_build('liteos_m',src,inc,ble = False,rtos = "liteos")

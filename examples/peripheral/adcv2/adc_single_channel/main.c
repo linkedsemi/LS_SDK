@@ -11,7 +11,7 @@ static ADC_HandleTypeDef ADCx_Hdl;
 
 static void pinmux_adc_init(void)
 {
-    pinmux_adc1_in5_init();// PA01
+    pinmux_adc1_in5_init();// LM3050:PA01; LS1010:PA14
 }
 
 void Error_Handler(void)

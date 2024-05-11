@@ -1,5 +1,6 @@
 #include "ls_hal_dmacv2.h"
 #include "ls_dbg.h"
+#include "field_manipulate.h"
 
 void HAL_DMA_Controller_Init(DMA_Controller_HandleTypeDef *hdma)
 {
@@ -24,6 +25,14 @@ void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,
     hdma->Instance->CH[ch_idx].BCR = cfg->byte_count;
     uint32_t *csr = (uint32_t *)&cfg->ctrl;
     hdma->Instance->CH[ch_idx].CSR = *csr;
+}
+
+uint32_t HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx)
+{
+    REG_FIELD_WR(hdma->Instance->CH[ch_idx].CSR, DMAC_CHEN, 0);
+    uint32_t current = hdma->Instance->CH[ch_idx].BCR >> 16;
+    uint32_t count = hdma->Instance->CH[ch_idx].BCR & 0xffff;
+    return count - current;
 }
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
