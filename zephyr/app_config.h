@@ -3,7 +3,7 @@
 
 //#define DEBUG_MODE 0
 
-#ifdef SOC_LS1010
+#ifdef CONFIG_SOC_LS1010
 
 #ifdef CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC
 #define SDK_HSE_USED (1)

@@ -118,7 +118,7 @@ if(CONFIG_SOC_LS1010)
     ../module/common/async_call.c
     ../module/common/sw_timer.c
     ../module/crc/crc16.c
-    ../module/debug/log.c
+    # ../module/debug/log.c
     ../module/debug/ls_dbg.c
     ../module/debug/RTT/SEGGER_RTT.c
     ../module/static_buffer/linked_buffer.c
@@ -230,6 +230,7 @@ if(CONFIG_SOC_LS1010)
   zephyr_linker_sources(ROM_START SORT_KEY -1vectors leo_sbl.ld)
 
   zephyr_compile_definitions(LEO)
+  zephyr_compile_definitions(GLOBAL_OUTPUT_LVL=0)
   message("ZEPHYR_CURRENT_MODULE_DIR: ${ZEPHYR_CURRENT_MODULE_DIR}  ${ZEPHYR_CURRENT_MODULE_DIR}/tools/leo/info_sbl_merge.py")
   message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
