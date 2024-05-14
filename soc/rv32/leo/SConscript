@@ -211,7 +211,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         rtos_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
             'rv32/leo/port.c',
-            'rv32/leo/portasm.S',
+            'rv32/leo/portASM.S',
             'rv32/leo/freertos_adapt.c',
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
