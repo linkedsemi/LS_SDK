@@ -8,7 +8,6 @@
 #define SYSERRNO	0x13
 
 static bool _semihosting_enabled = true;
-static bool try_semihosting = true;
 
 static long semihosting_trap(int sysnum, void *addr)
 {
@@ -36,9 +35,7 @@ bool semihosting_enabled(void)
 	register void *param0 asm ("a1") = NULL;
 	unsigned long tmp = 0;
 
-	if (!try_semihosting)
-		return _semihosting_enabled;
-
+	_semihosting_enabled = true;
 	asm volatile (
 		"	.align 4\n"
 		"	.option push\n"
@@ -69,7 +66,6 @@ bool semihosting_enabled(void)
 		  [ret] "+r" (ret)
 		: "r" (param0) : "memory");
 
-	try_semihosting = false;
 	return _semihosting_enabled;
 }
 

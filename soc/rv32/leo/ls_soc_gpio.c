@@ -149,8 +149,8 @@ static gpio_port_pin_t ps2h4_dat;
 static gpio_port_pin_t owm_pin;
 
 static uint8_t otg_id = 0xff;
-static uint8_t i2c_dbg_scl_io = 0xff;
-static uint8_t i2c_dbg_dat_io = 0xff;
+uint8_t i2c_dbg_scl_io = 0xff;
+uint8_t i2c_dbg_dat_io = 0xff;
 
 __attribute__((weak)) void io_exti_callback(uint8_t pin,exti_edge_t edge){}
 

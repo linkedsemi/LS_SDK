@@ -4,6 +4,7 @@
 #include "ls_hal_uart.h"
 #include "ls_soc_gpio.h"
 #include "sdk_config.h"
+#include "cpu.h"
 #if __riscv
 #include "semihosting.h"
 #endif
@@ -176,9 +177,16 @@ void ls_log_init()
     #endif
     #if(LOG_BACKEND&SEMIHOSTING)
     {
-        if (semihosting_enabled()){
+        extern uint8_t i2c_dbg_dat_io;
+        disable_global_irq();
+        if(i2c_dbg_dat_io!=0xff)
+        {
+            while(!semihosting_enabled()){}
+		    semihosting_init();
+        }else if (semihosting_enabled()){
 		    semihosting_init();
         }
+        enable_global_irq();
     }
     #endif
     #if(LOG_BACKEND&RAM_LOG)
