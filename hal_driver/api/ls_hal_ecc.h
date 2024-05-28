@@ -27,6 +27,10 @@ extern const struct ecc_curve_param secp256k1_param;
 
 extern const struct ecc_curve_param sm2_param;
 
+extern const struct ecc_curve_param bp_p256_r1_param;
+
+extern const struct ecc_curve_param bn_p256_param;
+
 void HAL_LSECC_Init(void);
 
 void HAL_LSECC_DeInit(void);
