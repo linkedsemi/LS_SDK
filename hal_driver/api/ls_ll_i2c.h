@@ -10,6 +10,11 @@
 #include "reg_base_addr.h"
 #include "field_manipulate.h"
 #include "log.h"
+#include "cpu.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -899,33 +904,76 @@ static inline void LL_I2C_SetTimingPrescaler(reg_i2c_t *I2Cx, uint32_t TimingPre
  * @retval None
  */
 static inline void LL_I2C_SetClockPeriod(reg_i2c_t *I2Cx, uint32_t ClockSpeed)
-
 {
-    uint32_t freq, SCLH, SCLL, sdadel, scldel;
-    uint32_t pclk1;
-    /* Calculate frequency value */
-    if (ClockSpeed < I2C_MIN_FREQ)
-        pclk1 = I2C_CLOCK >> 5;
-    else
+    uint32_t speed_array[I2C_SPEED_MAX] = {100 * 1000, 400 * 1000, 1000 * 1000};
+    uint16_t cycle_count = I2C_CLOCK / speed_array[ClockSpeed];
+    int16_t scll, sclh, scldel, sdadel;
+    uint8_t prescaler = 0;
+    if (cycle_count > 256)
     {
-        pclk1 = I2C_CLOCK;
-    }
-    freq = I2C_FREQRANGE(pclk1, ClockSpeed);
-    SCLL = freq / 2;
-    SCLH = freq - SCLL; // If it's not divisible,The remainder is added to SCLH
-    sdadel = SCLH / 4;
-    scldel = SCLH / 4;
+        for (uint8_t i = 1; prescaler < 16; i++)
+        {
+            /* For easier calculating, just set prescaler to an odd number. */
+            prescaler = 2 * i - 1;
+            cycle_count = (I2C_CLOCK / speed_array[ClockSpeed]) / (prescaler + 1);
+            if (cycle_count <= 256)
+            {
+                LS_ASSERT(0);
+            }
+        }
+        if (prescaler >= 16)
+        {
+            LS_ASSERT(0);
+        }
+        }
+        if (cycle_count < 16)
+        {
+            LS_ASSERT(0);
+        }
+        /* Set SCL dutycycle to about 30% */
+        scll = (cycle_count * 2) / 3;
+        sclh = cycle_count / 3 - 1 - 4;
+        if (scll < 1)
+        {
+            scll = 1;
+        }
+        if (sclh < 0)
+        {
+            sclh = 0;
+        }
+        scldel = scll / 3;
+        if (scldel > 15)
+        {
+            scldel = 15;
+        }
+        else if (scldel < 5)
+        {
+            /* SCLDEL should not bee too small to keep campatible with different resistance */
+            scldel = 5;
+        }
+        sdadel = scldel - 4;
+        if (sdadel > 4)
+        {
+            /* We should set a ceiling for SDADEL. This is unnecessary, and will reduce compatibility if we are IIC slave */
+            sdadel = 4;
+        }
+        else if (sdadel < 1)
+        {
+            sdadel = 1;
+        }
+        /* HW design requires that SCLDEL should be no less than SDADEL + 5 */
+        if (scldel <= sdadel + 5)
+        {
+            scldel = sdadel + 5;
+        }
     /*---------------------------- I2Cx TIMINGR Configuration ----------------------*/
     /* Configure I2Cx: Frequency range */
-    if (ClockSpeed < I2C_MIN_FREQ)
-    {
-        MODIFY_REG(I2Cx->TIMINGR, I2C_TIMINGR_PRESC_MASK, 4 << I2C_TIMINGR_PRESC_POS);
-    }
-    else
-    {
-        CLEAR_BIT(I2Cx->TIMINGR, I2C_TIMINGR_PRESC_MASK);
-    }
-    MODIFY_REG(I2Cx->TIMINGR, (I2C_TIMINGR_SCLH_MASK | I2C_TIMINGR_SCLL_MASK), (SCLH << I2C_TIMINGR_SCLH_POS | SCLL << I2C_TIMINGR_SCLL_POS | sdadel << I2C_TIMINGR_SDADEL_POS | scldel << I2C_TIMINGR_SCLDEL_POS));
+    MODIFY_REG(I2Cx->TIMINGR, I2C_TIMINGR_PRESC_MASK, prescaler << I2C_TIMINGR_PRESC_POS); 
+    MODIFY_REG(I2Cx->TIMINGR, (I2C_TIMINGR_SCLH_MASK | I2C_TIMINGR_SCLL_MASK | I2C_TIMINGR_SDADEL_MASK | I2C_TIMINGR_SCLDEL_MASK), 
+                                        (sclh << I2C_TIMINGR_SCLH_POS\
+                                        |scll << I2C_TIMINGR_SCLL_POS\
+                                        |sdadel << I2C_TIMINGR_SDADEL_POS\
+                                        |scldel << I2C_TIMINGR_SCLDEL_POS));
 }
 /******************************************TIMEOUTR******************************************/
 /*                                                                                          */
@@ -1026,7 +1074,7 @@ static inline void LL_I2C_DisableTimeExten(reg_i2c_t *I2Cx)
  */
 static inline uint32_t LL_I2C_IsEnableTimeExten(reg_i2c_t *I2Cx)
 {
-    return (READ_BIT(I2Cx->TIMEOUTR, I2C_TIMEOUTR_TEXTEN_MASK) == (I2C_TIMEOUTR_TEXTEN_MASK));
+    return (READ_BIT(I2Cx->TIMEOUTR, I2C_TIMEOUTR_TEXTEN_MASK) == ((uint32_t)I2C_TIMEOUTR_TEXTEN_MASK));
 }
 /******************************************SR******************************************/
 /*                                                                                    */
@@ -1338,4 +1386,9 @@ static inline void LL_I2C_ClearFlagIT(reg_i2c_t *I2Cx, uint32_t RegisterBit)
 /** @}*/
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

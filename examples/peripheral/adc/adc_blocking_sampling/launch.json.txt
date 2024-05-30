@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/adc/adc_blocking_sampling/build/le501x/adc_blocking_sampling.elf",
+            "name": "LE501X Debug ADC_BLOCKING_SAMPLING",
+            "device": "LE501X",
+            "interface": "swd",
+            "preLaunchCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/le501x/fw.elf",  
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "examples/peripheral/adc/adc_blocking_sampling/build/le501x/adc_blocking_sampling.elf",
+            "name": "LE501X Attach ADC_BLOCKING_SAMPLING",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                //"add-symbol-file stack/build/le501x/fw.elf",  
+            ]
+        },
+    ]
+}

@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum fotas_evt_type
 {
     FOTAS_START_REQ_EVT,
@@ -79,6 +83,10 @@ void dev_manager_prf_fota_server_add(uint8_t sec_lvl);
 void prf_fotas_start_confirm(enum fota_start_cfm_status status);
 
 uint8_t prf_fotas_get_current_conidx(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

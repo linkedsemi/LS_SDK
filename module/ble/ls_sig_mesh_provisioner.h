@@ -4,6 +4,10 @@
 #include "ls_ble.h"
 #include "ls_sig_mesh.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup SIG_MESH_PROVISIONER
  *  @{
  */
@@ -579,5 +583,9 @@ void ls_sig_mesh_set_prover_iv_seq(const uint32_t prover_iv, const uint32_t prov
 void ls_sig_mesh_get_prover_iv_seq(void);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //(_LS_SIG_MESH_PROVISIONER_H_

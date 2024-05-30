@@ -1,0 +1,26 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+     'main.c',
+     'tmall_light_cfg.c',
+     'tmall_mesh_ctl.c',
+     '../genie_files/tmall_genie_ota.c',
+     '../genie_files/tmall_genie_ais.c',
+     '../genie_files/genie_crc16.c',
+     '../genie_files/genie_crypto.c',
+     '../genie_files/genie_triple.c',
+     '../genie_files/ali_dfu_port.c',
+     '../genie_files/genie_time_v2.c',
+     '../genie_files/tmall_genie_triple_handle.c',
+     '../genie_files/tmall_genie_ais_main_handle.c',
+     '../../../../module/tinycrypt/lib/source/aes_encrypt.c',
+     '../../../../module/tinycrypt/lib/source/aes_decrypt.c'
+]
+inc = [
+    '.',
+    '../genie_files/.',
+    '../../../../module/tinycrypt/lib/include/tinycrypt/.'
+]
+env.app_build('tmall_mesh_gatt_ls_ota',src,inc,mesh=True)

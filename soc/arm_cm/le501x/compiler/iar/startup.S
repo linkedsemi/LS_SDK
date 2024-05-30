@@ -48,6 +48,7 @@
 
                 EXTERN   __iar_program_start
                 EXTERN   SystemInit
+                EXTERN   SysTick_Handler
                 PUBLIC   __vector_table
                 PUBLIC   __vector_table_0x1c
                 PUBLIC   __Vectors
@@ -132,12 +133,10 @@ Reset_Handler
                 PUBWEAK HardFault_Handler
                 PUBWEAK SVC_Handler
                 PUBWEAK PendSV_Handler
-                PUBWEAK SysTick_Handler
 NMI_Handler
 HardFault_Handler
 SVC_Handler
 PendSV_Handler
-SysTick_Handler
 Default_Handler
                 B        .
 

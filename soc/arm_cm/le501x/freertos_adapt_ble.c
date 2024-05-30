@@ -9,7 +9,11 @@
 #include "ls_dbg.h"
 #include "ls_sys.h"
 #include "cpu.h"
+#ifndef MIBLE_RTOS
 #define BLE_TASK_STACK_SIZE 200
+#else
+#define BLE_TASK_STACK_SIZE 512
+#endif
 #define TIMER_TASK_STACK_SIZE 100
 #define IDLE_TASK_STACK_SIZE 100
 static StackType_t timer_task_stack[TIMER_TASK_STACK_SIZE];
@@ -64,7 +68,7 @@ void ble_stack_isr()
     }
 }
 
-static void ble_stack_task(void *param)
+__attribute__((weak)) void ble_stack_task(void *param)
 {
     while(1)
     {
@@ -77,6 +81,7 @@ static void timer_callback(TimerHandle_t xTimer)
 {
     void *arg = pvTimerGetTimerID(xTimer);
     os_wrapped_timer_callback((uint32_t)arg);
+    xTaskNotifyGive((void *)&ble_task_buf);
     xTimerDelete(xTimer,portMAX_DELAY);
 }
 
@@ -90,7 +95,7 @@ static void timer_stop(void **timer_hdl)
 {
     taskENTER_CRITICAL();
     xTimerStop(*timer_hdl,portMAX_DELAY);
-    xTimerStart(*timer_hdl,portMAX_DELAY);
+    xTimerDelete(*timer_hdl,portMAX_DELAY);
     taskEXIT_CRITICAL();
 }
 

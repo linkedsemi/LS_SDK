@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'main.c',
+    'sig_mesh_ctl.c',
+    'sig_mesh_vendor_event.c'
+]
+inc = [
+    '.'
+]
+env.app_build('sig_mesh_provee_auto_prov',src,inc,mesh = True)

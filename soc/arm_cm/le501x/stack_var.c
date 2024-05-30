@@ -6,7 +6,7 @@
 #include "log.h"
 #include "modem_rf_le501x.h"
 #define ENV_BUF_SIZE 2048
-#if CONFIG_AOS
+#if CONFIG_AOS || __ZEPHYR__
 #define DB_BUF_SIZE 0
 #define MSG_BUF_SIZE 1900
 #define NON_RET_BUF_SIZE (12)
@@ -39,6 +39,7 @@ __attribute((weak)) uint8_t max_profile_num;
 __attribute((weak)) uint8_t max_ral_num;
 __attribute((weak)) uint8_t max_user_task_num;
 __attribute((weak)) bool slave_md_enable_default;
+__attribute((weak)) bool mult_mtu_exch_enable;
 
 #if !defined(CONFIG_AOS)
 struct {
@@ -162,6 +163,7 @@ void stack_var_ptr_init()
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
     slave_md_enable_default = false;
+    mult_mtu_exch_enable = false;
 
     statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
     prf_fn_init();
@@ -259,6 +261,7 @@ void ll_stack_var_ptr_init()
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
     slave_md_enable_default = false;
+    mult_mtu_exch_enable = false;
 
     ll_stack_buffer_init(ENV_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
 }

@@ -253,7 +253,7 @@
         <option>
           <name>IExtraOptions</name>
           <state></state>
-          <state>--diag_suppress=Pa082,Pe188,Pa089,Pe068,Pa039</state>
+          <state>--diag_suppress=Pa082,Pe188,Pa089,Pe068,Pa039,Pa131,Pe111</state>
           <state>--warnings_are_errors</state>
         </option>
         <option>
@@ -302,8 +302,8 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state>$PROJ_DIR$\..\..\Include</state>
           <state>$PROJ_DIR$\..\..</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc</state>
           <state>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc</state>
           <state>$PROJ_DIR$\..\..\..\..\..\hal_driver\api</state>
           <state>$PROJ_DIR$\..\..\..\..\..\module\common</state>
@@ -968,7 +968,7 @@
   <group>
     <name>default</name>
     <file>
-      <name>$PROJ_DIR$\..\..\Include\app_config.h</name>
+      <name>$PROJ_DIR$\..\..\app_config.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\arm_common_tables.h</name>
@@ -978,6 +978,21 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\arm_math.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\asm_arm.inc</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\asm_arm_mult_square.inc</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\asm_arm_mult_square_umaal.inc</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\asm_avr.inc</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\asm_avr_mult_square.inc</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\module\common\async_call.h</name>
@@ -1088,6 +1103,9 @@
       <name>$PROJ_DIR$\..\..\..\..\..\module\crc\crc16.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\curve-specific.inc</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\dmac_config.h</name>
     </file>
     <file>
@@ -1097,9 +1115,6 @@
       <name>$PROJ_DIR$\..\..\..\..\..\module\static_buffer\fifo.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\flash_svcall_int.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\gpio_mode.h</name>
     </file>
     <file>
@@ -1107,9 +1122,6 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\hal_flash_int.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\hal_flash_svcall.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\i2c_misc.h</name>
@@ -1340,10 +1352,16 @@
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\mpu_armv8.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\musb_type.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\module\settings\ota_settings.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\integration\pis_config.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\platform-specific.inc</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\platform.h</name>
@@ -1532,9 +1550,6 @@
       <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\inc\ssi_misc.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\svcall.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\module\common\sw_timer.h</name>
     </file>
     <file>
@@ -1568,13 +1583,22 @@
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\tk_misc.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\types.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\cmsis\tz_context.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\uECC.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\uECC_vli.h</name>
     </file>
   </group>
   <group>
     <name>examples</name>
     <file>
-      <name>$PROJ_DIR$\..\..\Source\main.c</name>
+      <name>$PROJ_DIR$\..\..\main.c</name>
     </file>
   </group>
   <group>
@@ -1607,7 +1631,7 @@
       <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_qspi.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_svcall.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_flash_swint.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\hal_driver\src\ls_hal_i2c.c</name>
@@ -1718,6 +1742,9 @@
       <name>$PROJ_DIR$\..\..\..\..\..\module\tinyfs\tinyfs_write_cache.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\module\micro-ecc\uECC.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\module\tinycrypt\lib\source\utils.c</name>
     </file>
   </group>
@@ -1811,16 +1838,10 @@
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\startup.S</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\svcall.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\svcall_asm.S</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sw_timer_port.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\swint_handler.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\compiler\iar\swint_asm.S</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\soc\arm_cm\le501x\sys_stat.c</name>

@@ -1,0 +1,11 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'main.c'
+]
+inc = [
+    '.'
+]
+env.app_build('uart_it',src,inc,ble = False)

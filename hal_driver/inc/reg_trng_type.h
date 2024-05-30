@@ -2,6 +2,10 @@
 #define REG_LSTRNG_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     volatile uint32_t CR;
@@ -116,5 +120,9 @@ enum TRNG_REG_ISR_FIELD
     TRNG_IS_SERR_MASK = 0x4,
     TRNG_IS_SERR_POS = 2,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

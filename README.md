@@ -30,7 +30,6 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | ble/ble_uart_server_mult_link                                             |  √     |        |
 | ble/fota                                                                  |  √     |        |
 | ble/host_test                                                             |  √     |        |
-| mesh/genie_mesh/tmall_mesh                                                |  √     |        |
 | mesh/genie_mesh/tmall_mesh_gatt                                           |  √     |        |
 | mesh/genie_mesh/tmall_mesh_gatt_glp                                       |  √     |        |
 | mesh/genie_mesh/tmall_mesh_gatt_ls_ota                                    |  √     |        |
@@ -68,6 +67,8 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/dac/single_dac_channel_sine_wave                               |        |  √     |
 | peripheral/dac/single_dac_channel_voltage                                 |        |  √     |
 | peripheral/dac/single_dac_channel_wave                                    |        |  √     |
+| peripheral/ecc/ecdh_it                                                    |  √     |  √     |
+| peripheral/ecc/ecdh_polling                                               |  √     |  √     |
 | peripheral/gpio                                                           |  √     |  √     |
 | peripheral/i2c/i2c_dma                                                    |  √     |  √     |
 | peripheral/i2c/i2c_it                                                     |  √     |  √     |
@@ -75,8 +76,9 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/i2c/ll_i2c_it                                                  |  √     |  √     |
 | peripheral/i2c/ll_i2c_polling                                             |  √     |  √     |
 | peripheral/iap/iap_application                                            |  √     |  √     |
-| peripheral/iap/iap_bootloader                                             |  √     |  √     |           
-| peripheral/pdm                                                            |  √     |        |
+| peripheral/iap/iap_bootloader                                             |  √     |  √     |
+| peripheral/pdm_pingpong_dma                                               |  √     |        |
+| peripheral/pdm_it                                                         |  √     |  √     |
 | peripheral/rtc                                                            |  √     |        |
 | peripheral/rtcv2                                                          |        |  √     |
 | peripheral/sha/sha_it                                                     |        |  √     |
@@ -118,6 +120,12 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/uart/uart_dma                                                  |  √     |  √     |
 | peripheral/uart/uart_it                                                   |  √     |  √     |
 | peripheral/uart/uart_polling                                              |  √     |  √     |
+| peripheral/usb/usbd_cdc_msc                                               |        |  √     |
+| peripheral/usb/usbd_cdc_msc_fatfs                                         |        |  √     |
+| peripheral/usb/usbd_cdc_msc_fatfs_upgrade                                 |        |  √     |
+| peripheral/usb/usbd_hid_composite                                         |        |  √     |
+| peripheral/usb/usbd_hid_keyboard                                          |        |  √     |
+| peripheral/usb/usbh_msc_file_explorer                                     |        |  √     |
 | peripheral/wdg/iwdg                                                       |  √     |  √     |
 | peripheral/wdg/wwdg                                                       |  √     |  √     |
 | prop_24g/ls_prop_24g                                                      |  √     |        |

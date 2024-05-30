@@ -7,10 +7,3 @@ _build/
 *.uvguix.*
 *.map
 *__info_array.c
-*.psl
-*.xcl
-*.crun
-*.dbgdt
-*.dnx
-*.wsdt
-*.cspy.bat

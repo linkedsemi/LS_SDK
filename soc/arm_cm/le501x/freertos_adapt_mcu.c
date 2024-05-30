@@ -382,15 +382,12 @@ bool mac_sleep(void)
     return false;
 }
 __attribute((weak)) void ls24_reg_store(void){}
-extern void uart_log_pause(void);
-extern void uart_log_resume(void);
 static bool ls_mcu_sleep_wakeup_freertos(void)
 {
     bool enter_sleep = false;
     if (!peri_status_busy() && !app_event_status_busy())
     {
         vPortEnterCritical();
-        uart_log_pause();
         if(mac_sleep())
         {
             ls24_reg_store();
@@ -398,7 +395,6 @@ static bool ls_mcu_sleep_wakeup_freertos(void)
             clr_mcu_wkup_status();
             enter_sleep = true;
         }
-        uart_log_resume();
         vPortExitCritical();
         
         if (enter_sleep)

@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const unsigned char one_bits[];
 /// Number of '1' bits in a byte
 #define NB_ONE_BITS(byte)   (one_bits[(byte) & 0x0F] + one_bits[(byte) >> 4])
@@ -20,7 +24,7 @@ extern const unsigned char one_bits[];
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
 
-#define CEILING(dividend,divisor) ((dividend)/(divisor) + (((dividend)%(divisor))?1:0))
+#define CEILING(dividend,divisor) (((dividend) + ((divisor) - 1))/(divisor))
 
 __attribute__((always_inline)) static inline int32_t time_diff(uint32_t time0,uint32_t time1)
 {
@@ -45,4 +49,9 @@ uint8_t count_leading_zeros(uint32_t x);
 uint32_t __div64_32(uint64_t *n, uint32_t base);
 
 void memcpy_rev(uint8_t *dest, const uint8_t *src, uint32_t len);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

@@ -2,6 +2,10 @@
 #define REG_CALC_TYPE_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct{
     volatile uint32_t SQRTSR;
     volatile uint32_t RDCND;
@@ -25,5 +29,10 @@ enum CALC_REG_DIVCSR_FIELD
     CALC_DIV_TRM_MASK = 0x200,
     CALC_DIV_TRM_POS = 9,
 };
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 

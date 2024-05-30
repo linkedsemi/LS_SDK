@@ -1,6 +1,10 @@
 #ifndef SDK_DEFAULT_CONFIG_H_
 #define SDK_DEFAULT_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SDK_USER_BUILTIN_TIMER_NUM_MAX
 #define SDK_USER_BUILTIN_TIMER_NUM_MAX 5
 #endif
@@ -65,11 +69,40 @@
 #define CHIP_TEMP_SENSOR 0
 #endif
 
+#ifndef LOG_UART_TXD
+#define LOG_UART_TXD (PB00)
+#endif
+#ifndef LOG_UART_RXD
+#define LOG_UART_RXD (PB01)
+#endif
+#ifndef LOG_UART_BAUDRATE
+#define LOG_UART_BAUDRATE UART_BAUDRATE_921600
+#endif
+#ifndef LOG_UART_WORDLENGTH
+#define LOG_UART_WORDLENGTH UART_BYTESIZE8
+#endif
+#ifndef LOG_UART_STOPBITS
+#define LOG_UART_STOPBITS UART_STOPBITS1
+#endif
+#ifndef LOG_UART_PARITY
+#define LOG_UART_PARITY UART_NOPARITY
+#endif
+#ifndef LOG_UART_MSBEN
+#define LOG_UART_MSBEN 0
+#endif
+
+#define BLE_MAC_TIMER 2
+#define OS_TICK_SOURCE BLE_MAC_TIMER
+
 #define SDK_BUILTIN_TIMER_MAX (SDK_USER_BUILTIN_TIMER_NUM_MAX+SDK_LSI_USED)
 #define SDK_PCLK_MHZ (SDK_HCLK_MHZ/SDK_PCLK_DIV)
 #define SDK_MAX_ACT_NUM    (SDK_MAX_CONN_NUM + 2)
 #define SDK_BUILTIN_TASK_NUM 1
 #define SDK_MAX_USER_TASK_NUM (SDK_BUILTIN_TASK_NUM + SDK_USER_TASK_NUM)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

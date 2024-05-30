@@ -1,5 +1,9 @@
 #include "ls_ble.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
   * @brief Adv payload parsing struct.
   */
@@ -21,3 +25,7 @@ struct adv_payload_struct
  ****************************************************************************************
  */
 bool dev_manager_adv_report_parse(uint8_t type, const struct adv_report_evt* adv_report, struct adv_payload_struct* typedata);
+
+#ifdef __cplusplus
+}
+#endif

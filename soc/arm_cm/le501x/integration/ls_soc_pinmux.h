@@ -1,6 +1,11 @@
 #ifndef LS_SOC_PINMUX_H_
 #define LS_SOC_PINMUX_H_
 #include <stdint.h>
+#include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
   * @brief Init IO for SPI Flash (CS CLK DQ0 DQ1)
@@ -25,8 +30,9 @@ void pinmux_hal_flash_quad_deinit(void);
 /**
   * @brief  GPIO initilization
   * @param  clk  Specific GPIO pin
+  * @param  cpol  Clock polarity state
   */
-void pinmux_ssi_clk_init(uint8_t clk);
+void pinmux_ssi_clk_init(uint8_t clk, uint8_t cpol);
 
 /**
   * @brief     GPIO initilization as ssi nss0
@@ -65,10 +71,46 @@ void pinmux_ssi_dq2_init(uint8_t dq2);
 void pinmux_ssi_dq3_init(uint8_t dq3);
 
 /**
+  * @brief    DeInit SSI Clk IO
+  */
+void pinmux_ssi_clk_deinit(void);
+
+/**
+  * @brief    DeInit SSI nss0 IO
+  */
+void pinmux_ssi_nss0_deinit(void);
+
+/**
+  * @brief    DeInit SSI nss1 IO
+  */
+void pinmux_ssi_nss1_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq0 IO
+  */
+void pinmux_ssi_dq0_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq1 IO
+  */
+void pinmux_ssi_dq1_deinit(void);
+
+/**
+  * @brief   DeInit SSI dq2 IO
+  */
+void pinmux_ssi_dq2_deinit(void);
+
+/**
+  * @brief  DeInit SSI dq3 IO
+  */
+void pinmux_ssi_dq3_deinit(void);
+
+/**
   * @brief  Set pin mux function to spi2 master clk
   * @param  clk   Specific GPIO pin
+  * @param  cpol  Clock polarity state
   */
-void pinmux_spi2_master_clk_init(uint8_t clk);
+void pinmux_spi2_master_clk_init(uint8_t clk, uint8_t cpol);
 
 /**
   * @brief   Set pin mux function to spi2 master nss
@@ -682,5 +724,8 @@ void pinmux_pdm_data1_init(uint8_t pin);
 void pinmux_pdm_data1_deinit(void);
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

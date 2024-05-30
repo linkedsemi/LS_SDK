@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///Maximal number of BAS that can be added in the DB
 #define BASS_NB_BAS_INSTANCES_MAX         (2)
 #define PRF_BASS_BATTERY_LVL_MAX 100
@@ -30,5 +34,9 @@ void dev_manager_prf_bass_server_add(uint8_t sec_lvl,struct bas_db_cfg*cfg,uint1
 void bas_batt_lvl_update(uint8_t ins_idx, uint8_t batt_lvl);
 
 void bas_batt_enable(uint8_t con_idx, bool enable, uint8_t old_bat_lvl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

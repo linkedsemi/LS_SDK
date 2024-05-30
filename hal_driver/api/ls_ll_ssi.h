@@ -4,6 +4,11 @@
 #include "ssi_misc.h"
 #include "field_manipulate.h"
 #include "ls_msp_ssi.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -1257,5 +1262,8 @@ static inline uint32_t LL_SSI_GetWaitCycles(reg_ssi_t *ssi)
 
 /** @}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

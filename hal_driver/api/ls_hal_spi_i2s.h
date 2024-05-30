@@ -1,15 +1,12 @@
 #ifndef LS_HAL_SPI_H_
 #define LS_HAL_SPI_H_
-#include <stdbool.h>
-#include "ls_ll_spi.h"
 #include "HAL_def.h"
-#include "ls_msp_spi_i2s.h"
 #include "field_manipulate.h"
-#include "log.h"
-#include "systick.h"
-#include "ls_dbg.h"
-#include "common.h"
+#include "ls_msp_spi_i2s.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** \addtogroup PERIPHERAL
  *  @{
@@ -584,6 +581,10 @@ void HAL_I2S_TxDMACpltCallback(I2S_HandleTypeDef *hi2s);
   * @retval None
   */
 void HAL_I2S_RxDMACpltCallback(I2S_HandleTypeDef *hi2s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

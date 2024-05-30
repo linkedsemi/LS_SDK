@@ -5,6 +5,10 @@
 #include "HAL_def.h"
 #include "ls_msp_wwdg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup PERIPHERAL
  *  @{
  */
@@ -46,6 +50,10 @@ HAL_StatusTypeDef HAL_WWDG_DeInit(void);
 
 
 /** @}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif 
 

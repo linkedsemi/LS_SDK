@@ -1,5 +1,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ls_hal_spi_i2s.h"
+#include <stdbool.h>
+#include "log.h"
+#include "systick.h"
+#include "ls_dbg.h"
+#include "common.h"
 
 #define SPI_I2S_TX_FIFO_DEPTH 16
 #define SPI_I2S_TX_FIFO_NOT_FULL(__HANDLE__) (REG_FIELD_RD((__HANDLE__)->Instance->SR, SPI_SR_TXFLV) < SPI_I2S_TX_FIFO_DEPTH)
@@ -167,75 +172,73 @@ static void spi_config(SPI_HandleTypeDef *hspi, bool itmode)
     }
 }
 
-static HAL_StatusTypeDef spi_timeout_handle(SPI_HandleTypeDef *hspi, uint32_t end_tick)
+static HAL_StatusTypeDef spi_data_transfer(SPI_HandleTypeDef *hspi, uint32_t Timeout)
 {
-    HAL_StatusTypeDef errorcode = HAL_OK;
-    if (hspi->Init.Mode == SPI_MODE_SLAVE)
-    {
-        if (time_diff(systick_get_value(), end_tick) > 0U)
-        {
-            errorcode = HAL_TIMEOUT;
-        }
-    }
-    return errorcode;
-}
+    uint32_t tickstart = systick_get_value();
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+    uint32_t end_tick = tickstart + timeout;
+    uint32_t txallowed = 0U;
 
-static void spi_data_transfer(SPI_HandleTypeDef *hspi, uint32_t end_tick)
-{
     while ((hspi->Tx_Env.Interrupt.Count > 0U) || (hspi->Rx_Env.Interrupt.Count > 0U))
     {
-        if (SPI_I2S_TX_FIFO_NOT_FULL(hspi) && (hspi->Tx_Env.Interrupt.Count > 0U))
+        if (SPI_I2S_TX_FIFO_NOT_FULL(hspi) && (hspi->Tx_Env.Interrupt.Count > 0U) && (txallowed == 1U))
         {
             hspi->Tx_Env.Interrupt.transfer_Fun(hspi);
+            /* Next Data is a reception (Rx). Tx not allowed */
+            txallowed = 0U;
         }
-        if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->Rx_Env.Interrupt.Count> 0U))
+        if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hspi)) && (hspi->Rx_Env.Interrupt.Count > 0U))
         {
             hspi->Rx_Env.Interrupt.transfer_Fun(hspi);
+            /* Next Data is a Transmission (Tx). Tx is allowed */
+            txallowed = 1U;
         }
-        spi_timeout_handle(hspi, end_tick);
+        if (hspi->Init.Mode == SPI_MODE_SLAVE)
+        {
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                return HAL_TIMEOUT;
+            }
+        }
     }
+
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint16_t Size, uint32_t Timeout)
 {   
-    uint32_t tickstart = systick_get_value();
-    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
-    uint32_t end_tick = tickstart + timeout;
+    HAL_StatusTypeDef hal_status;
     CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
     tx_para_init(hspi, pTxData, Size);
     rx_para_init(hspi, NULL, Size);
     spi_config(hspi,false);
-    spi_data_transfer(hspi, end_tick);
+    hal_status = spi_data_transfer(hspi, Timeout); 
     spi_disable(hspi);
-    return HAL_OK;
+    return hal_status;
 }
 
 HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
 {
-    uint32_t tickstart = systick_get_value();
-    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
-    uint32_t end_tick = tickstart + timeout;
-    SET_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
+    HAL_StatusTypeDef hal_status;
+    CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
     tx_para_init(hspi, NULL, Size);
     rx_para_init(hspi, pRxData, Size);
     spi_config(hspi,false);
-    spi_data_transfer(hspi, end_tick);
+    hal_status = spi_data_transfer(hspi, Timeout);
     spi_disable(hspi);
-    return HAL_OK;
+    return hal_status;
 }
 
 HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
 {
-    uint32_t tickstart = systick_get_value();
-    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
-    uint32_t end_tick = tickstart + timeout;
+    HAL_StatusTypeDef hal_status;
     CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
     tx_para_init(hspi, pTxData, Size);
     rx_para_init(hspi, pRxData, Size);
     spi_config(hspi,false);
-    spi_data_transfer(hspi, end_tick);
+    hal_status = spi_data_transfer(hspi, Timeout);
     spi_disable(hspi);
-    return HAL_OK;
+    return hal_status;
 }
 
 __attribute__((weak)) void HAL_SPI_CpltCallback(SPI_HandleTypeDef *hspi){}
@@ -292,7 +295,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pTxData,
 
 HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pRxData, uint16_t Size)
 {
-    SET_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
+    CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_RXONLY_MASK);
     tx_para_init(hspi, NULL, Size);
     rx_para_init(hspi, pRxData, Size);
     spi_config(hspi,true);
@@ -387,19 +390,6 @@ static void i2s_rx_load_data(I2S_HandleTypeDef *hi2s)
     hi2s->Rx_Env.Interrupt.Count--;
 }
 
-static HAL_StatusTypeDef i2s_timeout_handle(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
-{
-    HAL_StatusTypeDef errorcode = HAL_OK;
-    if ((hi2s->Init.Mode == I2S_MODE_SLAVE_TX) || (hi2s->Init.Mode == I2S_MODE_SLAVE_RX))
-    {
-        if (time_diff(systick_get_value(), end_tick) > 0U)
-        {
-            errorcode = HAL_TIMEOUT;
-        }
-    }
-    return errorcode;
-}
-
 static void i2s_load_tx_dummy_data(I2S_HandleTypeDef *hi2s)
 {
     hi2s->Instance->DR = 0;
@@ -444,20 +434,36 @@ static void i2s_config(I2S_HandleTypeDef *hi2s, uint16_t *pTxData, uint16_t *pRx
     }
 }
 
-static void i2s_tx_data(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
+static HAL_StatusTypeDef i2s_tx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
 {
+    uint32_t tickstart = systick_get_value();
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+    uint32_t end_tick = tickstart + timeout;
+
     while (hi2s->Tx_Env.Interrupt.Count > 0U)
     {
         if (SPI_I2S_TX_FIFO_NOT_FULL(hi2s))
         {
             hi2s->Tx_Env.Interrupt.i2s_transfer_Fun(hi2s);
         }
-        i2s_timeout_handle(hi2s, end_tick);
+        if ((hi2s->Init.Mode == I2S_MODE_SLAVE_TX) || (hi2s->Init.Mode == I2S_MODE_SLAVE_RX))
+        {
+            if (time_diff(systick_get_value(), end_tick) > 0)
+            {
+                return HAL_TIMEOUT;
+            }
+        }
     }
+
+    return HAL_OK;
 }
 
-static void i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
+static HAL_StatusTypeDef i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t Timeout)
 {
+    uint32_t tickstart = systick_get_value();
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+    uint32_t end_tick = tickstart + timeout;
+
     if (hi2s->Init.Mode == I2S_MODE_MASTER_RX)
     {
         while ((hi2s->Tx_Env.Interrupt.Count > 0U) || (hi2s->Rx_Env.Interrupt.Count > 0U))
@@ -466,11 +472,10 @@ static void i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
             {
                 hi2s->Tx_Env.Interrupt.i2s_transfer_Fun(hi2s);
             }
-            if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hi2s)) && (hi2s->Rx_Env.Interrupt.Count> 0U))
+            if ((SPI_I2S_RX_FIFO_NOT_EMPTY(hi2s)) && (hi2s->Rx_Env.Interrupt.Count > 0U))
             {
                 hi2s->Rx_Env.Interrupt.i2s_transfer_Fun(hi2s);
             }
-            i2s_timeout_handle(hi2s, end_tick);
         }
     }
     else 
@@ -481,9 +486,17 @@ static void i2s_rx_data(I2S_HandleTypeDef *hi2s, uint32_t end_tick)
             {
                 hi2s->Rx_Env.Interrupt.i2s_transfer_Fun(hi2s);
             }
-            i2s_timeout_handle(hi2s, end_tick);
+            if ((hi2s->Init.Mode == I2S_MODE_SLAVE_TX) || (hi2s->Init.Mode == I2S_MODE_SLAVE_RX))
+            {
+                if (time_diff(systick_get_value(), end_tick) > 0)
+                {
+                    return HAL_TIMEOUT;
+                }
+            }
         }
     }
+    
+    return HAL_OK;
 }
 
 static void i2s_disable(I2S_HandleTypeDef *hi2s)
@@ -494,24 +507,20 @@ static void i2s_disable(I2S_HandleTypeDef *hi2s)
 
 HAL_StatusTypeDef HAL_I2S_Transmit(I2S_HandleTypeDef *hi2s, uint16_t *pTxData, uint16_t Size, uint32_t Timeout)
 {
-    uint32_t tickstart = systick_get_value();
-    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
-    uint32_t end_tick = tickstart + timeout;
+    HAL_StatusTypeDef hal_status;
     i2s_config(hi2s, pTxData, NULL, Size, false);
-    i2s_tx_data(hi2s,end_tick);
+    hal_status = i2s_tx_data(hi2s, Timeout);
     i2s_disable(hi2s);
-    return HAL_OK;
+    return hal_status;
 }
 
 HAL_StatusTypeDef HAL_I2S_Receive(I2S_HandleTypeDef *hi2s, uint16_t *pRxData, uint16_t Size, uint32_t Timeout)
 { 
-    uint32_t tickstart = systick_get_value();
-    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
-    uint32_t end_tick = tickstart + timeout;
+    HAL_StatusTypeDef hal_status;
     i2s_config(hi2s, NULL, pRxData, Size, false);
-    i2s_rx_data(hi2s, end_tick);
+    hal_status =i2s_rx_data(hi2s, Timeout);
     i2s_disable(hi2s);
-    return HAL_OK;
+    return hal_status;
 }
 
 __attribute__((weak)) void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s){}

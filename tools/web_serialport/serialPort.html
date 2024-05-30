@@ -1,0 +1,145 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LINKEDSEMI UART启动Web串口助手</title>
+  <script src="serialPort.js"></script>
+</head>
+
+<body>
+  <nav style="background-color: #009966;">
+    <div style="display: flex;justify-content: center;align-items: center;height: 5vh; ">
+      <text style="color: white;font-size: 30px;">LINKEDSEMI UART启动Web串口助手</text>
+    </div>
+  </nav>
+
+<div style="padding-top: 50px; padding-left: 30px; ">
+  <div style="display: inline-block; max-width: 50%;text-align: justify;">
+        
+         <text>波特率：</text>
+        <select id="baudRate" style="width:200px">
+          <option value="110">110</option>
+          <option value="300">300</option>
+          <option value="600">600</option>
+          <option value="1200">1200</option>
+          <option value="2400">2400</option>
+          <option value="4800">4800</option>
+          <option value="7200">7200</option>
+          <option value="9600" selected="selected">9600</option>
+          <option value="14400">14400</option>
+          <option value="19200">19200</option>
+          <option value="38400">38400</option>
+          <option value="57600">57600</option>
+          <option value="115200">115200</option>
+          <option value="200000">200000</option>
+          <option value="230400">230400</option>
+          <option value="300000">300000</option>
+          <option value="400000">400000</option>
+          <option value="921600">921600</option>
+          <option value="166667">166667</option>
+          <option value="1000002">1M</option>
+          <option value="250000">250000</option>
+          <option value="1500000">1.5M</option>
+          <option value="333333">333333</option>
+          <option value="1999998">2M</option>
+        </select>
+        <br> <br>
+
+        <button id="btnOpen" onclick="openSerialPort()">打开</button>
+        <script>document.getElementById("btnOpen").addEventListener("click", openSerialPort);</script>
+
+        <button style="margin-left: 20px;" id="btnClose" onclick="closeSerialPort()">关闭</button>
+        <script>document.getElementById("btnClose").addEventListener("click", closeSerialPort);</script>
+        <br>
+
+        <!-- 显示串口状态的元素 -->
+        <div id="portStatus"></div>
+        <br/>
+
+        <button  id="clearWindow" onclick="clearWindow()">
+          清空窗口
+        </button>
+        <button style="margin-left: 10px;" id="downloadButton">点击下载</button>
+        <button style="margin-left: 10px;" onclick="highest_MainFrequency()" id="LEO">LEO:切主频到144M</button>
+        <button style="margin-left: 10px;" onclick="highest_MainFrequency()" id="LM3050">LM3050:切主频到128M</button>
+        <br><br>
+
+        <div>
+          <textarea rows="155" cols="70" id="receiverText">欢迎使用网页版串口助手。</textarea>
+        </div>
+  </div>
+
+  <style>
+    .box {
+      width: 700px;
+      height: 20px;
+      background-color: #f0f0f0;
+      border: 1px solid #000;
+    }
+  </style>
+
+  <div style="display: inline-block;  max-width: 55%; padding-left: 150px;">
+
+    <input type="file" id="fileInput" style="display: none;">
+    <button id="fileButton" onclick="download_bin()">烧录</button> 
+    <span id="fileName">未选中文件</span>
+    <br><br>
+
+    <button type="button" onclick="InitData()">初始同步命令</button><br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_0')" class="sendButton" data-target="box00">0x00</button> <input type="text" style="width: 380px;" id="myInput_0" placeholder=" 地址(4字节),数据(4字节)"><span style="margin-left: 5px;">MEM32_WRITE</span> <div class="box" id="box00"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_1')" class="sendButton" data-target="box01">0x01</button> <input type="text" style="width: 380px;" id="myInput_1" placeholder=" 地址(4字节)"><span style="margin-left: 5px;">MEM32_READ</span> <div class="box" id="box01"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_2')" class="sendButton" data-target="box02">0x02</button> <input type="text" style="width: 380px;" id="myInput_2" placeholder=" 地址(4字节),长度(4字节),数据"><span style="margin-left: 5px;">MEM_BULK_WRITE</span> <div class="box" id="box02"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_3')" class="sendButton" data-target="box03">0x03</button> <input type="text" style="width: 380px;" id="myInput_3" placeholder=" 地址(4字节),长度(4字节)"><span style="margin-left: 5px;">MEM_BULK_READ</span> <div class="box" id="box03"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_4')" class="sendButton" data-target="box04">0x04</button> <input type="text" style="width: 380px;" id="myInput_4" placeholder=" 函数指针(4字节),参数(4字节)"><span style="margin-left: 5px;">PROGRAM_GO</span> <div class="box" id="box04"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_5')" class="sendButton" data-target="box05">0x05</button> <input type="text" style="width: 380px;" id="myInput_5" placeholder=" CHIP_ERASE_OPCODE(0x60)"><span style="margin-left: 5px;">FLASH_CHIP_ERASE</span> <div class="box" id="box05"></div> <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box06">0x06</button> <span style="margin-left: 5px;">FLASH_READ_STATUS_REG_0</span> <div class="box" id="box06"></div>  <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box07">0x07</button> <span style="margin-left: 5px;">FLASH_READ_STATUS_REG_1</span> <div class="box" id="box07"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_8')" class="sendButton" data-target="box08">0x08</button> <input type="text" style="width: 380px;" id="myInput_8" placeholder=" 数据(2字节)"><span style="margin-left: 5px;">FLASH_WRITE_STATUS_REG</span> <div class="box" id="box08"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_9')" class="sendButton" data-target="box09">0x09</button> <input type="text" style="width: 380px;" id="myInput_9" placeholder=" 偏移(4字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_QUAD_PAGE_PROGRAM</span> <div class="box" id="box09"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_a')" class="sendButton" data-target="box0a">0x0a</button> <input type="text" style="width: 380px;" id="myInput_a" placeholder=" 偏移(4字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_PAGE_PROGRAM</span> <div class="box" id="box0a"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_b')" class="sendButton" data-target="box0b">0x0b</button> <input type="text" style="width: 380px;" id="myInput_b" placeholder=" 偏移(4字节)"><span style="margin-left: 5px;">FLASH_SECTOR_ERASE</span> <div class="box" id="box0b"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_c')" class="sendButton" data-target="box0c">0x0c</button> <input type="text" style="width: 380px;" id="myInput_c" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_QUAD_IO_READ</span> <div class="box" id="box0c"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_d')" class="sendButton" data-target="box0d">0x0d</button> <input type="text" style="width: 380px;" id="myInput_d" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_FAST_READ</span> <div class="box" id="box0d"></div> <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box0e">0x0e</button> <span style="margin-left: 5px;">FLASH_DEEP_POWER_DOWN</span> <div class="box" id="box0e"></div> <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box0f">0x0f</button> <span style="margin-left: 5px;">FLASH_RELEASE_FROM_DEEP_POWER_DOWN</span> <div class="box" id="box0f"></div> <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box10">0x10</button> <span style="margin-left: 5px;">FLASH_READ_JEDEC_ID</span> <div class="box" id="box10"></div> <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box11">0x11</button> <span style="margin-left: 5px;">FLASH_READ_UNIQUE_ID</span> <div class="box" id="box11"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_12')" class="sendButton" data-target="box12">0x12</button> <input type="text" style="width: 380px;" id="myInput_12" placeholder=" 索引(1字节)"><span style="margin-left: 5px;">FLASH_ERASE_SECURITY_AREA</span> <div class="box" id="box12"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_13')" class="sendButton" data-target="box13">0x13</button> <input type="text" style="width: 380px;" id="myInput_13" placeholder=" 地址(3字节),索引(1字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_PROGRAM_SECURITY_AREA</span> <div class="box" id="box13"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_14')" class="sendButton" data-target="box14">0x14</button> <input type="text" style="width: 380px;" id="myInput_14" placeholder=" 地址(3字节),索引(1字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_READ_SECURITY_AREA</span> <div class="box" id="box14"></div> <br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box15">0x15</button> <span style="margin-left: 5px;">FLASH_SOFTWARE_RESET</span> <div class="box" id="box15"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_16')" class="sendButton" data-target="box16">0x16</button> <input type="text" style="width: 380px;" id="myInput_16" placeholder=" 数量(1字节),{地址(4字节)，数据(4字节)}*数量"><span style="margin-left: 5px;">MEM32_WRITE_MULTI</span> <div class="box" id="box16"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_17')" class="sendButton" data-target="box17">0x17</button> <input type="text" style="width: 380px;" id="myInput_17" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_DUAL_IO_READ</span> <div class="box" id="box17"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_18')" class="sendButton" data-target="box18">0x18</button> <input type="text" style="width: 380px;" id="myInput_18" placeholder=" 偏移(4字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_DUAL_PAGE_PROGRAM</span> <div class="box" id="box18"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_19')" class="sendButton" data-target="box19">0x19</button> <input type="text" style="width: 380px;" id="myInput_19" placeholder=" 配置字(1字节)1:配置QPSI D2 D3;0:不配置QSPI D2 D3(1字节)"><span style="margin-left: 5px;">FLASH_INIT</span> <div class="box" id="box19"></div><br><br>
+    <button type="button" onclick="sendData(this)" class="sendButton" data-target="box1a">0x1a</button> <span style="margin-left: 5px;">RAM_BIST</span> <div class="box" id="box1a"></div> <br><br>
+    <button type="button" onclick="SendMultipleData(this,'myInput_1b')" class="sendButton" data-target="box1b">0x1b</button> <input type="text" style="width: 380px;" id="myInput_1b" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_READ_SFDP</span> <div class="box" id="box1b"></div> <br><br>
+  </div> 
+</div>
+
+<script>
+  // 监听下载按钮的点击事件
+  document.getElementById('downloadButton').addEventListener('click', function () {
+    if (targetBox.textContent) {
+      // 步骤2：创建 Blob 对象
+      const blob = new Blob([targetBox.textContent], { type: 'application/octet-stream' });
+      // 步骤3：创建 URL
+      const url = URL.createObjectURL(blob);
+      // 创建下载链接
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = 'receivedData.bin'; // 设置文件名
+      // 模拟点击下载链接
+      downloadLink.click();
+    }
+  });
+</script>
+
+</body>
+</html>
+</script>
+</body>
+
+</html>
