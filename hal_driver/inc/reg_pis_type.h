@@ -10,6 +10,7 @@ extern "C" {
 typedef struct
 {
     volatile uint32_t CH[PIC_CHANNEL_NUM];
+    volatile uint32_t RESERVED0[8];
     volatile uint32_t OER;
 } reg_pis_t;
 
