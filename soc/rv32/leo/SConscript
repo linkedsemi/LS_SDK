@@ -66,6 +66,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'rv32/leo/ls_msp_iwdg.c',
         'rv32/leo/ls_msp_wwdg.c',
         'rv32/leo/ls_msp_ps2h.c',
+        'rv32/leo/ls_msp_pis.c',
         'rv32/leo/ls_msp_cache.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
@@ -113,6 +114,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_wwdg.c',
         'src/ls_hal_iwdgv2.c',
         'src/ls_hal_ps2h.c',
+        'src/ls_hal_pis.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',
