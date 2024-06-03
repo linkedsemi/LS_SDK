@@ -4,16 +4,17 @@
 #include "platform.h"
 #include "log.h"
 
-static uint32_t random32bit;
-
 int main()
 {
     sys_init_none();
-    HAL_TRNG_Init();
+    uint32_t random32bit;
+#ifdef LEO
+    rng_init();
+#endif
     while (1)
     {
-        HAL_TRNG_GenerateRandomNumber(&random32bit);
-        LOG_I("RandomNumber: %x", random32bit);
+        random32bit = GenerateRandom32Bit();
+        LOG_I("Random32bit: 0x%x", random32bit);
         DELAY_US(1000 * 1000);
     }
 }

@@ -342,6 +342,12 @@ uint32_t get_trng_value()
     HAL_TRNG_DeInit();
     return random32bit;
 }
+
+uint32_t GenerateRandom32Bit()
+{
+    return get_trng_value();
+}
+
 bool flash_55nm;
 void get_flash_process(void)
 {

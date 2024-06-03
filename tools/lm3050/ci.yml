@@ -1495,45 +1495,7 @@ lm3050_iap_application_iar_build:
     - !reference [.release_rule, rules]
   script:
     - cd examples/peripheral/iap/iap_application/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iap_application.ewp -build * -log all    
-
-lm3050_trng_polling_build:
-  stage: build
-  script:
-    - cd examples/peripheral/trng/trng_polling && scons flags=-Werror ic=lm3050
-
-lm3050_trng_polling_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/trng/trng_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng_polling.uvprojx -o UVBuild/build.txt -j0
-
-lm3050_trng_polling_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/trng/trng_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_polling.ewp -build * -log all
-
-lm3050_trng_it_build:
-  stage: build
-  script:
-    - cd examples/peripheral/trng/trng_it && scons flags=-Werror ic=lm3050
-
-lm3050_trng_it_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/trng/trng_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng_it.uvprojx -o UVBuild/build.txt -j0
-
-lm3050_trng_it_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/trng/trng_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_it.ewp -build * -log all
-    
+   
 lm3050_pdm_it_build:
   stage: build
   script:

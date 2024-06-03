@@ -197,11 +197,6 @@ void ecc_status_set(bool stat)
     SYS_STAT_WR(peri_stat, ECC_STAT_BIT, stat);
 }
 
-void trng_status_set(bool stat)
-{
-    SYS_STAT_WR(peri_stat, TRNG_STAT_BIT, stat);
-}
-
 void touchkey_status_set(bool stat)
 {
     SYS_STAT_WR(peri_stat, TK_STAT_BIT, stat);

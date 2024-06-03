@@ -428,15 +428,10 @@ leo_owm_polling_build:
   script:
     - cd examples/peripheral/owm/owm_polling && scons flags=-Werror ic=leo
 
-leo_trng_polling_build:
+leo_trng_build:
   stage: build
   script:
-    - cd examples/peripheral/trng/trng_polling && scons flags=-Werror ic=leo
-
-leo_trng_it_build:
-  stage: build
-  script:
-    - cd examples/peripheral/trng/trng_it && scons flags=-Werror ic=leo
+    - cd examples/peripheral/trng && scons flags=-Werror ic=leo
 
 leo_pwm_build:
   stage: build
