@@ -152,11 +152,6 @@ void ecc_status_set(bool stat)
     *SRAM_BIT_BAND_ADDR(&peri_stat,ECC_STAT_BIT) = stat;
 }
 
-void trng_status_set(bool stat)
-{
-    *SRAM_BIT_BAND_ADDR(&peri_stat,TRNG_STAT_BIT) = stat;
-}
-
 void touchkey_status_set(bool stat)
 {
     *SRAM_BIT_BAND_ADDR(&peri_stat,TK_STAT_BIT) = stat;

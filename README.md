@@ -134,8 +134,7 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/tk/tk_polling                                                  |  √     |        |        |
 | peripheral/touchkey/touchkey_it                                           |        |  √     |  √     |
 | peripheral/touchkey/touchkey_polling                                      |        |  √     |  √     |
-| peripheral/trng/trng_it                                                   |  √     |  √     |  √     |
-| peripheral/trng/trng_polling                                              |  √     |  √     |  √     |
+| peripheral/trng                                                           |  √     |        |  √     |
 | peripheral/uart/ll_uart_it                                                |  √     |  √     |  √     |
 | peripheral/uart/ll_uart_polling                                           |  √     |  √     |  √     |
 | peripheral/uart/uart_dma                                                  |  √     |  √     |  √     |

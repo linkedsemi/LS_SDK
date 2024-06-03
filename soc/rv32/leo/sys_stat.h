@@ -66,8 +66,6 @@ void adc2_status_set(bool);
 
 void ecc_status_set(bool);
 
-void trng_status_set(bool);
-
 void comp_status_set(bool);
 
 void touchkey_status_set(bool);

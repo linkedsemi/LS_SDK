@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "field_manipulate.h"
-#include "ls_hal_trng.h"
 #include "ls_hal_sha.h"
 #include "platform.h"
 #include "common.h"
@@ -86,7 +85,6 @@ int main(void)
 {
     sys_init_none();
     HAL_LSECC_Init();
-    HAL_TRNG_Init();
     HAL_LSSHA_Init();
     #if secp256r1
     HAL_LSECC_PointMult(&secp256r1_param, (uint8_t*)&random32bit, BasePoint, pub_key1);//k*G
