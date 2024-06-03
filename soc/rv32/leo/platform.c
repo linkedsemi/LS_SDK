@@ -14,6 +14,10 @@
 #include "sleep.h"
 #include "ls_msp_qspiv2.h"
 #include "sw_timer.h"
+#include "reg_sysc_per.h"
+#include "ls_msp_timer.h"
+#include "ls_hal_pis.h"
+
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((aligned(64))) void (*interrupt_vector[IRQn_MAX])();
@@ -116,7 +120,6 @@ static void flash_swint_init()
     csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
     csi_vic_enable_irq(FLASH_SWINT_NUM);
 }
-
 void sys_init_none()
 {
     clk_flash_init();
@@ -128,6 +131,7 @@ void sys_init_none()
     low_power_init();
     systick_start();
     sw_timer_module_init();
+    HAL_PIS_Init();
 }
 
 void platform_reset(uint32_t error)
@@ -174,4 +178,36 @@ __attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
 uint32_t get_hclk_mhz()
 {
     return SDK_HCLK_MHZ;
+}
+
+void rng_init()
+{
+    /* TIMER */
+    SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_CLR_GPTIMB1_MASK;
+    SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_CLR_GPTIMB1_N_MASK;
+    SYSC_PER->PD_PER_SRST0 = SYSC_PER_SRST_SET_GPTIMB1_N_MASK;
+    SYSC_PER->PD_PER_CLKG0 = SYSC_PER_CLKG_SET_GPTIMB1_MASK;
+
+    LSGPTIMB->PSC = 0;
+    LSGPTIMB->ARR = 0xFFFFFFFF;
+    REG_FIELD_WR(LSGPTIMB->CR1, TIMER_CR1_DIR, 0);
+    REG_FIELD_WR(LSGPTIMB->CCMR1, TIMER_CCMR1_CC1S, 0x3);
+    REG_FIELD_WR(LSGPTIMB->SMCR, TIMER_SMCR_TS, 0);
+    REG_FIELD_WR(LSGPTIMB->SMCR, TIMER_SMCR_SMS, 4);
+    REG_FIELD_WR(LSGPTIMB->CR1, TIMER_CR1_CEN, 1);
+
+    /* PIS */
+    HAL_PIS_Config(0, CLK_LS, GPTIMB1_ITR0, PIS_SYNC_SRC_LEVEL, PIS_EDGE_NONE);
+}
+
+uint32_t GenerateRandom32Bit()
+{
+    uint32_t random32bit = 0;
+    for (uint8_t i = 0; i < 32; i++)
+    {
+        while ((LSGPTIMB->RIF & 0x40) == 0) ;
+        LSGPTIMB->ICR = TIMER_ICR_TIE_MASK;
+        random32bit |= (LSGPTIMB->CCR1 & 0x1) << i;
+    }
+    return random32bit;
 }
