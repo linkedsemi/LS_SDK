@@ -60,6 +60,10 @@ void clk_flash_init();
 
 uint32_t get_hclk_mhz();
 
+void rng_init();
+
+uint32_t GenerateRandom32Bit();
+
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
