@@ -193,8 +193,7 @@ void rng_init()
     REG_FIELD_WR(LSGPTIMB->CR1, TIMER_CR1_DIR, 0);
     REG_FIELD_WR(LSGPTIMB->CCMR1, TIMER_CCMR1_CC1S, 0x3);
     REG_FIELD_WR(LSGPTIMB->SMCR, TIMER_SMCR_TS, 0);
-    REG_FIELD_WR(LSGPTIMB->SMCR, TIMER_SMCR_SMS, 4);
-    REG_FIELD_WR(LSGPTIMB->CR1, TIMER_CR1_CEN, 1);
+    REG_FIELD_WR(LSGPTIMB->SMCR, TIMER_SMCR_SMS, 6);
 
     /* PIS */
     HAL_PIS_Config(0, CLK_LS, GPTIMB1_ITR0, PIS_SYNC_SRC_LEVEL, PIS_EDGE_NONE);
@@ -202,12 +201,33 @@ void rng_init()
 
 uint32_t GenerateRandom32Bit()
 {
-    uint32_t random32bit = 0;
-    for (uint8_t i = 0; i < 32; i++)
+    REG_FIELD_WR(LSGPTIMB->CR1, TIMER_CR1_CEN, 1);
+    uint32_t result=0, random32bit = 0;
+    static uint16_t data, predata = 0;
+    uint8_t clk_cnt=0, i = 0;
+    while ((LSGPTIMB->RIF & 0x40) == 0) ;
+    LSGPTIMB->ICR = TIMER_ICR_TIE_MASK;
+    predata = LSGPTIMB->CCR1;
+    while (1)
     {
         while ((LSGPTIMB->RIF & 0x40) == 0) ;
         LSGPTIMB->ICR = TIMER_ICR_TIE_MASK;
-        random32bit |= (LSGPTIMB->CCR1 & 0x1) << i;
+        data = LSGPTIMB->CCR1;
+        int16_t diff = data - predata;
+        LS_ASSERT(diff > 0);
+        result += diff;
+        predata = data;
+        if (++clk_cnt < RNG_32K_NUMBER)
+        {
+            continue;
+        }
+        random32bit |= (result & 0x1) << i;
+        if (i++ >= 32)
+        {
+        REG_FIELD_WR(LSGPTIMB->CR1, TIMER_CR1_CEN, 0);
+            return random32bit;
+        }
+        result = 0;
+        clk_cnt = 0;
     }
-    return random32bit;
 }
