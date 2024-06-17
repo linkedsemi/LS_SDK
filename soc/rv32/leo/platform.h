@@ -62,6 +62,9 @@ uint32_t get_hclk_mhz();
 
 void rng_init();
 
+#ifndef RNG_32K_NUMBER
+#define RNG_32K_NUMBER (20)
+#endif
 uint32_t GenerateRandom32Bit();
 
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
