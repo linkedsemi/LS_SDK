@@ -50,3 +50,8 @@ void disable_irq(int32_t irq)
 {
     csi_vic_disable_irq(irq);
 }
+
+uint32_t get_enabled_irq(int32_t irq)
+{
+    return csi_vic_get_enabled_irq(irq);
+}
