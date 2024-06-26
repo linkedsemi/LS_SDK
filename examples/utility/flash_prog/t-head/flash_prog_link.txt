@@ -1,6 +1,6 @@
 MEMORY
 {
-  RAM (rwx) : ORIGIN = 0x400000, LENGTH = 0x10000
+  RAM (rwx) : ORIGIN = 0x10001000, LENGTH = 0x10000
 }
 ENTRY(Reset_Handler)
 SECTIONS
@@ -39,7 +39,7 @@ SECTIONS
 		. = ALIGN(4);
         *(.sdata*)
 		*(.data*)
-		*(.xip_banned)
+		*(.xip_banned.*)
         . = ALIGN(4);
     	__data_lma__ = .;
    		__data_start__ = .;
@@ -64,7 +64,4 @@ SECTIONS
 	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
 	PROVIDE(__stack = __StackTop);
 	PROVIDE(__global_pointer$ = __data_start__ + (4K / 2) );
-    
-
-	
 }

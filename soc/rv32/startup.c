@@ -18,11 +18,15 @@ __attribute__ ((naked)) void Reset_Handler()
     __set_MTVEC((uint32_t)&exception_entry);
     __set_MTVT((uint32_t)interrupt_vector);
     __set_SP((uint32_t)&__StackTop);
-    SystemInit();
     extern uint32_t __bss_start__;
     extern uint32_t __bss_end__;
     uint32_t *start = &__bss_start__;
     uint32_t *end = &__bss_end__;
     memset32(start,0,end-start);
+    uint32_t *src = &__data_lma__;
+    start = &__data_start__;
+    end = &__data_end__;
+    memcpy32(start,src,end-start);
+    SystemInit();
     main();
 }

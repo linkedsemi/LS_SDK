@@ -10,9 +10,9 @@ uint32_t adc_test_num = 0;
 
 static void pinmux_adc_init(void)
 {
-    pinmux_adc1_in5_init();// PA01
-    pinmux_adc1_in6_init();// PA02
-    pinmux_adc1_in7_init();// PA03
+    pinmux_adc1_in5_init();// LM3050:PA01; LS1010:PA14
+    pinmux_adc1_in6_init();// LM3050:PA02; LS1010:PA15
+    pinmux_adc1_in7_init();// LM3050:PA03; LS1010:PB00
 }
 
 void Error_Handler(void)

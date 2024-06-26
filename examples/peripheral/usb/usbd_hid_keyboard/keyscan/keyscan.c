@@ -11,6 +11,7 @@
  ******************************************************************************/
 #include "keyscan.h"
 
+#include "sleep.h"
 /******************************************************************************
  External Const Declaration
  ******************************************************************************/
@@ -33,11 +34,11 @@
  ******************************************************************************/
 typedef struct keyscan
 {
-    uint8_t rowPinNum;
-    uint8_t colPinNum;
-    const uint8_t *rowPinArray;
-    const uint8_t *colPinArray;
-    uint32_t scanPeriod;
+    uint8_t         rowPinNum;
+    uint8_t         colPinNum;
+    const uint8_t   *rowPinArray;
+    const uint8_t   *colPinArray;
+    uint32_t        scanPeriod;
     KS_KEY_CALLBACK ks_Key_CallBack;
 }KEYSCAN_CTIL_st;
 /******************************************************************************
@@ -47,19 +48,22 @@ typedef struct keyscan
 /******************************************************************************
  Local function Declaration
  ******************************************************************************/
-static void vKey_Init(void);
-static void vScan_Key(void);
-static void Basic_Timer_Cfg(uint32_t period_ms);
+static void _vKeyboard_Init(void);
+static void _vScan_Key(void);
+static void _vBasic_Timer_Cfg(uint32_t period_ms);
 /******************************************************************************
  Local Variable Definition
  ******************************************************************************/
 #if  LONG_KEY_EN == 1
-uint16_t g_usLongKey_Press;			// long key press value
-uint16_t g_usLongKey_PressIng = 0; 	// long key press 
+uint16_t            g_usLongKey_Press;			// long key press value
+uint16_t            g_usLongKey_PressIng = 0; 	// long key press 
 #endif
-uint16_t g_usShortKey_Press;// short key press value
-TIM_HandleTypeDef TimHandle;
-KEYSCAN_CTIL_st _KEYSCAN_Controller = {0};
+uint16_t             g_usShortKey_Press = 0; // short key press value
+TIM_HandleTypeDef   _TIMER_Handle = {0};
+KEYSCAN_CTIL_st     _KEYSCAN_Controller = {0};
+
+const uint8_t        C_ucaKey_col_reg[] = KEYSCAN_COL_TABLES;//row pin array
+const uint8_t        C_ucaKey_row_reg[] = KEYSCAN_ROW_TABLES;//col pin array
 
 /******************************************************************************
  * Function:
@@ -71,14 +75,14 @@ KEYSCAN_CTIL_st _KEYSCAN_Controller = {0};
  * Overview:
  * Note:
  ******************************************************************************/
-static void Basic_Timer_Cfg(uint32_t period_ms)
+static void _vBasic_Timer_Cfg(uint32_t period_ms)
 {
-    TimHandle.Instance = LSGPTIMA;
-    TimHandle.Init.Prescaler = TIM_PRESCALER;
-    TimHandle.Init.Period = period_ms*TIM_PERIOD;
-    TimHandle.Init.ClockDivision = 0;
-    TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
-    HAL_TIM_Init(&TimHandle);
+    _TIMER_Handle.Instance = LSGPTIMA;
+    _TIMER_Handle.Init.Prescaler = TIM_PRESCALER;
+    _TIMER_Handle.Init.Period = period_ms*TIM_PERIOD;
+    _TIMER_Handle.Init.ClockDivision = 0;
+    _TIMER_Handle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    HAL_TIM_Init(&_TIMER_Handle);
 }
 /******************************************************************************
  * Function:
@@ -90,7 +94,7 @@ static void Basic_Timer_Cfg(uint32_t period_ms)
  * Overview:
  * Note:
  ******************************************************************************/
-static void vKey_Init(void)
+static void _vKeyboard_Init(void)
 {
     for (uint8_t i = 0; i < KEYSCAN_COL_NUM; i++)
     {
@@ -115,17 +119,16 @@ static void vKey_Init(void)
  * Overview:
  * Note:
  ******************************************************************************/
-void Craet_ScanKey(const uint8_t *row_pin_array, uint8_t row_pin_num,const uint8_t *col_pin_array, \
-                        uint8_t col_pin_num,uint32_t scan_period_ms, void (*keyscan_callback)(uint16_t))
+void keyscan_Create_Keyboard( void (*keyscan_callback)(uint16_t))
 {
-    _KEYSCAN_Controller.rowPinArray = row_pin_array;
-    _KEYSCAN_Controller.colPinArray = col_pin_array;
-    _KEYSCAN_Controller.rowPinNum = row_pin_num;
-    _KEYSCAN_Controller.colPinNum = col_pin_num;
-    _KEYSCAN_Controller.scanPeriod = scan_period_ms;
+    _KEYSCAN_Controller.rowPinArray = C_ucaKey_row_reg;
+    _KEYSCAN_Controller.colPinArray = C_ucaKey_col_reg;
+    _KEYSCAN_Controller.rowPinNum = KEYSCAN_ROW_NUM;
+    _KEYSCAN_Controller.colPinNum = KEYSCAN_COL_NUM;
+    _KEYSCAN_Controller.scanPeriod = KEYBORAD_SCAN_PERIOD;
     _KEYSCAN_Controller.ks_Key_CallBack = keyscan_callback;
-    Basic_Timer_Cfg(_KEYSCAN_Controller.scanPeriod);
-    vKey_Init();
+    _vBasic_Timer_Cfg(_KEYSCAN_Controller.scanPeriod);
+    _vKeyboard_Init();
 }
 /******************************************************************************
  * Function:
@@ -142,10 +145,10 @@ bool keyscan_Start(bool scan)
     bool res = false;
 	if (_KEYSCAN_Controller.scanPeriod) {
 		if (scan) {
-			HAL_TIM_Base_Start_IT(&TimHandle);
+			HAL_TIM_Base_Start_IT(&_TIMER_Handle);
 		}
 		else {
-			HAL_TIM_Base_Stop_IT(&TimHandle);
+			HAL_TIM_Base_Stop_IT(&_TIMER_Handle);
 		}
 		res = true;
 	}
@@ -162,7 +165,7 @@ bool keyscan_Start(bool scan)
  * Overview:
  * Note:
  ******************************************************************************/
-static void vScan_Key(void)
+static void _vScan_Key(void)
 {
     static uint16_t s_usOldKeyStatus = 0;
     static uint16_t s_usCurruntKeyStatus = 0;
@@ -261,8 +264,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim->Instance == LSGPTIMA)
     {
-        vScan_Key();
+        _vScan_Key();
     }
+}
+
+void io_exti_callback(uint8_t pin,exti_edge_t edge) 
+{
+    _KEYSCAN_Controller.ks_Key_CallBack(0x80);
 }
 
 

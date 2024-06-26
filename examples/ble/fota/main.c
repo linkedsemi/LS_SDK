@@ -10,13 +10,14 @@
 #include "reg_syscfg.h"
 #include "reg_rf.h"
 #include "prf_fotas.h"
-#include "tinycrypt/ecc_dsa.h"
 #include "ls_ble.h"
 #include "ls_dbg.h"
 #include "log.h"
 #include "common.h"
 #include "systick.h"
 #include "ota_settings.h"
+#include "uECC.h"
+
 #define FW_ECC_VERIFY (0)
 
 static uint8_t adv_obj_hdl;
@@ -145,6 +146,26 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u * evt)
     }
 }
 
+static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_name_ptr);
+    dev_name_ptr->value = (uint8_t*)"FOTA";
+    dev_name_ptr->length = sizeof("FOTA") - 1;
+}
+static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_appearance_ptr);
+    dev_appearance_ptr->appearance = 0;
+}
+static void get_slv_pref_param(struct gap_dev_info_slave_pref_param *dev_slv_pref_param_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_slv_pref_param_ptr);
+    dev_slv_pref_param_ptr->con_intv_min  = 8;
+    dev_slv_pref_param_ptr->con_intv_max  = 20;
+    dev_slv_pref_param_ptr->slave_latency =  0;
+    dev_slv_pref_param_ptr->conn_timeout  = 200;
+}
+
 static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u * evt, uint8_t con_idx)
 {
     switch(type)
@@ -163,6 +184,15 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u * evt, 
     break;
     case ADV_STOPPED:
         LOG_I("adv stopped");
+    break;
+    case GET_DEV_INFO_DEV_NAME:
+        get_dev_name((struct gap_dev_info_dev_name*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_APPEARANCE:
+        get_appearance((struct gap_dev_info_appearance*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_SLV_PRE_PARAM:
+        get_slv_pref_param((struct gap_dev_info_slave_pref_param*)evt, con_idx);
     break;
     default:
 

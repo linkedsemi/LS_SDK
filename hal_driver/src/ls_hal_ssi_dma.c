@@ -120,6 +120,80 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,&cfg,SSI_Transmit_DMA_Callback,(uint32_t)hssi);
     }
 }
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+static void SSI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
+        ssi_tx_dma_cb(hssi);
+    }
+}
+
+static void SSI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
+        ssi_rx_dma_cb(hssi);
+    }
+}
+
+static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t TX_Count,uint16_t RX_Count)
+{
+    hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|
+        FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
+        FIELD_BUILD(SSI_TXEIM,0);
+    hssi->REG->SSIENR = SSI_Enabled;
+    uint8_t data_width;
+    if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
+    {
+        data_width = TRANSFER_WIDTH_8BITS;
+    }else if(hssi->Init.ctrl.data_frame_size <= DFS_32_16_bits)
+    {
+        data_width = TRANSFER_WIDTH_16BITS;
+        TX_Count /= 2;
+        RX_Count /= 2;
+    }else
+    {
+        data_width = TRANSFER_WIDTH_32BITS;
+        TX_Count /= 4;
+        RX_Count /= 4;
+    }
+
+    struct ch_reg cfg;
+    if(RX_Data)
+    {
+        DMA_CHANNEL_CFG(cfg,
+            hssi->Rx_Env.DMA.DMA_Channel,
+            (uint32_t)hssi->DR_REG,
+            (uint32_t)RX_Data,
+            data_width,
+            RX_Count,
+            P2M,
+            0,
+            HAL_SSI_RX_DMA_Handshake_Get(hssi),
+            0,0,0,0);
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance, &cfg, SSI_Receive_DMA_Callback, (uint32_t)hssi);
+    }
+    hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
+    if(TX_Data)
+    {
+        DMA_CHANNEL_CFG(cfg,
+            hssi->Tx_Env.DMA.DMA_Channel,
+            (uint32_t)TX_Data,
+            (uint32_t)hssi->DR_REG,
+            data_width,
+            TX_Count,
+            M2P,
+            0,
+            HAL_SSI_TX_DMA_Handshake_Get(hssi),
+            0,0,0,0);
+        HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance, &cfg, SSI_Transmit_DMA_Callback, (uint32_t)hssi);
+    }
+}
+
 #else
 #include "ls_hal_dmac.h"
 static void SSI_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
@@ -202,7 +276,6 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Tx_Env.DMA.DMA_Channel,HAL_SSI_TX_DMA_Handshake_Get(hssi),(uint32_t)hssi);
     }
 }
-
 #endif
 
 HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
@@ -219,7 +292,7 @@ HAL_StatusTypeDef HAL_SSI_Receive_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_
     ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
     hssi->REG->CTRLR1 = Count - 1;
     hssi->REG->DMACR = SSI_RDMAE_MASK;
-    hssi->REG->DMARDLR = 1;
+    hssi->REG->DMARDLR = 0;
     ssi_dma_config(hssi,NULL,Data,Count,Count);
     hssi->REG->DR = 0;
     return HAL_OK;
@@ -230,7 +303,7 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_D
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
     hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
     hssi->REG->DMATDLR = 2;
-    hssi->REG->DMARDLR = 1;
+    hssi->REG->DMARDLR = 0;
     ssi_dma_config(hssi,TX_Data,RX_Data,Count,Count);
     return HAL_OK;
 }
@@ -240,8 +313,7 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_DMA(SSI_HandleTypeDef *hssi
     ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
     hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
     hssi->REG->DMATDLR = 2;
-    hssi->REG->DMARDLR = 1;
+    hssi->REG->DMARDLR = 0;
     ssi_dma_config(hssi,TX_Data,RX_Data,TX_Count,RX_Count);
     return HAL_OK;
 }
-

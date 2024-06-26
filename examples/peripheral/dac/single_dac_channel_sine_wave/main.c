@@ -1,18 +1,22 @@
 #include "platform.h"
 #include "ls_soc_gpio.h"
 #include "ls_hal_dac.h"
-#include "ls_hal_dmacv2.h"
 #include "ls_hal_timer.h"
 #include "sine_wave.h"
 #include "log.h"
+#if DMACV2
+#include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
+#else
+#include "ls_hal_dmac.h"
+#endif
 
 DEF_DMA_CONTROLLER(dmac1_inst,DMAC1);
 static DAC_HandleTypeDef DACx_Hdl;
 
 #define TIM_PRESCALER     (8-1)
 #define TIM_PERIOD        (4) /* Period Value  */
-
-static DAC_HandleTypeDef DACx_Hdl;
 
 TIM_HandleTypeDef TimHandle;
 
@@ -30,7 +34,11 @@ void Basic_Timer_Cfg(void)
 
 static void pinmux_dac_init(void)
 {
+    #ifdef LM3050
     pinmux_dac2_init();         // PC04
+    #elif defined LEO
+    pinmux_dac2_out1_init();    // PA03
+    #endif
 }
 
 void Error_Handler(void)

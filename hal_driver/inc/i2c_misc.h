@@ -54,7 +54,7 @@ enum
 #define I2C_IT_TXE                      I2C_IER_TXEIE_MASK
 #define I2C_IT_TC                       I2C_IER_TCIE_MASK
 #define I2C_IT_TCR                      I2C_IER_TCRIE_MASK
-#define I2C_IT_EVT                      I2C_IER_ADDRIE_MASK | I2C_IER_NACKIE_MASK | I2C_IER_STOPIE_MASK
+#define I2C_IT_EVT                      I2C_IER_ADDRIE_MASK | I2C_IER_NACKIE_MASK
 #define I2C_IT_ERR                      I2C_IER_BERRIE_MASK
 #define I2C_FLAG_TXE                    I2C_SR_TXE_MASK
 #define I2C_FLAG_RXNE                   I2C_SR_RXNE_MASK
@@ -109,7 +109,14 @@ enum
 #define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
                                        ((INSTANCE) == I2C2) || \
                                        ((INSTANCE) == I2C3))
-#endif          
+#elif defined LEO
+#define IS_I2C_ALL_INSTANCE(INSTANCE) (((INSTANCE) == I2C1) || \
+                                       ((INSTANCE) == I2C2) || \
+                                       ((INSTANCE) == I2C3) || \
+                                       ((INSTANCE) == I2C4) || \
+                                       ((INSTANCE) == I2C5) || \
+                                       ((INSTANCE) == I2C6))
+#endif
 
 #define IS_I2C_ADDRESSING_MODE(ADDRESS) (((ADDRESS) == I2C_ADDRESSINGMODE_7BIT) || \
                                          ((ADDRESS) == I2C_ADDRESSINGMODE_10BIT))

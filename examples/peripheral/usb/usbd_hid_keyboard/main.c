@@ -15,15 +15,15 @@
 #include "tusb.h"
 
 #include "usb_descriptors.h"
+
 /******************************************************************************
  External Const Definition
  ******************************************************************************/
-const uint8_t C_ucaKey_col_reg[] = KEYSCAN_COL_TABLES;//row pin array
-const uint8_t C_ucaKey_row_reg[] = KEYSCAN_ROW_TABLES;//col pin array
+
 /******************************************************************************
  External Variable Declaration
  ******************************************************************************/
-uint32_t g_ScanPeriod = 1;//1ms
+
 /******************************************************************************
  Local Const Definition
  ******************************************************************************/
@@ -38,7 +38,6 @@ Local Macro Definition
 /******************************************************************************
  Local function Declaration
  **********************************************************************a********/
-void Led_init(void);
 void led_blinking_task(void);
 void hid_task(uint16_t ShortKey_Press);
 /******************************************************************************
@@ -57,7 +56,7 @@ enum  {
 
 static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 
-
+volatile bool g_light_sleep_flag = false;
 
 /*------------- MAIN -------------*/
 int main(void)
@@ -66,7 +65,7 @@ int main(void)
 
   // init device stack on configured roothub port
   tud_init(BOARD_TUD_RHPORT);
-  Craet_ScanKey(C_ucaKey_row_reg, KEYSCAN_ROW_NUM, C_ucaKey_col_reg, KEYSCAN_COL_NUM, g_ScanPeriod, hid_task);
+  keyscan_Create_Keyboard(hid_task);//The hid_task function is called when a press is detected
   keyscan_Start(true);
   while (1)
   {
@@ -152,16 +151,14 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
 void hid_task(uint16_t ShortKey_Press)
 {
   // Remote wakeup
-  if ( tud_suspended() && ShortKey_Press )
+  if ( tud_suspended()&&(ShortKey_Press))
   {
     // Wake up host if we are in suspend mode
     // and REMOTE_WAKEUP feature is enabled by host
     tud_remote_wakeup();
-  }else
-  {
+  }
     // Send the 1st of report chain, the rest will be sent by tud_hid_report_complete_cb()
     send_hid_report(REPORT_ID_KEYBOARD, ShortKey_Press);
-  }
 }
 
 // Invoked when sent REPORT successfully to host
@@ -209,11 +206,11 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
       {
         // Capslock On: disable blink, turn led on
         blink_interval_ms = 0;
-        board_led_write(true);
+        // board_led_write(true);
       }else
       {
         // Caplocks Off: back to normal blink
-        board_led_write(false);
+        // board_led_write(false);
         blink_interval_ms = BLINK_MOUNTED;
       }
     }
@@ -235,6 +232,6 @@ void led_blinking_task(void)
   if ( board_millis() - start_ms < blink_interval_ms) return; // not enough time
   start_ms += blink_interval_ms;
 
-  board_led_write(led_state);
+  // board_led_write(led_state);
   led_state = 1 - led_state; // toggle
 }

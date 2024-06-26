@@ -1,6 +1,6 @@
 #include "FlashOS.h"
 #include "reg_base_addr.h"
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 /**
  * structure to describe flash device
  */

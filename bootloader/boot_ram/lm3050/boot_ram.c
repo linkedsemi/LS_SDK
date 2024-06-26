@@ -7,7 +7,14 @@
 #include "common.h"
 #include "reg_sysc_awo_type.h"
 #include "reg_v33_rg_type.h"
-#define APP_ADDR 0x800300
+#include "ls_hal_sha.h"
+#include "../../module/micro-ecc/uECC.h"
+
+#define APP_ADDR 0x800500
+#define APP_OFFSET 0x500
+#define APP_SIGN_OFFSET APP_OFFSET - 0x40
+#define APP_SIZE_INFO APP_OFFSET - 0x44
+
 
 __NO_RETURN static void boot_app(uint32_t base)
 {
@@ -38,6 +45,35 @@ static void trim_val_load()
         V33_RG->TRIM0 = trim_value[6];
     }
 }
+
+extern bool sec_boot;
+extern bool secp256k1;
+extern uint8_t pub_key[64];
+bool signature_verification(uint8_t *signature)
+{
+    uint32_t app_len;
+    uint32_t digest[SHA256_WORDS_NUM];
+    hal_flash_dual_io_read(APP_SIZE_INFO, (uint8_t *)&app_len,sizeof(app_len));
+    HAL_LSSHA_Init();
+    HAL_LSSHA_SHA256((void *)APP_ADDR,app_len,digest);
+    HAL_LSSHA_DeInit();
+    uECC_Curve curve = secp256k1 ? uECC_secp256k1() : uECC_secp256r1();
+    uint8_t result =  uECC_verify(pub_key,(uint8_t *)digest,32,signature,curve);
+    return result;
+}
+
+static void ecc_verify(void)
+{
+    bool passed = false;
+    uint8_t signature[64];
+    if(sec_boot)
+    {
+        hal_flash_dual_io_read(APP_SIGN_OFFSET,signature,sizeof(signature));
+        passed = signature_verification(signature);
+        while(passed == false);
+    }
+}
+
 __NO_RETURN void boot_ram_start()
 {
     __disable_irq();
@@ -47,5 +83,6 @@ __NO_RETURN void boot_ram_start()
     hal_flash_xip_start();
     lscache_cache_enable(1);
     trim_val_load();
+    ecc_verify();
     boot_app(APP_ADDR);
 }

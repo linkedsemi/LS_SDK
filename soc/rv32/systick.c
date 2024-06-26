@@ -6,7 +6,7 @@
 #define RV_TIME_IRQ_IDX 7
 static uint32_t total_ticks;
 
-XIP_BANNED void SysTick_Handler()
+void XIP_BANNED_FUNC(SysTick_Handler)
 {
     unsigned long long target;
     do{
@@ -16,7 +16,7 @@ XIP_BANNED void SysTick_Handler()
     }while(target<CORET->MTIME);
 }
 
-void systick_start(void)
+__attribute__((weak)) void systick_start(void)
 {
     total_ticks = 0;
     rv_set_int_isr(RV_TIME_IRQ_IDX,SysTick_Handler);
@@ -25,12 +25,12 @@ void systick_start(void)
     csi_vic_enable_irq(RV_TIME_IRQ_IDX);
 }
 
-XIP_BANNED uint32_t systick_get_value(void)
+uint32_t XIP_BANNED_FUNC(systick_get_value)
 {
     return total_ticks;
 }
 
-XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
+bool XIP_BANNED_FUNC(systick_poll_timeout,uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
 {
     va_list ap;
     uint32_t end_tick = start_tick + timeout;

@@ -280,10 +280,23 @@ uint8_t io_get_output_val(uint8_t pin)
     return SYSC_AWO->IO[x->port].OE_DOT >> x->num & 0x1;
 }
 
-uint8_t io_read_pin(uint8_t pin)
+uint8_t io_get_input_val(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     return SYSC_AWO->IO[x->port].DIN >> x->num & 0x1;
+}
+
+uint8_t io_read_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (SYSC_AWO->IO[x->port].OE_DOT & (1<<16<<x->num))
+    {
+        return io_get_output_val(pin);
+    }
+    else
+    {
+        return io_get_input_val(pin);
+    }
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)
@@ -337,13 +350,14 @@ io_pull_type_t io_pull_read(uint8_t pin)
 void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    WRITE_REG(SYSC_AWO->IO[x->port].DS, (drive&0x1)<< (x->num) |((drive&0x2)<< (x->num +15))) ;
+    MODIFY_REG(SYSC_AWO->IO[x->port].DS, 0x1<< (x->num) | (0x1<< (x->num +16)), (drive&0x1)<< (x->num) |(((drive&0x2)>>1)<< (x->num +16)));
 }
 
 io_drive_type_t io_drive_capacity_read(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    return (((READ_REG(SYSC_AWO->IO[x->port].DS) & 0xffff) >> x->num) | READ_REG(SYSC_AWO->IO[x->port].DS) >> (x->num+15));
+    uint32_t tmp = READ_REG(SYSC_AWO->IO[x->port].DS);
+    return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
 }
 
 static void v33_ext_intr_mask(uint8_t group,exti_edge_t edge)
@@ -537,6 +551,7 @@ static void per_func_disable(uint8_t func_io_num)
     {
         SYSC_AWO->PIN_SEL1 &= ~(1<<func_io_num);
     }
+    MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),0);
 }
 
 static void iic_io_cfg(uint8_t scl,uint8_t sda)

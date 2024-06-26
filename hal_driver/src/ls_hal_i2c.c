@@ -79,9 +79,10 @@ static bool I2C_speed_config_calc_master_dft(uint8_t speed, struct i2c_speed_con
     if (0 == speed_config->role)
     {
         uint32_t speed_array[I2C_SPEED_MAX] = {100*1000, 400*1000, 1000*1000};
-        uint16_t cycle_count = I2C_CLOCK / speed_array[speed];
+        uint8_t prescaler = 1;
+        uint16_t cycle_count = I2C_CLOCK / speed_array[speed]/ (prescaler + 1);
         int16_t scll, sclh, scldel, sdadel;
-        uint8_t prescaler = 0;
+
         if (cycle_count > 256)
         {
             for (uint8_t i = 1; prescaler < 16; i++)
@@ -125,10 +126,10 @@ static bool I2C_speed_config_calc_master_dft(uint8_t speed, struct i2c_speed_con
             scldel = 5;
         }
         sdadel = scldel - 4;
-        if (sdadel > 4)
+        if (sdadel > 10)
         {
             /* We should set a ceiling for SDADEL. This is unnecessary, and will reduce compatibility if we are IIC slave */
-            sdadel = 4;
+            sdadel = 10;
         }
         else if (sdadel < 1)
         {
@@ -815,6 +816,277 @@ RECEIVE_FINISH:
     }
 }
 
+/**
+ * @brief   i2c主机，读取设备地址DevAddress指定内存MemAddress, 长度为Size字节数据到pData指向的内存中。
+ * @param   [in] hi2c: 指向i2c的配置信息.包含i2c寄存器的基地址等
+ *          DevAddress: 从设备地址
+ *          MemAddress: 内存地址
+ *          MemAddSize: 内存地址占用的字节数
+ *          [out] pData: 指向读到的内存地址值
+ *          Size: 读的字节数
+ *          Timeout: 读操作的超时时间，单位ms
+ * @return
+ *          HAL_INVALIAD_PARAM:指针为空
+ *          HAL_BUSY:i2c总线忙
+ *          HAL_ERROR:总线错误
+ *          HAL_OK:读成功
+ */
+HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+    /* i2c不处于就绪状态，返回忙 */
+    if (hi2c->State != HAL_I2C_STATE_READY) {
+        return HAL_BUSY;
+    }
+
+    uint32_t tickstart = systick_get_value(); /* 获取当前系统时钟，用于判断超时 */
+    if (pData == NULL || MemAddSize == 0 || Size == 0  || Timeout == 0)
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+    /* 使能i2c 时钟，并等待总线空闲 */
+    __HAL_I2C_ENABLE(hi2c);
+    if (I2C_WaitOnFlagUntilTimeout(hi2c, I2C_FLAG_BUSY, SET, I2C_TIMEOUT_BUSY_FLAG, tickstart) != HAL_OK)
+    {
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_BUSY;
+    }
+    
+    hi2c->State       = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode        = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode   = HAL_I2C_ERROR_NONE;
+
+    hi2c->pBuffPtr    = (uint8_t *)&MemAddress;
+    hi2c->XferCount   = MemAddSize;
+    hi2c->XferSize    = hi2c->XferCount;
+
+    /* 清除状态寄存器，配置主机为软件结束模式，在传输完成NBYTES数据后设置TC标志 */
+    __HAL_I2C_CLEAR_SR(hi2c);
+    CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | I2C_CR2_RELOAD_MASK | I2C_CR2_NBYTES_MASK);
+    SET_BIT(hi2c->Instance->CR2, (((uint32_t)hi2c->XferSize) << I2C_CR2_NBYTES_POS));						
+    
+    /* Clear TXFIFO */
+    __HAL_I2C_CLR_TXDR(hi2c);
+
+    if (I2C_MasterRequestRead_Write(hi2c, DevAddress, Timeout, tickstart, false) != HAL_OK)
+    {
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_ERROR;
+    }
+
+    while (1)
+    {
+        I2C_FIFO_TX(hi2c);
+        if (0 == hi2c->XferCount)
+        {
+            break;
+        }
+        /* Timeout check is necessary for I2C master, because I2C slave can hold bus which will lead to Timeout */
+        if (I2C_WaitOnFLVUntilTimeout(i2c_txflvnfandstop_poll, hi2c, Timeout, tickstart) != HAL_OK)
+        {
+            /* Stop event is detected in I2C_WaitOnFLVUntilTimeout. We handle this case out of the while loop */
+            if (hi2c->ErrorCode == HAL_I2C_ERROR_BERR)
+            {
+                break; 
+            }
+            /* Master failed send data to bus in time. It's likely to happen when the bus is hold by slave.*/
+            hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+            __HAL_I2C_DISABLE(hi2c);
+            return HAL_ERROR;
+        }
+    }
+
+    if (I2C_WaitOnItSourceUntilTimeout(hi2c, I2C_RIF_TCRI_MASK, RESET, Timeout, tickstart) != HAL_OK)
+    {
+        /* Stop event Timeout. It's likely to happen when the bus is hold by slave.*/
+        hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_ERROR;
+    }
+
+    /* 判断内存地址地址是否全部发送完毕 */
+    hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+    if (0 == hi2c->XferCount)
+    {
+        hi2c->ErrorCode = HAL_I2C_ERROR_NONE;
+    }
+    else
+    {
+        hi2c->ErrorCode = HAL_I2C_ERROR_BERR;
+    }
+    
+    /* 读内存地址地址，对应的值 */
+    hi2c->State       = HAL_I2C_STATE_BUSY_RX;
+    hi2c->Mode        = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode   = HAL_I2C_ERROR_NONE;
+
+    hi2c->pBuffPtr    = pData;
+    hi2c->XferCount   = Size;
+    hi2c->XferSize    = hi2c->XferCount;
+
+    /* Clear TXFIFO */
+    __HAL_I2C_CLR_TXDR(hi2c); 
+    __HAL_I2C_CLEAR_SR(hi2c);    
+    CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | I2C_CR2_RELOAD_MASK | I2C_CR2_NBYTES_MASK);
+    SET_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | (((uint32_t)hi2c->XferSize) << I2C_CR2_NBYTES_POS));
+
+    if (I2C_MasterRequestRead_Write(hi2c, DevAddress, Timeout, tickstart, true) != HAL_OK)
+    {
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_ERROR;
+    }
+    
+    while (1)
+    {
+        while (__HAL_I2C_GET_RXFLV(hi2c) > 0 && (hi2c)->XferCount > 0)
+        {
+            *hi2c->pBuffPtr = (uint8_t)(hi2c->Instance->RXDR);
+            hi2c->pBuffPtr++;
+            hi2c->XferCount--;
+        }
+        if (0 == hi2c->XferCount)
+        {
+            break;
+        }
+        if (I2C_WaitOnFLVUntilTimeout(i2c_rxflvnzandstop_poll, hi2c, Timeout, tickstart) != HAL_OK) 
+        {
+            __HAL_I2C_DISABLE(hi2c);
+            return HAL_ERROR;
+        }
+    }
+    if (I2C_WaitOnItSourceUntilTimeout(hi2c, I2C_RIF_STOPRI_MASK, RESET, Timeout, tickstart) != HAL_OK)
+    {
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_ERROR;
+    }
+
+    __HAL_I2C_CLEAR_FLAG(hi2c, I2C_CFR_STOPCF_MASK);
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    hi2c->ErrorCode = HAL_I2C_ERROR_NONE;
+    __HAL_I2C_DISABLE(hi2c);
+    return HAL_OK;
+
+}
+
+/**
+ * @brief   i2c主机，向设备地址DevAddress, 指定内存MemAddress, 写入长度为Size的字节数据
+ * @param   [in] hi2c: 指向i2c的配置信息.包含i2c寄存器的基地址等
+ *          DevAddress: 从设备地址
+ *          MemAddress: 内存地址
+ *          MemAddSize: 内存地址占用的字节数
+ *          [in] pData: 指向写入内存地址的值
+ *          Size: 字节数
+ *          Timeout: 读操作的超时时间，单位ms
+ * @return
+ *          HAL_INVALIAD_PARAM:指针为空
+ *          HAL_BUSY:i2c总线忙
+ *          HAL_ERROR:总线错误
+ *          HAL_OK:读成功
+ */
+HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,
+    uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+    /* i2c不处于就绪状态，返回忙 */
+    if (hi2c->State != HAL_I2C_STATE_READY) {
+        return HAL_BUSY;
+    }
+
+    uint32_t tickstart = systick_get_value(); /* 获取当前系统时钟，用于判断超时 */
+    if (pData == NULL || MemAddSize == 0 || Size == 0  || Timeout == 0)
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+    /* 使能i2c 时钟，并等待总线空闲 */
+    __HAL_I2C_ENABLE(hi2c);
+    if (I2C_WaitOnFlagUntilTimeout(hi2c, I2C_FLAG_BUSY, SET, I2C_TIMEOUT_BUSY_FLAG, tickstart) != HAL_OK)
+    {
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_BUSY;
+    }
+
+    /* 清除状态寄存器，启动发送，发送设备地址和内存地址 */ 
+    __HAL_I2C_CLEAR_SR(hi2c);
+    CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | I2C_CR2_RELOAD_MASK | I2C_CR2_NBYTES_MASK);
+    SET_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | (((uint32_t)(Size + MemAddSize)) << I2C_CR2_NBYTES_POS));	
+
+    hi2c->State       = HAL_I2C_STATE_BUSY_TX;
+    hi2c->Mode        = HAL_I2C_MODE_MASTER;
+    hi2c->ErrorCode   = HAL_I2C_ERROR_NONE;
+
+    hi2c->pBuffPtr    = (uint8_t *)&MemAddress;
+    hi2c->XferCount   = MemAddSize;
+    hi2c->XferSize    = hi2c->XferCount;
+
+    /* Clear TXFIFO */
+    __HAL_I2C_CLR_TXDR(hi2c);
+
+    /* 发送起始信号和设备地址 */
+    if (I2C_MasterRequestRead_Write(hi2c, DevAddress, Timeout, tickstart, false) != HAL_OK)
+    {
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_ERROR;
+    }
+    /* 配置主机为软件结束模式，在传输完成NBYTES数据后设置TC标志 */
+    int32_t memAddrSendOver = 0;
+    while (1)
+    {
+        I2C_FIFO_TX(hi2c);
+        if (0 == hi2c->XferCount)
+        {
+            /* 内存地址发送完毕,准备写数据 */
+            if (memAddrSendOver == 0) {
+                hi2c->pBuffPtr    = pData;
+                hi2c->XferCount   = Size;
+                hi2c->XferSize    = hi2c->XferCount;
+                memAddrSendOver = 1;
+                continue;
+            }
+            break;
+        }
+        /* Timeout check is necessary for I2C master, because I2C slave can hold bus which will lead to Timeout */
+        if (I2C_WaitOnFLVUntilTimeout(i2c_txflvnfandstop_poll, hi2c, Timeout, tickstart) != HAL_OK)
+        {
+            LOG_I("I2C_FIFO_TX I2C_WaitOnFLVUntilTimeout\r\n");
+            /* Stop event is detected in I2C_WaitOnFLVUntilTimeout. We handle this case out of the while loop */
+            if (hi2c->ErrorCode == HAL_I2C_ERROR_BERR)
+            {
+                break; 
+            }
+            /* Master failed send data to bus in time. It's likely to happen when the bus is hold by slave.*/
+            hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+            __HAL_I2C_DISABLE(hi2c);
+            return HAL_ERROR;
+        }
+    }
+
+    /* 等到数据发送完成 */
+    if (I2C_WaitOnItSourceUntilTimeout(hi2c, I2C_RIF_TCRI_MASK, RESET, Timeout, tickstart) != HAL_OK)
+    {
+        /* Stop event Timeout. It's likely to happen when the bus is hold by slave.*/
+        hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+        __HAL_I2C_DISABLE(hi2c);
+        return HAL_ERROR;
+    }
+
+    /* 判断内存地址地址是否全部发送完毕 */
+    hi2c->XferCount += __HAL_I2C_GET_TXFLV(hi2c);
+    if (0 == hi2c->XferCount)
+    {
+        hi2c->ErrorCode = HAL_I2C_ERROR_NONE;
+    }
+    else
+    {
+        hi2c->ErrorCode = HAL_I2C_ERROR_BERR;
+    }
+    /* 清除停止位标志 */
+    __HAL_I2C_CLEAR_FLAG(hi2c, I2C_CFR_STOPCF_MASK);
+    hi2c->State = HAL_I2C_STATE_READY;
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+    __HAL_I2C_DISABLE(hi2c);
+    return hi2c->ErrorCode == HAL_I2C_ERROR_NONE ? HAL_OK : HAL_ERROR;
+}
+
 void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
 {
     uint32_t sr1itflags = hi2c->Instance->SR;
@@ -826,6 +1098,7 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_ADDRIE_MASK) != RESET)
         {
             I2C_ADDR(hi2c, sr1itflags);
+            SET_BIT(hi2c->Instance->IER, I2C_IER_STOPIE_MASK);
         }
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
@@ -853,6 +1126,7 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
         if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_ADDRIE_MASK) != RESET)
         {
             I2C_ADDR(hi2c, sr1itflags);
+            SET_BIT(hi2c->Instance->IER, I2C_IER_STOPIE_MASK);
         }
         else if (I2C_CHECK_IT_SOURCE(itsources, I2C_IER_STOPIE_MASK) != RESET)
         {
@@ -1022,7 +1296,7 @@ static void I2C_STOPF(I2C_HandleTypeDef *hi2c)
 {
     HAL_I2C_StateTypeDef CurrentState = hi2c->State;
     HAL_I2C_ModeTypeDef CurrentMode = hi2c->Mode;
-    __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR);
+    __HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_RXNE | I2C_IT_TXE | I2C_IT_TC | I2C_IT_ERR | I2C_FLAG_STOPF);
     __HAL_I2C_CLEAR_STOPFLAG(hi2c);
 
     bool tx_dma_en = LL_I2C_IsEnabledDMAReq_TX(hi2c->Instance);

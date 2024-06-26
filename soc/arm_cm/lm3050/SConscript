@@ -13,7 +13,8 @@ def plf_postaction(self,target):
         return
     self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     target_path = str(target[0]).replace('.elf','')
-    app_hex = self.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+    app_hex = self.Command(target_path+'.hex',target[0],Action('$OBJCOPY -O ihex --gap-fill 0 $SOURCES $TARGET'))
+    app_bin = self.Command(target_path+'.bin', target[0], Action('$OBJCOPY -O binary $SOURCES $TARGET'))
     info_sbl_bin = self.Command('build/$IC/info_sbl.bin','$SDK_ROOT/soc/arm_cm/lm3050/bin/bram.bin',Action(self.subst('python $SDK_ROOT/tools/lm3050/info_sbl_merge.py')+' $SOURCE $TARGET'))
     info_array_c = self.Command('$SDK_ROOT/soc/arm_cm/lm3050/__info_array.c',info_sbl_bin,Action(self.subst('python $SDK_ROOT/tools/bin2c/bin2c.py')+ ' $SOURCE __info_array 80 4 > $TARGET'))
     info_obj = self.Object(self.variant_dir_source(['$SDK_ROOT/soc/arm_cm/lm3050/__info_array.c']))
@@ -48,7 +49,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'arm_cm/lm3050/ls_msp_spi_i2s.c',
         'arm_cm/lm3050/ls_msp_ssi.c',
         'arm_cm/lm3050/ls_msp_timer.c',
-        'arm_cm/lm3050/ls_msp_trngv2.c',
         'arm_cm/lm3050/ls_msp_touchkey.c',
         'arm_cm/lm3050/ls_msp_dmacv2.c',
         'arm_cm/lm3050/ls_msp_adc.c',
@@ -91,7 +91,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_ssi.c',
         'src/ls_hal_timer.c',
         'src/ls_hal_touchkey.c',
-        'src/ls_hal_trngv2.c',
         'src/ls_hal_qspiv2.c',
         'src/ls_hal_flash_qspiv2.c',
         'src/ls_hal_flash.c',
@@ -189,7 +188,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_LM3050'])
     rtos_src = []
-    if not rtos is None:
+    if rtos == 'freertos':
         rtos_src = list(map(lambda x:os.path.join('$SDK_ROOT/rtos/freertos/',x),[
             'croutine.c',
             'event_groups.c',
@@ -207,6 +206,23 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         inc_list += ['$SDK_ROOT/rtos/freertos/include']
         self.Append(CPPDEFINES = ['FREERTOS'])
+    elif rtos == 'liteos':
+        sdk_root_abs = env['SDK_ROOT'].abspath
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/src/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/src/mm/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//utils/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//third_party/bounds_checking_function/src/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/arch/arm/cortex-m4/gcc/*.c', strings=True)
+        rtos_src += Glob(sdk_root_abs + '/rtos/kernel_liteos_m//kernel/arch/arm/cortex-m4/gcc/*.S', strings=True)
+        inc_list += [
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/utils',
+            '$SDK_ROOT/rtos/kernel_liteos_m/third_party/bounds_checking_function/include',
+            '$SDK_ROOT/rtos/kernel_liteos_m/third_party/bounds_checking_function/src',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/arm/cortex-m4/gcc/',
+            '$SDK_ROOT/rtos/kernel_liteos_m/kernel/arch/arm/cortex-m4/gcc/asm',
+        ]
     if self.get('LINKSCRIPT') is None:
         self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/arm_cm/lm3050/compiler/$COMPILER/link_script.txt"))
     if not 'progen' in self['TOOLS']:

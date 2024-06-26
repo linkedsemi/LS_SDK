@@ -1119,12 +1119,26 @@ uint8_t io_get_output_val(uint8_t pin)
     return val;
 }
 
-uint8_t io_read_pin(uint8_t pin)
+uint8_t io_get_input_val(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
     uint8_t val = (gpiox->DIN >> x->num) & 0x1;
     return val;
+}
+
+uint8_t io_read_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    if (gpiox->OE & (1 << x->num))
+    {
+        return io_get_output_val(pin);
+    }
+    else
+    {
+        return io_get_input_val(pin);
+    }
 }
 
 void io_toggle_pin(uint8_t pin)

@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "EC FD READWRITE",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/fdcan/app_readwrite/build/leo/app_readwrite.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "set mem inaccessible-by-default off",
+                "mem 0x08000000 0x08ffffff ro", 
+                // "reset",
+                "interrupt",
+                // "set $pc = 0x10000000",
+            ],
+        },
+    ]
+}

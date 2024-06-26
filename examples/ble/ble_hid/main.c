@@ -97,7 +97,6 @@ struct gap_pin_str passkey =
 };
 
 static void start_adv(void);
-static void hid_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx);
 
 const uint8_t hid_report_map[] =
 {
@@ -168,6 +167,27 @@ static void uptate_batt_timer_init(void)
     update_batt_timer_inst = builtin_timer_create(update_batt_timer_cb);
 }
 
+static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_name_ptr);
+    dev_name_ptr->value = (uint8_t *)APP_HID_DEV_NAME;
+    dev_name_ptr->length = APP_HID_DEV_NAME_LEN;
+}
+
+static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_appearance_ptr);
+    dev_appearance_ptr->appearance = 0;
+}
+static void get_slv_pref_param(struct gap_dev_info_slave_pref_param *dev_slv_pref_param_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_slv_pref_param_ptr);
+    dev_slv_pref_param_ptr->con_intv_min  = 8;
+    dev_slv_pref_param_ptr->con_intv_max  = 20;
+    dev_slv_pref_param_ptr->slave_latency =  0;
+    dev_slv_pref_param_ptr->conn_timeout  = 200;
+}
+
 static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx)
 {
     uint16_t ntf_cfg;
@@ -228,8 +248,14 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
         LOG_I("NUMERIC_COMPARE");
         break;
     case GET_DEV_INFO_DEV_NAME:
-        hid_server_get_dev_name((struct gap_dev_info_dev_name *)evt, con_idx);
-        break;
+        get_dev_name((struct gap_dev_info_dev_name*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_APPEARANCE:
+        get_appearance((struct gap_dev_info_appearance*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_SLV_PRE_PARAM:
+        get_slv_pref_param((struct gap_dev_info_slave_pref_param*)evt, con_idx);
+    break;
     default:
 
         break;
@@ -264,13 +290,6 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     }
 }
 
-static void hid_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx)
-{
-    LS_ASSERT(dev_name_ptr);
-    dev_name_ptr->value = (uint8_t *)APP_HID_DEV_NAME;
-    dev_name_ptr->length = APP_HID_DEV_NAME_LEN;
-}
-
 static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt)
 {
     uint16_t ntf_cfg;
@@ -300,6 +319,8 @@ static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt
         break;
     case HID_REPORT_WRITE:
         LOG_I("HID REPORT WRITE");
+        LOG_I("hid_idx = %d type = %d  idx = %d ",evt->write_report_req.hid_idx,evt->write_report_req.type,evt->write_report_req.idx);
+		LOG_HEX(evt->write_report_req.value,evt->write_report_req.length);
         break;
     default:
         break;
@@ -359,9 +380,13 @@ static void prf_added_handler(struct profile_added_evt *evt)
         struct hid_db_cfg db_cfg = {0};   
         db_cfg.hids_nb = 1;
         db_cfg.cfg[0].svc_features = HID_KEYBOARD;
-        db_cfg.cfg[0].report_nb = 1;
+        db_cfg.cfg[0].report_nb = 2;
+
         db_cfg.cfg[0].report_id[0] = 0;
         db_cfg.cfg[0].report_cfg[0] = HID_REPORT_IN;
+        db_cfg.cfg[0].report_id[1] = 0;
+        db_cfg.cfg[0].report_cfg[1] = HID_REPORT_OUT;
+
         db_cfg.cfg[0].info.bcdHID = 0X0111;
         db_cfg.cfg[0].info.bCountryCode = 0;
         db_cfg.cfg[0].info.flags = HID_WKUP_FOR_REMOTE | HID_NORM_CONN;

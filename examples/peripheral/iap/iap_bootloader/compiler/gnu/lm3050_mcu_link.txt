@@ -9,7 +9,7 @@ SECTIONS
 	.info :
 	{
 		KEEP(*(.rodata.__info_array))
-		. = ALIGN(0x100);
+		. = 0x500;
 	} >FLASH
 
 	__image_lma__ = LOADADDR(.info);
@@ -23,7 +23,7 @@ SECTIONS
 	
 	__vector_lma__ = LOADADDR(.vectors);
 
-	.data 0x20000134 :
+	.data 0x20000148 :
 	{
 		. = ALIGN(4);
 		__data_start__ = .;

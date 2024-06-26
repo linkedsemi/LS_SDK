@@ -14,6 +14,11 @@
 #define APP_CONFIG_ADDR_BASE    0x5000    // 0x00800000 + 0x5000
 #define APP_DATA_ADDR_BASE      0x5100      // 0x00800000 + 0x5100
 #define APP_DATA_ADDR_BASE_END  0x80000 // 0x00800000 + 0x80000
+#elif defined(LEO)
+#define APP_FLASH_ADDR_BASE     0x5000     // 0x00800000 + 0x5000
+#define APP_CONFIG_ADDR_BASE    0x5000    // 0x00800000 + 0x5000
+#define APP_DATA_ADDR_BASE      0x5100      // 0x00800000 + 0x5100
+#define APP_DATA_ADDR_BASE_END  0x80000 // 0x00800000 + 0x80000
 #else
 #error "error config for chip."
 #endif

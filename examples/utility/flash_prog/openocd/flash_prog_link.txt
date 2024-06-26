@@ -1,0 +1,30 @@
+PHDRS
+{
+	text PT_LOAD ;
+}
+SECTIONS
+{
+	PrgCode :
+	{
+		KEEP(*(.text.FlashInit))
+		KEEP(*(.text.XipStart))
+		KEEP(*(.text.XipStop))
+		KEEP(*(.text.EraseChip))
+		KEEP(*(.text.EraseSector))
+		KEEP(*(.text.ProgramAsyn))
+		KEEP(*(.text.ProgramSyn))
+		KEEP(*(.text.ReadStatusReg))
+		KEEP(*(.text.WriteStatusReg))
+		*(.text* .rodata*)
+		*(.xip_banned*)
+		. = ALIGN(16);
+	} :text
+	PrgData :
+	{
+		*(.got*)
+		*(.data*)
+		*(.bss*)
+		*(COMMON)
+        . = ALIGN(16);
+	}
+}

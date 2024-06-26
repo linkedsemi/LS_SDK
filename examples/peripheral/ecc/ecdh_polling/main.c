@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "field_manipulate.h"
-#include "ls_hal_trng.h"
 #include "platform.h"
 #include "common.h"
 #include "log.h"

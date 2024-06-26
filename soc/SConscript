@@ -4,6 +4,7 @@ Import('env')
 plf = {
     'le501x': 'arm_cm',
     'taurus': 'rv32',
+    'leo':'rv32',
     'lm3050': 'arm_cm',
 }
 if env.get('IC') is None:

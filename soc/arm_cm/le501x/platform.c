@@ -32,7 +32,7 @@
 #include "ls_sys.h"
 #include "sys_stat.h"
 #include "swint_call_asm.h"
-#define XTAL_STB_VAL 20
+#define XTAL_STB_VAL 30
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
@@ -343,6 +343,25 @@ uint32_t get_trng_value()
     return random32bit;
 }
 
+uint32_t GenerateRandom32Bit()
+{
+    return get_trng_value();
+}
+
+bool flash_55nm;
+void get_flash_process(void)
+{
+    uint16_t f_info = 0;
+    hal_flash_read_sfdp(0x68,(uint8_t *)&f_info,2);
+    if(f_info == 0xe8d9)
+    {
+        flash_55nm = false;
+    }else
+    {
+        flash_55nm = true;
+    }
+}
+
 static void module_init()
 {
     io_init();
@@ -359,11 +378,12 @@ static void module_init()
     mac_init();
     irq_init();
     modem_rf_init();
+    get_flash_process();
     systick_start();
-    rco_freq_counting_start();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
+    rco_freq_counting_start();
 }
 
 void XIP_BANNED_FUNC(LVD33_Handler,)
@@ -392,8 +412,10 @@ void lvd33_disable()
 
 static void lsi_calib()
 {
+    MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_RCO_CAL_START_MASK|SYSCFG_EN_RCO_DIG_PWR_MASK,0);
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_RCO_MODE_SEL_MASK|SYSCFG_RCO_CAL_START_MASK|SYSCFG_EN_RCO_DIG_PWR_MASK,
-        0<<SYSCFG_RCO_MODE_SEL_POS|1<<SYSCFG_RCO_CAL_START_POS|1<<SYSCFG_EN_RCO_DIG_PWR_POS);
+        0<<SYSCFG_RCO_MODE_SEL_POS|1<<SYSCFG_EN_RCO_DIG_PWR_POS);   
+    REG_FIELD_WR(SYSCFG->ANACFG1,SYSCFG_RCO_CAL_START,1);
     while(REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_DONE)==0)
     {
         uint16_t cal_code = REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_CODE);
@@ -456,6 +478,7 @@ void sys_init_none()
     mac_init();
     io_init();
     irq_init();
+    get_flash_process();
     systick_start();
     LOG_INIT();
     rco_freq_counting_init();
@@ -564,7 +587,7 @@ void XIP_BANNED_FUNC(BLE_Handler,)
     if(flash_writing_status)
     {
         hal_flash_prog_erase_resume();
-        DELAY_US(8);
+        DELAY_US(20);
     }
 }
 

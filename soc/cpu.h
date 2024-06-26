@@ -25,6 +25,8 @@ void enable_irq(int32_t);
 
 void disable_irq(int32_t);
 
+uint32_t get_enabled_irq(int32_t irq);
+
 #if ROM_CODE == 1 && !defined(BOOT_ROM)
 extern uint32_t (*enter_critical_fn)(void);
 extern void (*exit_critical_fn)(uint32_t);

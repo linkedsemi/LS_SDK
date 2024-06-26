@@ -25,14 +25,10 @@ enum comp_intr_edge
 
 enum comp_vrefsel
 {
-  VREFSEL_COMP1_PC01                  = 0x0,
-  VREFSEL_COMP2_PC03                  = 0x0,
-  VREFSEL_COMP3_PA03                  = 0x0,
-  VREFSEL_COMP1_PC13                  = 0x1,
-  VREFSEL_COMP2_PA02                  = 0x1,
-  VREFSEL_COMP3_PA06                  = 0x1,
-  VREFSEL_IOVIM2_RESERVED             = 0x2,
-  VREFSEL_IOVIM3_RESERVED             = 0x3,
+  VREFSEL_IOVIM1                      = 0x0,
+  VREFSEL_IOVIM2                      = 0x1,
+  VREFSEL_IOVIM3                      = 0x2,
+  VREFSEL_IOVIM4                      = 0x3,
   VREFSEL_INTERNAL_REFERENCE_VOLTAGE  = 0x4,
   VREFSEL_DAC2                        = 0x5,
   VREFSEL_BANDGAP_1200mV              = 0x6,
@@ -49,16 +45,10 @@ enum comp_vrefctl
 
 enum comp_input
 {
-  INPUT_COMP1_PC00                    = 0x0,
-  INPUT_COMP2_PA00                    = 0x0,
-  INPUT_COMP3_PA04                    = 0x0,
-  INPUT_COMP1_PC02                    = 0x1,
-  INPUT_COMP2_PA01                    = 0x1,
-  INPUT_COMP3_PA05                    = 0x1,
-  INPUT_COMP1_PC13                    = 0x2,
-  INPUT_COMP2_PA02                    = 0x2,
-  INPUT_COMP3_PA06                    = 0x2,
-  INPUT_IOVIP3                        = 0x3,
+  INPUT_IOVIP1                        = 0x0,
+  INPUT_IOVIP2                        = 0x1,
+  INPUT_IOVIP3                        = 0x2,
+  INPUT_IOVIP4                        = 0x3,
 };
 
 enum comp_hysteresis
@@ -95,19 +85,19 @@ typedef struct
       vrefctl : 2,        // COMP internal reference voltage select
                           // 0: 0.3V   1: 0.6V   2: 0.9V   3: 1.2V
       vrefsel : 3,        // COMP reference source select
-                          // 0: IOVIM[0] COMP1: PC01 COMP2: PC03 COMP3: PA03
-                          // 1: IOVIM[1] COMP1: PC13 COMP2: PA02 COMP3: PA06
-                          // 2: IOVIM[2] ----
-                          // 3: IOVIM[3] ----
+                          // 0: IOVIM[0] 
+                          // 1: IOVIM[1] 
+                          // 2: IOVIM[2] 
+                          // 3: IOVIM[3] 
                           // 4: internal reference defined by VREFCTL
                           // 5: DAC
                           // 6: bandgap 1.2V
                           // 7: GND
       input : 2,          // COMP input select
-                          // 0: IOVIP[0] COMP1: PC00 COMP2: PA00 COMP3: PA04
-                          // 1: IOVIP[1] COMP1: PC02 COMP2: PA01 COMP3: PA05
-                          // 2: IOVIP[2] COMP1: PC13 COMP2: PA02 COMP3: PA06
-                          // 3: IOVIP[3] ----
+                          // 0: IOVIP[0]
+                          // 1: IOVIP[1]
+                          // 2: IOVIP[2] 
+                          // 3: IOVIP[3]
       reserved1 : 3,      // reserved 3 bit
       flt_prd : 2,        // the filter period in MSI clock
       flt_byp : 1,        // filter bypass

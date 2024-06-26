@@ -1,0 +1,13 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'main.c'
+]
+inc = [
+    '.'
+]
+# env['LINKSCRIPT']= File(env.subst('$SDK_ROOT/soc/rv32/leo/leo_link.txt'))
+# env.image_build('app_loopback',src,inc,ble=False)
+env.app_build('app_loopback',src,inc,ble=False)

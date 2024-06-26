@@ -1,12 +1,12 @@
 /**
  * Driver for flash program.
  */
-#include "spi_flash.h"
+#include "ls_hal_flash.h"
 #include "reg_base_addr.h"
 #include "platform.h"
-#include "io_config.h"
+#include "ls_soc_gpio.h"
 #include "cpu.h"
-#include "lscache.h"
+#include "ls_hal_cache.h"
 /**
  * ERROR TYPE. MUST NOT BE MODIFIED
  */
@@ -29,15 +29,19 @@
 int  flashInit(){
     disable_global_irq();
     lscache_cache_disable();
-    clk_switch();
-    qspi_flash_io_init();
-    spi_flash_drv_var_init(false,false);
-    spi_flash_init();
-    spi_flash_software_reset();
+    io_pull_write(PD04, IO_PULL_UP);
+    io_pull_write(PC13, IO_PULL_UP);
+    pinmux_hal_flash_init();
+    hal_flash_dual_mode_set(true);
+    hal_flash_drv_var_init(false,false);
+    hal_flash_xip_func_ptr_dummy();
+    hal_flash_init();
+    clk_flash_init();
+    hal_flash_software_reset();
     DELAY_US(500);
-    spi_flash_release_from_deep_power_down();
+    hal_flash_release_from_deep_power_down();
     DELAY_US(100);
-    spi_flash_qe_status_read_and_set();
+    hal_flash_qe_status_read_and_set();
     return 0;
 }
 
@@ -61,7 +65,7 @@ int  flashUnInit(){
  * Otherwise return 0.
  */
 int  flashID(unsigned int* flashID){
-    spi_flash_read_id((uint8_t *)flashID);
+    hal_flash_read_id((uint8_t *)flashID);
     return 0;
 }
 
@@ -90,7 +94,7 @@ int flashProgram(char* dst, char *src, int size){
     }
     if(length)
     {
-        spi_flash_quad_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
+        hal_flash_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -98,7 +102,7 @@ int flashProgram(char* dst, char *src, int size){
     while(size)
     {
         length = size > 256 ? 256 : size;
-        spi_flash_quad_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
+        hal_flash_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -118,7 +122,7 @@ int flashProgram(char* dst, char *src, int size){
  * Otherwise return 0.
  */
 int flashRead(char* dst, char *src, int length){
-    spi_flash_quad_io_read((uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
+    hal_flash_dual_io_read((uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
     return 0;
 }
 
@@ -137,7 +141,7 @@ int flashErase(char *dst, int size){
     uint32_t offset = (uint32_t)dst;
     while(size)
     {
-        spi_flash_sector_erase(offset);
+        hal_flash_sector_erase(offset);
         if(size > FLASH_SECTOR_SIZE)
         {
             size -= FLASH_SECTOR_SIZE;
@@ -157,7 +161,7 @@ int flashErase(char *dst, int size){
  * Otherwise return 0.
  */
 int flashChipErase( ){
-    spi_flash_chip_erase();
+    hal_flash_chip_erase();
     return 0;
 }
 
@@ -182,11 +186,11 @@ int flashChipErase( ){
  */
 int flashChecksum(char*dst, int length, int checksum) {
     int i, sum = 0;
-    spi_flash_xip_start();
+    hal_flash_xip_start();
     for (i = 0; i < length; i++) {
         sum += dst[i];
     }
-    spi_flash_xip_stop();
+    hal_flash_xip_stop();
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
 

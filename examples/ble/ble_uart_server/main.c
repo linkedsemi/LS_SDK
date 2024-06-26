@@ -15,6 +15,7 @@
 #include "SEGGER_RTT.h"
 
 #define UART_SERVER_WITH_OTA 0
+#define FW_ECC_VERIFY 0
 
 #if UART_SERVER_WITH_OTA == 1
 #define UART_SVC_ADV_NAME "LS Uart Server ota prf"
@@ -119,7 +120,8 @@ static void ls_uart_server_data_length_update(uint8_t con_idx);
 
 #if UART_SERVER_WITH_OTA == 1
 #if FW_ECC_VERIFY
-extern const uint8_t fotas_pub_key[64];
+#include "uECC.h"
+const uint8_t fotas_pub_key[64] = {0};
 bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
 {
     return uECC_verify(fotas_pub_key, digest->data, sizeof(digest->data), signature->data, uECC_secp256r1());
@@ -284,6 +286,26 @@ static void ls_uart_server_data_length_update(uint8_t con_idx)
     gap_manager_set_pkt_size(con_idx, &dlu_param);
 }
 
+static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_name_ptr);
+    dev_name_ptr->value = (uint8_t*)UART_SVC_ADV_NAME;
+    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME) - 1;
+}
+static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_appearance_ptr);
+    dev_appearance_ptr->appearance = 0;
+}
+static void get_slv_pref_param(struct gap_dev_info_slave_pref_param *dev_slv_pref_param_ptr, uint8_t con_idx)
+{
+    LS_ASSERT(dev_slv_pref_param_ptr);
+    dev_slv_pref_param_ptr->con_intv_min  = 8;
+    dev_slv_pref_param_ptr->con_intv_max  = 20;
+    dev_slv_pref_param_ptr->slave_latency =  0;
+    dev_slv_pref_param_ptr->conn_timeout  = 200;
+}
+
 static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uint8_t con_idx)
 {
     switch(type)
@@ -295,6 +317,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     case DISCONNECTED:
         connect_id = 0xff;
         uart_server_mtu = UART_SERVER_MTU_DFT;
+        uart_server_ntf_done = true;
         LOG_I("disconnected!");
         start_adv();
     break;
@@ -303,6 +326,15 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     break;
     case CONN_PARAM_UPDATED:
 
+    break;
+    case GET_DEV_INFO_DEV_NAME:
+        get_dev_name((struct gap_dev_info_dev_name*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_APPEARANCE:
+        get_appearance((struct gap_dev_info_appearance*)evt, con_idx);
+    break;
+    case GET_DEV_INFO_SLV_PRE_PARAM:
+        get_slv_pref_param((struct gap_dev_info_slave_pref_param*)evt, con_idx);
     break;
     default:
 

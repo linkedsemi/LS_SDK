@@ -22,11 +22,11 @@ extern "C" {
 /******************************************************************************
  External Macro Definition
  ******************************************************************************/
-//timer configuration paramter
+/***************timer configuration paramter**********************/
 #define TIM_PRESCALER     (SDK_HCLK_MHZ-1)
 #define TIM_PERIOD        (1000 - 1) /* Period Value 1ms */
 
-
+/***************Keyboard configuration paramter**********************/
 /*********************************
 		C0  C1  C2	C4       	Matrix
 	R0 {0,	0,	0,	0},       1  2  3  4
@@ -46,9 +46,11 @@ extern "C" {
 #define KEY_COL3_PIN 	(PA02)
 #define KEY_COL4_PIN 	(PB09)
 
-#define KEYSCAN_ROW_NUM 	(4)	// ROW PIN NUM
-#define KEYSCAN_COL_NUM 	(4)	// COL PIN NUM
-#define BUTTON_KEEP_TIME_MAX    60  // debounce time
+//Keyboard create paramter
+#define KEYSCAN_ROW_NUM 		(4)		// ROW PIN NUM
+#define KEYSCAN_COL_NUM 		(4)		// COL PIN NUM
+#define BUTTON_KEEP_TIME_MAX    (60)  	// debounce time
+#define KEYBORAD_SCAN_PERIOD 	(1)		//Keyboard scan cycle
 
 //io array
 #define KEYSCAN_ROW_TABLES {KEY_ROW1_PIN, KEY_ROW2_PIN, KEY_ROW3_PIN, KEY_ROW4_PIN}
@@ -70,9 +72,7 @@ typedef void (*KS_KEY_CALLBACK)(uint16_t );
  ******************************************************************************/
 
 bool keyscan_Start(bool scan);
-void Craet_ScanKey(const uint8_t *row_pin_array, uint8_t row_pin_num,const uint8_t *col_pin_array, \
-							uint8_t col_pin_num,uint32_t scan_period_ms, void (*keyscan_callback)(uint16_t));
-
+void keyscan_Create_Keyboard( void (*keyscan_callback)(uint16_t));
 
 #ifdef	__cplusplus
 }

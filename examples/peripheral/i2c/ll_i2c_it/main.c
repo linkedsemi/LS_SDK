@@ -62,9 +62,9 @@ int main(void)
   sys_init_none();
 
   /* Configure the GPIO AF */
-  /* SDA-------------PB12 */
-  /* SCL-------------PB13 */
-  pinmux_iic1_init(PB13, PB12);
+  /* SDA-------------PB08 */
+  /* SCL-------------PB09 */
+  pinmux_iic1_init(PB09, PB08);
 
   LL_I2C1_MSP_Init();
   
@@ -77,7 +77,7 @@ int main(void)
   LL_I2C_SetDigitalFilter(I2C1, 0);
 
   /*---------------------------- I2Cx SCL Clock Speed Configuration ------------*/
-  LL_I2C_SetClockPeriod(I2C1, 200000);
+  LL_I2C_SetClockPeriod(I2C1, I2C_SPEED_FAST_400K);
 
   /*---------------------------- I2Cx OAR1 Configuration -----------------------*/
   LL_I2C_SetOwnAddress1(I2C1, I2C_ADDRESS, LL_I2C_OWNADDRESS1_7BIT);

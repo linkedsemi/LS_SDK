@@ -94,6 +94,8 @@ void lvd33_disable(void);
 
 void mesh_stack_data_bss_init(void);
 
+uint32_t GenerateRandom32Bit();
+
 #define FLASH_SWINT_NUM QSPI_IRQn
 #define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
 

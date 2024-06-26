@@ -31,6 +31,8 @@
 #include "ls_hal_spi_i2s.h"
 #if DMACV2
 #include "ls_hal_dmacv2.h"
+#elif DMACV3
+#include "ls_hal_dmacv3.h"
 #else
 #include "ls_hal_dmac.h"
 #endif

@@ -240,17 +240,17 @@ bool check_application(void)
 void jump_to_app(void)
 {
     typedef void (*APP_FUNC)();
-
-    APP_FUNC jump2app;
     uint32_t app_addr;
-    uint32_t i;
+    APP_FUNC jump2app;
+
 
     __disable_irq();
     systick_stop();
 
     // skip user_info_config, 0x100
     // skip  Info Page , 0x200
-
+#if defined(LM3050)
+    uint32_t i;
     app_addr = (0x00800000 + USER_FLASH_OFFSET_ADDRESS + 256 + 512);
 
     for (i = 0; i < 8; i++)
@@ -258,17 +258,17 @@ void jump_to_app(void)
         NVIC->ICER[i] = 0xFFFFFFFF;
         NVIC->ICPR[i] = 0xFFFFFFFF;
     }
-
+#endif
     __enable_irq();
-
-    // DELAY_US(500000);
-
+#if defined(LM3050)
     __set_PSP(*(uint32_t *)(app_addr));
     __set_MSP(*(uint32_t *)app_addr);
-
     SCB->VTOR = *(__IO uint32_t *)app_addr;
-
     app_addr = *(__IO uint32_t *)(app_addr + 4);
+#elif defined(LEO)
+    app_addr = *(__IO uint32_t *)(0x08000000 + USER_FLASH_OFFSET_ADDRESS);
+#endif
+    
     jump2app = (APP_FUNC)app_addr;
     jump2app();
 }

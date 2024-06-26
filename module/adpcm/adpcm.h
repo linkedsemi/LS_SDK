@@ -27,7 +27,7 @@ void Adpcm_FrameEncode(const int16_t *PCMBuffer, void *EncodeBuffer, int32_t Len
 void Adpcm_FrameDecode(int16_t *PCMBuffer, const void *EncodeBuffer, int32_t Len);
 void Adpcm_FrameEncode_Restart(google_tv_audio_header *AudioHeader);
 void Adpcm_FrameEncode_Google_TV_Audio(const int16_t *PCMBuffer, void *EncodeBuffer, google_tv_audio_header *AudioHeader, int32_t Len);
-
+int Adpcm_Decode_Block(int16_t *outbuf, const uint8_t *inbuf, size_t inbufsize, int channels);
 #ifdef __cplusplus
 }
 #endif

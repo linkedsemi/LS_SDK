@@ -345,25 +345,6 @@ le501x_host_test_iar_build:
   script:
     - cd examples/ble/host_test/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" host_test.ewp -build * -log all
 
-le501x_tmall_mesh_build:
-  stage: build
-  script:
-    - cd examples/mesh/genie_mesh/tmall_mesh && scons flags=-Werror
-
-le501x_tmall_mesh_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/mesh/genie_mesh/tmall_mesh/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b tmall_mesh.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
-
-le501x_tmall_mesh_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/mesh/genie_mesh/tmall_mesh/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" tmall_mesh.ewp -build * -log all
-
 le501x_tmall_mesh_gatt_build:
   stage: build
   script:
@@ -1354,6 +1335,25 @@ le501x_Basic_TIM_iar_build:
   script:
     - cd examples/peripheral/timer/Basic_TIM/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" Basic_TIM.ewp -build * -log all
 
+le501x_BLDC_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/BLDC && scons flags=-Werror
+
+le501x_BLDC_keil_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/BLDC/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b BLDC.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
+
+le501x_BLDC_iar_build:
+  stage: build
+  rules:
+    - !reference [.release_rule, rules]
+  script:
+    - cd examples/peripheral/timer/BLDC/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" BLDC.ewp -build * -log all
+
 le501x_DTC_PWM_build:
   stage: build
   script:
@@ -1552,7 +1552,12 @@ le501x_coremark_build:
 le501x_flash_prog_build:
   stage: build
   script:
-    - cd examples/utility/flash_prog/arm_cm && scons flags=-Werror
+    - cd examples/utility/flash_prog/cmsis && scons flags=-Werror
+
+le501x_flash_prog_openocd_build:
+  stage: build
+  script:
+    - cd examples/utility/flash_prog/openocd && scons flags=-Werror
 
 le501x_ram_test_build:
   stage: build
@@ -1711,40 +1716,21 @@ le501x_iap_application_iar_build:
   script:
     - cd examples/peripheral/iap/iap_application/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" iap_application.ewp -build * -log all
     
-le501x_trng_polling_build:
+le501x_trng_build:
   stage: build
   script:
-    - cd examples/peripheral/trng/trng_polling && scons flags=-Werror
+    - cd examples/peripheral/trng && scons flags=-Werror
 
-le501x_trng_polling_keil_build:
+le501x_trng_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/trng/trng_polling/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng_polling.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/trng/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng.uvprojx -o UVBuild/build.txt -j0
 
-le501x_trng_polling_iar_build:
+le501x_trng_iar_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/trng/trng_polling/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_polling.ewp -build * -log all
-
-le501x_trng_it_build:
-  stage: build
-  script:
-    - cd examples/peripheral/trng/trng_it && scons flags=-Werror
-
-le501x_trng_it_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/trng/trng_it/le501x/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b trng_it.uvprojx -o UVBuild/build.txt -j0
-
-le501x_trng_it_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/trng/trng_it/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng_it.ewp -build * -log all
+    - cd examples/peripheral/trng/le501x/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" trng.ewp -build * -log all

@@ -19,13 +19,17 @@ extern "C" {
 #endif
 #define PUYA_FLASH_WORKAROUND 1
 #define TSINGTENG_FLASH_WORKAROUND 2
+
+#ifndef SUSPEND_WORKAROUND 
 #if (defined(FLASH_PROG_ALGO) || BOOT_RAM==1)
 #define SUSPEND_WORKAROUND 0
-#else
-#ifndef SUSPEND_WORKAROUND 
+#elif defined(LE501X)
 #define SUSPEND_WORKAROUND PUYA_FLASH_WORKAROUND
+#else
+#define SUSPEND_WORKAROUND 0
 #endif
 #endif
+
 #if defined(LM3050)
 #define DUAL_CONTINUOUS_MODE_OFF 1
 #else
@@ -61,7 +65,7 @@ extern "C" {
 #define PROG_ERASE_RESUME 0x7a
 #define CONTINUOUS_READ_MODE_RESET 0xff
 
-#define XIP_MODE_BITS 0x20
+#define XIP_MODE_BITS 0xa0
 
 #define DUMMY_BYTE_VAL 0x3c
 

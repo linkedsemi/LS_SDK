@@ -675,6 +675,7 @@ void dcd_remote_wakeup(uint8_t rhport)
     DELAY_US(1000);
 
     USB0->POWER &= ~USB_POWER_RESUME;
+    dcd_event_bus_signal(rhport, DCD_EVENT_RESUME, false);
 }
 
 // Connect by enabling internal pull-up resistor on D+/D-
@@ -929,6 +930,7 @@ void dcd_int_handler(uint8_t rhport)
         dcd_event_bus_signal(rhport, DCD_EVENT_SOF, true);
     }
     if (is & USB_IS_RESET) {
+        USB0->POWER |= USB_POWER_PWRDNPHY;
         process_bus_reset(rhport);
     }
     if (is & USB_IS_RESUME) {

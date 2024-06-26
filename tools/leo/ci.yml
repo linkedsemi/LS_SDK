@@ -1,0 +1,489 @@
+leo_flash_prog_build:
+  stage: build
+  script:
+    - cd examples/utility/flash_prog/cmsis && scons flags=-Werror ic=leo
+
+leo_flash_prog_openocd_build:
+  stage: build
+  script:
+    - cd examples/utility/flash_prog/openocd && scons flags=-Werror ic=leo
+
+leo_ecb_cbc_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_it && scons flags=-Werror ic=leo
+
+leo_ecb_cbc_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/ecb_cbc_polling && scons flags=-Werror ic=leo
+
+leo_ecb_it_padding_build:
+  stage: build
+  script:
+    - cd examples/peripheral/crypt/ecb_it_padding && scons flags=-Werror ic=leo
+
+leo_ecdh_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdh_it && scons flags=-Werror ic=leo
+
+leo_ecdh_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdh_polling && scons flags=-Werror ic=leo
+
+leo_ecdsa_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdsa_it && scons flags=-Werror ic=leo
+
+leo_ecdsa_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ecc/ecdsa_polling && scons flags=-Werror ic=leo
+
+leo_sha_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sha/sha_polling && scons flags=-Werror ic=leo
+
+leo_sha_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sha/sha_it && scons flags=-Werror ic=leo
+
+leo_sm4_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sm4/sm4_polling && scons flags=-Werror ic=leo
+
+leo_sm4_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/sm4/sm4_it && scons flags=-Werror ic=leo
+
+leo_touchkey_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/touchkey/touchkey_polling && scons flags=-Werror ic=leo
+
+leo_touchkey_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/touchkey/touchkey_it && scons flags=-Werror ic=leo
+
+leo_gpio_build:
+  stage: build
+  script:
+    - cd examples/peripheral/gpio && scons flags=-Werror ic=leo
+
+leo_i2c_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_it && scons flags=-Werror ic=leo
+
+leo_ll_i2c_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_it && scons flags=-Werror ic=leo
+
+leo_ll_i2c_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/ll_i2c_polling && scons flags=-Werror ic=leo
+
+leo_i2c_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_polling && scons flags=-Werror ic=leo
+
+leo_i2c_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_dma && scons flags=-Werror ic=leo
+
+leo_software_calendar_build:
+  stage: build
+  script:
+    - cd examples/peripheral/software_calendar && scons flags=-Werror ic=leo
+
+leo_software_timers_build:
+  stage: build
+  script:
+    - cd examples/peripheral/software_timers && scons flags=-Werror ic=leo
+
+leo_ll_spi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/ll_spi_it && scons flags=-Werror ic=leo
+
+leo_ll_spi_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/ll_spi_polling && scons flags=-Werror ic=leo
+
+leo_spi_dma_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/spi_dma_master && scons flags=-Werror ic=leo
+
+leo_spi_dma_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/spi_dma_slave && scons flags=-Werror ic=leo
+
+leo_spi_it_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/spi_it_master && scons flags=-Werror ic=leo
+
+leo_spi_it_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/spi_it_slave && scons flags=-Werror ic=leo
+
+leo_spi_polling_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/spi_polling_master && scons flags=-Werror ic=leo
+
+leo_spi_polling_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/spi_polling_slave && scons flags=-Werror ic=leo
+
+leo_spis_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spis/spis_dma && scons flags=-Werror ic=leo
+
+leo_spis_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spis/spis_it && scons flags=-Werror ic=leo
+
+leo_spis_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spis/spis_polling && scons flags=-Werror ic=leo
+
+leo_i2s_dma_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_master && scons flags=-Werror ic=leo
+
+leo_i2s_dma_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_dma_slave && scons flags=-Werror ic=leo
+
+leo_i2s_it_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_master && scons flags=-Werror ic=leo
+
+leo_i2s_it_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_it_slave && scons flags=-Werror ic=leo
+
+leo_i2s_polling_master_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_master && scons flags=-Werror ic=leo
+
+leo_i2s_polling_slave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/spi_i2s/i2s_polling_slave && scons flags=-Werror ic=leo
+
+leo_ll_ssi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ll_ssi_it && scons flags=-Werror ic=leo
+
+leo_ssi_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ssi_dma && scons flags=-Werror ic=leo
+
+leo_ssi_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ssi_it && scons flags=-Werror ic=leo
+
+leo_Basic_PWM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Basic_PWM && scons flags=-Werror ic=leo
+
+leo_Basic_TIM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Basic_TIM && scons flags=-Werror ic=leo
+
+leo_DTC_PWM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/DTC_PWM && scons flags=-Werror ic=leo
+
+leo_Encode_TIM_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/Encode_TIM && scons flags=-Werror ic=leo
+
+leo_input_Capture_build:
+  stage: build
+  script:
+    - cd examples/peripheral/timer/input_Capture && scons flags=-Werror ic=leo
+
+leo_uart_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/uart_dma && scons flags=-Werror ic=leo
+
+leo_uart_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/uart_it && scons flags=-Werror ic=leo
+
+leo_ll_uart_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/ll_uart_it && scons flags=-Werror ic=leo
+
+leo_ll_uart_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/ll_uart_polling && scons flags=-Werror ic=leo
+
+leo_uart_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/uart/uart_polling && scons flags=-Werror ic=leo
+
+leo_usbd_cdc_msc_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc && scons flags=-Werror ic=leo
+
+leo_usbd_cdc_msc_fatfs_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs && scons flags=-Werror ic=leo
+
+leo_usbd_cdc_msc_fatfs_upgrade_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_cdc_msc_fatfs_upgrade && scons flags=-Werror ic=leo
+
+leo_usbd_hid_composite_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_composite && scons flags=-Werror ic=leo
+
+leo_usbd_hid_iap_app_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_iap_app && scons flags=-Werror ic=leo
+
+leo_usbd_hid_iap_bootloader_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_iap_bootloader && scons flags=-Werror ic=leo
+
+leo_usbd_hid_keyboard_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbd_hid_keyboard && scons flags=-Werror ic=leo
+
+leo_usbh_msc_file_explorer_build:
+  stage: build
+  script:
+    - cd examples/peripheral/usb/usbh_msc_file_explorer && scons flags=-Werror ic=leo
+
+leo_adc_amic_sampling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_amic_sampling && scons flags=-Werror ic=leo
+
+leo_adc_blocking_sampling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_blocking_sampling && scons flags=-Werror ic=leo
+
+leo_adc_single_channel_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_single_channel && scons flags=-Werror ic=leo
+
+leo_adc_multi_channel_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel && scons flags=-Werror ic=leo
+
+leo_adc_analog_wdg_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_analog_wdg && scons flags=-Werror ic=leo
+
+leo_adc_multi_channel_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_multi_channel_dma && scons flags=-Werror ic=leo
+
+leo_dual_dac_channel_dma_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_dma_voltage && scons flags=-Werror ic=leo
+
+leo_dual_dac_channel_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_voltage && scons flags=-Werror ic=leo
+
+leo_dual_dac_channel_wave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/dual_dac_channel_wave && scons flags=-Werror ic=leo
+
+leo_single_dac_adpcm_audio_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_adpcm_audio && scons flags=-Werror ic=leo
+
+leo_single_dac_channel_dma_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_dma_voltage && scons flags=-Werror ic=leo
+
+leo_single_dac_channel_sine_wave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_sine_wave && scons flags=-Werror ic=leo
+
+leo_single_dac_channel_voltage_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_voltage && scons flags=-Werror ic=leo
+
+leo_single_dac_channel_wave_build:
+  stage: build
+  script:
+    - cd examples/peripheral/dac/single_dac_channel_wave && scons flags=-Werror ic=leo
+
+leo_rtcv2_build:
+  stage: build
+  script:
+    - cd examples/peripheral/rtcv2 && scons flags=-Werror ic=leo
+
+leo_cap_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/cap/cap_it && scons flags=-Werror ic=leo
+
+leo_cap_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/cap/cap_polling && scons flags=-Werror ic=leo
+    
+leo_iwdg_build:
+  stage: build
+  script:
+    - cd examples/peripheral/wdg/iwdg && scons flags=-Werror ic=leo
+
+leo_wwdg_build:
+  stage: build
+  script:
+    - cd examples/peripheral/wdg/wwdg && scons flags=-Werror ic=leo
+
+leo_comp_internal_build:
+  stage: build
+  script:
+    - cd examples/peripheral/comp/comp_internal && scons flags=-Werror ic=leo
+
+leo_comp_dac_build:
+  stage: build
+  script:
+    - cd examples/peripheral/comp/comp_dac && scons flags=-Werror ic=leo
+
+leo_iap_bootloader_build:
+  stage: build
+  script:
+    - cd examples/peripheral/iap/iap_bootloader && scons flags=-Werror ic=leo
+
+leo_iap_application_build:
+  stage: build
+  script:
+    - cd examples/peripheral/iap/iap_application && scons flags=-Werror ic=leo
+
+leo_owm_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/owm/owm_it && scons flags=-Werror ic=leo
+
+leo_owm_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/owm/owm_polling && scons flags=-Werror ic=leo
+
+leo_trng_build:
+  stage: build
+  script:
+    - cd examples/peripheral/trng && scons flags=-Werror ic=leo
+
+leo_pwm_build:
+  stage: build
+  script:
+    - cd examples/peripheral/pwm && scons flags=-Werror ic=leo
+
+leo_cec_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/cec/cec_polling && scons flags=-Werror ic=leo
+
+leo_cec_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/cec/cec_it && scons flags=-Werror ic=leo
+
+leo_pdm_pingpong_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/pdm/pdm_pingpong_dma && scons flags=-Werror ic=leo
+
+leo_pdm_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/pdm/pdm_it && scons flags=-Werror ic=leo
+
+leo_ps2h_polling_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ps2h/ps2h_polling && scons flags=-Werror ic=leo
+
+leo_ps2h_it_build:
+  stage: build
+  script:
+    - cd examples/peripheral/ps2h/ps2h_it && scons flags=-Werror ic=leo
+    
+leo_kscan_build:
+  stage: build
+  script:
+    - cd examples/peripheral/kscan && scons flags=-Werror ic=leo
+
+leo_fdcan_interrup_build:
+  stage: build
+  script:
+    - cd examples/peripheral/fdcan/app_interrupt && scons flags=-Werror ic=leo
+
+leo_fdcan_loopback_build:
+  stage: build
+  script:
+    - cd examples/peripheral/fdcan/app_loopback && scons flags=-Werror ic=leo
+
+leo_fdcan_readwrite_build:
+  stage: build
+  script:
+    - cd examples/peripheral/fdcan/app_readwrite && scons flags=-Werror ic=leo

@@ -105,7 +105,7 @@ extern "C" {
 #define     __OM     volatile             /*! Defines 'write only' structure member permissions */
 #define     __IOM    volatile             /*! Defines 'read / write' structure member permissions */
 
-/*@} end of group CK802 */
+/*@} end of group RV32 */
 
 /*******************************************************************************
  *                 Register Abstraction
@@ -286,6 +286,50 @@ typedef struct {
 
 /*@} end of group CSI_CACHE */
 
+/**
+  \ingroup    CSI_core_register
+  \defgroup   CSI_SYSMAP system map (SYSMAP)
+  \brief      Type definitions for the SYSMAP Registers
+  @{
+ */
+
+#define SYSMAP_SYSMAPCFG_B_Pos                       0U                                    /*!< SYSMAP SYSMAPCFG: B Position */
+#define SYSMAP_SYSMAPCFG_B_Msk                       (0x1UL << SYSMAP_SYSMAPCFG_B_Pos)           /*!< SYSMAP SYSMAPCFG: B Mask */
+
+#define SYSMAP_SYSMAPCFG_C_Pos                       1U                                    /*!< SYSMAP SYSMAPCFG: C Position */
+#define SYSMAP_SYSMAPCFG_C_Msk                       (0x1UL << SYSMAP_SYSMAPCFG_C_Pos)           /*!< SYSMAP SYSMAPCFG: C Mask */
+
+#define SYSMAP_SYSMAPCFG_SO_Pos                      2U                                    /*!< SYSMAP SYSMAPCFG: SO Position */
+#define SYSMAP_SYSMAPCFG_SO_Msk                      (0x1UL << SYSMAP_SYSMAPCFG_SO_Pos)          /*!< SYSMAP SYSMAPCFG: SO Mask */
+
+/**
+  \ingroup    CSI_core_register
+  \defgroup   CSI_SYSMAP system map (SYSMAP)
+  \brief      Type definitions for the SYSMAP Registers
+  @{
+ */
+typedef struct {
+    __IOM uint32_t SYSMAPADDR0;               /*!< Offset: 0x000 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG0;              /*!< Offset: 0x004 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR1;               /*!< Offset: 0x008 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG1;              /*!< Offset: 0x00c (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR2;               /*!< Offset: 0x010 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG2;              /*!< Offset: 0x014 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR3;               /*!< Offset: 0x018 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG3;              /*!< Offset: 0x01c (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR4;               /*!< Offset: 0x020 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG4;              /*!< Offset: 0x024 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR5;               /*!< Offset: 0x028 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG5;              /*!< Offset: 0x02c (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR6;               /*!< Offset: 0x030 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG6;              /*!< Offset: 0x034 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPADDR7;               /*!< Offset: 0x038 (R/W)  SYSMAP configure register */
+    __IOM uint32_t SYSMAPCFG7;              /*!< Offset: 0x03c (R/W)  SYSMAP configure register */
+} SYSMAP_Type;
+
+
+/*@} end of group CSI_SYSMAP */
+
 
 /**
   \ingroup  CSI_core_register
@@ -299,7 +343,7 @@ typedef struct {
  */
 typedef struct {
     __IOM unsigned long long MTIMECMP;            /*!< Offset: 0x000 (R/W) Timer compare register */
-    uint32_t RESERVED[8187];
+    uint32_t RESERVED[8188];
     __IM  unsigned long long MTIME;               /*!< Offset: 0x7FFC (R)  Timer current register */
 } CORET_Type;
 
@@ -374,16 +418,18 @@ typedef struct {
   @{
  */
 
-/* Memory mapping of CK802 Hardware */
+/* Memory mapping of THEAD CPU */
 #define TCIP_BASE           (0xE000E000UL)                            /*!< Titly Coupled IP Base Address */
 #define CORET_BASE          (0xE0004000UL)                            /*!< CORET Base Address */
 #define CLIC_BASE           (0xE0800000UL)                            /*!< CLIC Base Address */
+#define SYSMAP_BASE         (0xEFFFF000UL)                            /*!< SYSMAP Base Address */
 #define DCC_BASE            (0xE4010000UL)                            /*!< DCC Base Address */
 #define CACHE_BASE          (TCIP_BASE +  0x1000UL)                   /*!< CACHE Base Address */
 
 #define CORET               ((CORET_Type   *)     CORET_BASE  )       /*!< SysTick configuration struct */
 #define CLIC                ((CLIC_Type    *)     CLIC_BASE   )       /*!< CLIC configuration struct */
 #define DCC                 ((DCC_Type     *)     DCC_BASE    )       /*!< DCC configuration struct */
+#define SYSMAP              ((SYSMAP_Type  *)     SYSMAP_BASE )       /*!< SYSMAP configuration struct */
 #define CACHE               ((CACHE_Type   *)     CACHE_BASE  )       /*!< cache configuration struct */
 
 /*@} */
@@ -506,7 +552,9 @@ __STATIC_INLINE void csi_vic_clear_pending_irq(int32_t IRQn)
 __STATIC_INLINE void csi_vic_set_prio(int32_t IRQn, uint32_t priority)
 {
     uint8_t nlbits = (CLIC->CLICINFO & CLIC_INFO_CLICINTCTLBITS_Msk) >> CLIC_INFO_CLICINTCTLBITS_Pos;
-    CLIC->CLICINT[IRQn].CTL = (CLIC->CLICINT[IRQn].CTL & (~CLIC_INTCFG_PRIO_Msk)) | (priority << (8 - nlbits));
+    uint8_t clic_intcfg_prio_mask = (uint8_t)(0xff << (8 - nlbits));
+
+    CLIC->CLICINT[IRQn].CTL = (CLIC->CLICINT[IRQn].CTL & (~clic_intcfg_prio_mask)) | (priority << (8 - nlbits));
 }
 
 /**
@@ -522,6 +570,36 @@ __STATIC_INLINE uint32_t csi_vic_get_prio(int32_t IRQn)
 {
     uint8_t nlbits = (CLIC->CLICINFO & CLIC_INFO_CLICINTCTLBITS_Msk) >> CLIC_INFO_CLICINTCTLBITS_Pos;
     return CLIC->CLICINT[IRQn].CTL >> (8 - nlbits);
+}
+
+/**
+  \brief   Get Interrupt thresh
+  \details Read the thresh of interrupt
+           Only the interrupt priority is greater than the value of thresh, the interrupt can be responded to
+  \return             Interrupt thresh value(0~255).
+                      Value is aligned automatically to the implemented priority bits of the microcontroller.
+ */
+__STATIC_INLINE uint32_t csi_vic_get_thresh(void)
+{
+    return CLIC->MINTTHRESH >> 24;
+}
+
+/**
+  \brief   Set Interrupt thresh
+  \details Write the thresh of interrupt
+           Only the interrupt priority is greater than the value of thresh, the interrupt can be responded to
+  \param [in]      Interrupt thresh value(0~255).
+ */
+__STATIC_INLINE uint32_t csi_vic_set_thresh(uint32_t thresh)
+{
+    uint32_t temp = CLIC->MINTTHRESH;
+    uint8_t nlbits = (CLIC->CLICINFO & CLIC_INFO_CLICINTCTLBITS_Msk) >> CLIC_INFO_CLICINTCTLBITS_Pos;
+
+    if(!nlbits)
+        CLIC->MINTTHRESH = 0xff << 24;
+
+    CLIC->MINTTHRESH = thresh << 24;
+    return temp;
 }
 
 /**
@@ -641,7 +719,7 @@ __STATIC_INLINE void csi_mpu_disable_region(uint32_t idx)
  */
 __STATIC_INLINE uint32_t csi_coret_config(uint32_t ticks, int32_t IRQn)
 {
-    if (CORET->MTIMECMP) {
+    if ((CORET->MTIMECMP != 0) && (CORET->MTIMECMP != 0xffffffffffffffff)) {
         CORET->MTIMECMP = CORET->MTIMECMP + ticks;
     } else {
         CORET->MTIMECMP = CORET->MTIME + ticks;
@@ -686,6 +764,123 @@ __STATIC_INLINE uint32_t csi_coret_get_valueh(void)
 }
 
 /*@} end of CSI_Core_SysTickFunctions */
+
+/* ##########################   SYSMAP functions  #################################### */
+/**
+  \ingroup  CSI_Core_FunctionInterface
+  \defgroup CSI_Core_SYSMAPFunctions SYSMAP Functions
+  \brief    Functions that manage system map attribute
+  @{
+ */
+
+/**
+  \brief   Get SYSMAPCFGx Register by index
+  \details Returns the content of the SYSMAPxCFG Register.
+  \param [in]    idx    SYSMAP region index
+  \return               SYSMAPxCFG Register value
+ */
+__STATIC_INLINE uint8_t __get_SYSMAPCFGx(uint32_t idx)
+{
+    switch (idx) {
+    case 0: return SYSMAP->SYSMAPCFG0;
+    case 1: return SYSMAP->SYSMAPCFG1;
+    case 2: return SYSMAP->SYSMAPCFG2;
+    case 3: return SYSMAP->SYSMAPCFG3;
+    case 4: return SYSMAP->SYSMAPCFG4;
+    case 5: return SYSMAP->SYSMAPCFG5;
+    case 6: return SYSMAP->SYSMAPCFG6;
+    case 7: return SYSMAP->SYSMAPCFG7;
+    default: return 0;
+    }
+}
+
+/**
+  \brief   Set SYSMAPCFGx by index
+  \details Writes the given value to the SYSMAPxCFG Register.
+  \param [in]    idx      SYSMAPx region index
+  \param [in]    sysmapxcfg  SYSMAPxCFG Register value to set
+ */
+__STATIC_INLINE void __set_SYSMAPCFGx(uint32_t idx, uint32_t sysmapxcfg)
+{
+    switch (idx) {
+    case 0: SYSMAP->SYSMAPCFG0 = sysmapxcfg; break;
+    case 1: SYSMAP->SYSMAPCFG1 = sysmapxcfg; break;
+    case 2: SYSMAP->SYSMAPCFG2 = sysmapxcfg; break;
+    case 3: SYSMAP->SYSMAPCFG3 = sysmapxcfg; break;
+    case 4: SYSMAP->SYSMAPCFG4 = sysmapxcfg; break;
+    case 5: SYSMAP->SYSMAPCFG5 = sysmapxcfg; break;
+    case 6: SYSMAP->SYSMAPCFG6 = sysmapxcfg; break;
+    case 7: SYSMAP->SYSMAPCFG7 = sysmapxcfg; break;
+    default: return;
+    }
+}
+
+/**
+  \brief   Get SYSMAPADDRx Register by index
+  \details Returns the content of the SYSMAPADDRx Register.
+  \param [in]    idx    SYSMAP region index
+  \return               SYSMAPADDRx Register value
+ */
+__STATIC_INLINE uint32_t __get_SYSMAPADDRx(uint32_t idx)
+{
+    switch(idx){
+    case 0: return SYSMAP->SYSMAPADDR0;
+    case 1: return SYSMAP->SYSMAPADDR1;
+    case 2: return SYSMAP->SYSMAPADDR2;
+    case 3: return SYSMAP->SYSMAPADDR3;
+    case 4: return SYSMAP->SYSMAPADDR4;
+    case 5: return SYSMAP->SYSMAPADDR5;
+    case 6: return SYSMAP->SYSMAPADDR6;
+    case 7: return SYSMAP->SYSMAPADDR7;
+    default: return 0;
+    }
+}
+
+/**
+  \brief   Set SYSMAPADDRx by index
+  \details Writes the given value to the SYSMAPADDRx Register.
+  \param [in]    idx      SYSMAP region index
+  \param [in]    sysmapaddr  SYSMAPADDRx Register value to set
+ */
+__STATIC_INLINE void __set_SYSMAPADDRx(uint32_t idx, uint32_t sysmapxaddr)
+{
+    switch (idx) {
+    case 0: SYSMAP->SYSMAPADDR0 = sysmapxaddr; break;
+    case 1: SYSMAP->SYSMAPADDR1 = sysmapxaddr; break;
+    case 2: SYSMAP->SYSMAPADDR2 = sysmapxaddr; break;
+    case 3: SYSMAP->SYSMAPADDR3 = sysmapxaddr; break;
+    case 4: SYSMAP->SYSMAPADDR4 = sysmapxaddr; break;
+    case 5: SYSMAP->SYSMAPADDR5 = sysmapxaddr; break;
+    case 6: SYSMAP->SYSMAPADDR6 = sysmapxaddr; break;
+    case 7: SYSMAP->SYSMAPADDR7 = sysmapxaddr; break;
+    default: return;
+    }
+}
+
+/**
+  \brief  configure system map attribute.
+  \details
+  \param [in]  idx        system map region (0, 1, 2, ..., 7).
+  \param [in]  base_addr  base address must be aligned with page size.
+  \param [in]  enable     enable or disable memory protected region.
+  */
+__STATIC_INLINE void csi_sysmap_config_region(uint32_t idx, uint32_t base_addr, uint32_t attr)
+{
+    uint32_t addr = 0;
+
+    if (idx > 7) {
+        return;
+    }
+
+    addr = base_addr >> 12;
+    attr = attr << 2;
+
+    __set_SYSMAPADDRx(idx, addr);
+    __set_SYSMAPCFGx(idx, attr);
+}
+
+/*@} end of CSI_Core_SYSMAPFunctions */
+
 
 /* ##################################### DCC function ########################################### */
 /**
@@ -741,6 +936,51 @@ __STATIC_INLINE int32_t csi_had_check_char(void)
 }
 
 /*@} end of CSI_core_DebugFunctions */
+
+
+/* ##########################  sleep and Reset functions  #################################### */
+/**
+  \ingroup  CSI_Core_FunctionInterface
+  \defgroup CSI_Core_SleepAndResetFunctions Sleep and Reset Functions
+  \brief    Functions that configure Sleep and Reset.
+  @{
+ */
+
+
+/* MEXSTATUS Register Definitions */
+#define MEXSTATUS_RESET_Pos                           0U
+#define MEXSTATUS_RESET_Msk                      (0x3UL << MEXSTATUS_RESET_Pos)                                             /*!< MEXSTATUS: RESET Position */
+#define MEXSTATUS_SLEEP_Pos                           2U
+#define MEXSTATUS_SLEEP_Msk                      (0x3UL << MEXSTATUS_SLEEP_Pos)                                             /*!< MEXSTATUS: RESET Position */
+/*@} end of group CSI_MEXSTATUS */
+
+
+
+/**
+  \brief   CPU System Reset
+  \details Triggle CPU System Reset
+  */
+__STATIC_INLINE void csi_system_reset (void)
+{
+    uint32_t mexstatus;
+    mexstatus = __get_MEXSTATUS();
+    mexstatus &= (~(MEXSTATUS_RESET_Msk));
+    mexstatus |= (uint32_t)(0x2 << MEXSTATUS_RESET_Pos);
+    __set_MEXSTATUS(mexstatus);
+}
+
+/**
+  \brief   CPU Core Reset
+  \details Triggle CPU Core Reset
+  */
+__STATIC_INLINE void csi_core_reset (void)
+{
+    uint32_t mexstatus;
+    mexstatus = __get_MEXSTATUS();
+    mexstatus &= (~(MEXSTATUS_RESET_Msk));
+    mexstatus |= (uint32_t)(0x1 << MEXSTATUS_RESET_Pos);
+    __set_MEXSTATUS(mexstatus);
+}
 
 /* ##########################  Cache functions  #################################### */
 /**
@@ -936,7 +1176,7 @@ __STATIC_INLINE void csi_dcache_invalid_range (uint32_t *addr, int32_t dsize)
 __STATIC_INLINE void csi_dcache_clean_range (uint32_t *addr, int32_t dsize)
 {
 
-#if (__DCACHE_PRESENT == 1)
+#if (__DCACHE_PRESENT == 1U)
     int32_t op_size = dsize + (uint32_t)addr % 32;
     uint32_t op_addr = (uint32_t) addr & CACHE_INV_ADDR_Msk;
     int32_t linesize = 32;
@@ -1041,6 +1281,163 @@ __STATIC_INLINE uint32_t csi_cache_get_miss_time (void)
 }
 
 /*@} end of CSI_Core_CacheFunctions */
+
+/**
+ \ingroup    CSI_tcm_register
+ \defgroup   CSI_TCM
+ \brief      Type definitions for the tcm Registers
+ @{
+ */
+
+/**
+ \brief  Consortium definition for accessing protection area selection register(MITCMCR, csr<0x7f9>).
+ */
+typedef union {
+    struct {
+        uint32_t EN: 1;                             /*!< bit:     0  Instruction Tightly-Coupled Memory enable */
+        uint32_t _reserved0: 1;                     /*!< bit:     1  Reserved */
+        uint32_t _reserved1: 1;                     /*!< bit:     2  Reserved */
+        uint32_t _reserved2: 1;                     /*!< bit:     3  Reserved */
+        uint32_t Size: 4;                           /*!< bit:  4..7  Size of ITCM */
+        uint32_t _reserved4: 4;                     /*!< bit:  8..11 Reserved */
+        uint32_t Base_Address: 20;                  /*!< bit: 12..31 Base address of ITCM */
+    } b;                                            /*!< Structure    Access by bit */
+    uint32_t w;                                     /*!< Type         Access by whole register */
+} MITCMCR_Type;
+
+#define MITCMCR_Base_Address_Pos             12U                                              /*!< MITCMCR: Base_Address Position */
+#define MITCMCR_Base_Address_Msk             (0xfffffUL << MITCMCR_Base_Address_Pos)           /*!< MITCMCR: Base_Address Mask */
+
+#define MITCMCR_Size_Pos                     4U                                               /*!< MITCMCR: Size Position */
+#define MITCMCR_Size_Msk                     (0xfUL << MITCMCR_Size_Pos)                       /*!< MITCMCR: Size Mask */
+
+#define MITCMCR_EN_Pos                       0U                                               /*!< MITCMCR: EN Position */
+#define MITCMCR_EN_Msk                       (0x1UL << MITCMCR_EN_Pos)                         /*!< MITCMCR: EN Mask */
+
+/**
+ \brief  Consortium definition for accessing protection area selection register(MDTCMCR, csr<0x7f8>).
+ */
+typedef union {
+    struct {
+        uint32_t EN: 1;                             /*!< bit:     0  Instruction Tightly-Coupled Memory enable */
+        uint32_t _reserved0: 1;                     /*!< bit:     1  Reserved */
+        uint32_t _reserved1: 1;                     /*!< bit:     2  Reserved */
+        uint32_t _reserved2: 1;                     /*!< bit:     3  Reserved */
+        uint32_t Size: 4;                           /*!< bit:  4..7  Size of DTCM */
+        uint32_t _reserved4: 4;                     /*!< bit:  8..11 Reserved */
+        uint32_t Base_Address: 20;                  /*!< bit: 12..31 Base address of DTCM */
+    } b;                                            /*!< Structure    Access by bit */
+    uint32_t w;                                     /*!< Type         Access by whole register */
+} MDTCMCR_Type;
+
+#define MDTCMCR_Base_Address_Pos             12U                                              /*!< MDTCMCR: Base_Address Position */
+#define MDTCMCR_Base_Address_Msk             (0xfffffUL << MDTCMCR_Base_Address_Pos)           /*!< MDTCMCR: Base_Address Mask */
+
+#define MDTCMCR_Size_Pos                     4U                                               /*!< MDTCMCR: Size Position */
+#define MDTCMCR_Size_Msk                     (0xfUL << MDTCMCR_Size_Pos)                       /*!< MDTCMCR: Size Mask */
+
+#define MDTCMCR_EN_Pos                       0U                                               /*!< MDTCMCR: EN Position */
+#define MDTCMCR_EN_Msk                       (0x1UL << MDTCMCR_EN_Pos)                         /*!< MDTCMCR: EN Mask */
+/*@} end of group CSI_TCM_bitfield */
+
+/* ##########################  TCM functions  #################################### */
+/**
+ \ingroup  CSI_Core_FunctionInterface
+ \defgroup CSI_Core_TCMFunctions TCM Functions
+ \brief    Functions that configure TCM.
+ @{
+ */
+
+/**
+ \brief   Enable ITCM
+ \details Turns on ITCM
+ */
+__STATIC_INLINE void csi_itcm_enable (void)
+{
+    __set_MITCMCR(__get_MITCMCR() | MITCMCR_EN_Msk);
+}
+
+/**
+ \brief   Enable DTCM
+ \details Turns on DTCM
+ */
+__STATIC_INLINE void csi_dtcm_enable (void)
+{
+    __set_MDTCMCR(__get_MDTCMCR() | MDTCMCR_EN_Msk);
+}
+
+/**
+ \brief   Enable ITCM
+ \details Turns on ITCM
+ */
+__STATIC_INLINE void csi_itcm_disable (void)
+{
+    __set_MITCMCR(__get_MITCMCR() & (~MITCMCR_EN_Msk));
+}
+
+/**
+ \brief   Enable DTCM
+ \details Turns on DTCM
+ */
+__STATIC_INLINE void csi_dtcm_disable (void)
+{
+    __set_MDTCMCR(__get_MDTCMCR() & (~MDTCMCR_EN_Msk));
+}
+
+/**
+ \brief   Get ITCM Size
+ \details Get ITCM Size
+ \return         ITCM size (bytes).
+ */
+__STATIC_INLINE uint32_t csi_itcm_get_size(void)
+{
+    MITCMCR_Type sizemask;
+    uint32_t ret;
+
+    sizemask.w = __get_MITCMCR();
+    ret = sizemask.b.Size;
+
+    return (1 << ret) << 9;
+}
+
+/**
+ \brief   Get DTCM Size
+ \details Get DTCM Size
+ \return         DTCM size (bytes).
+ */
+__STATIC_INLINE uint32_t csi_dtcm_get_size(void)
+{
+    MDTCMCR_Type sizemask;
+    uint32_t ret;
+
+    sizemask.w = __get_MDTCMCR();
+    ret = sizemask.b.Size;
+
+    return (1 << ret) << 9;
+}
+
+/**
+ \brief   Set ITCM Base Address
+ \details Set ITCM Base Address
+ \param [in]  base_addr  itcm base address.
+ */
+__STATIC_INLINE void csi_itcm_set_base_addr(uint32_t base_addr)
+{
+    __set_MITCMCR((__get_MITCMCR() & (~MITCMCR_Base_Address_Msk)) | (base_addr & MITCMCR_Base_Address_Msk));
+}
+
+/**
+ \brief   Set DTCM Base Address
+ \details Set DTCM Base Address
+ \param [in]  base_addr  dtcm base address.
+ */
+__STATIC_INLINE void csi_dtcm_set_base_addr(uint32_t base_addr)
+{
+    __set_MDTCMCR((__get_MDTCMCR() & (~MDTCMCR_Base_Address_Msk)) | (base_addr & MDTCMCR_Base_Address_Msk));
+}
+
+/*@} end of CSI_Core_TCMFunctions */
+
 
 /*@} end of CSI_core_DebugFunctions */
 

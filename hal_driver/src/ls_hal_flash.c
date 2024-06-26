@@ -11,20 +11,6 @@ ROM_SYMBOL bool flash_dual_mode_only;
 ROM_SYMBOL void (*hal_flash_xip_stop_fn)();
 ROM_SYMBOL void (*hal_flash_xip_start_fn)();
 
-static void xip_dummy(){}
-
-ROM_SYMBOL void hal_flash_xip_func_ptr_dummy()
-{
-    hal_flash_xip_start_fn = xip_dummy;
-    hal_flash_xip_stop_fn = xip_dummy;
-}
-
-ROM_SYMBOL void hal_flash_xip_func_ptr_init()
-{
-    hal_flash_xip_start_fn = hal_flash_xip_start;
-    hal_flash_xip_stop_fn = hal_flash_xip_stop;
-}
-
 ROM_SYMBOL void hal_flash_dual_mode_set(bool dual)
 {
     flash_dual_mode_only= dual;
@@ -63,6 +49,36 @@ static void XIP_BANNED_FUNC(hal_flash_write_status_check,)
     while(hal_flash_write_in_process());
 }
 
+#if FLASH_PROG_ALGO==1
+void hal_flash_xip_func_ptr_dummy(void) {}
+void hal_flash_xip_func_ptr_init(void) {}
+#define flash_writing_critical(func, param)   \
+    do                                        \
+    {                                         \
+        uint32_t cpu_stat = ENTER_CRITICAL(); \
+        hal_flash_xip_stop();                 \
+        hal_flash_write_enable();             \
+        func(param);                          \
+        EXIT_CRITICAL(cpu_stat);              \
+        hal_flash_write_status_check();       \
+        hal_flash_xip_start();                \
+    } while (0)
+#else
+
+static void xip_dummy(){}
+
+ROM_SYMBOL void hal_flash_xip_func_ptr_dummy()
+{
+    hal_flash_xip_start_fn = xip_dummy;
+    hal_flash_xip_stop_fn = xip_dummy;
+}
+
+ROM_SYMBOL void hal_flash_xip_func_ptr_init()
+{
+    hal_flash_xip_start_fn = hal_flash_xip_start;
+    hal_flash_xip_stop_fn = hal_flash_xip_stop;
+}
+
 #if ROM_CODE == 1
 void flash_reading_critical(void (*func)(void *),void *param)
 {
@@ -93,32 +109,47 @@ NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flash_reading_critical,void (*func)(voi
 
 #if SUSPEND_WORKAROUND == PUYA_FLASH_WORKAROUND
 #include "systick.h"
+extern bool flash_55nm;
 ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void *param)
 {
-    if(GLOBAL_INT_MASK_STATUS())
-    {
-        hal_flash_xip_stop();
-        hal_flash_write_enable();
-        func(param);
-        hal_flash_write_status_check();
-        hal_flash_xip_start();
+    if(flash_55nm){
+        if(GLOBAL_INT_MASK_STATUS())
+        {
+            hal_flash_xip_stop();
+            hal_flash_write_enable();
+            func(param);
+            hal_flash_write_status_check();
+            hal_flash_xip_start();
+        }else
+        {
+            uint32_t cpu_stat = ENTER_CRITICAL();
+            hal_flash_xip_stop();
+            hal_flash_write_enable();
+            func(param);
+            uint32_t writing_end_time = systick_get_value();
+            DELAY_US(500);
+            flash_stat.writing = true;
+            EXIT_CRITICAL(cpu_stat);
+            systick_poll_timeout(writing_end_time,func == do_hal_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
+            cpu_stat = ENTER_CRITICAL();
+            hal_flash_write_status_check();
+            EXIT_CRITICAL(cpu_stat);
+            flash_stat.writing = false;
+            hal_flash_xip_start();
+        }
     }else
     {
         uint32_t cpu_stat = ENTER_CRITICAL();
         hal_flash_xip_stop();
         hal_flash_write_enable();
         func(param);
-        uint32_t writing_end_time = systick_get_value();
-        DELAY_US(500);
         flash_stat.writing = true;
         EXIT_CRITICAL(cpu_stat);
-        systick_poll_timeout(writing_end_time,func == do_hal_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
-        cpu_stat = ENTER_CRITICAL();
         hal_flash_write_status_check();
-        EXIT_CRITICAL(cpu_stat);
         flash_stat.writing = false;
         hal_flash_xip_start();
     }
+
 }
 
 #elif SUSPEND_WORKAROUND == TSINGTENG_FLASH_WORKAROUND
@@ -148,7 +179,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void
     hal_flash_xip_start();
 }
 #endif
-
+#endif
 #endif
 
 ROM_SYMBOL void hal_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length)
