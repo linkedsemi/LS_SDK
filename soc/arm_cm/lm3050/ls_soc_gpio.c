@@ -1213,6 +1213,7 @@ static void spi_master_nss_io_cfg(uint8_t nss)
 static void spi_master_mosi_io_cfg(uint8_t mosi)
 {
     io_set_pin(mosi);
+    io_cfg_input(mosi);
     io_cfg_output(mosi);
 }
 
