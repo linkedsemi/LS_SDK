@@ -52,6 +52,8 @@ extern "C" {
 
 #define LSECC_BASE_ADDR (0x40002000)
 
+#define MAC_BASE_ADDR (0x50000000)
+
 #ifdef __cplusplus
 }
 #endif

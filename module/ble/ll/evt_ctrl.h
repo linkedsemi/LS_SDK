@@ -30,8 +30,134 @@ extern uint8_t tx_path_delay_1m_phy;
 extern uint8_t tx_path_delay_2m_phy;
 extern void (*rf_tx_cfg_fn)(enum ble_phy phy,uint8_t ch,uint8_t tx_pwr);
 extern void (*rf_rx_cfg_fn)(enum ble_phy phy,uint8_t ch);
+#ifdef LE501X
+struct tx_desc{
+    uint16_t nextptr:14,
+                reserved0:1,
+                txdone:1;
+    union{
+        uint16_t txllid:2,
+                txnesn:1,
+                txsn:1,
+                txmd:1,
+                txcp:1,
+                txaclrfu:2,
+                txlen:8;
+        uint16_t txtype0:4,
+                txadvrfu:1,
+                txchsel:1,
+                txtxadd:1,
+                txrxadd:1,
+                txadvlen:8;
+    }u1;
+    uint16_t txdataptr;
+    uint16_t txaelength:6,
+            txaemode:2,
+            txadva:1,
+            txtgta:1,
+            txcte:1,
+            txadi:1,
+            txauxptr:1,
+            txsync:1,
+            txpow:1,
+            txrsvd:1;
+    uint16_t tx_ll_ch:6,
+            txaux_ca:1,
+            txauxoffset_unit:1,
+            txauxoffset_l:8;
+    uint16_t txauxoffset_m:5,
+            txaux_phy:3;
+    uint16_t txaeheader_dataptr;
+    uint16_t txctetime:5,
+            txcterfu:1,
+            txctetype:2;
+}__attribute__((aligned(4)));
 
+struct rx_desc{
+    uint16_t nextptr:14,
+            reserved0:1,
+            rxdone:1;
+    union{
+        uint16_t conn_syncerr:1,
+                conn_rxtimeerr:1,
+                conn_lenerr:1,
+                conn_crcerr:1,
+                conn_micerr:1,
+                conn_lliderr:1,
+                conn_snerr:1,
+                conn_nesnerr:1,
+                reserved1:7,
+                conn_rxcteerr:1;
+        uint16_t adv_syncerr:1,
+                adv_rxtimeerr:1,
+                adv_lenerr:1,
+                adv_crcerr:1,
+                adv_priverr:1,
+                adv_typeerr:1,
+                bdaddr_match:1,
+                peer_add_match:1,
+                in_peradvl:1,
+                in_whl:1,
+                dev_filtering_ok:1,
+                advmodeerr:1,
+                followauxptr:1,
+                reserved2:2,
+                adv_rxcteerr:1;
+        uint16_t rxstatisom0;
+    }u1;
+    union{
+        uint16_t rxllid:2,
+                rxnesn:1,
+                rxsn:1,
+                rxmd:1,
+                rxcp:1,
+                rxaclrfu:2,
+                rxlen:8;
+        uint16_t rxtype:4,
+                rxadvrfu:1,
+                rxchsel:1,
+                rxtxadd:1,
+                rxrxadd:1,
+                rxadvlen:8;
+        uint16_t rxphisom0;
+    }u2;
+    uint16_t rxrssi:8,
+            used_chd_idx:6,
+            rate:2;
+    uint16_t rxclknsync0;
+    uint16_t rxclknsync1:12;
+    uint16_t rxfcntsync:10,
+            reserved3:1,
+            rxlinklbl:5;
+    uint16_t rxwpalptr;
+    uint16_t rxralptr;
+    uint16_t rxaelength:6,
+            rxaemode:2,
+            rxadva:1,
+            rxtgta:1,
+            rxcte:1,
+            rxadi:1,
+            rxauxptr:1,
+            rxsync:1,
+            rxpow:1,
+            rxrsvd:1;
+    uint16_t rxctetime:5,
+            rxcterfu:1,
+            rxctetype:2,
+            nbrxiqsamp:8;
+    uint16_t rxcteptr;
+}__attribute__((aligned(4)));
 
+uint32_t htimer_current_get();
+__attribute__((always_inline)) static inline uint8_t htimer_irq1_mask_status_get()
+{
+    return REG_FIELD_RD(MAC->INTCNTL1,RWMAC_TIMESTAMPTGT1INTMSK);
+}
+__attribute__((always_inline)) static inline bool mac_fifo_empty()
+{
+    return true;
+}
+#else
 __attribute__((always_inline)) static inline void tx_underrun_irq1_unmask()
 {
     REG_FIELD_WR(MAC->INT_MASK1,MAC_TX_UNDERRUN_INT,1);
@@ -319,6 +445,8 @@ __attribute__((always_inline)) static inline void sleep_req_set()
 {
     REG_FIELD_WR(MAC->SLEEP_CTRL,MAC_SLEEP_REQ,1);
 }
+
+#endif
 
 void mac_hw_init(void);
 
