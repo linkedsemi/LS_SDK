@@ -3,6 +3,7 @@
 #include "reg_base_addr.h"
 #include "reg_rwmac_type.h"
 #define MAC ((reg_rwmac_t *)MAC_BASE_ADDR)
+#define EM_BASE_ADDR 0x50004000
 #define LL_SWINT_NUM 22
 #define MAC_CLK_MHZ (16)
 

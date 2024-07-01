@@ -94,6 +94,19 @@ extern linked_buffer_t *sw_timer_buf_ptr;
 
 extern void (*hci_reset_reset_buf_fn)(void);
 
+#ifdef LE501X
+#define TX_DESC_NUM (20)
+struct rx_desc rx_desc_buf[HCI_ACL_DATA_TX_BUFFER_NUM];
+struct tx_desc tx_desc_buf[TX_DESC_NUM];
+static void tx_rx_desc_buf_init()
+{
+    rx_desc_buf_ptr = rx_desc_buf;
+    tx_desc_buf_ptr = tx_desc_buf;
+    tx_desc_buf_num = TX_DESC_NUM;
+}
+#else
+static void tx_rx_desc_buf_init(){}
+#endif
 static void adv_report_cache_init(void)
 {
     adv_rx_cache_ptr = &adv_rx_cache;
@@ -276,6 +289,7 @@ void ll_buf_init()
     sw_timer_buf_init();
     swint2_fifo_init();
     aes_128_calc_env_buf_init();
+    tx_rx_desc_buf_init();
 
     ll_sched_init();
     ll_sched_reset();

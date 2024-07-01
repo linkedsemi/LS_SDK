@@ -141,6 +141,7 @@ struct rx_desc{
             rxsync:1,
             rxpow:1,
             rxrsvd:1;
+    uint16_t rxdataptr;
     uint16_t rxctetime:5,
             rxcterfu:1,
             rxctetype:2,
@@ -148,15 +149,198 @@ struct rx_desc{
     uint16_t rxcteptr;
 }__attribute__((aligned(4)));
 
+struct ex_table{
+    uint16_t mode:3,
+            status:3,
+            iso:1,
+            rsvd:1,
+            ae_nps:1,
+            reserved0:1,
+            spa:1,
+            sch_prio1:5;
+    uint16_t rawstp_lsb;
+    uint16_t rawstp_msb;
+    uint16_t finestp;
+    uint16_t csptr;
+    uint16_t prio1d:15,
+            prio1d_unit:1;
+    uint16_t sch_prio2:5,
+            reserved1:3,
+            sch_prio3:5,
+            reserved2:3;
+    uint16_t reserved3:8,
+            pti_prio:5,
+            reserved4:3;
+}__attribute__((aligned(4)));
+
+struct control_struct
+{
+    uint16_t format:5,
+            reserved0:3,
+            dnabort:1,
+            rxbsy_en:1,
+            txbsy_en:1;
+    uint16_t priv_npub:1,
+            rxcrypt_en:1,
+            txcrypt_en:1,
+            crypt_mode:1,
+            mic_mode:1,
+            nullrxllidflt:1,
+            sas:1,
+            reserved1:1,
+            linklbl:4;
+    uint16_t isolinkcntl;
+    uint16_t txrate:2,
+            rxrate:2,
+            auxrate:2,
+            reserved2:2,
+            txthr:4,
+            rxthr:4;
+    uint16_t bdaddr_0;
+    uint16_t bdaddr_1;
+    uint16_t bdaddr_2;
+    uint16_t syncword_l;
+    uint16_t syncword_m;
+    uint16_t crcinit_l;
+    uint16_t crcinit_m:8,
+            rxmaxctebuf:8;
+    uint16_t ral_en:1,
+            ral_mode:1,
+            local_rpa_sel:1,
+            peradv_filt_en:1,
+            ral_resol_en:1,
+            reserved3:3,
+            filter_policy:8;
+    uint16_t ch_idx:6,
+            reservedd4:2,
+            hopint:5,
+            hop_mode:2,
+            fh_en:1;
+    uint16_t txpwr:8,
+            ext_pa_en:1,
+            ends_on_sac:1,
+            rxmafserr:1,
+            rxbfmicerr:1,
+            nesn:1,
+            sn:1,
+            lastempty:1,
+            rxbuff_full:1;
+    uint16_t dfen:1,
+            dffilteren:1,
+            dftype:2,
+            dfsampcntl:2,
+            dfswcntl:2,
+            dfrspen:1;
+    uint16_t rxwinsz:15,
+            rxwide:1;
+    uint16_t isotxdescptr;
+    uint16_t isorxdescptr;
+    uint16_t acltxdescptr;
+    uint16_t rx_ant_patt_length:7,
+            reserved5:1,
+            max_samp_cte:5,
+            reserved6:2,
+            dfrsp:1;
+    uint16_t rx_antenna_id_ptr:14;
+    uint16_t tx_ant_patt_length:7;
+    uint16_t tx_antenna_id_ptr:14;
+    uint16_t winoffset;
+    uint16_t minevtime;
+    uint16_t maxevtime;
+    union{
+        uint16_t conninterval;
+        uint16_t chmap0;
+    }u1;
+    uint16_t chmap1;
+    uint16_t chmap2:5,
+            advchmap:3,
+            reserved7:2,
+            ch_aux:6;
+    uint16_t aclrxmaxbuff:8,
+            isorxmaxbuf:8;
+    uint16_t rxmaxtime:13;
+    union{
+        uint16_t sk0;
+        uint16_t adv_bd_addr0;
+        uint16_t peer_ralptr:14;
+    }u2;
+    union{
+        uint16_t sk1;
+        uint16_t adv_bd_addr1;
+    }u3;
+    union{
+        uint16_t sk2;
+        uint16_t adv_bd_addr2;
+    }u4;
+    union{
+        uint16_t sk3;
+        uint16_t adv_bd_addr3:1;
+    }u5;
+    union{
+        uint16_t sk4;
+        uint16_t auxtxdescptr:14;
+    }u6;
+    union{
+        uint16_t sk5;
+        uint16_t winoffset_2m;
+    }u7;
+    union{
+        uint16_t sk6;
+        uint16_t conninterval_2m;
+    }u8;
+    union{
+        uint16_t sk7;
+        uint16_t winoffset_lr;
+    }u9;
+    union{
+        uint16_t iv0;
+        uint16_t conninterval_lr;
+    }u10;
+    uint16_t iv1;
+    uint16_t iv2;
+    uint16_t iv3;
+    union{
+        uint16_t txwinoffset;
+        uint16_t txccmpktcnt0;
+    }u11;
+    union{
+        uint16_t prev_adv_pkt_type:3,
+                prev_adv_mode:2,
+                prev_lam:1,
+                prev_pam:1,
+                prev_cte:1;
+        uint16_t txccmpktcnt1;
+    }u12;
+    uint16_t txccmpktcnt2:7;
+    uint16_t rxccmpktcnt0;
+    uint16_t rxccmpktcnt1;
+    uint16_t rxccmpktcnt2:7;
+    uint16_t evtcnt;
+    uint16_t evtcnt_offset0;
+    uint16_t evtcnt_offset1;
+    uint16_t evtcnt_offset2:7;
+    uint16_t isoevtcntl;
+    uint16_t isotxrxcntl;
+    uint16_t acltxdesccnt:8,
+             aclrxdesccnt:8;
+    uint16_t isotxrxpktcnt;
+}__attribute__((aligned(4)));
+
+extern struct ex_table em_et;
+extern struct control_struct em_cs;
+extern struct rx_desc *rx_desc_buf_ptr;
+extern struct tx_desc *tx_desc_buf_ptr;
+extern uint8_t tx_desc_buf_num;
 uint32_t htimer_current_get();
 __attribute__((always_inline)) static inline uint8_t htimer_irq1_mask_status_get()
 {
     return REG_FIELD_RD(MAC->INTCNTL1,RWMAC_TIMESTAMPTGT1INTMSK);
 }
-__attribute__((always_inline)) static inline bool mac_fifo_empty()
-{
-    return true;
-}
+
+uint32_t time_mac2stamp(uint32_t clkn,uint16_t finecnt);
+
+void set_em_et_rawstp_finestp(uint32_t timestamp);
+
 #else
 __attribute__((always_inline)) static inline void tx_underrun_irq1_unmask()
 {

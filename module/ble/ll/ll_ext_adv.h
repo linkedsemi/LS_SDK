@@ -125,5 +125,8 @@ enum ll_evt_transition_type htimer_ext_prim_adv_evt_sync_timeout(struct ll_evt *
 
 enum ll_evt_transition_type htimer_ext_second_adv_evt_sync_timeout(struct ll_evt *evt);
 
+void ble_adv_evt_start_handler(struct ll_evt *evt);
+
+void ble_adv_evt_before_end(struct ll_evt *evt);
 #endif
 

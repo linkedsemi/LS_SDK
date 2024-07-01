@@ -463,5 +463,9 @@ struct hci_acl_air_tx_data *hci_acl_data_rx_buf_alloc(void);
 
 enum ll_evt_transition_type htimer_conn_evt_sync_timeout(struct ll_evt *evt);
 
+void ble_conn_evt_start_handler(struct ll_evt *evt);
+
+void ble_conn_evt_before_end(struct ll_evt *evt);
+
 #endif
 

@@ -135,5 +135,9 @@ enum ll_evt_transition_type htimer_ext_second_scan_evt_sync_timeout(struct ll_ev
 
 uint8_t *ext_header_extract(uint8_t *payload,struct ext_header_field_param *param);
 
+void ble_scan_evt_start_handler(struct ll_evt *evt);
+
+void ble_scan_evt_before_end(struct ll_evt *evt);
+
 #endif
 
