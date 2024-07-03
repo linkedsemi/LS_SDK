@@ -8,9 +8,11 @@ extern "C" {
 
 typedef uint32_t sw_timer_time_t;
 
-#define MS_2_PERIOD(x) (2000*(uint64_t)(x)/625)
-#define PERIOD_2_MS(x) (625*(uint64_t)(x)/2000)
+#define MS_2_PERIOD(x) ms_2_period(x)
+#define PERIOD_2_MS(x) period_2_ms(x)
 
+uint32_t ms_2_period(uint32_t x);
+uint32_t period_2_ms(uint32_t x);
 #ifdef __cplusplus
 }
 #endif

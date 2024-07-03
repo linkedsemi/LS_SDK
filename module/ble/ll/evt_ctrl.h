@@ -244,8 +244,10 @@ struct control_struct
     uint16_t rx_antenna_id_ptr:14;
     uint16_t tx_ant_patt_length:7;
     uint16_t tx_antenna_id_ptr:14;
-    uint16_t winoffset;
-    uint16_t minevtime;
+    union{
+        uint16_t winoffset;
+        uint16_t minevtime;
+    }u0;
     uint16_t maxevtime;
     union{
         uint16_t conninterval;

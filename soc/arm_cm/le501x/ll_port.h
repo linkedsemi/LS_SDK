@@ -7,13 +7,11 @@
 #define LL_SWINT_NUM 22
 #define MAC_CLK_MHZ (16)
 
-void ble_pkt_irq_mask(void);
+static inline void ble_pkt_irq_mask(void){}
 
-void ble_pkt_irq_unmask(void);
+static inline void ble_pkt_irq_unmask(void){}
 
-void ble_pkt_irq_clr(void);
-
-void ble_util_irq_clr(void);
+static inline void ble_pkt_irq_clr(void){}
 
 void sleep_expected_time_set(uint32_t time);
 

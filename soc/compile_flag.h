@@ -20,7 +20,7 @@ extern "C" {
 
 #if (ROM_CODE==1 || BOOT_RAM==1)
 #define XIP_BANNED_FUNC(__NAME,...) __NAME(__VA_ARGS__)
-#if defined(BOOT_ROM)
+#if defined(BOOT_ROM)||defined(LE501X)
 #define LL_PKT_ISR 
 #else
 #define LL_PKT_ISR __attribute((section(".ll_pkt_isr")))

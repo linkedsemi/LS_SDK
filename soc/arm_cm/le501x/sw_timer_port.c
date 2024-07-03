@@ -22,12 +22,12 @@
 static void (*timer_isr)();
 static sw_timer_time_t wkup_time;
 static uint16_t wkup_cnt;
-sw_timer_time_t timer_time_add(sw_timer_time_t a,sw_timer_time_t b)
+ROM_SYMBOL sw_timer_time_t timer_time_add(sw_timer_time_t a,sw_timer_time_t b)
 {
     return (a + b) & 0xfffffff;
 }
 
-int timer_time_compare(sw_timer_time_t a,sw_timer_time_t b)
+ROM_SYMBOL int timer_time_compare(sw_timer_time_t a,sw_timer_time_t b)
 {
     uint32_t diff = (a - b) &0xfffffff;
     if(diff&0x8000000)
@@ -39,7 +39,7 @@ int timer_time_compare(sw_timer_time_t a,sw_timer_time_t b)
     }
 }
 
-sw_timer_time_t timer_time_get()
+ROM_SYMBOL sw_timer_time_t timer_time_get()
 {
     CLK_SAMP = 0x80000000;
     sw_timer_time_t result;
@@ -49,22 +49,22 @@ sw_timer_time_t timer_time_get()
     return result;
 }
 
-void timer_match_set(sw_timer_time_t match)
+ROM_SYMBOL void timer_match_set(sw_timer_time_t match)
 {
     CLK_TARGET = match;
 }
 
-void timer_irq_unmask()
+ROM_SYMBOL void timer_irq_unmask()
 {
     INT_MASK |= 0x40;
 }
 
-void timer_irq_mask()
+ROM_SYMBOL void timer_irq_mask()
 {
     INT_MASK &= ~0x40;
 }
 
-void timer_irq_clr()
+ROM_SYMBOL void timer_irq_clr()
 {
     INT_CLR = 0x40;
 }
@@ -134,7 +134,7 @@ static void mac_init_for_sw_timer()
     INT_CLR = 0xffffffff;
 }
 
-void timer_setup(void (*isr)())
+ROM_SYMBOL void timer_setup(void (*isr)())
 {
     timer_isr = isr;
     mac_init_for_sw_timer();
@@ -153,7 +153,7 @@ static bool wkup_sleep_interval_enough(sw_timer_time_t time,uint16_t cnt)
     }
 }
 
-bool timer_sleep()
+ROM_SYMBOL bool timer_sleep()
 {
     sw_timer_time_t current = timer_time_get();
     uint16_t cnt = 624 - CNT_SAMP;
