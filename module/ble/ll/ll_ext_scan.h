@@ -137,6 +137,8 @@ uint8_t *ext_header_extract(uint8_t *payload,struct ext_header_field_param *para
 
 void ble_scan_evt_start_handler(struct ll_evt *evt);
 
+void ble_scan_rx_pkt_handler(struct ll_evt *evt);
+
 void ble_scan_evt_before_end(struct ll_evt *evt);
 
 #endif

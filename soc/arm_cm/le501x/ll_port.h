@@ -5,7 +5,7 @@
 #define MAC ((reg_rwmac_t *)MAC_BASE_ADDR)
 #define EM_BASE_ADDR 0x50004000
 #define LL_SWINT_NUM 22
-#define MAC_CLK_MHZ (16)
+#define MAC_CLK_MHZ (32) //at least 32m to match rwmac timing count
 
 static inline void ble_pkt_irq_mask(void){}
 

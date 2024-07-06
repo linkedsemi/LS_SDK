@@ -127,6 +127,8 @@ enum ll_evt_transition_type htimer_ext_second_adv_evt_sync_timeout(struct ll_evt
 
 void ble_adv_evt_start_handler(struct ll_evt *evt);
 
+void ble_adv_rx_pkt_handler(struct ll_evt *evt);
+
 void ble_adv_evt_before_end(struct ll_evt *evt);
 #endif
 

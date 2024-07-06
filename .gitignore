@@ -7,3 +7,4 @@ _build/
 *.uvguix.*
 *.map
 *__info_array.c
+.vscode-ctags

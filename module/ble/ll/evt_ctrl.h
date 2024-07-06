@@ -7,8 +7,13 @@
 #include "field_manipulate.h"
 
 #define CCM_IV_SIZE 8
+#ifdef LE501X
+#define AS_SOON_AS_POSSIBLE_DELAY US2HCLK(600)
+#define EVT_START_IN_ADVANCE US2HCLK(500)
+#else
 #define AS_SOON_AS_POSSIBLE_DELAY US2HCLK(250)
 #define EVT_START_IN_ADVANCE US2HCLK(200)
+#endif
 
 struct ll_crypto_env
 {
@@ -36,19 +41,23 @@ struct tx_desc{
                 reserved0:1,
                 txdone:1;
     union{
-        uint16_t txllid:2,
-                txnesn:1,
-                txsn:1,
-                txmd:1,
-                txcp:1,
-                txaclrfu:2,
-                txlen:8;
-        uint16_t txtype0:4,
-                txadvrfu:1,
-                txchsel:1,
-                txtxadd:1,
-                txrxadd:1,
-                txadvlen:8;
+        struct{
+            uint16_t txllid:2,
+                    txnesn:1,
+                    txsn:1,
+                    txmd:1,
+                    txcp:1,
+                    txaclrfu:2,
+                    txlen:8;
+        }txphce;
+        struct{
+            uint16_t txtype0:4,
+                    txadvrfu:1,
+                    txchsel:1,
+                    txtxadd:1,
+                    txrxadd:1,
+                    txadvlen:8;
+        }txphadv;
     }u1;
     uint16_t txdataptr;
     uint16_t txaelength:6,
@@ -78,47 +87,55 @@ struct rx_desc{
             reserved0:1,
             rxdone:1;
     union{
-        uint16_t conn_syncerr:1,
-                conn_rxtimeerr:1,
-                conn_lenerr:1,
-                conn_crcerr:1,
-                conn_micerr:1,
-                conn_lliderr:1,
-                conn_snerr:1,
-                conn_nesnerr:1,
-                reserved1:7,
-                conn_rxcteerr:1;
-        uint16_t adv_syncerr:1,
-                adv_rxtimeerr:1,
-                adv_lenerr:1,
-                adv_crcerr:1,
-                adv_priverr:1,
-                adv_typeerr:1,
-                bdaddr_match:1,
-                peer_add_match:1,
-                in_peradvl:1,
-                in_whl:1,
-                dev_filtering_ok:1,
-                advmodeerr:1,
-                followauxptr:1,
-                reserved2:2,
-                adv_rxcteerr:1;
+        struct{
+            uint16_t conn_syncerr:1,
+                    conn_rxtimeerr:1,
+                    conn_lenerr:1,
+                    conn_crcerr:1,
+                    conn_micerr:1,
+                    conn_lliderr:1,
+                    conn_snerr:1,
+                    conn_nesnerr:1,
+                    reserved1:7,
+                    conn_rxcteerr:1;
+        }rxstatce;
+        struct {
+            uint16_t adv_syncerr:1,
+                    adv_rxtimeerr:1,
+                    adv_lenerr:1,
+                    adv_crcerr:1,
+                    adv_priverr:1,
+                    adv_typeerr:1,
+                    bdaddr_match:1,
+                    peer_add_match:1,
+                    in_peradvl:1,
+                    in_whl:1,
+                    dev_filtering_ok:1,
+                    advmodeerr:1,
+                    followauxptr:1,
+                    reserved2:2,
+                    adv_rxcteerr:1;
+        }rxstatadv;
         uint16_t rxstatisom0;
     }u1;
     union{
-        uint16_t rxllid:2,
-                rxnesn:1,
-                rxsn:1,
-                rxmd:1,
-                rxcp:1,
-                rxaclrfu:2,
-                rxlen:8;
-        uint16_t rxtype:4,
-                rxadvrfu:1,
-                rxchsel:1,
-                rxtxadd:1,
-                rxrxadd:1,
-                rxadvlen:8;
+        struct{
+            uint16_t rxllid:2,
+                    rxnesn:1,
+                    rxsn:1,
+                    rxmd:1,
+                    rxcp:1,
+                    rxaclrfu:2,
+                    rxlen:8;
+        }rxphce;
+        struct{
+            uint16_t rxtype:4,
+                    rxadvrfu:1,
+                    rxchsel:1,
+                    rxtxadd:1,
+                    rxrxadd:1,
+                    rxadvlen:8;
+        }rxphadv;
         uint16_t rxphisom0;
     }u2;
     uint16_t rxrssi:8,
@@ -306,11 +323,13 @@ struct control_struct
         uint16_t txccmpktcnt0;
     }u11;
     union{
-        uint16_t prev_adv_pkt_type:3,
-                prev_adv_mode:2,
-                prev_lam:1,
-                prev_pam:1,
-                prev_cte:1;
+        struct{
+            uint16_t prev_adv_pkt_type:3,
+                    prev_adv_mode:2,
+                    prev_lam:1,
+                    prev_pam:1,
+                    prev_cte:1;
+        }extadvstat;
         uint16_t txccmpktcnt1;
     }u12;
     uint16_t txccmpktcnt2:7;
@@ -330,9 +349,12 @@ struct control_struct
 
 extern struct ex_table em_et;
 extern struct control_struct em_cs;
+extern struct rx_desc adv_scan_rx_desc[];
 extern struct rx_desc *rx_desc_buf_ptr;
 extern struct tx_desc *tx_desc_buf_ptr;
 extern uint8_t tx_desc_buf_num;
+extern uint8_t rx_desc_buf_num;
+extern uint8_t em_adv_rx_buf[];
 uint32_t htimer_current_get();
 __attribute__((always_inline)) static inline uint8_t htimer_irq1_mask_status_get()
 {

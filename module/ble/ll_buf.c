@@ -103,6 +103,7 @@ static void tx_rx_desc_buf_init()
     rx_desc_buf_ptr = rx_desc_buf;
     tx_desc_buf_ptr = tx_desc_buf;
     tx_desc_buf_num = TX_DESC_NUM;
+    rx_desc_buf_num = HCI_ACL_DATA_TX_BUFFER_NUM;
 }
 #else
 static void tx_rx_desc_buf_init(){}

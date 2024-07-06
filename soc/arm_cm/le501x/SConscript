@@ -110,6 +110,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         #'adpcm/adpcm.c',
         #'micro-ecc/uECC.c',
         'ble/ble_common_api.c',
+        'ble/ll_buf.c',
         'settings/inflash_settings.c',
         'settings/ota_settings.c',
     ]))
@@ -126,6 +127,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         #'module/micro-ecc',
         #'module/adpcm',
         'module/ble',
+        'module/ble/ll',
         'module/ble/prf',
         'module/settings',
         'soc',

@@ -11,8 +11,8 @@
 #define MSG_BUF_SIZE 1900
 #define NON_RET_BUF_SIZE (12)
 #else
-#define DB_BUF_SIZE 8192
-#define MSG_BUF_SIZE 8192
+#define DB_BUF_SIZE 4096
+#define MSG_BUF_SIZE 4096
 #define NON_RET_BUF_SIZE (380*2)
 
 #endif
@@ -138,6 +138,8 @@ __attribute((weak)) void prf_fn_init(void){}
 
 __attribute((weak)) void ble_storage_max_num_init(uint8_t num){}
 
+__attribute((weak)) void ll_buf_init(){}
+
 void stack_var_ptr_init()
 {
     stack_assert_asm_fn = stack_assert_asm;
@@ -168,6 +170,7 @@ void stack_var_ptr_init()
     statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
     prf_fn_init();
     ble_storage_max_num_init(SDK_BLE_STORAGE_PEER_MAX);
+    ll_buf_init();
 }
 
 static bool dummy()
@@ -187,10 +190,16 @@ __attribute__((weak)) bool uart_eif_flow_off(void){return false;}
 
 __attribute((weak)) void app_init(void){}
 
+void controller_read(uint8_t *buf,uint16_t length,void (*cb)());
+void controller_write(uint8_t *buf,uint16_t length,void (*cb)());
+extern void (*hci_read)(uint8_t *buf,uint16_t length,void (*cb)());
+extern void (*hci_write)(uint8_t *buf,uint16_t length,void (*cb)());
 void main_task_app_init()
 {
-    main_task = 3;
+    main_task = 0;
     app_init_fn = app_init;
+    hci_read = controller_read;
+    hci_write = controller_write;
     eif_read = (void (*)(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *))dummy;
     eif_write = (void (*)(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *))dummy;
     eif_flow_on = (void (*)(void))dummy;

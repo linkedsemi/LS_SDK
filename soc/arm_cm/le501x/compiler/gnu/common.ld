@@ -13,7 +13,7 @@ SECTIONS
 
     __data_lma__ = __vector_lma__ + SIZEOF(.vector);
 
-    __data_start__ = DEFINED(__mesh_stack_bss_end__)? __mesh_stack_bss_end__ : DEFINED(__stack_bss_end__)? __stack_bss_end__ : 0xc0;
+    __data_start__ = 0xc0;
 
     .data __data_start__ :
     {
@@ -82,6 +82,13 @@ SECTIONS
 	}>FLASH
 	__exidx_end = .;
 
+    .em __stack_bss_end__ (NOLOAD) :
+    {
+        *ll_buf.o*(.bss*)
+        *stack_var.o*(.bss*)
+        __em_end__ = .;
+    } > EM
+
     .bss (NOLOAD):
     {
         __bss_start__ = .;
@@ -97,15 +104,15 @@ SECTIONS
         PROVIDE(end = .);
         KEEP(*(.heap*))
     } > RAM
-    reset_retain_addr = MAX(__HeapLimit , 0x6AE8);
+    /* reset_retain_addr = MAX(__HeapLimit , 0x6AE8);
     .reset_retain reset_retain_addr (NOLOAD):
     {
         . = ALIGN(4);
         reset_retain_start = .;
         . += 2*4;
         reset_retain_end = .;
-    } > RAM
-    ASSERT(reset_retain_end <= 0xb800, "Error end address for reset retain")
+    }
+    ASSERT(reset_retain_end <= 0xb800, "Error end address for reset retain") */
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
      * values to stack symbols later */

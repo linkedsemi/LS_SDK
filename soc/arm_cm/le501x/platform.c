@@ -54,7 +54,7 @@ __attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}
 
 static void bb_mem_clr(void)
 {
-    //memset((void *)BASEBAND_MEMORY_ADDR,0,16384);
+    memset((void *)BASEBAND_MEMORY_ADDR,0,16384);
 }
 
 static void irq_priority()
@@ -383,7 +383,7 @@ static void module_init()
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
-    rco_freq_counting_start();
+    //rco_freq_counting_start();
 }
 
 void XIP_BANNED_FUNC(LVD33_Handler,)
@@ -522,8 +522,8 @@ void sys_init_ll()
 void platform_reset(uint32_t error)
 {
     __disable_irq();
-    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
-    reset_retain_ptr->reset_reason = error;
+    // struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
+    // reset_retain_ptr->reset_reason = error;
     switch_to_xo16m();
     __NVIC_SystemReset();
 }
