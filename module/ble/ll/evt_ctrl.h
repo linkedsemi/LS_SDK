@@ -8,7 +8,7 @@
 
 #define CCM_IV_SIZE 8
 #ifdef LE501X
-#define AS_SOON_AS_POSSIBLE_DELAY US2HCLK(600)
+#define AS_SOON_AS_POSSIBLE_DELAY US2HCLK(900)
 #define EVT_START_IN_ADVANCE US2HCLK(500)
 #else
 #define AS_SOON_AS_POSSIBLE_DELAY US2HCLK(250)
@@ -75,11 +75,13 @@ struct tx_desc{
             txauxoffset_unit:1,
             txauxoffset_l:8;
     uint16_t txauxoffset_m:5,
-            txaux_phy:3;
+            txaux_phy:3,
+            reserved1:8;
     uint16_t txaeheader_dataptr;
     uint16_t txctetime:5,
             txcterfu:1,
-            txctetype:2;
+            txctetype:2,
+            reserved2:8;
 }__attribute__((aligned(4)));
 
 struct rx_desc{
@@ -142,7 +144,7 @@ struct rx_desc{
             used_chd_idx:6,
             rate:2;
     uint16_t rxclknsync0;
-    uint16_t rxclknsync1:12;
+    uint16_t rxclknsync1;
     uint16_t rxfcntsync:10,
             reserved3:1,
             rxlinklbl:5;
@@ -196,7 +198,8 @@ struct control_struct
             reserved0:3,
             dnabort:1,
             rxbsy_en:1,
-            txbsy_en:1;
+            txbsy_en:1,
+            reserved01:5;
     uint16_t priv_npub:1,
             rxcrypt_en:1,
             txcrypt_en:1,
@@ -205,7 +208,8 @@ struct control_struct
             nullrxllidflt:1,
             sas:1,
             reserved1:1,
-            linklbl:4;
+            linklbl:5,
+            reserved11:3;
     uint16_t isolinkcntl;
     uint16_t txrate:2,
             rxrate:2,
@@ -247,7 +251,8 @@ struct control_struct
             dftype:2,
             dfsampcntl:2,
             dfswcntl:2,
-            dfrspen:1;
+            dfrspen:1,
+            reserved8:7;
     uint16_t rxwinsz:15,
             rxwide:1;
     uint16_t isotxdescptr;
@@ -258,9 +263,9 @@ struct control_struct
             max_samp_cte:5,
             reserved6:2,
             dfrsp:1;
-    uint16_t rx_antenna_id_ptr:14;
-    uint16_t tx_ant_patt_length:7;
-    uint16_t tx_antenna_id_ptr:14;
+    uint16_t rx_antenna_id_ptr;
+    uint16_t tx_ant_patt_length;
+    uint16_t tx_antenna_id_ptr;
     union{
         uint16_t winoffset;
         uint16_t minevtime;
@@ -277,11 +282,11 @@ struct control_struct
             ch_aux:6;
     uint16_t aclrxmaxbuff:8,
             isorxmaxbuf:8;
-    uint16_t rxmaxtime:13;
+    uint16_t rxmaxtime;
     union{
         uint16_t sk0;
         uint16_t adv_bd_addr0;
-        uint16_t peer_ralptr:14;
+        uint16_t peer_ralptr;
     }u2;
     union{
         uint16_t sk1;
@@ -293,11 +298,11 @@ struct control_struct
     }u4;
     union{
         uint16_t sk3;
-        uint16_t adv_bd_addr3:1;
+        uint16_t adv_bd_addr3;
     }u5;
     union{
         uint16_t sk4;
-        uint16_t auxtxdescptr:14;
+        uint16_t auxtxdescptr;
     }u6;
     union{
         uint16_t sk5;
@@ -332,14 +337,14 @@ struct control_struct
         }extadvstat;
         uint16_t txccmpktcnt1;
     }u12;
-    uint16_t txccmpktcnt2:7;
+    uint16_t txccmpktcnt2;
     uint16_t rxccmpktcnt0;
     uint16_t rxccmpktcnt1;
-    uint16_t rxccmpktcnt2:7;
+    uint16_t rxccmpktcnt2;
     uint16_t evtcnt;
     uint16_t evtcnt_offset0;
     uint16_t evtcnt_offset1;
-    uint16_t evtcnt_offset2:7;
+    uint16_t evtcnt_offset2;
     uint16_t isoevtcntl;
     uint16_t isotxrxcntl;
     uint16_t acltxdesccnt:8,
@@ -361,7 +366,9 @@ __attribute__((always_inline)) static inline uint8_t htimer_irq1_mask_status_get
     return REG_FIELD_RD(MAC->INTCNTL1,RWMAC_TIMESTAMPTGT1INTMSK);
 }
 
-uint32_t time_mac2stamp(uint32_t clkn,uint16_t finecnt);
+uint32_t get_pkt_start_time(struct rx_desc *rx,enum ble_phy phy);
+
+uint64_t time_mac2stamp(uint32_t clkn,uint16_t finecnt);
 
 void set_em_et_rawstp_finestp(uint32_t timestamp);
 

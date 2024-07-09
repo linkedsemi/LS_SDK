@@ -23,8 +23,10 @@
 #define BLE_VERSION_50 9
 #define BLE_VERSION_51 10
 #define BLE_VERSION_52 11
+#define BLE_VERSION_53 12
+#define BLE_VERSION_54 13
 
-#define CURRENT_BLE_VERSION BLE_VERSION_42
+#define CURRENT_BLE_VERSION BLE_VERSION_52
 
 /// Feature mask definition LMP:3.3
 #define B0_3_SLOT_POS               0
