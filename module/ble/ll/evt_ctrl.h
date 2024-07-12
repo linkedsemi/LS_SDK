@@ -366,6 +366,11 @@ __attribute__((always_inline)) static inline uint8_t htimer_irq1_mask_status_get
     return REG_FIELD_RD(MAC->INTCNTL1,RWMAC_TIMESTAMPTGT1INTMSK);
 }
 
+__attribute__((always_inline)) static inline bool mac_fifo_empty()
+{
+    return true;
+}
+
 uint32_t get_pkt_start_time(struct rx_desc *rx,enum ble_phy phy);
 
 uint64_t time_mac2stamp(uint32_t clkn,uint16_t finecnt);
