@@ -159,6 +159,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     }
     gpio_pd_latch_state_enter();
     cpu_sleep_asm();
+    e906_init();
     for(i=0;i<8;++i)
     {
         SYSC_AWO->IO[i].DOT = GPIO_DOT[i];
