@@ -13,6 +13,16 @@ extern "C" {
 #endif
 extern void (*interrupt_vector[])();
 
+__attribute__((always_inline)) static inline void e906_init()
+{
+    uint32_t value = __get_MSTATUS();
+    MODIFY_REG(value,0x6000,0x2000); 
+    __set_MSTATUS(value);//enable fpu
+    value = __get_MHCR();
+    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);
+    __set_MHCR(value);
+}
+
 __attribute__((always_inline)) static inline void hclk_set(uint32_t mhz)
 {
     switch(mhz)

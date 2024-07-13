@@ -28,9 +28,7 @@ void rv_set_int_isr(uint8_t type,void (*isr)())
 }
 
 __attribute__((weak)) void SystemInit(){
-    uint32_t value = __get_MSTATUS();
-    MODIFY_REG(value,0x6000,0x2000); 
-    __set_MSTATUS(value);//enable fpu
+    e906_init();
     MODIFY_REG(V33_RG->TRIM0,V33_RG_HSE_CTRL_MASK,7<<V33_RG_HSE_CTRL_POS);
     REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_CLK_SEL_LS, SDK_LSI_USED ? 1 : 2);
     V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
