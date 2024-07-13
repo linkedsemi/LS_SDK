@@ -261,7 +261,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     
 }
 
-
+#include "ll_port.h"
+#include "reg_gpio.h"
+#include "ls_soc_gpio.h"
 int main()
 {
     sys_init_app();
@@ -269,5 +271,13 @@ int main()
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
+    // MAC->DIAGCNTL = 0x80|0x20;
+    MAC->DIAGCNTL = 0x80|0x3;
+    // MAC->DIAGCNTL = 0x80|0x5;
+
+    LSGPIOB->MODE |= 0xffff0000;
+    io_cfg_output(0x10);
+    io_cfg_output(0x11);
+    io_cfg_output(0x12);
     ble_loop();
 }

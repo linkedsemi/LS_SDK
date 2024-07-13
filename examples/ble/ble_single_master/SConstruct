@@ -8,4 +8,6 @@ src = [
 inc = [
     '.'
 ]
+env['STACK_LIB'] = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/libls.o'))
+env['STACK_HEX'] = File(env.subst('$SDK_ROOT/soc/arm_cm/le501x/bin/ls_stack.hex'))
 env.app_build('ble_single_master',src,inc)

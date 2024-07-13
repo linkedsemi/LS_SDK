@@ -5,6 +5,7 @@
 #include "cpu.h"
 #include "log.h"
 #include "modem_rf_le501x.h"
+#include "ls_sys.h"
 #define ENV_BUF_SIZE 2048
 #if CONFIG_AOS || __ZEPHYR__
 #define DB_BUF_SIZE 0
@@ -12,7 +13,7 @@
 #define NON_RET_BUF_SIZE (12)
 #else
 #define DB_BUF_SIZE 4096
-#define MSG_BUF_SIZE 4096
+#define MSG_BUF_SIZE 1024
 #define NON_RET_BUF_SIZE (380*2)
 
 #endif
@@ -139,6 +140,9 @@ __attribute((weak)) void prf_fn_init(void){}
 __attribute((weak)) void ble_storage_max_num_init(uint8_t num){}
 
 __attribute((weak)) void ll_buf_init(){}
+#include "ll_external.h"
+#include "ls_soc_gpio.h"
+extern void (*ll_invoke_fn)(void (*func)(void *),void *param);
 
 void stack_var_ptr_init()
 {
@@ -167,10 +171,14 @@ void stack_var_ptr_init()
     slave_md_enable_default = false;
     mult_mtu_exch_enable = false;
 
+    //ll_invoke_fn = func_post;
     statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
     prf_fn_init();
     ble_storage_max_num_init(SDK_BLE_STORAGE_PEER_MAX);
+    
     ll_buf_init();
+    io_set_pin_fn = io_set_pin;
+    io_clr_pin_fn = io_clr_pin;
 }
 
 static bool dummy()
