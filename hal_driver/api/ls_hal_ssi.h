@@ -322,6 +322,22 @@ HAL_StatusTypeDef HAL_SSI_Quad_Transmit(SSI_HandleTypeDef *hssi,SSI_DualQuadConf
 
 HAL_StatusTypeDef HAL_SSI_Quad_Receive(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
 
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
 void HAL_SSI_IRQHandler(SSI_HandleTypeDef *hssi);
 
 /** @}*/

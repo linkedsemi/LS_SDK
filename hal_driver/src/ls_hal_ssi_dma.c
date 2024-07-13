@@ -5,7 +5,7 @@
 #include "field_manipulate.h"
 #include "ls_hal_ssi.h"
 
-void ssi_ctrlr0_set(SSI_HandleTypeDef *hssi,uint8_t frame_format,uint8_t mode);
+void ssi_ctrlr0_set(SSI_HandleTypeDef *hssi,uint8_t frame_format,uint8_t mode,uint8_t spi_frame_format);
 void ssi_tx_done(SSI_HandleTypeDef *hssi,void (*tx_callback)(SSI_HandleTypeDef *hssi));
 void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_halfduplex_callback)(SSI_HandleTypeDef *hssi));
 
@@ -280,7 +280,7 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
 
 HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
-    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only,Standard_SPI_Format);
     hssi->REG->DMACR = SSI_TDMAE_MASK;
     hssi->REG->DMATDLR = 2;
     ssi_dma_config(hssi,Data,NULL,Count,Count);
@@ -289,7 +289,7 @@ HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16
 
 HAL_StatusTypeDef HAL_SSI_Receive_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
-    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only,Standard_SPI_Format);
     hssi->REG->CTRLR1 = Count - 1;
     hssi->REG->DMACR = SSI_RDMAE_MASK;
     hssi->REG->DMARDLR = 0;
@@ -300,7 +300,7 @@ HAL_StatusTypeDef HAL_SSI_Receive_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_
 
 HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
-    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive,Standard_SPI_Format);
     hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
     hssi->REG->DMATDLR = 2;
     hssi->REG->DMARDLR = 0;
@@ -310,10 +310,67 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_D
 
 HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_DMA(SSI_HandleTypeDef *hssi,void *TX_Data,uint16_t TX_Count,void *RX_Data,uint16_t RX_Count)
 {
-    ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,EEPROM_Read,Standard_SPI_Format);
     hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
     hssi->REG->DMATDLR = 2;
     hssi->REG->DMARDLR = 0;
     ssi_dma_config(hssi,TX_Data,RX_Data,TX_Count,RX_Count);
+    return HAL_OK;
+}
+
+void pre_process(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst)
+{
+    hssi->REG->SPI_CTRLR0 = *(uint32_t *)cfg;
+    hssi->REG->SSIENR = SSI_Enabled;
+    hssi->DR_REG[0] = inst;
+    if(cfg->addr_l <= Addr_Width_32_bits)
+    {
+        hssi->DR_REG[0] = addr;
+    }else
+    {
+        hssi->DR_REG[0] = addr>>(4*(cfg->addr_l-Addr_Width_32_bits));
+        hssi->DR_REG[0] = addr;
+    }
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count)
+{
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only,Dual_SPI_Format);
+    hssi->REG->DMACR = SSI_TDMAE_MASK;
+    hssi->REG->DMATDLR = 2;
+    pre_process(hssi,cfg,addr,inst);
+    ssi_dma_config(hssi,Data,NULL,Count,Count);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count)
+{
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only,Dual_SPI_Format);
+    hssi->REG->CTRLR1 = Count - 1;
+    hssi->REG->DMACR = SSI_RDMAE_MASK;
+    hssi->REG->DMARDLR = 0;
+    pre_process(hssi,cfg,addr,inst);
+    ssi_dma_config(hssi,NULL,Data,Count,Count);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count)
+{
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only,Quad_SPI_Format);
+    hssi->REG->DMACR = SSI_TDMAE_MASK;
+    hssi->REG->DMATDLR = 2;
+    pre_process(hssi,cfg,addr,inst);
+    ssi_dma_config(hssi,Data,NULL,Count,Count);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count)
+{
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only,Quad_SPI_Format);
+    hssi->REG->DMARDLR = 0;
+    hssi->REG->DMACR = SSI_RDMAE_MASK;
+    hssi->REG->CTRLR1 = Count - 1;
+    pre_process(hssi,cfg,addr,inst);
+    ssi_dma_config(hssi,NULL,Data,Count,Count);
     return HAL_OK;
 }
