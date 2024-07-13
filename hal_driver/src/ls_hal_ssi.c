@@ -3,8 +3,8 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "ls_hal_ssi.h"
-#define SSI_TX_FIFO_DEPTH 4
-#define SSI_RX_FIFO_DEPTH 4
+#define SSI_TX_FIFO_DEPTH 16
+#define SSI_RX_FIFO_DEPTH 16
 HAL_StatusTypeDef HAL_SSI_Init(SSI_HandleTypeDef *hssi)
 {
     HAL_SSI_MSP_Init(hssi);
@@ -102,6 +102,7 @@ static void ssi_disable(SSI_HandleTypeDef *hssi)
 
 void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_callback)(SSI_HandleTypeDef *hssi),void (*txrx_halfduplex_callback)(SSI_HandleTypeDef *hssi))
 {
+    REG_FIELD_WR(hssi->REG->IMR, SSI_RXFIM, 0);
     ssi_disable(hssi);
     switch(REG_FIELD_RD(hssi->REG->CTRLR0,SSI_TMOD))
     {
@@ -361,6 +362,54 @@ HAL_StatusTypeDef HAL_SSI_Quad_Receive(SSI_HandleTypeDef *hssi,SSI_DualQuadConf 
         ssi_data_rx(hssi);
     }
     ssi_disable(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count)
+{
+    tx_var_init(hssi,TX_Data,TX_Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only,Dual_SPI_Format);
+    ssi_spi_ctrlr0_set(hssi,cfg);
+    hssi->REG->SSIENR = SSI_Enabled;
+    ssi_inst_addr_tx(hssi,cfg,addr,inst);
+    ssi_ser_cfg(hssi);
+    ssi_config_it(hssi,true,false);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count)
+{
+    rx_var_init(hssi,RX_Data,RX_Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only,Dual_SPI_Format);
+    ssi_spi_ctrlr0_set(hssi,cfg);
+    hssi->REG->CTRLR1 = RX_Count - 1;
+    ssi_config_it(hssi,false,true);
+    ssi_inst_addr_tx(hssi,cfg,addr,inst);
+    ssi_ser_cfg(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count)
+{
+    tx_var_init(hssi,TX_Data,TX_Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only,Quad_SPI_Format);
+    ssi_spi_ctrlr0_set(hssi,cfg);
+    hssi->REG->SSIENR = SSI_Enabled;
+    ssi_inst_addr_tx(hssi,cfg,addr,inst);
+    ssi_ser_cfg(hssi);
+    ssi_config_it(hssi,true,false);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count)
+{
+    rx_var_init(hssi,RX_Data,RX_Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only,Quad_SPI_Format);
+    ssi_spi_ctrlr0_set(hssi,cfg);
+    hssi->REG->CTRLR1 = RX_Count - 1;
+    ssi_config_it(hssi,false,true);
+    ssi_inst_addr_tx(hssi,cfg,addr,inst);
+    ssi_ser_cfg(hssi);
     return HAL_OK;
 }
 
