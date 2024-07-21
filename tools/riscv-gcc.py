@@ -10,6 +10,7 @@ def generate(env):
     link.generate(env)
     rspfile.link_by_rspfile(env)
     env['CC'] = 'riscv64-unknown-elf-gcc'
+    env['CXX'] = 'riscv64-unknown-elf-g++'
     env['AS'] = 'riscv64-unknown-elf-gcc'
     env['AR'] = 'riscv64-unknown-elf-gcc-ar'
     env['OBJDUMP'] = 'riscv64-unknown-elf-objdump'
