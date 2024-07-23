@@ -2,7 +2,7 @@ import os
 import sys
 Import('env')
 env['ABI'] = 'ilp32f'
-env['ARCH'] = 'rv32imafc_xtheade'
+env['ARCH'] = 'rv32imafcpzpsfoperand_xtheade'
 if not 'DEFAULT_OPT_LVL' in env:
     env['DEFAULT_OPT_LVL'] = '-Os'
 
