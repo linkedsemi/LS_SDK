@@ -18,9 +18,9 @@
 #if __arm__ || __ICCARM__
 #define LOG_BACKEND (JLINK_RTT)
 #elif __riscv
-#define LOG_BACKEND (UART_LOG|RAM_LOG)
+// #define LOG_BACKEND (UART_LOG|RAM_LOG)
 // #define LOG_BACKEND (RAM_LOG)
-//#define LOG_BACKEND (SEMIHOSTING | UART_LOG)
+#define LOG_BACKEND (UART_LOG)
 #else
 #error arch not supported
 #endif

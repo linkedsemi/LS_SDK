@@ -1,6 +1,6 @@
 MEMORY
 {
-  RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 0x8000
+  RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 0x20000
   FLASH (rx) : ORIGIN = 0x8000000, LENGTH = 0x80000
 }
 
@@ -21,7 +21,6 @@ SECTIONS
         KEEP(*(.init))
         KEEP(*(.fini))
 
-/* 
         *crtbegin.o(.ctors)
         *crtbegin?.o(.ctors)
         *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
@@ -29,12 +28,12 @@ SECTIONS
         *(.ctors)
 
 
-         *crtbegin.o(.dtors)
-         *crtbegin?.o(.dtors)
-         *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
-         *(SORT(.dtors.*))
-         *(.dtors)
-*/
+        *crtbegin.o(.dtors)
+        *crtbegin?.o(.dtors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+        *(SORT(.dtors.*))
+        *(.dtors)
+
         *(.eh_frame*)
         *(.text* .rodata* .srodata*)
 		__text_end = .;
