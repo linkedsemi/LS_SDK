@@ -16,6 +16,11 @@ void ls_assert(const char *expr,const char *file,int line)
     while(1);
 }
 
+void __assert_func (const char *file,int line,const char *func,const char *failedexpr)
+{
+    ls_assert(failedexpr,file,line);
+}
+
 void XIP_BANNED_FUNC(ls_ram_assert,)
 {
     disable_global_irq();
