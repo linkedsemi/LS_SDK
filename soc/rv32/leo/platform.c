@@ -173,11 +173,6 @@ __attribute__((weak)) int _read (int file,char *ptr,int len){  return -1;}
 
 __attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
 
-void __assert_func (const char *file,int line,const char *func,const char *failedexpr)
-{
-    ls_assert(failedexpr,file,line);
-}
-
 uint32_t get_hclk_mhz()
 {
     return SDK_HCLK_MHZ;
