@@ -54,28 +54,19 @@ SECTIONS
 	.bss (NOLOAD):
 	{
 		__bss_start__ = ALIGN(4);
-        PROVIDE(_edata = __bss_start__);
         *(.sbss*)
         *(.bss*)
         *(COMMON)
         *(SECTION_RTT)
 		. = ALIGN(4);
         __bss_end__ = .;
-        PROVIDE(_end = __bss_end__);
-        PROVIDE(end = .);
 	}>RAM 
 
     .heap (NOLOAD):
     {
-        __end__ = .;
-        PROVIDE(end = .);
-        *(.heap*)
+		PROVIDE(end = .);
+        KEEP(*(.heap*))
     } > RAM 
-
-    .reset_retain (COPY) :
-	{
-		*(.reset_retain)
-	}
 
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign
@@ -83,7 +74,7 @@ SECTIONS
 	.stack_dummy (COPY):
 	{
 		*(.stack*)
-	} > RAM AT>FLASH
+	} > RAM
 
 	/* Set stack top to end of RAM, and stack limit move down by
 	 * size of stack_dummy section */
