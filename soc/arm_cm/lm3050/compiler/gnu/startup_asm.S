@@ -48,9 +48,11 @@ __StackTop:
 
 	.section .heap,"a"
 	.align	3
-
+#ifndef HEAP_SIZE
 	.equ	Heap_Size, 0x800
-
+#else
+  .equ  Heap_Size, HEAP_SIZE
+#endif
 	.globl	__HeapBase
 	.globl	__HeapLimit
 __HeapBase:

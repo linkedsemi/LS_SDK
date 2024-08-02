@@ -8,6 +8,10 @@ extern uint32_t __data_start__;
 extern uint32_t __data_end__;
 extern uint32_t __StackTop;
 extern uint32_t exception_entry;
+#ifndef HEAP_SIZE
+#define HEAP_SIZE 0
+#endif
+__attribute__((aligned(4),section(".heap"))) uint32_t __heap[HEAP_SIZE/sizeof(uint32_t)];
 
 __attribute__ ((naked)) void Reset_Handler()
 {

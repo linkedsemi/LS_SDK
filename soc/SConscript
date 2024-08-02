@@ -26,6 +26,8 @@ def inc_dirs(self,dirs):
 def image_build(self,name,src,inc,ble=False,mesh=False,usb=False,rtos = None,with_startup = True,objprefix = ''):
     self.Append(CPPPATH = self.inc_dirs(inc))
     #self.Append(CCFLAGS = ['-Werror'])
+    if not 'NANO_SPECS' in self:
+        env['NANO_SPECS'] = "-specs=nano.specs"
     self.Append(LINKFLAGS = ' $GC_OPTION ')
     return self.plf_build(name,src,rtos,with_startup,ble,mesh,usb,objprefix)
 
