@@ -83,7 +83,9 @@ typedef enum
 #endif /* __packed */
 #endif /* __GNUC__ */
 
+#ifndef UNUSED
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+#endif
 
 #ifdef __cplusplus
 }

@@ -6,7 +6,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#define PDM_REF_CLK_KHZ (144000)
 /// LSPDM Macro for Register Access
 #define LSPDM ((reg_pdm_t *)LSPDM_BASE_ADDR)
 

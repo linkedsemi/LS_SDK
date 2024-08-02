@@ -30,7 +30,7 @@ extern const uint32_t fir_coef_16khz[64];
   * \param[in] kHz: Set the PDM clock rate value    Unit: khz
   * \note eg: if pdm clock is 1.024MHz, configure khz is 1024.
   */
-#define PDM_CLK_RATIO(kHz) (128000/(kHz) - 1)
+#define PDM_CLK_RATIO(kHz) (PDM_REF_CLK_KHZ/(kHz) - 1)
 
 /**
   * \brief Calculate the PDM sample rate value
