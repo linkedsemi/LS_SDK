@@ -369,8 +369,6 @@ struct ll_ctrl_procedure
 struct ll_conn_env{
     struct ll_evt evt;
     struct co_list pending_tx;
-    struct co_list received;
-    struct co_list rx_acl_data;
     struct hci_air_tx_type *tx;
     struct hci_acl_air_rx_data *rx;
     timer_t supv_to_timer;
