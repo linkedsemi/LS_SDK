@@ -119,7 +119,7 @@ static void flash_swint_init()
 
 void sys_init_none()
 {
-    clk_flash_init();
+    // clk_flash_init();
     set_all_irq_priority_to_lowest_level();
     flash_swint_init();
     hal_flash_xip_func_ptr_init();
