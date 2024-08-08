@@ -31,6 +31,8 @@ typedef struct{
 #define INIT_LINKED_BUF_WITH_REF_CNT(buf_hdl)\
     linked_buf_init(&buf_hdl,sizeof(_##buf_hdl##_array[0]),ARRAY_LEN(_##buf_hdl##_array),(uint8_t *)_##buf_hdl##_array,_##buf_hdl##_ref_cnt)
 
+#define LINKED_BUF_ELEM_IDX(ptr,elem) (((uint8_t *)(elem)-(uint8_t *)(ptr)->buf)/(ptr)->element_size)
+
 void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt);
 
 void *linked_buf_alloc(linked_buffer_t *ptr);

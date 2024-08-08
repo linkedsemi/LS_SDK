@@ -130,5 +130,7 @@ void ble_adv_evt_start_handler(struct ll_evt *evt);
 void ble_adv_rx_pkt_handler(struct ll_evt *evt);
 
 void ble_adv_evt_before_end(struct ll_evt *evt);
+
+void ble_adv_tx_pkt_handler(struct ll_evt *evt);
 #endif
 

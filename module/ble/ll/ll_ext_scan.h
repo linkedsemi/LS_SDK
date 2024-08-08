@@ -141,5 +141,6 @@ void ble_scan_rx_pkt_handler(struct ll_evt *evt);
 
 void ble_scan_evt_before_end(struct ll_evt *evt);
 
+void ble_scan_tx_pkt_handler(struct ll_evt *evt);
 #endif
 

@@ -33,8 +33,8 @@ ROM_SYMBOL LL_PKT_ISR void *linked_buf_alloc(linked_buffer_t *ptr)
     struct co_list_hdr *hdr = co_list_pop_front(&ptr->allocatable);
     if(hdr)
     {
-        uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
         if(ptr->ref_cnt){
+            uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
             ptr->ref_cnt[idx] += 1;
         }
     }

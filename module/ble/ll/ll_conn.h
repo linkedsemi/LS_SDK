@@ -467,5 +467,6 @@ void ble_conn_rx_pkt_handler(struct ll_evt *evt);
 
 void ble_conn_evt_before_end(struct ll_evt *evt);
 
+void ble_conn_tx_pkt_handler(struct ll_evt *evt);
 #endif
 
