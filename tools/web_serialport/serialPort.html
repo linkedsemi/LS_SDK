@@ -119,6 +119,29 @@
   </div> 
 </div>
 
+<div style="padding-left: 30px">
+  <br><br>
+    <b>使用说明：</b>
+        <p>1. TX接PH04，RX接PH05</p>
+        <p>2. 选择合适的波特率后，点击 “打开” 按钮，在弹出的窗口中选择串口，正常情况下会提示“串口已打开”</p>
+        <p>3. 点击“初始同步命令”按钮，会打印“发—>：55 收<—：aa 发—>：3c 3c a5 a5 收<—：c3 c3 5a 5a”</p> <br>   
+        <b>4. 写入格式：</b>
+          <p> a. 不需要"0x"前缀;</p>
+          <p> b. 不满足字节长度的默认在最左侧用0补齐;</p>
+          <p> c. 有多个输入参数的需要用英文逗号隔开;</p>
+          <p> d. 例如:FLASH_WRITE_STATUS_REG,如果要写入0x0004,直接写4即可，不足16bit会用0填充;
+              MEM_BULK_READ,如果要写入0x00000608,0x00000020,直接写"608,20"。</p><br>
+        <p>5. 每条命令执行后，芯片都会响应，响应数据格式如下：</p>
+        <p>命令（1字节） | 状态码（1字节）| 附加数据</p>
+
+        对于不识别的指令，会回复：
+        <p>无效命令（0xff） | 状态码（0x00）</p>
+        <p>状态码  | 描述</p>
+        <p> 0x0   |  NO_ERROR</p>
+        <p> 0x1   |  ERROR</p>
+        <p> 0x2   |  FEATURE_DISABLED</p>
+</div>
+
 <script>
   // 监听下载按钮的点击事件
   document.getElementById('downloadButton').addEventListener('click', function () {

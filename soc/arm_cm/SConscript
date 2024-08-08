@@ -21,9 +21,9 @@ else:
     env['COMPILER'] = 'gnu'
     env['CCFLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
     env['CFLAGS'] = ' -std=c11 '
-    env['CXXFLAGS'] = ' -fno-exceptions '
+    env['CXXFLAGS'] = ' -fno-exceptions -fno-rtti -fno-unwind-tables -fno-threadsafe-statics '
     env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '
-    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT_PREPROCESSED} -Wl,--print-memory-usage -Wl,-Map=${TARGET.base}.map -Wl,--fatal-warnings -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
+    env['LINKFLAGS'] = ' -mcpu=$CPU -g -specs=nosys.specs ${NANO_SPECS} -T ${LINKSCRIPT_PREPROCESSED} -Wl,--print-memory-usage -Wl,-Map=${TARGET.base}.map -Wl,--fatal-warnings -Wl,--cref -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning  '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 SConscript(dirs=env['IC'],exports = ['env'])

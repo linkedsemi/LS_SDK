@@ -111,7 +111,7 @@ struct ssi_ctrl{
             reserved1:4,
             control_frame_size:4, /**< ::Control_Frame_Size */
             data_frame_size:5,    /**< ::Data_Frame_Size */
-			reserved2;
+			spi_frame_format:2;
 };
 
 /// SSI Initialization Parameters Typedef
@@ -121,6 +121,17 @@ typedef struct __SSI_InitTypeDef
     uint16_t clk_div;      /**< Clock Dividing Coefficient */
     uint8_t rxsample_dly;  /**< RX Sampling Delay */
 }SSI_InitTypeDef;
+
+typedef struct __SSI_DualQuadConf
+{
+	uint32_t trans_type:2,
+			addr_l:4,
+			reserved0:2,
+			inst_l:2,
+			reserved1:1,
+			wait_cycles:5,
+			reserved2:16;
+}SSI_DualQuadConf;
 
 /// SSI Handle Typedef
 typedef struct __SSI_HandleTypeDef
@@ -302,6 +313,30 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_DMA(SSI_HandleTypeDef *hssi
  *  \param hssi Handle of SSI
  */
 void HAL_SSI_TxRxHalfDuplexDMACpltCallback(SSI_HandleTypeDef *hssi);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *RX_Data,uint16_t RX_Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Transmit_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
+HAL_StatusTypeDef HAL_SSI_Dual_Receive_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Transmit_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
+
+HAL_StatusTypeDef HAL_SSI_Quad_Receive_DMA(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *Data,uint16_t Count);
 
 void HAL_SSI_IRQHandler(SSI_HandleTypeDef *hssi);
 

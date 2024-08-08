@@ -9,24 +9,29 @@
 #include "semihosting.h"
 #endif
 
-#define JLINK_RTT           1
-#define UART_LOG           2
-#define RAM_LOG             4
-#define SEMIHOSTING         8
+#define JLINK_RTT 1
+#define UART_LOG 2
+#define RAM_LOG 4
+#define SEMIHOSTING 8
 
 #ifndef LOG_BACKEND
 #if __arm__ || __ICCARM__
 #define LOG_BACKEND (JLINK_RTT)
 #elif __riscv
-#define LOG_BACKEND (SEMIHOSTING | UART_LOG)
+// #define LOG_BACKEND (UART_LOG|RAM_LOG)
+// #define LOG_BACKEND (RAM_LOG)
+#define LOG_BACKEND (UART_LOG)
 #else
 #error arch not supported
 #endif
 #endif
-
+#define RAM_LOG_BUF_SIZE 10000
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
-__attribute((weak)) void (*log_output_fn)(bool linefeed,const char *format,...);
-__attribute((weak)) void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
+char ram_array[RAM_LOG_BUF_SIZE];
+int count = 0;
+__attribute((weak)) void (*log_output_fn)(bool linefeed, const char *format, ...);
+__attribute((weak)) void (*log_hex_output_fn)(const void *data_pointer, uint16_t data_length);
+void ram_log_print(char *ptr, int len);
 
 #if (LOG_BACKEND&UART_LOG)
 
@@ -92,7 +97,7 @@ int fputc(int ch, FILE *f)
     #endif
     #if(LOG_BACKEND&RAM_LOG)
     {
-//        ram_log_print(linefeed,format,&args);
+        ram_log_print(ptr,len);
     }
     #endif
     return ch;
@@ -114,7 +119,7 @@ int _write (int fd, char *ptr, int len)
     #endif
     #if(LOG_BACKEND&RAM_LOG)
     {
-//        ram_log_print(linefeed,format,&args);
+        ram_log_print(ptr,len);
     }
     #endif
     #if(LOG_BACKEND&SEMIHOSTING)
@@ -142,7 +147,7 @@ int __write (int fd, char *ptr, int len)
     #endif
     #if(LOG_BACKEND&RAM_LOG)
     {
-//        ram_log_print(linefeed,format,&args);
+        ram_log_print(ptr,len);
     }
     #endif
     return len;
@@ -226,6 +231,16 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     printf("%s",log_format_buff);
 }
 
-
-
-
+void ram_log_print(char *ptr, int len)
+{
+    for (int j = 0; j < len; j++)
+    {
+        ram_array[count] = *ptr;
+        count++;
+        if (count >= RAM_LOG_BUF_SIZE)
+        {
+            count = 0;
+        }
+        ptr++;
+    }
+}

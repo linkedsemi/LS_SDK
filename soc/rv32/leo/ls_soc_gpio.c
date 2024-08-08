@@ -1062,6 +1062,12 @@ void pinmux_peci_deinit(void)
 void pinmux_lpc_init(void)
 {
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0, SYSC_AWO_LPC_EN, 0x1);
+    io_cfg_input(PD10);
+    io_cfg_input(PD11);
+    io_cfg_input(PD12);
+    io_cfg_input(PD13);
+    io_cfg_input(PD14);
+    io_cfg_input(PD15);
 }
 
 void pinmux_lpc_deinit(void)
@@ -1089,6 +1095,7 @@ static void spi_nss_io_cfg(uint8_t nss)
 static void spi_mosi_io_cfg(uint8_t mosi)
 {
     io_set_pin(mosi);
+    io_cfg_input(mosi);
     io_cfg_output(mosi);
 }
 

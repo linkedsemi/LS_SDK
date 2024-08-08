@@ -6,9 +6,9 @@ env.Tool(tool,toolpath = ['$SDK_ROOT/tools'])
 env['COMPILER'] = 'gnu'
 env['CCFLAGS'] = ' -mabi=$ABI -march=$ARCH -mshorten-memrefs -mstrict-align -msave-restore -malign-data=natural -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
 env['CFLAGS'] = ' -std=c11 '
-env['CXXFLAGS'] = ' -fno-exceptions '
+env['CXXFLAGS'] = ' -std=c++11 -fno-exceptions  -fno-rtti -fno-unwind-tables -fno-threadsafe-statics '
 env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '
-env['LINKFLAGS'] = ' -mabi=$ABI -march=$ARCH  -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref  '
+env['LINKFLAGS'] = ' -mabi=$ABI -march=$ARCH  -g -specs=nosys.specs ${NANO_SPECS} -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref  '
 env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 SConscript(dirs=env['IC'],exports = ['env'])
