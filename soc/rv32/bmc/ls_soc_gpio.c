@@ -1,10 +1,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "ls_soc_gpio.h"
+#include "field_manipulate.h"
+#include "per_func_mux.h"
 #include "platform.h"
 #include "reg_pmu.h"
-// #include "field_manipulate.h"
-// #include "per_func_mux.h"
 // #include "bmc.h"
 // #include "reg_exti_type.h"
 // #include "ls_dbg.h"
@@ -20,8 +20,8 @@
 
 // #define USB_DP_PAD PD00
 // #define USB_DM_PAD PD01
-// static gpio_port_pin_t uart1_txd;
-// static gpio_port_pin_t uart1_rxd;
+static gpio_port_pin_t uart1_txd;
+static gpio_port_pin_t uart1_rxd;
 // static gpio_port_pin_t uart2_txd;
 // static gpio_port_pin_t uart2_rxd;
 // static gpio_port_pin_t uart3_txd;
@@ -146,8 +146,6 @@
 // static gpio_port_pin_t owm_pin;
 
 // static uint8_t otg_id = 0xff;
-// uint8_t i2c_dbg_scl_io = 0xff;
-// uint8_t i2c_dbg_dat_io = 0xff;
 
 // __attribute__((weak)) void io_exti_callback(uint8_t pin,exti_edge_t edge){}
 
@@ -256,50 +254,11 @@
 //     }
 // }
 
-// void i2c_dbg_io_reinit(uint32_t *value)
-// {
-//     uint8_t i2c_scl_list[] = {PA11,PC02,PC04,PE00,PB00,PE05,PE13,PB14,PH07};
-//     uint8_t i2c_sda_list[] = {PA12,PC03,PC05,PB01,PE04,PE14,PB15,PH06};
-
-//     uint8_t read_io_func = 0;
-//     if(io_read_pin(PB06)) //EC_MODE_PIN
-//     {
-//         for(uint8_t index=0;index<ARRAY_LEN(i2c_scl_list);index++)
-//         {
-//             read_io_func = READ_REG(SYSC_PER->FUNC_SEL[i2c_scl_list[index]/4]) >> (i2c_scl_list[index]%4)*8;
-//             if(read_io_func == FIO_I2C_DBG_SCL)
-//             {
-//                 value[i2c_scl_list[index]/0x0F] &= ~(1<<16<<(i2c_scl_list[index]&0x0f));
-//                 i2c_dbg_scl_io = i2c_scl_list[index];
-//                 if(index > 2)
-//                 {
-//                     value[i2c_sda_list[index-1]/0x0F] &= ~(1<<16<<(i2c_sda_list[index-1]&0x0f));
-//                     i2c_dbg_dat_io = i2c_sda_list[index-1];
-//                 }
-//                 else
-//                 {
-//                     value[i2c_sda_list[index]/0x0F] &= ~(1<<16<<(i2c_sda_list[index]&0x0f));
-//                     i2c_dbg_dat_io = i2c_sda_list[index];
-//                 }
-//                 break;
-//             }
-//         }
-//     }
-// }
-
-// bool i2c_dbg_io_check(uint8_t pin)
-// {
-//     return (pin==i2c_dbg_dat_io || pin==i2c_dbg_scl_io);
-// }
-
 void io_init(void)
 {
-    uint32_t gpio_ien_od_value[8] = {0xffff0000, 0xffff0000, 0x5fff0000, 0xfeab0000,
-                                     0xffff0000, 0xffff0000, 0xffff0000, 0xfff30000};
-    
     for (uint8_t i = 0; i < 15; i++)
     {
-        PMU->IO[i].IEN_OD = gpio_ien_od_value[i];
+        PMU->IO[i].IEN_OD = 0xffff0000;
         PMU->IO[i].OE_FIR= 0;
         PMU->GPIO_INTR_CLR[i] = 0xffff;
         PMU->GPIO_INTR_CLR[i] = 0;
@@ -317,175 +276,174 @@ void io_init(void)
     
 }
 
-// void io_cfg_output(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].OE_FIR |= 1<<16<<x->num;
-// }
+void io_cfg_output(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].OE_FIR |= 1<<16<<x->num;
+}
 
-// void io_cfg_opendrain(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].IEN_OD |= 1<<x->num;
-// }
+void io_cfg_opendrain(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].IEN_OD |= 1<<x->num;
+}
 
-// void io_cfg_pushpull(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].IEN_OD &= ~(1<<x->num);
-// }
+void io_cfg_pushpull(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].IEN_OD &= ~(1<<x->num);
+}
 
-// void io_cfg_input(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].OE_FIR &= ~(1<<16<<x->num);
-//     SYSC_AWO->IO[x->port].IEN_OD &= ~(1<<16<<x->num);
-// }
+void io_cfg_input(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].OE_FIR &= ~(1<<16<<x->num);
+    PMU->IO[x->port].IEN_OD &= ~(1<<16<<x->num);
+}
 
-// void io_write_pin(uint8_t pin,uint8_t val)
-// {
-//     if(val)
-//     {
-//         io_set_pin(pin);
-//     }else
-//     {
-//         io_clr_pin(pin);
-//     }
-// }
+void io_write_pin(uint8_t pin,uint8_t val)
+{
+    if(val)
+    {
+        io_set_pin(pin);
+    }else
+    {
+        io_clr_pin(pin);
+    }
+}
 
-// void io_set_pin(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].DOT = 1<<x->num;
-// }
+void io_set_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].DOT = 1<<x->num;
+}
 
-// void io_clr_pin(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].DOT = 1<<16<<x->num;
-// }
+void io_clr_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].DOT = 1<<16<<x->num;
+}
 
-// void io_toggle_pin(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     if(SYSC_AWO->IO[x->port].DOT & (1<<x->num))
-//     {
-//        io_clr_pin(pin);
-//     }else
-//     {
-//        io_set_pin(pin);
-//     }
-    
-// }
+void io_toggle_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if(PMU->IO[x->port].DOT & (1<<x->num))
+    {
+       io_clr_pin(pin);
+    }else
+    {
+       io_set_pin(pin);
+    }
+}
 
-// uint8_t io_get_output_val(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     return SYSC_AWO->IO[x->port].DOT >> x->num & 0x1;
-// }
+uint8_t io_get_output_val(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return PMU->IO[x->port].DOT >> x->num & 0x1;
+}
 
-// uint8_t io_get_input_val(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     return SYSC_AWO->IO[x->port].DIN >> x->num & 0x1;
-// }
+uint8_t io_get_input_val(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return PMU->IO[x->port].DIN >> x->num & 0x1;
+}
 
-// uint8_t io_read_pin(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     if (SYSC_AWO->IO[x->port].OE_FIR & (1<<16<<x->num))
-//     {
-//         return io_get_output_val(pin);
-//     }
-//     else
-//     {
-//         return io_get_input_val(pin);
-//     }
-// }
+uint8_t io_read_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (PMU->IO[x->port].OE_FIR & (1<<16<<x->num))
+    {
+        return io_get_output_val(pin);
+    }
+    else
+    {
+        return io_get_input_val(pin);
+    }
+}
 
-// void io_pull_write(uint8_t pin,io_pull_type_t pull)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     switch(pull)
-//     {
-//     case IO_PULL_DISABLE:
-//         SYSC_AWO->IO[x->port].PUPD &= ~(1<<16<<x->num | 1<<x->num);
-//     break;
-//     case IO_PULL_UP:
-//         MODIFY_REG(SYSC_AWO->IO[x->port].PUPD,1<<16<<x->num,1<<x->num);
-//     break;
-//     case IO_PULL_DOWN:
-//         MODIFY_REG(SYSC_AWO->IO[x->port].PUPD,1<<x->num,1<<16<<x->num);
-//     break;
-//     case IO_PULL_UP_DOWN:
-//         SYSC_AWO->IO[x->port].PUPD |= 1<<16<<x->num | 1<<x->num;
-//     break;
-//     }
-// }
+void io_pull_write(uint8_t pin,io_pull_type_t pull)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    switch(pull)
+    {
+    case IO_PULL_DISABLE:
+        PMU->IO[x->port].PUPD &= ~(1<<16<<x->num | 1<<x->num);
+    break;
+    case IO_PULL_UP:
+        MODIFY_REG(PMU->IO[x->port].PUPD,1<<16<<x->num,1<<x->num);
+    break;
+    case IO_PULL_DOWN:
+        MODIFY_REG(PMU->IO[x->port].PUPD,1<<x->num,1<<16<<x->num);
+    break;
+    case IO_PULL_UP_DOWN:
+        PMU->IO[x->port].PUPD |= 1<<16<<x->num | 1<<x->num;
+    break;
+    }
+}
 
-// static inline io_pull_type_t pull_down(uint8_t port,uint8_t num)
-// {
-//     if((SYSC_AWO->IO[port].PUPD>>num)&0x1)
-//     {
-//         return IO_PULL_DOWN;
-//     }else
-//     {
-//         return IO_PULL_DISABLE;
-//     }
-// }
+static inline io_pull_type_t pull_down(uint8_t port,uint8_t num)
+{
+    if((PMU->IO[port].PUPD>>num)&0x1)
+    {
+        return IO_PULL_DOWN;
+    }else
+    {
+        return IO_PULL_DISABLE;
+    }
+}
 
-// static inline io_pull_type_t pull_up(uint8_t port,uint8_t num)
-// {
-//     if((SYSC_AWO->IO[port].PUPD>>num>>16)&0x1)
-//     {
-//         return IO_PULL_UP;
-//     }else
-//     {
-//         return IO_PULL_DISABLE;
-//     }
-// }
+static inline io_pull_type_t pull_up(uint8_t port,uint8_t num)
+{
+    if((PMU->IO[port].PUPD>>num>>16)&0x1)
+    {
+        return IO_PULL_UP;
+    }else
+    {
+        return IO_PULL_DISABLE;
+    }
+}
 
-// io_pull_type_t io_pull_read(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     return pull_down(x->port,x->num)|pull_up(x->port,x->num);
-// }
+io_pull_type_t io_pull_read(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return pull_down(x->port,x->num)|pull_up(x->port,x->num);
+}
 
-// void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     MODIFY_REG(SYSC_AWO->IO[x->port].DS, 0x1<< (x->num) | (0x1<< (x->num +16)), (drive&0x1)<< (x->num) |(((drive&0x2)>>1)<< (x->num +16)));
-// }
+void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    MODIFY_REG(PMU->IO[x->port].DS, 0x1<< (x->num) | (0x1<< (x->num +16)), (drive&0x1)<< (x->num) |(((drive&0x2)>>1)<< (x->num +16)));
+}
 
-// io_drive_type_t io_drive_capacity_read(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     uint32_t tmp = READ_REG(SYSC_AWO->IO[x->port].DS);
-//     return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
-// }
+io_drive_type_t io_drive_capacity_read(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    uint32_t tmp = READ_REG(PMU->IO[x->port].DS);
+    return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
+}
 
-// static inline void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
-// {
-//     switch(edge)
-//     {
-//     case INT_EDGE_NONE:
-//         *mask &= ~(1<<num|1<<16<<num);
-//     break;
-//     case INT_EDGE_RISING:
-//         *clr = 1<<num;
-//         MODIFY_REG(*mask,1<<16<<num,1<<num);
-//     break;
-//     case INT_EDGE_FALLING:
-//         *clr = 1<<16<<num;
-//         MODIFY_REG(*mask,1<<num,1<<16<<num);
-//     break;
-//     case INT_EDGE_BOTH:
-//         *clr = 1<<num|1<<16<<num;
-//         *mask |= 1<<num|1<<16<<num;
-//     break;
-//     }
-//     *clr = 0;
-// }
+static inline void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
+{
+    switch(edge)
+    {
+    case INT_EDGE_NONE:
+        *mask &= ~(1<<num|1<<16<<num);
+    break;
+    case INT_EDGE_RISING:
+        *clr = 1<<num;
+        MODIFY_REG(*mask,1<<16<<num,1<<num);
+    break;
+    case INT_EDGE_FALLING:
+        *clr = 1<<16<<num;
+        MODIFY_REG(*mask,1<<num,1<<16<<num);
+    break;
+    case INT_EDGE_BOTH:
+        *clr = 1<<num|1<<16<<num;
+        *mask |= 1<<num|1<<16<<num;
+    break;
+    }
+    *clr = 0;
+}
 
 // void io_v33_exti_config(uint8_t pin,exti_edge_t edge)
 // {
@@ -511,36 +469,36 @@ void io_init(void)
 //     io_v33_exti_config(pin,edge);
 // }
 
-// static void uart_io_cfg(uint8_t txd,uint8_t rxd)
-// {
-//     io_set_pin(txd);
-//     io_cfg_output(txd);
-//     io_cfg_input(rxd);
-//     io_pull_write(rxd, IO_PULL_UP);
-// }
+static void uart_io_cfg(uint8_t txd,uint8_t rxd)
+{
+    io_set_pin(txd);
+    io_cfg_output(txd);
+    io_cfg_input(rxd);
+    io_pull_write(rxd, IO_PULL_UP);
+}
 
-// static uint8_t pin2func_io(gpio_port_pin_t *x)
-// {
-//     return x->port*16+x->num;
-// }
+static uint8_t pin2func_io(gpio_port_pin_t *x)
+{
+    return x->port * 16 + x->num;
+}
 
-// static void per_func_enable(uint8_t func_io_num,uint8_t per_func)
-// {
-//     MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),per_func<<8*(func_io_num%4));
-//     if(func_io_num >= 96)
-//     {
-//         SYSC_AWO->PIN_SEL4 |= 1<<(func_io_num-96);
-//     }else if(func_io_num >= 64)
-//     {
-//         SYSC_AWO->PIN_SEL3 |= 1<<(func_io_num-64);
-//     }else if(func_io_num >= 32)
-//     {
-//         SYSC_AWO->PIN_SEL2 |= 1<<(func_io_num-32);
-//     }else
-//     {
-//         SYSC_AWO->PIN_SEL1 |= 1<<func_io_num;
-//     }
-// }
+static void per_func_enable(uint8_t func_io_num,uint8_t per_func)
+{
+    // MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),per_func<<8*(func_io_num%4));
+    // if(func_io_num >= 96)
+    // {
+    //     SYSC_AWO->PIN_SEL4 |= 1<<(func_io_num-96);
+    // }else if(func_io_num >= 64)
+    // {
+    //     SYSC_AWO->PIN_SEL3 |= 1<<(func_io_num-64);
+    // }else if(func_io_num >= 32)
+    // {
+    //     SYSC_AWO->PIN_SEL2 |= 1<<(func_io_num-32);
+    // }else
+    // {
+    //     SYSC_AWO->PIN_SEL1 |= 1<<func_io_num;
+    // }
+}
 
 // static void per_func_disable(uint8_t func_io_num)
 // {
@@ -568,16 +526,14 @@ void io_init(void)
 //     io_pull_write(sda,IO_PULL_UP);
 // }
 
-// void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
-// {
-//     I2C_DBG_IO_CHECK(txd);
-//     I2C_DBG_IO_CHECK(rxd);
-//     *(uint8_t *)&uart1_txd = txd;
-//     *(uint8_t *)&uart1_rxd = rxd;
-//     uart_io_cfg(txd,rxd);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),UART1_TXD);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),UART1_RXD);
-// }
+void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&uart1_txd = txd;
+    *(uint8_t *)&uart1_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),UART1_TX);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),UART1_RX);
+}
 
 // void pinmux_uart1_deinit(void)
 // {

@@ -7,6 +7,7 @@
 #include "dmac_config.h"
 #include "core_rv32.h"
 #include "sys_stat.h"
+#include "ls_dbg.h"
 #include "bmc.h"
 
 #if defined(BOOT_ROM)
