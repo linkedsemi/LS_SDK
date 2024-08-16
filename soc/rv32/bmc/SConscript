@@ -1,0 +1,155 @@
+import os
+import sys
+Import('env')
+env['ABI'] = 'ilp32f'
+env['ARCH'] = 'rv32imafc_xtheade'
+if not 'DEFAULT_OPT_LVL' in env:
+    env['DEFAULT_OPT_LVL'] = '-Os'
+
+def plf_postaction(self,target):
+    self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+    self.AddPostAction(target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.bin'))
+    self.AddPostAction(target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
+
+def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
+    start_src = []
+    if with_startup:
+        start_src = ['$SDK_ROOT/soc/rv32/startup.c']
+    sdk_src = []
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+        'rv32/systick.c',
+        'rv32/int_call_asm.S',
+        'rv32/bmc/cpu.c',
+        'rv32/bmc/sleep_asm.S',
+        'rv32/bmc/exception_entry.S',
+        'rv32/bmc/delay_asm.S',
+        # 'rv32/bmc/ls_msp_qspiv2.c',
+        'rv32/bmc/ls_msp_uart.c',
+        # 'rv32/bmc/ls_msp_comp.c',
+        'rv32/bmc/ls_msp_crc.c',
+        'rv32/bmc/ls_msp_sha.c',
+        'rv32/bmc/ls_msp_sm4.c',
+        'rv32/bmc/ls_msp_crypt.c',
+        'rv32/bmc/ls_msp_ecc.c',
+        # 'rv32/bmc/ls_msp_touchkey.c',
+        # 'rv32/bmc/ls_msp_adc.c',
+        # 'rv32/bmc/ls_msp_dac.c',
+        # 'rv32/bmc/ls_msp_can.c',
+        # 'rv32/bmc/ls_msp_fdcan.c',
+        # 'rv32/bmc/ls_msp_spi_i2s.c',
+        # 'rv32/bmc/ls_msp_spis.c',
+        'rv32/bmc/ls_soc_gpio.c',
+        'rv32/bmc/sys_stat.c',
+        'rv32/bmc/platform.c',
+        # 'rv32/bmc/efuse.c',
+        # 'rv32/bmc/sleep.c',
+        # 'rv32/bmc/ls_msp_ssi.c',
+        # 'rv32/bmc/ls_msp_timer.c',
+        # 'rv32/bmc/ls_msp_i2c.c',
+        # 'rv32/bmc/ls_msp_kscan.c',
+        # 'rv32/bmc/ls_msp_rtc.c',
+        # 'rv32/bmc/ls_msp_pwm.c',
+        # 'rv32/bmc/ls_msp_dmacv3.c',
+        # 'rv32/bmc/ls_msp_pdm.c',
+        # 'rv32/bmc/ls_msp_cec.c',
+        # 'rv32/bmc/ls_msp_owm.c',
+	    # 'rv32/bmc/ls_msp_cap.c',
+	    # 'rv32/bmc/sw_timer_port.c',
+        # 'rv32/bmc/ls_msp_iwdg.c',
+        # 'rv32/bmc/ls_msp_wwdg.c',
+        # 'rv32/bmc/ls_msp_ps2h.c',
+        # 'rv32/bmc/ls_msp_pis.c',
+        # 'rv32/bmc/ls_msp_cache.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+        # 'src/ls_hal_flash_swint.c',
+        'src/ls_hal_sha.c',
+        'src/ls_hal_sm4.c',
+        'src/ls_hal_crc.c',
+        'src/ls_hal_ecc.c',
+        # 'src/ls_hal_can.c',
+        # 'src/ls_hal_fdcan.c',
+        'src/ls_hal_crypt.c',
+        # 'src/ls_hal_qspiv2.c',
+        # 'src/ls_hal_flash_qspiv2.c',
+        # 'src/ls_hal_flash.c',
+        # 'src/ls_hal_cache.c',
+        # 'src/ls_hal_comp.c',
+        'src/ls_hal_uart.c',
+        'src/ls_hal_dwuart.c',
+        # 'src/ls_hal_dwuart_dma.c',
+        # 'src/ls_hal_adcv2.c',
+        # 'src/ls_hal_adcv2_dma.c',
+        # 'src/ls_hal_dac.c',
+        # 'src/ls_hal_dac_dma.c',
+        # 'src/ls_hal_uart_dma.c',
+        # 'src/ls_hal_ssi.c',
+        # 'src/ls_hal_spi_i2s.c',
+        # 'src/ls_hal_spi_i2s_dma.c',
+        # 'src/ls_hal_spis.c',
+        # 'src/ls_hal_spis_dma.c',
+        # 'src/ls_hal_timer.c',
+        # 'src/ls_hal_touchkey.c',
+        # 'src/ls_hal_i2c.c',
+        # 'src/ls_hal_kscan.c',
+        # 'src/ls_hal_rtcv2.c',
+        # 'src/ls_hal_pwm.c',
+        # 'src/ls_hal_pdm.c',
+        # 'src/ls_hal_pdm_dma.c',
+        # 'src/ls_hal_dmacv3.c',
+        # 'src/ls_hal_cec.c',
+        # 'src/ls_hal_owm.c',
+        # 'src/ls_hal_cap.c',
+        # 'src/ls_hal_i2c_dma.c',
+        # 'src/ls_hal_ssi_dma.c',
+        # 'src/ls_hal_wwdg.c',
+        # 'src/ls_hal_iwdgv2.c',
+        # 'src/ls_hal_ps2h.c',
+        # 'src/ls_hal_pis.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
+        'common/common.c',
+        # 'common/circular_doubly_linked_list.c',
+        # 'common/linked_async_framework.c',
+        'common/async_call.c',
+        # 'common/sw_timer.c',
+        # 'calendar/calendar.c',
+        # 'crc/crc16.c',
+        'debug/log.c',
+        'debug/ls_dbg.c',
+        'debug/RTT/SEGGER_RTT.c',
+        'debug/semihosting/riscv/semihosting.c',
+        'static_buffer/linked_buffer.c',
+        'static_buffer/fifo.c',
+        # 'tinyfs/tinyfs_nvm.c',
+        # 'tinyfs/tinyfs_write_cache.c',
+        # 'tinyfs/tinyfs.c',
+        # 'tinycrypt/lib/source/sha256.c',
+        # 'tinycrypt/lib/source/utils.c',
+    ]))
+    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),[
+        'hal_driver/inc',
+        'hal_driver/api',
+        'module/common',
+        #'module/calendar',
+        # 'module/crc',
+        'module/debug',
+        'module/debug/RTT',
+        'module/debug/semihosting/riscv',
+        'module/static_buffer',
+        # 'module/tinyfs',
+        # 'module/tinycrypt/lib/include',
+        'module/micro-ecc',
+        # 'module/adpcm',
+        'soc',
+        'soc/rv32',
+        'soc/rv32/bmc',
+    ]))
+
+    self.Append(CPPPATH = self.inc_dirs(inc_list))
+    target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src),OBJPREFIX = objprefix)
+    self.Depends(target,[self['LINKSCRIPT']])
+    return target
+
+env.AddMethod(plf_postaction)
+env.AddMethod(plf_build)

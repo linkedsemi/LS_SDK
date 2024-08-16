@@ -1,0 +1,32 @@
+#ifndef LS_MSP_ECC_H_
+#define LS_MSP_ECC_H_
+#include "reg_base_addr.h"
+#include "reg_ecc_type.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef BMC_PER_ECC_ADDR
+#define LSECC ((reg_ecc_t *)BMC_PER_ECC_ADDR)
+#endif
+
+void HAL_LSECC_MSP_Init(void);
+
+void HAL_LSECC_MSP_DeInit(void);
+
+void HAL_LSECC_Busy_Set(void);
+
+void HAL_LSECC_Idle_Set(void);
+
+void HAL_LSECC_MSP_INT_ENABLE(void);
+
+void HAL_LSECC_MSP_INT_DISABLE(void);
+
+void HAL_LSECC_MSP_INT_CLRPENDING(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
