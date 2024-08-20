@@ -20,37 +20,44 @@ typedef struct
     volatile uint32_t PD_AWO_ANA1; //0x38
     volatile uint32_t CLK_OUT_SEL; //0x3c
     volatile uint32_t RESERVED2[16];
-    volatile uint32_t IO1_FUNC1_EN; //0x80
-    volatile uint32_t IO2_FUNC1_EN; //0x84
-    volatile uint32_t IO3_FUNC1_EN; //0x88
-    volatile uint32_t IO4_FUNC1_EN; //0x8c
-    volatile uint32_t IO5_FUNC1_EN; //0x90
-    volatile uint32_t IO6_FUNC1_EN; //0x94
-    volatile uint32_t IO7_FUNC1_EN; //0x98
-    volatile uint32_t RESERVED3[1];
-    volatile uint32_t IO1_FUNC2_EN; //0xa0
-    volatile uint32_t IO2_FUNC2_EN; //0xa4
-    volatile uint32_t IO3_FUNC2_EN; //0xa8
-    volatile uint32_t IO4_FUNC2_EN; //0xac
-    volatile uint32_t IO5_FUNC2_EN; //0xb0
-    volatile uint32_t IO6_FUNC2_EN; //0xb4
-    volatile uint32_t IO7_FUNC2_EN; //0xb8
-    volatile uint32_t RESERVED4[1];
-    volatile uint32_t IO1_FUNC3_EN; //0xc0
-    volatile uint32_t IO2_FUNC3_EN; //0xc4
-    volatile uint32_t IO3_FUNC3_EN; //0xc8
-    volatile uint32_t IO4_FUNC3_EN; //0xcc
-    volatile uint32_t IO5_FUNC3_EN; //0xd0
-    volatile uint32_t IO6_FUNC3_EN; //0xd4
-    volatile uint32_t IO7_FUNC3_EN; //0xd8
-    volatile uint32_t RESERVED5[1];
-    volatile uint32_t IO1_FUNC4_EN; //0xe0
-    volatile uint32_t IO2_FUNC4_EN; //0xe4
-    volatile uint32_t IO3_FUNC4_EN; //0xe8
-    volatile uint32_t IO4_FUNC4_EN; //0xec
-    volatile uint32_t IO5_FUNC4_EN; //0xf0
-    volatile uint32_t IO6_FUNC4_EN; //0xf4
-    volatile uint32_t IO7_FUNC4_EN; //0xf8
+    struct IO_FUNC_
+    {
+        volatile uint32_t IO[7];
+        volatile uint32_t RESERVED3;
+    } DIGITAL_FUNC_EN[4];
+    // volatile uint16_t IO_FUNC1_EN[14];
+    // volatile uint32_t RESERVED3[1];
+    // volatile uint32_t IO1_FUNC1_EN; //0x80
+    // volatile uint32_t IO2_FUNC1_EN; //0x84
+    // volatile uint32_t IO3_FUNC1_EN; //0x88
+    // volatile uint32_t IO4_FUNC1_EN; //0x8c
+    // volatile uint32_t IO5_FUNC1_EN; //0x90
+    // volatile uint32_t IO6_FUNC1_EN; //0x94
+    // volatile uint32_t IO7_FUNC1_EN; //0x98
+    // volatile uint32_t RESERVED3[1];
+    // volatile uint32_t IO1_FUNC2_EN; //0xa0
+    // volatile uint32_t IO2_FUNC2_EN; //0xa4
+    // volatile uint32_t IO3_FUNC2_EN; //0xa8
+    // volatile uint32_t IO4_FUNC2_EN; //0xac
+    // volatile uint32_t IO5_FUNC2_EN; //0xb0
+    // volatile uint32_t IO6_FUNC2_EN; //0xb4
+    // volatile uint32_t IO7_FUNC2_EN; //0xb8
+    // volatile uint32_t RESERVED4[1];
+    // volatile uint32_t IO1_FUNC3_EN; //0xc0
+    // volatile uint32_t IO2_FUNC3_EN; //0xc4
+    // volatile uint32_t IO3_FUNC3_EN; //0xc8
+    // volatile uint32_t IO4_FUNC3_EN; //0xcc
+    // volatile uint32_t IO5_FUNC3_EN; //0xd0
+    // volatile uint32_t IO6_FUNC3_EN; //0xd4
+    // volatile uint32_t IO7_FUNC3_EN; //0xd8
+    // volatile uint32_t RESERVED5[1];
+    // volatile uint32_t IO1_FUNC4_EN; //0xe0
+    // volatile uint32_t IO2_FUNC4_EN; //0xe4
+    // volatile uint32_t IO3_FUNC4_EN; //0xe8
+    // volatile uint32_t IO4_FUNC4_EN; //0xec
+    // volatile uint32_t IO5_FUNC4_EN; //0xf0
+    // volatile uint32_t IO6_FUNC4_EN; //0xf4
+    // volatile uint32_t IO7_FUNC4_EN; //0xf8
 }reg_sysc_awo_t;
 
 enum SYSC_AWO_REG_SLP_HLD_CTRL_FIELD

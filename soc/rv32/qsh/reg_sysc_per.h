@@ -23,62 +23,63 @@ typedef struct
     volatile uint32_t PIS_SFT; //0x34
     volatile uint32_t TIMER_UART; //0x38
     volatile uint32_t RESERVED1[1];
-    volatile uint32_t FUNC_SEL_IOA1; //0x40
-    volatile uint32_t FUNC_SEL_IOA2; //0x44
-    volatile uint32_t FUNC_SEL_IOA3; //0x48
-    volatile uint32_t FUNC_SEL_IOA4; //0x4c
-    volatile uint32_t FUNC_SEL_IOB1; //0x50
-    volatile uint32_t FUNC_SEL_IOB2; //0x54
-    volatile uint32_t FUNC_SEL_IOB3; //0x58
-    volatile uint32_t FUNC_SEL_IOB4; //0x5c
-    volatile uint32_t FUNC_SEL_IOC1; //0x60
-    volatile uint32_t FUNC_SEL_IOC2; //0x64
-    volatile uint32_t FUNC_SEL_IOC3; //0x68
-    volatile uint32_t FUNC_SEL_IOC4; //0x6c
-    volatile uint32_t FUNC_SEL_IOD1; //0x70
-    volatile uint32_t FUNC_SEL_IOD2; //0x74
-    volatile uint32_t FUNC_SEL_IOD3; //0x78
-    volatile uint32_t FUNC_SEL_IOD4; //0x7c
-    volatile uint32_t FUNC_SEL_IOE1; //0x80
-    volatile uint32_t FUNC_SEL_IOE2; //0x84
-    volatile uint32_t FUNC_SEL_IOE3; //0x88
-    volatile uint32_t FUNC_SEL_IOE4; //0x8c
-    volatile uint32_t FUNC_SEL_IOF1; //0x90
-    volatile uint32_t FUNC_SEL_IOF2; //0x94
-    volatile uint32_t FUNC_SEL_IOF3; //0x98
-    volatile uint32_t FUNC_SEL_IOF4; //0x9c
-    volatile uint32_t FUNC_SEL_IOG1; //0xa0
-    volatile uint32_t FUNC_SEL_IOG2; //0xa4
-    volatile uint32_t FUNC_SEL_IOG3; //0xa8
-    volatile uint32_t FUNC_SEL_IOG4; //0xac
-    volatile uint32_t FUNC_SEL_IOH1; //0xb0
-    volatile uint32_t FUNC_SEL_IOH2; //0xb4
-    volatile uint32_t FUNC_SEL_IOH3; //0xb8
-    volatile uint32_t FUNC_SEL_IOH4; //0xbc
-    volatile uint32_t FUNC_SEL_IOI1; //0xc0
-    volatile uint32_t FUNC_SEL_IOI2; //0xc4
-    volatile uint32_t FUNC_SEL_IOI3; //0xc8
-    volatile uint32_t FUNC_SEL_IOI4; //0xcc
-    volatile uint32_t FUNC_SEL_IOJ1; //0xd0
-    volatile uint32_t FUNC_SEL_IOJ2; //0xd4
-    volatile uint32_t FUNC_SEL_IOJ3; //0xd8
-    volatile uint32_t FUNC_SEL_IOJ4; //0xdc
-    volatile uint32_t FUNC_SEL_IOK1; //0xe0
-    volatile uint32_t FUNC_SEL_IOK2; //0xe4
-    volatile uint32_t FUNC_SEL_IOK3; //0xe8
-    volatile uint32_t FUNC_SEL_IOK4; //0xec
-    volatile uint32_t FUNC_SEL_IOM1; //0xf0
-    volatile uint32_t FUNC_SEL_IOM2; //0xf4
-    volatile uint32_t FUNC_SEL_IOM3; //0xf8
-    volatile uint32_t FUNC_SEL_IOM4; //0xfc
-    volatile uint32_t FUNC_SEL_ION1; //0x100
-    volatile uint32_t FUNC_SEL_ION2; //0x104
-    volatile uint32_t FUNC_SEL_ION3; //0x108
-    volatile uint32_t FUNC_SEL_ION4; //0x10c
-    volatile uint32_t FUNC_SEL_IOQ1; //0x110
-    volatile uint32_t FUNC_SEL_IOQ2; //0x114
-    volatile uint32_t FUNC_SEL_IOQ3; //0x118
-    volatile uint32_t FUNC_SEL_IOQ4; //0x11c
+    volatile uint32_t FUNC_SEL[14][4];
+    // volatile uint32_t FUNC_SEL_IOA1; //0x40
+    // volatile uint32_t FUNC_SEL_IOA2; //0x44
+    // volatile uint32_t FUNC_SEL_IOA3; //0x48
+    // volatile uint32_t FUNC_SEL_IOA4; //0x4c
+    // volatile uint32_t FUNC_SEL_IOB1; //0x50
+    // volatile uint32_t FUNC_SEL_IOB2; //0x54
+    // volatile uint32_t FUNC_SEL_IOB3; //0x58
+    // volatile uint32_t FUNC_SEL_IOB4; //0x5c
+    // volatile uint32_t FUNC_SEL_IOC1; //0x60
+    // volatile uint32_t FUNC_SEL_IOC2; //0x64
+    // volatile uint32_t FUNC_SEL_IOC3; //0x68
+    // volatile uint32_t FUNC_SEL_IOC4; //0x6c
+    // volatile uint32_t FUNC_SEL_IOD1; //0x70
+    // volatile uint32_t FUNC_SEL_IOD2; //0x74
+    // volatile uint32_t FUNC_SEL_IOD3; //0x78
+    // volatile uint32_t FUNC_SEL_IOD4; //0x7c
+    // volatile uint32_t FUNC_SEL_IOE1; //0x80
+    // volatile uint32_t FUNC_SEL_IOE2; //0x84
+    // volatile uint32_t FUNC_SEL_IOE3; //0x88
+    // volatile uint32_t FUNC_SEL_IOE4; //0x8c
+    // volatile uint32_t FUNC_SEL_IOF1; //0x90
+    // volatile uint32_t FUNC_SEL_IOF2; //0x94
+    // volatile uint32_t FUNC_SEL_IOF3; //0x98
+    // volatile uint32_t FUNC_SEL_IOF4; //0x9c
+    // volatile uint32_t FUNC_SEL_IOG1; //0xa0
+    // volatile uint32_t FUNC_SEL_IOG2; //0xa4
+    // volatile uint32_t FUNC_SEL_IOG3; //0xa8
+    // volatile uint32_t FUNC_SEL_IOG4; //0xac
+    // volatile uint32_t FUNC_SEL_IOH1; //0xb0
+    // volatile uint32_t FUNC_SEL_IOH2; //0xb4
+    // volatile uint32_t FUNC_SEL_IOH3; //0xb8
+    // volatile uint32_t FUNC_SEL_IOH4; //0xbc
+    // volatile uint32_t FUNC_SEL_IOI1; //0xc0
+    // volatile uint32_t FUNC_SEL_IOI2; //0xc4
+    // volatile uint32_t FUNC_SEL_IOI3; //0xc8
+    // volatile uint32_t FUNC_SEL_IOI4; //0xcc
+    // volatile uint32_t FUNC_SEL_IOJ1; //0xd0
+    // volatile uint32_t FUNC_SEL_IOJ2; //0xd4
+    // volatile uint32_t FUNC_SEL_IOJ3; //0xd8
+    // volatile uint32_t FUNC_SEL_IOJ4; //0xdc
+    // volatile uint32_t FUNC_SEL_IOK1; //0xe0
+    // volatile uint32_t FUNC_SEL_IOK2; //0xe4
+    // volatile uint32_t FUNC_SEL_IOK3; //0xe8
+    // volatile uint32_t FUNC_SEL_IOK4; //0xec
+    // volatile uint32_t FUNC_SEL_IOM1; //0xf0
+    // volatile uint32_t FUNC_SEL_IOM2; //0xf4
+    // volatile uint32_t FUNC_SEL_IOM3; //0xf8
+    // volatile uint32_t FUNC_SEL_IOM4; //0xfc
+    // volatile uint32_t FUNC_SEL_ION1; //0x100
+    // volatile uint32_t FUNC_SEL_ION2; //0x104
+    // volatile uint32_t FUNC_SEL_ION3; //0x108
+    // volatile uint32_t FUNC_SEL_ION4; //0x10c
+    // volatile uint32_t FUNC_SEL_IOQ1; //0x110
+    // volatile uint32_t FUNC_SEL_IOQ2; //0x114
+    // volatile uint32_t FUNC_SEL_IOQ3; //0x118
+    // volatile uint32_t FUNC_SEL_IOQ4; //0x11c
 }reg_sysc_per_t;
 
 enum SYSC_PER_REG_PD_PER_CLKG0_FIELD

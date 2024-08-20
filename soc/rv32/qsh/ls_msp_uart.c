@@ -89,15 +89,6 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
         csi_vic_enable_irq(BMC_UART2_IRQn);
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
     break;
-//     case (uint32_t)UART3:
-//         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART3_N_MASK;
-//         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART3_N_MASK;
-//         rv_set_int_isr(UART3_IRQn,UART3_Handler);
-//         UART_inst_env[2] = inst;
-//         csi_vic_clear_pending_irq(UART3_IRQn);
-//         csi_vic_enable_irq(UART3_IRQn);
-//         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART3_MASK;
-//     break;
     }
 }
 
@@ -113,10 +104,6 @@ void HAL_UART_MSP_DeInit(UART_HandleTypeDef *inst)
         REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART2, 1);
         csi_vic_disable_irq(BMC_UART2_IRQn);
     break;
-    // case (uint32_t)UART3:
-    //     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART3, 1);
-    //     csi_vic_disable_irq(UART3_IRQn);
-    // break;
     }
 }
 

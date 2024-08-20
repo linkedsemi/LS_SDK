@@ -5,116 +5,162 @@
 extern "C" {
 #endif
 
-typedef enum
-{
-    I2C1_RX       =0  ,
-    I2C1_TX       =1  ,
-    I2C2_RX       =2  ,
-    I2C2_TX       =3  ,
-    I2C3_RX       =4  ,
-    I2C3_TX       =5  ,
-    I2C4_RX       =6  ,
-    I2C4_TX       =7  ,
-    I2C5_RX       =8  ,
-    I2C5_TX       =9  ,
-    I2C6_RX       =10 ,
-    I2C6_TX       =11 ,
-    UART1_RX      =12 ,
-    UART1_TX      =13 ,
-    UART2_RX      =14 ,
-    UART2_TX      =15 ,
-    UART3_RX      =16 ,
-    UART3_TX      =17 ,
-    DWUART1_RX    =18 ,
-    DWUART1_TX    =19 ,
-    DWUART2_RX    =20 ,
-    DWUART2_TX    =21 ,
-    ADC2          =22 ,
-    SPI1_RX       =23 ,
-    SPI1_TX       =24 ,
-    SPI2_RX       =25 ,
-    SPI2_TX       =26 ,
-    SPI3_RX       =27 ,
-    SPI3_TX       =28 ,
-    ADC1          =29 ,
-    PDM_CH0       =30 ,
-    PDM_CH1       =31 ,
-    DAC_CH1       =32 ,
-    DAC_CH2       =33 ,
-    SPIS_TX       =34 ,
-    SPIS_RX       =35 ,
-    ADC1_RGL      =36 ,
-    ADC1_INJ      =37 ,
-    ADC2_RGL      =38 ,
-    ADC2_INJ      =39 ,
-    ADC_FILTER_TX =40 ,
-    ADC_FILTER_RX =41 ,
-    QSPI_TX       =42 ,
-    QSPI_RX       =43 ,
-    CRYPT_WR      =44 ,
-    CRYPT_RD      =45 ,
-    ECC           =46 ,
-    GPTIMA1_0     =64 ,
-    GPTIMA1_1     =65 ,
-    GPTIMA1_2     =66 ,
-    GPTIMA1_3     =67 ,
-    GPTIMA1_4     =68 ,
-    GPTIMA1_5     =69 ,
-    GPTIMA2_0     =70 ,
-    GPTIMA2_1     =71 ,
-    GPTIMA2_2     =72 ,
-    GPTIMA2_3     =73 ,
-    GPTIMA2_4     =74 ,
-    GPTIMA2_5     =75 ,
-    GPTIMB1_0     =76 ,
-    GPTIMB1_1     =77 ,
-    GPTIMB1_2     =78 ,
-    GPTIMB1_3     =79 ,
-    GPTIMB1_4     =80 ,
-    GPTIMB1_5     =81 ,
-    GPTIMC1_0     =82 ,
-    GPTIMC1_1     =83 ,
-    GPTIMC1_2     =84 ,
-    GPTIMC1_3     =85 ,
-    GPTIMC1_4     =86 ,
-    BSTIM         =87 ,
-    ADTIM1_0      =88 ,
-    ADTIM1_1      =89 ,
-    ADTIM1_2      =90 ,
-    ADTIM1_3      =91 ,
-    ADTIM1_4      =92 ,
-    ADTIM1_5      =93 ,
-    ADTIM1_6      =94 ,
-    ADTIM2_0      =95 ,
-    ADTIM2_1      =96 ,
-    ADTIM2_2      =97 ,
-    ADTIM2_3      =98 ,
-    ADTIM2_4      =99 ,
-    ADTIM2_5      =100,
-    ADTIM2_6      =101,
-    ADTIM3_0      =102,
-    ADTIM3_1      =103,
-    ADTIM3_2      =104,
-    ADTIM3_3      =105,
-    ADTIM3_4      =106,
-    ADTIM3_5      =107,
-    ADTIM3_6      =108,
-    ADTIM4_0      =109,
-    ADTIM4_1      =110,
-    ADTIM4_2      =111,
-    ADTIM4_3      =112,
-    ADTIM4_4      =113,
-    ADTIM4_5      =114,
-    ADTIM4_6      =115,
-    PWM_1         =116,
-    PWM_2         =117,
-    PWM_3         =118,
-    PWM_4         =119,
-    PWM_5         =120,
-    PWM_6         =121,
-    PWM_7         =122,
-    PWM_8         =123,
-} DMA_ChnSig_TypeDef;
+#define DMA_I2C1_RX         0
+#define DMA_I2C1_TX         1
+#define DMA_I2C2_RX         2
+#define DMA_I2C2_TX         3
+#define DMA_I2C3_RX         4
+#define DMA_I2C3_TX         5
+#define DMA_I2C4_RX         6
+#define DMA_I2C4_TX         7
+#define DMA_I2C5_RX         8
+#define DMA_I2C5_TX         9
+#define DMA_I2C6_RX         10
+#define DMA_I2C6_TX         11
+#define DMA_I2C7_RX         12
+#define DMA_I2C7_TX         13
+#define DMA_I2C8_RX         14
+#define DMA_I2C8_TX         15
+#define DMA_I2C9_RX         16
+#define DMA_I2C9_TX         17
+#define DMA_I2C10_RX        18
+#define DMA_I2C10_TX        19
+#define DMA_I2C11_RX        20
+#define DMA_I2C11_TX        21
+#define DMA_I2C12_RX        22
+#define DMA_I2C12_TX        23
+#define DMA_I2C13_RX        24
+#define DMA_I2C13_TX        25
+#define DMA_I2C14_RX        26
+#define DMA_I2C14_TX        27
+#define DMA_I3C1_RX         28
+#define DMA_I3C1_TX         29
+#define DMA_I3C2_RX         30
+#define DMA_I3C2_TX         31
+#define DMA_I3C3_RX         32
+#define DMA_I3C3_TX         33
+#define DMA_I3C4_RX         34
+#define DMA_I3C4_TX         35
+#define DMA_I3C5_RX         36
+#define DMA_I3C5_TX         37
+#define DMA_I3C6_RX         38
+#define DMA_I3C6_TX         39
+#define DMA_I3C7_RX         40
+#define DMA_I3C7_TX         41
+#define DMA_I3C8_RX         42
+#define DMA_I3C8_TX         43
+#define DMA_I3C9_RX         44
+#define DMA_I3C9_TX         45
+#define DMA_I3C10_RX        46
+#define DMA_I3C10_TX        47
+#define DMA_I3C11_RX        48
+#define DMA_I3C11_TX        49
+#define DMA_I3C12_RX        50
+#define DMA_I3C12_TX        51
+#define DMA_I3C13_RX        52
+#define DMA_I3C13_TX        53
+#define DMA_I3C14_RX        54
+#define DMA_I3C14_TX        55
+#define DMA_UART1_RX        56
+#define DMA_UART1_TX        57
+#define DMA_UART2_RX        58
+#define DMA_UART2_TX        59
+#define DMA_UART3_RX        60
+#define DMA_UART3_TX        61
+#define DMA_UART4_RX        62
+#define DMA_UART4_TX        63
+#define DMA_UART5_RX        64
+#define DMA_UART5_TX        65
+#define DMA_UART6_RX        66
+#define DMA_UART6_TX        67
+#define DMA_SPI1_RX         68
+#define DMA_SPI1_TX         69
+#define DMA_SPI2_RX         70
+#define DMA_SPI2_TX         71
+#define DMA_SPI3_RX         72
+#define DMA_SPI3_TX         73
+#define DMA_SPI4_RX         74
+#define DMA_SPI4_TX         75
+#define DMA_SPIS1_RX        76
+#define DMA_SPIS1_TX        77
+#define DMA_SPIS2_RX        78
+#define DMA_SPIS2_TX        79
+#define DMA_ADC1            80
+#define DMA_ADC1_RGL        81
+#define DMA_ADC1_INJ        82
+#define DMA_ADC2            83
+#define DMA_ADC2_RGL        84
+#define DMA_ADC2_INJ        85
+#define DMA_ADC3            86
+#define DMA_ADC3_RGL        87
+#define DMA_ADC3_INJ        88
+#define DMA_ADTIM1_CH1      89
+#define DMA_ADTIM1_CH2      90
+#define DMA_ADTIM1_CH3      91
+#define DMA_ADTIM1_CH4      92
+#define DMA_ADTIM1_UP       93
+#define DMA_ADTIM1_TRIG     94
+#define DMA_ADTIM1_COM      95
+#define DMA_ADTIM2_CH1      96
+#define DMA_ADTIM2_CH2      97
+#define DMA_ADTIM2_CH3      98
+#define DMA_ADTIM2_CH4      99
+#define DMA_ADTIM2_UP       100
+#define DMA_ADTIM2_TRIG     101
+#define DMA_ADTIM2_COM      102
+#define DMA_GPTIMA1_CH1     103
+#define DMA_GPTIMA1_CH2     104
+#define DMA_GPTIMA1_CH3     105
+#define DMA_GPTIMA1_CH4     106
+#define DMA_GPTIMA1_UP      107
+#define DMA_GPTIMA1_TRIG    108
+#define DMA_GPTIMA2_CH1     109
+#define DMA_GPTIMA2_CH2     110
+#define DMA_GPTIMA2_CH3     111
+#define DMA_GPTIMA2_CH4     112
+#define DMA_GPTIMA2_UP      113
+#define DMA_GPTIMA2_TRIG    114
+#define DMA_GPTIMB1_CH1     115
+#define DMA_GPTIMB1_CH2     116
+#define DMA_GPTIMB1_CH3     117
+#define DMA_GPTIMB1_CH4     118
+#define DMA_GPTIMB1_UP      119
+#define DMA_GPTIMB1_TRIG    120
+#define DMA_GPTIMC1_CH1     121
+#define DMA_GPTIMC1_CH2     122
+#define DMA_GPTIMC1_UP      123
+#define DMA_GPTIMC1_TRIG    124
+#define DMA_GPTIMC1_COM     125
+#define DMA_BSTIM1_UP       126
+#define DMA_BSTIM2_UP       127
+#define DMA_FILTER_TX       128
+#define DMA_FILTER_RX       129
+#define DMA_PWM1            130
+#define DMA_PWM2            131
+#define DMA_PWM3            132
+#define DMA_PWM4            133
+#define DMA_PWM5            134
+#define DMA_PWM6            135
+#define DMA_PWM7            136
+#define DMA_PWM8            137
+#define DMA_PWM9            138
+#define DMA_PWM10           139
+#define DMA_PWM11           140
+#define DMA_PWM12           141
+#define DMA_PWM13           142
+#define DMA_PWM14           143
+#define DMA_PWM15           144
+#define DMA_PWM16           145
+#define DMA_PDM_CH0         146
+#define DMA_PDM_CH1         147
+#define DMA_QSPI1_TX        148
+#define DMA_QSPI1_RX        149
+#define DMA_QSPI2_TX        150
+#define DMA_QSPI2_RX        151
+#define DMA_CRYPT_WR        152
+#define DMA_CRYPT_RD        153
+#define DMA_ECC             154
+
 
 #ifdef __cplusplus
 }
