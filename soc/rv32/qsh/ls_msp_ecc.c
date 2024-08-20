@@ -5,7 +5,7 @@
 #include "reg_sysc_cpu.h"
 #include "sys_stat.h"
 #include "platform.h"
-#include "bmc.h"
+#include "qsh.h"
 
 void HAL_LSECC_MSP_Init(void)
 {

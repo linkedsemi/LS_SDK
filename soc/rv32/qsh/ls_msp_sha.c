@@ -1,6 +1,6 @@
 #include "ls_msp_sha.h"
 #include "reg_sysc_cpu.h"
-#include "bmc.h"
+#include "qsh.h"
 #include "platform.h"
 #include "ls_hal_sha.h"
 #include "exception_isr.h"

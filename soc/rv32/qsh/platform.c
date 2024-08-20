@@ -9,7 +9,7 @@
 #include "exception_isr.h"
 #include "ls_soc_gpio.h"
 #include "field_manipulate.h"
-#include "bmc.h"
+#include "qsh.h"
 
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 

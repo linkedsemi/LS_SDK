@@ -5,7 +5,7 @@
 #include "per_func_mux.h"
 #include "platform.h"
 #include "reg_pmu.h"
-// #include "bmc.h"
+// #include "qsh.h"
 // #include "reg_exti_type.h"
 // #include "ls_dbg.h"
 // #include "exception_isr.h"
@@ -22,14 +22,16 @@
 // #define USB_DM_PAD PD01
 static gpio_port_pin_t uart1_txd;
 static gpio_port_pin_t uart1_rxd;
-// static gpio_port_pin_t uart2_txd;
-// static gpio_port_pin_t uart2_rxd;
-// static gpio_port_pin_t uart3_txd;
-// static gpio_port_pin_t uart3_rxd;
+static gpio_port_pin_t uart2_txd;
+static gpio_port_pin_t uart2_rxd;
 // static gpio_port_pin_t dwuart1_txd;
 // static gpio_port_pin_t dwuart1_rxd;
 // static gpio_port_pin_t dwuart2_txd;
 // static gpio_port_pin_t dwuart2_rxd;
+// static gpio_port_pin_t dwuart3_txd;
+// static gpio_port_pin_t dwuart3_rxd;
+// static gpio_port_pin_t dwuart4_txd;
+// static gpio_port_pin_t dwuart4_rxd;
 // static gpio_port_pin_t iic1_scl;
 // static gpio_port_pin_t iic1_sda;
 // static gpio_port_pin_t iic2_scl;
@@ -256,9 +258,10 @@ static gpio_port_pin_t uart1_rxd;
 
 void io_init(void)
 {
+    uint32_t gpio_ie_value[15] = {0xffff0000,0xfffc0000};
     for (uint8_t i = 0; i < 15; i++)
     {
-        PMU->IO[i].IEN_OD = 0xffff0000;
+        PMU->IO[i].IEN_OD = gpio_ie_value[i];
         PMU->IO[i].OE_FIR= 0;
         PMU->GPIO_INTR_CLR[i] = 0xffff;
         PMU->GPIO_INTR_CLR[i] = 0;
@@ -492,7 +495,7 @@ static void per_func_enable(uint8_t func_io_num,uint8_t per_func)
     // {
     //     SYSC_AWO->PIN_SEL3 |= 1<<(func_io_num-64);
     // }else if(func_io_num >= 32)
-    // {
+    // { 
     //     SYSC_AWO->PIN_SEL2 |= 1<<(func_io_num-32);
     // }else
     // {
@@ -500,23 +503,23 @@ static void per_func_enable(uint8_t func_io_num,uint8_t per_func)
     // }
 }
 
-// static void per_func_disable(uint8_t func_io_num)
-// {
-//     if(func_io_num >= 96)
-//     {
-//         SYSC_AWO->PIN_SEL4 &= ~(1<<(func_io_num-96));
-//     }else if(func_io_num >= 64)
-//     {
-//         SYSC_AWO->PIN_SEL3 &= ~(1<<(func_io_num-64));
-//     }else if(func_io_num >= 32)
-//     {
-//         SYSC_AWO->PIN_SEL2 &= ~(1<<(func_io_num-32));
-//     }else
-//     {
-//         SYSC_AWO->PIN_SEL1 &= ~(1<<func_io_num);
-//     }
-//     MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),0);
-// }
+static void per_func_disable(uint8_t func_io_num)
+{
+    // if(func_io_num >= 96)
+    // {
+    //     SYSC_AWO->PIN_SEL4 &= ~(1<<(func_io_num-96));
+    // }else if(func_io_num >= 64)
+    // {
+    //     SYSC_AWO->PIN_SEL3 &= ~(1<<(func_io_num-64));
+    // }else if(func_io_num >= 32)
+    // {
+    //     SYSC_AWO->PIN_SEL2 &= ~(1<<(func_io_num-32));
+    // }else
+    // {
+    //     SYSC_AWO->PIN_SEL1 &= ~(1<<func_io_num);
+    // }
+    // MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),0);
+}
 
 // static void iic_io_cfg(uint8_t scl,uint8_t sda)
 // {
@@ -541,27 +544,23 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart1_rxd));
 // }
 
-// void pinmux_uart2_init(uint8_t txd,uint8_t rxd)
-// {
-//     I2C_DBG_IO_CHECK(txd);
-//     I2C_DBG_IO_CHECK(rxd);
-//     *(uint8_t *)&uart2_txd = txd;
-//     *(uint8_t *)&uart2_rxd = rxd;
-//     uart_io_cfg(txd,rxd);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),UART2_TXD);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),UART2_RXD);
-// }
+void pinmux_uart2_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&uart2_txd = txd;
+    *(uint8_t *)&uart2_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),UART2_TX);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),UART2_RX);
+}
 
-// void pinmux_uart2_deinit()
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_txd));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_rxd));
-// }
+void pinmux_uart2_deinit()
+{
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_txd));
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_rxd));
+}
 
 // void pinmux_uart3_init(uint8_t txd,uint8_t rxd)
 // {
-//     I2C_DBG_IO_CHECK(txd);
-//     I2C_DBG_IO_CHECK(rxd);
 //     *(uint8_t *)&uart3_txd = txd;
 //     *(uint8_t *)&uart3_rxd = rxd;
 //     uart_io_cfg(txd,rxd);
@@ -577,8 +576,6 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
 
 // void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd)
 // {
-//     I2C_DBG_IO_CHECK(txd);
-//     I2C_DBG_IO_CHECK(rxd);
 //     *(uint8_t *)&dwuart1_txd = txd;
 //     *(uint8_t *)&dwuart1_rxd = rxd;
 //     uart_io_cfg(txd,rxd);
@@ -594,8 +591,6 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
 
 // void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd)
 // {
-//     I2C_DBG_IO_CHECK(txd);
-//     I2C_DBG_IO_CHECK(rxd);
 //     *(uint8_t *)&dwuart2_txd = txd;
 //     *(uint8_t *)&dwuart2_rxd = rxd;
 //     uart_io_cfg(txd,rxd);
@@ -2141,8 +2136,6 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
 
 // void pinmux_fdcan_init(uint8_t txd,uint8_t rxd)
 // {
-//     I2C_DBG_IO_CHECK(txd);
-//     I2C_DBG_IO_CHECK(rxd);
 //     *(uint8_t *)&fdcan_txd = txd;
 //     *(uint8_t *)&fdcan_rxd = rxd;
 //     uart_io_cfg(txd,rxd);

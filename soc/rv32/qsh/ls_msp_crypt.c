@@ -5,7 +5,7 @@
 #include "reg_sysc_cpu.h"
 #include "core_rv32.h"
 #include "sys_stat.h"
-#include "bmc.h"
+#include "qsh.h"
 
 void HAL_LSCRYPT_MSP_Init(void)
 {
