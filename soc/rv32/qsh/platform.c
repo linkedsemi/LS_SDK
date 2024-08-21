@@ -8,6 +8,7 @@
 #include "ls_hal_flash.h"
 #include "exception_isr.h"
 #include "ls_soc_gpio.h"
+#include "reg_pmu.h"
 #include "field_manipulate.h"
 #include "qsh.h"
 
@@ -35,3 +36,8 @@ __attribute__((weak)) int _isatty (int file){  return 0;}
 __attribute__((weak)) int _read (int file,char *ptr,int len){  return -1;}
 
 __attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
+
+void XIP_BANNED_FUNC(sync_for_xip_stop,)
+{
+    while ((PMU->IO[13].DIN & 1 << 8) ==0);
+}

@@ -11,7 +11,7 @@
 // #include "reg_exti_type.h"
 // #include "ls_dbg.h"
 // #include "exception_isr.h"
-// #include "compile_flag.h"
+#include "compile_flag.h"
 // #include "common.h"
 
 // #if BOOT_RAM
@@ -487,16 +487,31 @@ static uint8_t pin2func_io(gpio_port_pin_t *x)
     return x->port * 16 + x->num;
 }
 
-static void per_func_enable(gpio_port_pin_t io,uint8_t per_func)
+static void per_func_enable(uint8_t pin, uint8_t FUNC_num)
 {
-    SYSC_PER->FUNC_SEL[io.port][io.num / 4] |= per_func << ((io.num % 4) * 8);
-    SYSC_AWO->DIGITAL_FUNC_EN[0].IO[io.port / 2] |= 1 << io.num;
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    SYSC_AWO->DIGITAL_FUNC_EN[FUNC_num].IO[x->port / 2] |= 1 << (((x->port % 2) * 16)+ x->num);
 }
 
-static void per_func_disable(gpio_port_pin_t io)
+static void per_func_disable(uint8_t pin, uint8_t FUNC_num)
 {
-    SYSC_AWO->DIGITAL_FUNC_EN[0].IO[io.port / 2] &= ~(1 << io.num);
-    SYSC_PER->FUNC_SEL[io.port][io.num / 4] &= ~(0xff << ((io.num % 4) * 8));
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    SYSC_AWO->DIGITAL_FUNC_EN[FUNC_num].IO[x->port / 2] &= ~(1 << (((x->port % 2) * 16)+ x->num));
+}
+
+static void per_func0_enable(uint8_t pin,uint8_t per_func)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    SYSC_PER->FUNC_SEL[x->port][x->port / 4] |= per_func << ((x->num % 4) * 8);
+    per_func_enable(pin, 0);
+    // SYSC_AWO->DIGITAL_FUNC_EN[0].IO[x->port / 2] |= 1 << x->num;
+}
+
+static void per_func0_disable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    per_func_disable(pin, 0);
+    SYSC_PER->FUNC_SEL[x->port][x->num / 4] &= ~(0xff << ((x->num % 4) * 8));
 }
 
 // static void iic_io_cfg(uint8_t scl,uint8_t sda)
@@ -512,14 +527,14 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd)
     *(uint8_t *)&uart1_txd = txd;
     *(uint8_t *)&uart1_rxd = rxd;
     uart_io_cfg(txd,rxd);
-    per_func_enable(uart1_txd,FIOA_UART1_TXD);
-    per_func_enable(uart1_rxd,FIOA_UART1_RXD);
+    per_func0_enable(pin2func_io(&uart1_txd),FIOA_UART1_TXD);
+    per_func0_enable(pin2func_io(&uart1_rxd),FIOA_UART1_RXD);
 }
 
 void pinmux_uart1_deinit(void)
 {
-    per_func_disable(uart1_txd);
-    per_func_disable(uart1_rxd);
+    per_func0_disable(pin2func_io(&uart1_txd));
+    per_func0_disable(pin2func_io(&uart1_rxd));
 }
 
 void pinmux_uart2_init(uint8_t txd,uint8_t rxd)
@@ -527,14 +542,14 @@ void pinmux_uart2_init(uint8_t txd,uint8_t rxd)
     *(uint8_t *)&uart2_txd = txd;
     *(uint8_t *)&uart2_rxd = rxd;
     uart_io_cfg(txd,rxd);
-    per_func_enable(uart2_txd,FIOB_UART2_TXD);
-    per_func_enable(uart2_rxd,FIOB_UART2_RXD);
+    per_func0_enable(pin2func_io(&uart2_txd),FIOB_UART2_TXD);
+    per_func0_enable(pin2func_io(&uart2_rxd),FIOB_UART2_RXD);
 }
 
 void pinmux_uart2_deinit()
 {
-    per_func_disable(uart2_txd);
-    per_func_disable(uart2_rxd);
+    per_func0_disable(pin2func_io(&uart2_txd));
+    per_func0_disable(pin2func_io(&uart2_rxd));
 }
 
 // void pinmux_uart3_init(uint8_t txd,uint8_t rxd)
@@ -815,10 +830,15 @@ void pinmux_uart2_deinit()
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&owm_pin));
 // }
 
-// ROM_SYMBOL void pinmux_hal_flash_init(void)
-// {
-//     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0xf);
-// }
+ROM_SYMBOL void pinmux_hal_flash_init(void)
+{
+    per_func_enable(PQ10, 1);//clk
+    per_func_enable(PQ11, 1);//cs
+    per_func_enable(PQ12, 1);//data0
+    per_func_enable(PQ13, 1);
+    per_func_enable(PQ14, 1);
+    per_func_enable(PQ15, 1);
+}
 
 // ROM_SYMBOL void pinmux_hal_flash_deinit(void)
 // {

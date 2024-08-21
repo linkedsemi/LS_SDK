@@ -25,8 +25,6 @@ typedef struct
         volatile uint32_t IO[7];
         volatile uint32_t RESERVED3;
     } DIGITAL_FUNC_EN[4];
-    // volatile uint16_t IO_FUNC1_EN[14];
-    // volatile uint32_t RESERVED3[1];
     // volatile uint32_t IO1_FUNC1_EN; //0x80
     // volatile uint32_t IO2_FUNC1_EN; //0x84
     // volatile uint32_t IO3_FUNC1_EN; //0x88

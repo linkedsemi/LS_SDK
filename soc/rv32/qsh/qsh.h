@@ -7,9 +7,9 @@ extern "C" {
 
 typedef enum IRQn
 {
-  BMC_RV_SOFT_IRQn          = 3,
-  BMC_RV_TIME_IRQn          = 7,
-  BMC_RV_EXT_IRQn           = 11,
+  RV_SOFT_IRQn              = 3,
+  RV_TIME_IRQn              = 7,
+  RV_EXT_IRQn               = 11,
   
   BMC_PMU_0_IRQn            = 16,
   BMC_PMU_1_IRQn            = 17,
