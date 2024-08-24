@@ -77,7 +77,7 @@ void rng_init();
 #endif
 uint32_t GenerateRandom32Bit();
 
-#define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
+#define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/3,1)
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
 #define ROM_FLASH_API
