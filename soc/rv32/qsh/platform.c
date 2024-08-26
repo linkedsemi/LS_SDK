@@ -16,6 +16,61 @@
 
 __attribute__((aligned(64))) void (*interrupt_vector[IRQn_MAX])();
 
+__attribute__((weak)) void SystemInit(){
+    e906_init();
+    // MODIFY_REG(V33_RG->TRIM0,V33_RG_HSE_CTRL_MASK,7<<V33_RG_HSE_CTRL_POS);
+    // REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_CLK_SEL_LS, SDK_LSI_USED ? 1 : 2);
+    // V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
+    // V33_RG->PMU_SET_VAL = V33_RG_PMU_SET_TGGL_MASK | PMU_CLK_VAL;
+    // V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
+    if(SDK_HSE_USED)
+    {//delay for hse stabilization
+        rv32_delay_asm(14400,1);
+    }
+    enable_global_irq();
+}
+
+// NOINLINE void XIP_BANNED_FUNC(clk_flash_init,)
+// {
+//     dpll_qspi_clk_config();
+//     MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
+//                 1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+//     clk_switch();
+// }
+
+// static void set_all_irq_priority_to_lowest_level()
+// {
+//     uint8_t i;
+//     for(i=0;i<IRQn_MAX;++i)
+//     {
+//         csi_vic_set_prio(i,0);
+//     }
+// }
+
+// static void flash_swint_init()
+// {
+//     rv_set_int_isr(FLASH_SWINT_NUM,FLASH_SWINT_HANDLER);
+//     CLIC->CLICINT[FLASH_SWINT_NUM].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+//     csi_vic_set_prio(FLASH_SWINT_NUM,0xf);
+//     csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
+//     csi_vic_enable_irq(FLASH_SWINT_NUM);
+// }
+
+
+void sys_init_none()
+{
+    // clk_flash_init();
+    // set_all_irq_priority_to_lowest_level();
+    // flash_swint_init();
+    // hal_flash_xip_func_ptr_init();
+    io_init();
+    LOG_INIT();
+    // low_power_init();
+    systick_start();
+    // sw_timer_module_init();
+    // HAL_PIS_Init();
+}
+
 void rv_set_int_isr(uint8_t type,void (*isr)())
 {
     interrupt_vector[type] = isr;

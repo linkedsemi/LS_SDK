@@ -52,10 +52,10 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART1_N_MASK;
         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART1_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
-        rv_set_int_isr(BMC_UART1_IRQn,UART1_Handler);
+        rv_set_int_isr(QSH_UART1_IRQn,UART1_Handler);
         UART_inst_env[0] = inst;
-        csi_vic_clear_pending_irq(BMC_UART1_IRQn);
-        csi_vic_enable_irq(BMC_UART1_IRQn);
+        csi_vic_clear_pending_irq(QSH_UART1_IRQn);
+        csi_vic_enable_irq(QSH_UART1_IRQn);
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
     break;
    case (uint32_t)UART2:
@@ -63,10 +63,10 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART2_N_MASK;
         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART2_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
-        rv_set_int_isr(BMC_UART2_IRQn,UART2_Handler);
+        rv_set_int_isr(QSH_UART2_IRQn,UART2_Handler);
         UART_inst_env[1] = inst;
-        csi_vic_clear_pending_irq(BMC_UART2_IRQn);
-        csi_vic_enable_irq(BMC_UART2_IRQn);
+        csi_vic_clear_pending_irq(QSH_UART2_IRQn);
+        csi_vic_enable_irq(QSH_UART2_IRQn);
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
     break;
     }
@@ -78,11 +78,11 @@ void HAL_UART_MSP_DeInit(UART_HandleTypeDef *inst)
     {
     case (uint32_t)UART1:
         REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART1, 1);
-        csi_vic_disable_irq(BMC_UART1_IRQn);
+        csi_vic_disable_irq(QSH_UART1_IRQn);
     break;
     case (uint32_t)UART2:
         REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART2, 1);
-        csi_vic_disable_irq(BMC_UART2_IRQn);
+        csi_vic_disable_irq(QSH_UART2_IRQn);
     break;
     }
 }
@@ -94,10 +94,10 @@ void HAL_DWUART_MSP_Init(DWUART_HandleTypeDef *inst)
     // case (uint32_t)DWUART1:
     //     SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_DWUART1_N_MASK;
     //     SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_DWUART1_N_MASK;
-    //     rv_set_int_isr(BMC_DWUART1_IRQn, DWUART1_Handler);
+    //     rv_set_int_isr(QSH_DWUART1_IRQn, DWUART1_Handler);
     //     DWUART_inst_env[0] = inst;
-    //     csi_vic_clear_pending_irq(BMC_DWUART1_IRQn);
-    //     csi_vic_enable_irq(BMC_DWUART1_IRQn);
+    //     csi_vic_clear_pending_irq(QSH_DWUART1_IRQn);
+    //     csi_vic_enable_irq(QSH_DWUART1_IRQn);
     //     SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_DWUART1_MASK;
     // break;
     // case (uint32_t)DWUART2:
@@ -118,7 +118,7 @@ void HAL_DWUART_MSP_DeInit(DWUART_HandleTypeDef *inst)
     {
     // case (uint32_t)DWUART1:
     //     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_DWUART1, 1);
-    //     csi_vic_disable_irq(BMC_DWUART1_IRQn);
+    //     csi_vic_disable_irq(QSH_DWUART1_IRQn);
     //     break;
     // case (uint32_t)DWUART2:
     //     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_DWUART2, 1);
@@ -276,7 +276,7 @@ __attribute__((weak)) void LL_UART2_Handler() {}
 
 void LL_UART2_MSP_Init(void)
 {
-    rv_set_int_isr(BMC_UART2_IRQn, LL_UART2_Handler);
+    rv_set_int_isr(QSH_UART2_IRQn, LL_UART2_Handler);
     SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
 }
 
@@ -302,7 +302,7 @@ void LL_UART2_MSP_Init(void)
 
 // void LL_DWUART1_MSP_Init(void)
 // {
-//     rv_set_int_isr(BMC_DWUART1_IRQn, LL_DWUART1_Handler);
+//     rv_set_int_isr(QSH_DWUART1_IRQn, LL_DWUART1_Handler);
 //     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_DWUART1, 1);
 // }
 

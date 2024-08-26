@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "reg_base_addr.h"
 
-#define PMU ((reg_pmu_rg_t *)BMC_PMU_RG_ADDR)
+#define PMU ((reg_pmu_rg_t *)QSH_PMU_RG_ADDR)
 
 typedef struct 
 {

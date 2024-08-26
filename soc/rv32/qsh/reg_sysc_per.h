@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "reg_base_addr.h"
 
-#define SYSC_PER ((reg_sysc_per_t *)BMC_SYSC_PER_ADDR)
+#define SYSC_PER ((reg_sysc_per_t *)QSH_SYSC_PER_ADDR)
 
 typedef struct
 {

@@ -8,11 +8,11 @@
 extern "C" {
 #endif
 
-#ifdef BMC_PER_QSPI1_ADDR
-#define LSQSPIV2 ((reg_lsqspiv2_t *) BMC_PER_QSPI1_ADDR)
+#ifdef QSH_PER_QSPI1_ADDR
+#define LSQSPIV2 ((reg_lsqspiv2_t *) QSH_PER_QSPI1_ADDR)
 #endif
-#ifdef BMC_PER_QSPI2_ADDR
-#define LSQSPIV2_2 ((reg_lsqspiv2_t *) BMC_PER_QSPI2_ADDR)
+#ifdef QSH_PER_QSPI2_ADDR
+#define LSQSPIV2_2 ((reg_lsqspiv2_t *) QSH_PER_QSPI2_ADDR)
 #endif
 
 extern uint32_t (*qspiv2_global_int_disable_fn)();

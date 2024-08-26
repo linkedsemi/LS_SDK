@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "reg_base_addr.h"
 
-#define SYSC_AWO ((reg_sysc_awo_t *)BMC_SYSC_AWO_ADDR)
+#define SYSC_AWO ((reg_sysc_awo_t *)QSH_SYSC_AWO_ADDR)
 
 typedef struct
 {

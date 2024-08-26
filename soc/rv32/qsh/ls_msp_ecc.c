@@ -13,7 +13,7 @@ void HAL_LSECC_MSP_Init(void)
     SYSC_CPU->PD_CPU_SRST[1] = SYSC_CPU_SRST_CLR_ECC_MASK;
     SYSC_CPU->PD_CPU_SRST[1] = SYSC_CPU_SRST_SET_ECC_MASK;
     SYSC_CPU->PD_CPU_CLKG[1] = SYSC_CPU_CLKG_SET_ECC_MASK;
-    rv_set_int_isr(BMC_ECC_IRQn, LSECC_IRQHandler);
+    rv_set_int_isr(QSH_ECC_IRQn, LSECC_IRQHandler);
 }
 
 void HAL_LSECC_MSP_DeInit(void)
@@ -33,15 +33,15 @@ void HAL_LSECC_Idle_Set(void)
 
 void HAL_LSECC_MSP_INT_ENABLE(void)
 {
-    csi_vic_enable_irq(BMC_ECC_IRQn);
+    csi_vic_enable_irq(QSH_ECC_IRQn);
 }
 
 void HAL_LSECC_MSP_INT_DISABLE(void)
 {
-    csi_vic_disable_irq(BMC_ECC_IRQn);
+    csi_vic_disable_irq(QSH_ECC_IRQn);
 }
 
 void HAL_LSECC_MSP_INT_CLRPENDING(void)
 {
-    csi_vic_clear_pending_irq(BMC_ECC_IRQn);
+    csi_vic_clear_pending_irq(QSH_ECC_IRQn);
 }

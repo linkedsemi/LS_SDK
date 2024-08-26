@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef BMC_PER_SHA_ADDR
-#define LSSHA ((reg_sha_t *)BMC_PER_SHA_ADDR)
+#ifdef QSH_PER_SHA_ADDR
+#define LSSHA ((reg_sha_t *)QSH_PER_SHA_ADDR)
 #endif
 
 

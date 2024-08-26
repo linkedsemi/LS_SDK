@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef BMC_PER_ECC_ADDR
-#define LSECC ((reg_ecc_t *)BMC_PER_ECC_ADDR)
+#ifdef QSH_PER_ECC_ADDR
+#define LSECC ((reg_ecc_t *)QSH_PER_ECC_ADDR)
 #endif
 
 void HAL_LSECC_MSP_Init(void);

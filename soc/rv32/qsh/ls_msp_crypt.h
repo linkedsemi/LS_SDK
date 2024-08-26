@@ -7,9 +7,9 @@
 extern "C" {
 #endif
 
-#ifdef BMC_PER_CRYPT_ADDR
+#ifdef QSH_PER_CRYPT_ADDR
 /// LSCRYPT Macro for Register Access
-#define LSCRYPT ((reg_crypt_t *)BMC_PER_CRYPT_ADDR)
+#define LSCRYPT ((reg_crypt_t *)QSH_PER_CRYPT_ADDR)
 #endif
 
 void HAL_LSCRYPT_MSP_Init(void);
