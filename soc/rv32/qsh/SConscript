@@ -31,7 +31,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'rv32/qsh/ls_msp_sm4.c',
         'rv32/qsh/ls_msp_crypt.c',
         'rv32/qsh/ls_msp_ecc.c',
-        # 'rv32/qsh/ls_msp_otbn.c',
+        'rv32/qsh/ls_msp_otbn.c',
         # 'rv32/qsh/ls_msp_touchkey.c',
         # 'rv32/qsh/ls_msp_adc.c',
         # 'rv32/qsh/ls_msp_dac.c',
@@ -68,7 +68,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_sm4.c',
         'src/ls_hal_crc.c',
         'src/ls_hal_ecc.c',
-        # 'src/ls_hal_otbn.c',
+        'src/ls_hal_otbn.c',
         # 'src/ls_hal_can.c',
         # 'src/ls_hal_fdcan.c',
         'src/ls_hal_crypt.c',
@@ -148,7 +148,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'soc/rv32/qsh',
     ]))
     if self.get('LINKSCRIPT') is None:
-        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/qsh/link_script.txt"))
+        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/qsh/link_script_fpga.ld"))
+        # self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/qsh/link_script.txt"))
     self.Append(CPPPATH = self.inc_dirs(inc_list))
     target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src),OBJPREFIX = objprefix)
     self.Depends(target,[self['LINKSCRIPT']])
