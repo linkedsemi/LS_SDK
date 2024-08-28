@@ -26,8 +26,7 @@ typedef struct
     volatile uint32_t RESERVED2[12];
     struct IO_FUNC_
     {
-        volatile uint32_t IO[7];
-        volatile uint32_t RESERVED3;
+        volatile uint32_t IO[8];
     } DIGITAL_FUNC_EN[4];
     // volatile uint32_t IO1_FUNC1_EN; //0x80
     // volatile uint32_t IO2_FUNC1_EN; //0x84
@@ -280,6 +279,12 @@ enum SYSC_AWO_REG_IO7_FUNC2_EN_FIELD
     SYSC_AWO_FUNC2_ION_EN_POS = 0,
     SYSC_AWO_FUNC2_IOQ_EN_MASK = (int)0xffff0000,
     SYSC_AWO_FUNC2_IOQ_EN_POS = 16,
+};
+
+enum SYSC_AWO_REG_IO8_FUNC2_EN_FIELD
+{
+    SYSC_AWO_FUNC2_IOT_EN_MASK = (int)0xffff,
+    SYSC_AWO_FUNC2_IOT_EN_POS = 0,
 };
 
 enum SYSC_AWO_REG_IO1_FUNC3_EN_FIELD
