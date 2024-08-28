@@ -19,7 +19,11 @@ typedef struct
     volatile uint32_t PD_AWO_ANA0; //0x34
     volatile uint32_t PD_AWO_ANA1; //0x38
     volatile uint32_t CLK_OUT_SEL; //0x3c
-    volatile uint32_t RESERVED2[16];
+    volatile uint32_t TX_DLL_CTRL; //0x40
+    volatile uint32_t RX_DLL_CTRL; //0x44
+    volatile uint32_t CLK_ETH_REG; //0x48
+    volatile uint32_t ETH_CRG_CFG; //0x4c
+    volatile uint32_t RESERVED2[12];
     struct IO_FUNC_
     {
         volatile uint32_t IO[7];
@@ -132,6 +136,38 @@ enum SYSC_AWO_REG_CLK_OUT_SEL_FIELD
 {
     SYSC_AWO_CLK_OUT_SEL_MASK = (int)0x30000000,
     SYSC_AWO_CLK_OUT_SEL_POS = 28,
+};
+
+enum SYSC_AWO_REG_TX_DLL_CTRL_FIELD
+{
+    SYSC_AWO_TX_DLL_CTRL_MASK = (int)0x3ffff,
+    SYSC_AWO_TX_DLL_CTRL_POS = 0,
+};
+
+enum SYSC_AWO_REG_RX_DLL_CTRL_FIELD
+{
+    SYSC_AWO_RX_DLL_CTRL_MASK = (int)0x3ffff,
+    SYSC_AWO_RX_DLL_CTRL_POS = 0,
+};
+
+enum SYSC_AWO_REG_CLK_ETH_REG_FIELD
+{
+    SYSC_AWO_CLK_ETH_TX_REG_MASK = (int)0xfff,
+    SYSC_AWO_CLK_ETH_TX_REG_POS = 0,
+    SYSC_AWO_CLK_ETH_RX_REG_MASK = (int)0x7000,
+    SYSC_AWO_CLK_ETH_RX_REG_POS = 12,
+    SYSC_AWO_CLK_ETH_RMII_REG_MASK = (int)0x1ff0000,
+    SYSC_AWO_CLK_ETH_RMII_REG_POS = 16,
+    SYSC_AWO_TX_CLK_SEL_MASK = (int)0x10000000,
+    SYSC_AWO_TX_CLK_SEL_POS = 28,
+    SYSC_AWO_RX_CLK_SEL_MASK = (int)0x20000000,
+    SYSC_AWO_RX_CLK_SEL_POS = 29,
+};
+
+enum SYSC_AWO_REG_ETH_CRG_CFG_FIELD
+{
+    SYSC_AWO_ETH_CRG_CFG_MASK = (int)0x3ffff,
+    SYSC_AWO_ETH_CRG_CFG_POS = 0,
 };
 
 enum SYSC_AWO_REG_IO1_FUNC1_EN_FIELD
