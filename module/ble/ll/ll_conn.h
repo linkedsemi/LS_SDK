@@ -404,6 +404,11 @@ struct ll_conn_env{
     uint8_t master;
     uint8_t peer_version_valid;
     uint8_t peer_features_valid;
+    #ifdef LE501X
+    struct tx_desc *tx_desc_buf;
+    uint8_t tx_desc_idx;
+    uint8_t prog_tx_desc_idx;
+    #endif
 };
 
 extern uint16_t conn_data_max_len;

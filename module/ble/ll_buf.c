@@ -98,7 +98,7 @@ extern void (*hci_reset_reset_buf_fn)(void);
 #define TX_DESC_NUM (20)
 #define RX_DESC_NUM (HCI_ACL_DATA_TX_BUFFER_NUM - 1)
 struct rx_desc rx_desc_buf[RX_DESC_NUM];
-struct tx_desc tx_desc_buf[TX_DESC_NUM];
+struct tx_desc tx_desc_buf[LL_CONNECTION_MAX][TX_DESC_NUM];
 static void tx_rx_desc_buf_init()
 {
     rx_desc_buf_ptr = rx_desc_buf;

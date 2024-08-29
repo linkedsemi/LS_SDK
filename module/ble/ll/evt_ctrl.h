@@ -354,9 +354,10 @@ struct control_struct
 
 extern struct ex_table em_et;
 extern struct control_struct em_cs;
+extern struct tx_desc adv_scan_tx_desc[];
 extern struct rx_desc adv_scan_rx_desc[];
 extern struct rx_desc *rx_desc_buf_ptr;
-extern struct tx_desc *tx_desc_buf_ptr;
+extern struct tx_desc **tx_desc_buf_ptr;
 extern uint8_t tx_desc_buf_num;
 extern uint8_t rx_desc_buf_num;
 extern uint8_t em_adv_rx_buf[];
