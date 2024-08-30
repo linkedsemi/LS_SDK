@@ -1,6 +1,9 @@
 #ifndef REG_SYSC_AWO_TYPE_H_
 #define REG_SYSC_AWO_TYPE_H_
 #include <stdint.h>
+#include "reg_base_addr.h"
+
+#define SYSC_AWO ((reg_sysc_awo_t *)QSH_SYSC_AWO_ADDR)
 
 typedef struct
 {
@@ -25,38 +28,42 @@ typedef struct
     volatile uint32_t CLK_ETH_REG; //0x58
     volatile uint32_t ETH_CRG_CFG; //0x5c
     volatile uint32_t RESERVED4[8];
-    volatile uint32_t IO1_FUNC1_EN; //0x80
-    volatile uint32_t IO2_FUNC1_EN; //0x84
-    volatile uint32_t IO3_FUNC1_EN; //0x88
-    volatile uint32_t IO4_FUNC1_EN; //0x8c
-    volatile uint32_t IO5_FUNC1_EN; //0x90
-    volatile uint32_t IO6_FUNC1_EN; //0x94
-    volatile uint32_t IO7_FUNC1_EN; //0x98
-    volatile uint32_t IO8_FUNC1_EN; //0x9c
-    volatile uint32_t IO1_FUNC2_EN; //0xa0
-    volatile uint32_t IO2_FUNC2_EN; //0xa4
-    volatile uint32_t IO3_FUNC2_EN; //0xa8
-    volatile uint32_t IO4_FUNC2_EN; //0xac
-    volatile uint32_t IO5_FUNC2_EN; //0xb0
-    volatile uint32_t IO6_FUNC2_EN; //0xb4
-    volatile uint32_t IO7_FUNC2_EN; //0xb8
-    volatile uint32_t IO8_FUNC2_EN; //0xbc
-    volatile uint32_t IO1_FUNC3_EN; //0xc0
-    volatile uint32_t IO2_FUNC3_EN; //0xc4
-    volatile uint32_t IO3_FUNC3_EN; //0xc8
-    volatile uint32_t IO4_FUNC3_EN; //0xcc
-    volatile uint32_t IO5_FUNC3_EN; //0xd0
-    volatile uint32_t IO6_FUNC3_EN; //0xd4
-    volatile uint32_t IO7_FUNC3_EN; //0xd8
-    volatile uint32_t IO8_FUNC3_EN; //0xdc
-    volatile uint32_t IO1_FUNC4_EN; //0xe0
-    volatile uint32_t IO2_FUNC4_EN; //0xe4
-    volatile uint32_t IO3_FUNC4_EN; //0xe8
-    volatile uint32_t IO4_FUNC4_EN; //0xec
-    volatile uint32_t IO5_FUNC4_EN; //0xf0
-    volatile uint32_t IO6_FUNC4_EN; //0xf4
-    volatile uint32_t IO7_FUNC4_EN; //0xf8
-    volatile uint32_t IO8_FUNC4_EN; //0xfc
+    struct IO_FUNC_
+    {
+        volatile uint32_t IO[8];
+    } DIGITAL_FUNC_EN[4];
+    // volatile uint32_t IO1_FUNC1_EN; //0x80
+    // volatile uint32_t IO2_FUNC1_EN; //0x84
+    // volatile uint32_t IO3_FUNC1_EN; //0x88
+    // volatile uint32_t IO4_FUNC1_EN; //0x8c
+    // volatile uint32_t IO5_FUNC1_EN; //0x90
+    // volatile uint32_t IO6_FUNC1_EN; //0x94
+    // volatile uint32_t IO7_FUNC1_EN; //0x98
+    // volatile uint32_t IO8_FUNC1_EN; //0x9c
+    // volatile uint32_t IO1_FUNC2_EN; //0xa0
+    // volatile uint32_t IO2_FUNC2_EN; //0xa4
+    // volatile uint32_t IO3_FUNC2_EN; //0xa8
+    // volatile uint32_t IO4_FUNC2_EN; //0xac
+    // volatile uint32_t IO5_FUNC2_EN; //0xb0
+    // volatile uint32_t IO6_FUNC2_EN; //0xb4
+    // volatile uint32_t IO7_FUNC2_EN; //0xb8
+    // volatile uint32_t IO8_FUNC2_EN; //0xbc
+    // volatile uint32_t IO1_FUNC3_EN; //0xc0
+    // volatile uint32_t IO2_FUNC3_EN; //0xc4
+    // volatile uint32_t IO3_FUNC3_EN; //0xc8
+    // volatile uint32_t IO4_FUNC3_EN; //0xcc
+    // volatile uint32_t IO5_FUNC3_EN; //0xd0
+    // volatile uint32_t IO6_FUNC3_EN; //0xd4
+    // volatile uint32_t IO7_FUNC3_EN; //0xd8
+    // volatile uint32_t IO8_FUNC3_EN; //0xdc
+    // volatile uint32_t IO1_FUNC4_EN; //0xe0
+    // volatile uint32_t IO2_FUNC4_EN; //0xe4
+    // volatile uint32_t IO3_FUNC4_EN; //0xe8
+    // volatile uint32_t IO4_FUNC4_EN; //0xec
+    // volatile uint32_t IO5_FUNC4_EN; //0xf0
+    // volatile uint32_t IO6_FUNC4_EN; //0xf4
+    // volatile uint32_t IO7_FUNC4_EN; //0xf8
+    // volatile uint32_t IO8_FUNC4_EN; //0xfc
 }reg_sysc_awo_t;
 
 enum SYSC_AWO_REG_SLP_HLD_CTRL_FIELD
