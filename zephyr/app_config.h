@@ -1,0 +1,15 @@
+#ifndef APP_CONFIG_H_
+#define APP_CONFIG_H_
+
+//#define DEBUG_MODE 0
+
+#ifdef CONFIG_SOC_LS1010
+
+#ifdef CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC
+#define SDK_HSE_USED (1)
+#define SDK_HCLK_MHZ (CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC/1000000)
+#endif
+
+#endif
+
+#endif //APP_CONFIG_H_
