@@ -50,14 +50,17 @@ typedef struct
   */
 
 /**
-  * @brief  Interrupt Environment
+  * @brief  Transfer Environment
   */
-struct Interrupt_Env
+struct Transfer_Env
 {
   uint8_t                    *pBuffPtr;                         /*!< Pointer to transfer Buffer */
   uint16_t              	 Count;                             /*!< SPI Transfer Counter */
-  void (*transfer_Fun)(struct __SPI_HandleTypeDef *hspi);       /*!< function pointer on transfer_Fun */
-  void (*i2s_transfer_Fun)(struct __I2S_HandleTypeDef *hi2s);   /*!< function pointer on transfer_Fun */
+
+  union {
+    void (*transfer_Fun)(struct __SPI_HandleTypeDef *hspi);       /*!< function pointer on transfer_Fun */
+    void (*i2s_transfer_Fun)(struct __I2S_HandleTypeDef *hi2s);   /*!< function pointer on transfer_Fun */
+  };
 };
 
 /**
@@ -80,10 +83,10 @@ typedef struct __SPI_HandleTypeDef
 
   void                       *DMAC_Instance;
 
-  union{
-        struct Interrupt_Env  Interrupt;         /*!< Interrupt Env  */
-        struct DMA_Env        DMA;               /*!< DMA Env  */
-  }Tx_Env,Rx_Env;                                /*!< Tx Rx Environment */
+  struct {
+    struct Transfer_Env  Transfer;         /*!< Transfer Env  */
+    struct DMA_Env       DMA;              /*!< DMA Env  */
+  } Tx_Env,Rx_Env;                         /*!< Tx Rx Environment */
 
 } SPI_HandleTypeDef;
 /**
@@ -124,14 +127,14 @@ typedef struct __I2S_HandleTypeDef
 {
   reg_spi_t                 *Instance;     /*!< I2S registers base address  */
 
-  I2S_InitTypeDef            Init;         /*!< I2S communication parameters */
+  I2S_InitTypeDef           Init;         /*!< I2S communication parameters */
 
-  void                       *DMAC_Instance;    /*!< I2S DMA Instance  */
+  void                      *DMAC_Instance;    /*!< I2S DMA Instance  */
 
-  union{
-        struct Interrupt_Env  Interrupt;         /*!< Interrupt Env  */
-        struct DMA_Env        DMA;               /*!< DMA Env  */
-  }Tx_Env,Rx_Env;                                /*!< Tx Rx Environment */
+  struct {
+    struct Transfer_Env Transfer;        /*!< Transfer Env  */
+    struct DMA_Env      DMA;             /*!< DMA Env  */
+  } Tx_Env,Rx_Env;                       /*!< Tx Rx Environment */
 
 } I2S_HandleTypeDef;
 
@@ -436,20 +439,52 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi,void *TX_D
 void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi);
 
 /**
-  * @brief  Transfer completed callback.
+  * @brief  Tx Transfer completed callback.
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
   *               the configuration information for SPI module.
   * @retval None
   */
-void HAL_SPI_CpltCallback(SPI_HandleTypeDef *hspi);
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
 
 /**
-  * @brief  Transfer completed callback in DMA.
+  * @brief  Rx Transfer completed callback.
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
   *               the configuration information for SPI module.
   * @retval None
   */
-void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi);
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi);
+
+/**
+  * @brief  Tx and Rx Transfer completed callback.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval None
+  */
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi);
+
+/**
+  * @brief  Tx Transfer completed callback in DMA.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval None
+  */
+void HAL_SPI_TxDMACpltCallback(SPI_HandleTypeDef *hspi);
+
+/**
+  * @brief  Rx Transfer completed callback in DMA.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval None
+  */
+void HAL_SPI_RxDMACpltCallback(SPI_HandleTypeDef *hspi);
+
+/**
+  * @brief  Tx and Rx Transfer completed callback in DMA.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @retval None
+  */
+void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi);
 
 /**
   * @brief  Initializes the I2S according to the specified parameters
