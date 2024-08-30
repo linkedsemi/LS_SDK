@@ -1,9 +1,6 @@
 #ifndef REG_SYSC_AWO_TYPE_H_
 #define REG_SYSC_AWO_TYPE_H_
 #include <stdint.h>
-#include "reg_base_addr.h"
-
-#define SYSC_AWO ((reg_sysc_awo_t *)QSH_SYSC_AWO_ADDR)
 
 typedef struct
 {
@@ -19,46 +16,47 @@ typedef struct
     volatile uint32_t PD_AWO_ANA0; //0x34
     volatile uint32_t PD_AWO_ANA1; //0x38
     volatile uint32_t CLK_OUT_SEL; //0x3c
-    volatile uint32_t TX_DLL_CTRL; //0x40
-    volatile uint32_t RX_DLL_CTRL; //0x44
-    volatile uint32_t CLK_ETH_REG; //0x48
-    volatile uint32_t ETH_CRG_CFG; //0x4c
-    volatile uint32_t RESERVED2[12];
-    struct IO_FUNC_
-    {
-        volatile uint32_t IO[8];
-    } DIGITAL_FUNC_EN[4];
-    // volatile uint32_t IO1_FUNC1_EN; //0x80
-    // volatile uint32_t IO2_FUNC1_EN; //0x84
-    // volatile uint32_t IO3_FUNC1_EN; //0x88
-    // volatile uint32_t IO4_FUNC1_EN; //0x8c
-    // volatile uint32_t IO5_FUNC1_EN; //0x90
-    // volatile uint32_t IO6_FUNC1_EN; //0x94
-    // volatile uint32_t IO7_FUNC1_EN; //0x98
-    // volatile uint32_t RESERVED3[1];
-    // volatile uint32_t IO1_FUNC2_EN; //0xa0
-    // volatile uint32_t IO2_FUNC2_EN; //0xa4
-    // volatile uint32_t IO3_FUNC2_EN; //0xa8
-    // volatile uint32_t IO4_FUNC2_EN; //0xac
-    // volatile uint32_t IO5_FUNC2_EN; //0xb0
-    // volatile uint32_t IO6_FUNC2_EN; //0xb4
-    // volatile uint32_t IO7_FUNC2_EN; //0xb8
-    // volatile uint32_t RESERVED4[1];
-    // volatile uint32_t IO1_FUNC3_EN; //0xc0
-    // volatile uint32_t IO2_FUNC3_EN; //0xc4
-    // volatile uint32_t IO3_FUNC3_EN; //0xc8
-    // volatile uint32_t IO4_FUNC3_EN; //0xcc
-    // volatile uint32_t IO5_FUNC3_EN; //0xd0
-    // volatile uint32_t IO6_FUNC3_EN; //0xd4
-    // volatile uint32_t IO7_FUNC3_EN; //0xd8
-    // volatile uint32_t RESERVED5[1];
-    // volatile uint32_t IO1_FUNC4_EN; //0xe0
-    // volatile uint32_t IO2_FUNC4_EN; //0xe4
-    // volatile uint32_t IO3_FUNC4_EN; //0xe8
-    // volatile uint32_t IO4_FUNC4_EN; //0xec
-    // volatile uint32_t IO5_FUNC4_EN; //0xf0
-    // volatile uint32_t IO6_FUNC4_EN; //0xf4
-    // volatile uint32_t IO7_FUNC4_EN; //0xf8
+    volatile uint32_t RESERVED2[1];
+    volatile uint32_t CPU_DBG_PWRUPACK; //0x44
+    volatile uint32_t DPLL_LOCK; //0x48
+    volatile uint32_t RESERVED3[1];
+    volatile uint32_t TX_DLL_CTRL; //0x50
+    volatile uint32_t RX_DLL_CTRL; //0x54
+    volatile uint32_t CLK_ETH_REG; //0x58
+    volatile uint32_t ETH_CRG_CFG; //0x5c
+    volatile uint32_t RESERVED4[8];
+    volatile uint32_t IO1_FUNC1_EN; //0x80
+    volatile uint32_t IO2_FUNC1_EN; //0x84
+    volatile uint32_t IO3_FUNC1_EN; //0x88
+    volatile uint32_t IO4_FUNC1_EN; //0x8c
+    volatile uint32_t IO5_FUNC1_EN; //0x90
+    volatile uint32_t IO6_FUNC1_EN; //0x94
+    volatile uint32_t IO7_FUNC1_EN; //0x98
+    volatile uint32_t IO8_FUNC1_EN; //0x9c
+    volatile uint32_t IO1_FUNC2_EN; //0xa0
+    volatile uint32_t IO2_FUNC2_EN; //0xa4
+    volatile uint32_t IO3_FUNC2_EN; //0xa8
+    volatile uint32_t IO4_FUNC2_EN; //0xac
+    volatile uint32_t IO5_FUNC2_EN; //0xb0
+    volatile uint32_t IO6_FUNC2_EN; //0xb4
+    volatile uint32_t IO7_FUNC2_EN; //0xb8
+    volatile uint32_t IO8_FUNC2_EN; //0xbc
+    volatile uint32_t IO1_FUNC3_EN; //0xc0
+    volatile uint32_t IO2_FUNC3_EN; //0xc4
+    volatile uint32_t IO3_FUNC3_EN; //0xc8
+    volatile uint32_t IO4_FUNC3_EN; //0xcc
+    volatile uint32_t IO5_FUNC3_EN; //0xd0
+    volatile uint32_t IO6_FUNC3_EN; //0xd4
+    volatile uint32_t IO7_FUNC3_EN; //0xd8
+    volatile uint32_t IO8_FUNC3_EN; //0xdc
+    volatile uint32_t IO1_FUNC4_EN; //0xe0
+    volatile uint32_t IO2_FUNC4_EN; //0xe4
+    volatile uint32_t IO3_FUNC4_EN; //0xe8
+    volatile uint32_t IO4_FUNC4_EN; //0xec
+    volatile uint32_t IO5_FUNC4_EN; //0xf0
+    volatile uint32_t IO6_FUNC4_EN; //0xf4
+    volatile uint32_t IO7_FUNC4_EN; //0xf8
+    volatile uint32_t IO8_FUNC4_EN; //0xfc
 }reg_sysc_awo_t;
 
 enum SYSC_AWO_REG_SLP_HLD_CTRL_FIELD
@@ -135,6 +133,18 @@ enum SYSC_AWO_REG_CLK_OUT_SEL_FIELD
 {
     SYSC_AWO_CLK_OUT_SEL_MASK = (int)0x30000000,
     SYSC_AWO_CLK_OUT_SEL_POS = 28,
+};
+
+enum SYSC_AWO_REG_CPU_DBG_PWRUPACK_FIELD
+{
+    SYSC_AWO_CPU_DBG_PWRUPACK_MASK = (int)0x1,
+    SYSC_AWO_CPU_DBG_PWRUPACK_POS = 0,
+};
+
+enum SYSC_AWO_REG_DPLL_LOCK_FIELD
+{
+    SYSC_AWO_DPLL_LOCK_MASK = (int)0x2,
+    SYSC_AWO_DPLL_LOCK_POS = 1,
 };
 
 enum SYSC_AWO_REG_TX_DLL_CTRL_FIELD
@@ -223,6 +233,12 @@ enum SYSC_AWO_REG_IO7_FUNC1_EN_FIELD
     SYSC_AWO_FUNC1_ION_EN_POS = 0,
     SYSC_AWO_FUNC1_IOQ_EN_MASK = (int)0xffff0000,
     SYSC_AWO_FUNC1_IOQ_EN_POS = 16,
+};
+
+enum SYSC_AWO_REG_IO8_FUNC1_EN_FIELD
+{
+    SYSC_AWO_FUNC1_IOT_EN_MASK = (int)0xffff,
+    SYSC_AWO_FUNC1_IOT_EN_POS = 0,
 };
 
 enum SYSC_AWO_REG_IO1_FUNC2_EN_FIELD
@@ -343,6 +359,12 @@ enum SYSC_AWO_REG_IO7_FUNC3_EN_FIELD
     SYSC_AWO_FUNC3_IOQ_EN_POS = 16,
 };
 
+enum SYSC_AWO_REG_IO8_FUNC3_EN_FIELD
+{
+    SYSC_AWO_FUNC3_IOT_EN_MASK = (int)0xffff,
+    SYSC_AWO_FUNC3_IOT_EN_POS = 0,
+};
+
 enum SYSC_AWO_REG_IO1_FUNC4_EN_FIELD
 {
     SYSC_AWO_FUNC4_IOA_EN_MASK = (int)0xffff,
@@ -397,6 +419,12 @@ enum SYSC_AWO_REG_IO7_FUNC4_EN_FIELD
     SYSC_AWO_FUNC4_ION_EN_POS = 0,
     SYSC_AWO_FUNC4_IOQ_EN_MASK = (int)0xffff0000,
     SYSC_AWO_FUNC4_IOQ_EN_POS = 16,
+};
+
+enum SYSC_AWO_REG_IO8_FUNC4_EN_FIELD
+{
+    SYSC_AWO_FUNC4_IOT_EN_MASK = (int)0xffff,
+    SYSC_AWO_FUNC4_IOT_EN_POS = 0,
 };
 
 #endif
