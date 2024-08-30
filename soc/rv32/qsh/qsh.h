@@ -17,6 +17,7 @@ typedef enum IRQn
   QSH_PMU_3_IRQn            = 19,
   QSH_PMU_4_IRQn            = 20,
   QSH_PMU_5_IRQn            = 21,
+  
   QSH_SEC_CPU_IRQn          = 26,
   QSH_APP_CPU_IRQn          = 27,
   QSH_USB1_IRQn             = 28,
@@ -40,7 +41,12 @@ typedef enum IRQn
   QSH_SHA_IRQn              = 46,
   QSH_SM4_IRQn              = 47,
   QSH_OTBN_IRQn             = 48,
+  QSH_SYSC_OTBN_IRQn        = 49,
+  QSH_SYSC_SPID1_IRQn       = 50,
+  QSH_SYSC_SPID2_IRQn       = 51,
   
+  QSH_SPID1_IRQn            = 54,
+  QSH_SPID2_IRQn            = 55,
   QSH_ADTIM1_IRQn           = 56,
   QSH_ADTIM2_IRQn           = 57,
   QSH_GPTIMA1_IRQn          = 58,
