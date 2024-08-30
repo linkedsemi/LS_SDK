@@ -443,18 +443,6 @@ void pinmux_uart2_init(uint8_t txd,uint8_t rxd);
 void pinmux_uart2_deinit(void);
 
 /**
-  * @brief       Set pin mux function to uart3
-  * @param  txd   Specific GPIO pin  
-  * @param rxd   Specific GPIO pin   
-  */
-void pinmux_uart3_init(uint8_t txd,uint8_t rxd);
-
-/**
-  * @brief clear  pin mux function of uart3
-  */
-void pinmux_uart3_deinit(void);
-
-/**
   * @brief       Set pin mux function to dwuart1
   * @param  txd   Specific GPIO pin  
   * @param rxd   Specific GPIO pin   
@@ -477,6 +465,18 @@ void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd);
   * @brief clear  pin mux function of dwuart2
   */
 void pinmux_dwuart2_deinit(void);
+
+/**
+  * @brief       Set pin mux function to dwuart2
+  * @param  txd   Specific GPIO pin  
+  * @param rxd   Specific GPIO pin   
+  */
+void pinmux_dwuart3_init(uint8_t txd,uint8_t rxd);
+
+/**
+  * @brief clear  pin mux function of dwuart2
+  */
+void pinmux_dwuart3_deinit(void);
 
 /**
   * @brief Set pin mux function to adtim1 

@@ -26,14 +26,14 @@ static gpio_port_pin_t uart1_txd;
 static gpio_port_pin_t uart1_rxd;
 static gpio_port_pin_t uart2_txd;
 static gpio_port_pin_t uart2_rxd;
-// static gpio_port_pin_t dwuart1_txd;
-// static gpio_port_pin_t dwuart1_rxd;
-// static gpio_port_pin_t dwuart2_txd;
-// static gpio_port_pin_t dwuart2_rxd;
-// static gpio_port_pin_t dwuart3_txd;
-// static gpio_port_pin_t dwuart3_rxd;
-// static gpio_port_pin_t dwuart4_txd;
-// static gpio_port_pin_t dwuart4_rxd;
+static gpio_port_pin_t dwuart1_txd;
+static gpio_port_pin_t dwuart1_rxd;
+static gpio_port_pin_t dwuart2_txd;
+static gpio_port_pin_t dwuart2_rxd;
+static gpio_port_pin_t dwuart3_txd;
+static gpio_port_pin_t dwuart3_rxd;
+static gpio_port_pin_t dwuart4_txd;
+static gpio_port_pin_t dwuart4_rxd;
 // static gpio_port_pin_t iic1_scl;
 // static gpio_port_pin_t iic1_sda;
 // static gpio_port_pin_t iic2_scl;
@@ -567,35 +567,65 @@ void pinmux_uart2_deinit()
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart3_rxd));
 // }
 
-// void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd)
-// {
-//     *(uint8_t *)&dwuart1_txd = txd;
-//     *(uint8_t *)&dwuart1_rxd = rxd;
-//     uart_io_cfg(txd,rxd);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),DWUART1_TXD);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),DWUART1_RXD);
-// }
+void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&dwuart1_txd = txd;
+    *(uint8_t *)&dwuart1_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func0_enable(pin2func_io(&uart1_txd),FIOC_UART3_TXD);
+    per_func0_enable(pin2func_io(&uart1_rxd),FIOC_UART3_RXD);
+}
 
-// void pinmux_dwuart1_deinit()
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart1_txd));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart1_rxd));
-// }
+void pinmux_dwuart1_deinit()
+{
+    per_func0_disable(pin2func_io(&dwuart1_txd));
+    per_func0_disable(pin2func_io(&dwuart1_rxd));
+}
 
-// void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd)
-// {
-//     *(uint8_t *)&dwuart2_txd = txd;
-//     *(uint8_t *)&dwuart2_rxd = rxd;
-//     uart_io_cfg(txd,rxd);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),DWUART2_TXD);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),DWUART2_RXD);
-// }
+void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&dwuart2_txd = txd;
+    *(uint8_t *)&dwuart2_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func0_enable(pin2func_io(&uart2_txd),FIOD_UART4_TXD);
+    per_func0_enable(pin2func_io(&uart2_rxd),FIOD_UART4_RXD);
+}
 
-// void pinmux_dwuart2_deinit()
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart2_txd));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart2_rxd));
-// }
+void pinmux_dwuart2_deinit()
+{
+    per_func0_disable(pin2func_io(&dwuart2_txd));
+    per_func0_disable(pin2func_io(&dwuart2_rxd));
+}
+
+void pinmux_dwuart3_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&dwuart3_txd = txd;
+    *(uint8_t *)&dwuart3_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func0_enable(pin2func_io(&dwuart3_txd),FIOE_UART5_TXD);
+    per_func0_enable(pin2func_io(&dwuart3_rxd),FIOE_UART5_RXD);
+}
+
+void pinmux_dwuart3_deinit()
+{
+    per_func0_disable(pin2func_io(&dwuart3_txd));
+    per_func0_disable(pin2func_io(&dwuart3_rxd));
+}
+
+void pinmux_dwuart34_init(uint8_t txd,uint8_t rxd)
+{
+    *(uint8_t *)&dwuart4_txd = txd;
+    *(uint8_t *)&dwuart4_rxd = rxd;
+    uart_io_cfg(txd,rxd);
+    per_func0_enable(pin2func_io(&dwuart4_txd),FIOF_UART6_TXD);
+    per_func0_enable(pin2func_io(&dwuart4_rxd),FIOF_UART6_RXD);
+}
+
+void pinmux_dwuart4_deinit()
+{
+    per_func0_disable(pin2func_io(&dwuart4_txd));
+    per_func0_disable(pin2func_io(&dwuart4_rxd));
+}
 
 // void pinmux_i2c_dbg_init(uint8_t clk,uint8_t dat)
 // {
