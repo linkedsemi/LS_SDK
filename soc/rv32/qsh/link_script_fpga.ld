@@ -1,6 +1,9 @@
 MEMORY
 {
-    RAM (wx) : ORIGIN = 0x10000000, LENGTH = 0xC0000
+    ROM (rx) : ORIGIN = 0x01000000, LENGTH = 0x8000
+    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 0x20000
+    RAM (wx) : ORIGIN = 0x10000000, LENGTH = 0x18000
+    OTP (rx) : ORIGIN = 0x10018000, LENGTH = 0x8000
 }
 ENTRY(Reset_Handler)
 SECTIONS
@@ -8,11 +11,11 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.text.Reset_Handler))
-		*(.text* .*rodata*)
+		*(.text* .*srodata*)
 		*(.xip_banned*)
 		*(.ABS*)
 		. = ALIGN(8);
-	} >RAM
+	} >ROM
 
     __data_lma__ = ALIGN (4);
 
@@ -24,7 +27,7 @@ SECTIONS
 		*(.*data*)
 		. = ALIGN(4);
         __data_end__ = .;
-	} >RAM 
+	} >RAM AT>ROM
 
 	.bss :
 	{
@@ -39,5 +42,7 @@ SECTIONS
 	PROVIDE(end = .);
 
 	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+	__StackTop_APP = ORIGIN(RAM) + LENGTH(RAM) / 2;
 	PROVIDE(__global_pointer$ = ORIGIN(RAM) + 2K);
+	PROVIDE(__otp_offset__ = ORIGIN(OTP));
 }
