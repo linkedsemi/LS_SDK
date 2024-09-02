@@ -202,7 +202,7 @@ static void Error_Handler(void)
     }
 }
 
-void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi) 
+void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi) 
 {
     SPI_CS_HIGH();
     /* Turn LED on: Transfer in transmission/reception process is correct */

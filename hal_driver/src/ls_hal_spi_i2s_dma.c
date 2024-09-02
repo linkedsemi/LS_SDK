@@ -3,7 +3,9 @@
 #include "ls_hal_spi_i2s.h"
 #include "sdk_config.h"
 
-__attribute__((weak)) void HAL_SPI_DMACpltCallback(SPI_HandleTypeDef *hspi){}
+__attribute__((weak)) void HAL_SPI_TxDMACpltCallback(SPI_HandleTypeDef *hspi){}
+__attribute__((weak)) void HAL_SPI_RxDMACpltCallback(SPI_HandleTypeDef *hspi){}
+__attribute__((weak)) void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi){}
 
 static void spi_tx_dma_cb(SPI_HandleTypeDef *hspi)
 {
@@ -15,7 +17,8 @@ static void spi_rx_dma_cb(SPI_HandleTypeDef *hspi)
     CLEAR_BIT(hspi->Instance->CR2, SPI_CR2_RXDMAEN_MASK);
     while (REG_FIELD_RD(hspi->Instance->SR,SPI_SR_BSY) == 1U);
     CLEAR_BIT(hspi->Instance->CR1, SPI_CR1_SPE_MASK);
-    HAL_SPI_DMACpltCallback(hspi);
+
+    (!hspi->Tx_Env.Transfer.pBuffPtr) ? HAL_SPI_RxDMACpltCallback(hspi) : hspi->Rx_Env.Transfer.pBuffPtr ? HAL_SPI_TxRxDMACpltCallback(hspi) : HAL_SPI_TxDMACpltCallback(hspi);
 }
 
 #if  DMACV2
@@ -38,6 +41,9 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     uint8_t *pTxData, *pRxData; 
     pTxData = TX_Data? TX_Data: &hspi->Tx_Env.DMA.dummy;
     pRxData = RX_Data? RX_Data: &hspi->Rx_Env.DMA.dummy;
+
+    hspi->Tx_Env.Transfer.pBuffPtr = TX_Data;
+    hspi->Rx_Env.Transfer.pBuffPtr = RX_Data;
 
     if(hspi->Init.DataSize == SPI_DATASIZE_16BIT)
     {
@@ -113,6 +119,9 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     pTxData = TX_Data? TX_Data: &hspi->Tx_Env.DMA.dummy;
     pRxData = RX_Data? RX_Data: &hspi->Rx_Env.DMA.dummy;
 
+    hspi->Tx_Env.Transfer.pBuffPtr = TX_Data;
+    hspi->Rx_Env.Transfer.pBuffPtr = RX_Data;
+
     if(hspi->Init.DataSize == SPI_DATASIZE_16BIT)
     {
         data_width = TRANSFER_WIDTH_16BITS;
@@ -173,6 +182,9 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
     uint32_t rx_data_end_ptr = (uint32_t)RX_Data;
     uint8_t data_size;
     uint8_t inc;
+
+    hspi->Tx_Env.Transfer.pBuffPtr = TX_Data;
+    hspi->Rx_Env.Transfer.pBuffPtr = RX_Data;
 
     if(hspi->Init.DataSize == SPI_DATASIZE_16BIT)
     {
