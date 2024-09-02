@@ -262,3 +262,64 @@ if(CONFIG_SOC_LS1010)
 
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
 endif()
+
+if(CONFIG_SOC_LSQSH)
+  zephyr_include_directories(
+    . 
+    ../soc
+    ../soc/rv32
+    ../soc/rv32/qsh
+    ../hal_driver/inc
+    ../hal_driver/api
+    ../module/common
+    ../module/debug
+    ../module/debug/RTT
+    ../module/static_buffer
+  )
+
+  zephyr_library_include_directories(
+        ../module/common
+        ../module/crc
+        ../module/debug
+        ../module/debug/RTT
+        ../module/static_buffer
+  )
+
+  zephyr_library_sources(
+    ../soc/rv32/startup.c
+    ../module/common/common.c
+    ../module/common/circular_doubly_linked_list.c
+    ../module/common/linked_async_framework.c
+    ../module/common/async_call.c
+    ../module/crc/crc16.c
+    ../module/debug/ls_dbg.c
+    ../module/debug/RTT/SEGGER_RTT.c
+    ../module/static_buffer/linked_buffer.c
+    ../module/static_buffer/fifo.c
+    ../hal_driver/src/ls_hal_uart.c
+    ../hal_driver/src/ls_hal_dwuart.c
+    ../soc/rv32/systick.c
+    ../soc/rv32/int_call_asm.S
+    ../soc/rv32/qsh/cpu.c
+    ../soc/rv32/qsh/sleep_asm.S
+    ../soc/rv32/qsh/exception_entry.S
+    ../soc/rv32/qsh/delay_asm.S
+    ../soc/rv32/qsh/ls_msp_uart.c
+    ../soc/rv32/qsh/ls_soc_gpio.c
+    ../soc/rv32/qsh/sys_stat.c
+    ../soc/rv32/qsh/platform.c
+    ../module/static_buffer/fifo.c
+  )
+
+  zephyr_linker_sources(
+    RAMFUNC_SECTION
+    xip_banned.ld
+  )
+
+  zephyr_linker_sources(
+    NOINIT
+    reset_retain.ld
+  )
+
+  # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
+endif()
