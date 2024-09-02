@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include "sys_stat.h"
 #include "reg_sysc_cpu.h"
+#include "reg_sysc_awo.h"
 #include "usbd.h"
 #include "ls_soc_gpio.h"
 #include "systick.h"
@@ -54,7 +55,8 @@ uint32_t HAL_USB_MSP_GetEnableIRQ()
 
 void HAL_USB_MSP_Host_Setup(void *param)
 {
-
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0, SYSC_AWO_USB_PUPD, 0x1);
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0, SYSC_AWO_USB_CID, 0x1);
 }
 
 void HAL_USB_MSP_Host_Discon_Hook()

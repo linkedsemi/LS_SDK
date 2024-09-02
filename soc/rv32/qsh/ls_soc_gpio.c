@@ -552,21 +552,6 @@ void pinmux_uart2_deinit()
     per_func0_disable(pin2func_io(&uart2_rxd));
 }
 
-// void pinmux_uart3_init(uint8_t txd,uint8_t rxd)
-// {
-//     *(uint8_t *)&uart3_txd = txd;
-//     *(uint8_t *)&uart3_rxd = rxd;
-//     uart_io_cfg(txd,rxd);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&txd),UART3_TXD);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&rxd),UART3_RXD);
-// }
-
-// void pinmux_uart3_deinit()
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart3_txd));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart3_rxd));
-// }
-
 void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd)
 {
     *(uint8_t *)&dwuart1_txd = txd;
@@ -612,7 +597,7 @@ void pinmux_dwuart3_deinit()
     per_func0_disable(pin2func_io(&dwuart3_rxd));
 }
 
-void pinmux_dwuart34_init(uint8_t txd,uint8_t rxd)
+void pinmux_dwuart4_init(uint8_t txd,uint8_t rxd)
 {
     *(uint8_t *)&dwuart4_txd = txd;
     *(uint8_t *)&dwuart4_rxd = rxd;
