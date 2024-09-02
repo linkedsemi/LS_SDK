@@ -502,7 +502,7 @@ static void per_func_disable(uint8_t pin, uint8_t FUNC_num)
 static void per_func0_enable(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    SYSC_PER->FUNC_SEL[x->port][x->port / 4] |= per_func << ((x->num % 4) * 8);
+    SYSC_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
     per_func_enable(pin, 0);
     // SYSC_AWO->DIGITAL_FUNC_EN[0].IO[x->port / 2] |= 1 << x->num;
 }
@@ -572,8 +572,8 @@ void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd)
     *(uint8_t *)&dwuart1_txd = txd;
     *(uint8_t *)&dwuart1_rxd = rxd;
     uart_io_cfg(txd,rxd);
-    per_func0_enable(pin2func_io(&uart1_txd),FIOC_UART3_TXD);
-    per_func0_enable(pin2func_io(&uart1_rxd),FIOC_UART3_RXD);
+    per_func0_enable(pin2func_io(&dwuart1_txd),FIOC_UART3_TXD);
+    per_func0_enable(pin2func_io(&dwuart1_rxd),FIOC_UART3_RXD);
 }
 
 void pinmux_dwuart1_deinit()
@@ -587,8 +587,8 @@ void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd)
     *(uint8_t *)&dwuart2_txd = txd;
     *(uint8_t *)&dwuart2_rxd = rxd;
     uart_io_cfg(txd,rxd);
-    per_func0_enable(pin2func_io(&uart2_txd),FIOD_UART4_TXD);
-    per_func0_enable(pin2func_io(&uart2_rxd),FIOD_UART4_RXD);
+    per_func0_enable(pin2func_io(&dwuart2_txd),FIOD_UART4_TXD);
+    per_func0_enable(pin2func_io(&dwuart2_rxd),FIOD_UART4_RXD);
 }
 
 void pinmux_dwuart2_deinit()
