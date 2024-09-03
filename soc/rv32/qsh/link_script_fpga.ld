@@ -12,6 +12,7 @@ SECTIONS
 	{
 		KEEP(*(.text.Reset_Handler))
 		*(.text* .*srodata*)
+		KEEP(*(.rodata._p256_verify_text))
 		*(.xip_banned*)
 		*(.ABS*)
 		. = ALIGN(8);

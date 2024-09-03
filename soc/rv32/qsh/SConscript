@@ -62,6 +62,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'rv32/qsh/ls_msp_cache.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+        'src/otbn_text_array/_p256_verify_text.c',
         'src/ls_hal_flash_swint.c',
         'src/ls_hal_sha.c',
         'src/ls_hal_sm4.c',

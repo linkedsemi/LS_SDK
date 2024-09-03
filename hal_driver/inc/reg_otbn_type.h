@@ -2,6 +2,9 @@
 #define REG_OTBN_TYPE_H_
 #include <stdint.h>
 
+#define OTBN_IMEM_SIZE (0x2000)
+#define OTBN_DMEM_SIZE (0xC00)
+
 typedef struct
 {
     volatile uint32_t INTR_STATE;
@@ -15,10 +18,6 @@ typedef struct
     volatile uint32_t FATAL_ALERT_CAUSE;
     volatile uint32_t TNSN_CNT;
     volatile uint32_t LOAD_CHECKSUM;
-    volatile uint32_t reserved_0[0xff5];
-    volatile uint32_t IMEM[0x800];
-    volatile uint32_t reserved_1[0x800];
-    volatile uint32_t DMEM[0x300];
 } reg_otbn_t;
 
 enum OTBN_REG_INTR_STATE_FIELD
