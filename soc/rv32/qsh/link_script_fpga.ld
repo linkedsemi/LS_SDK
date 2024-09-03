@@ -2,8 +2,8 @@ MEMORY
 {
     ROM (rx) : ORIGIN = 0x01000000, LENGTH = 0x8000
     FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 0x20000
-    RAM (wx) : ORIGIN = 0x10000000, LENGTH = 0x18000
-    OTP (rx) : ORIGIN = 0x10018000, LENGTH = 0x8000
+    RAM (wx) : ORIGIN = 0x10000000, LENGTH = 0x100000
+    RAM1 (wx) : ORIGIN = 0x10100000, LENGTH = 0x40000
 }
 ENTRY(Reset_Handler)
 SECTIONS
@@ -42,7 +42,6 @@ SECTIONS
 	PROVIDE(end = .);
 
 	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
-	__StackTop_APP = ORIGIN(RAM) + LENGTH(RAM) / 2;
+	__StackTop_APP = ORIGIN(RAM1) + LENGTH(RAM1);
 	PROVIDE(__global_pointer$ = ORIGIN(RAM) + 2K);
-	PROVIDE(__otp_offset__ = ORIGIN(OTP));
 }
