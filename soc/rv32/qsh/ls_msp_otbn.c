@@ -19,7 +19,7 @@ void HAL_LSOTBN_MSP_Init(void)
     csi_vic_clear_pending_irq(QSH_OTBN_IRQn);
     csi_vic_enable_irq(QSH_OTBN_IRQn);
     rv_set_int_isr(QSH_SYSC_OTBN_IRQn, HAL_OTBN_SYSC_IRQHandler);
-    csi_vic_clear_pending_irq(QSH_OTBN_IRQn);
+    csi_vic_clear_pending_irq(QSH_SYSC_OTBN_IRQn);
     csi_vic_enable_irq(QSH_SYSC_OTBN_IRQn);
     
     SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_FIPS_MASK;
@@ -57,15 +57,15 @@ static void HAL_OTBN_SYSC_IRQHandler()
     }
     if (intr & CO_BIT(1))
     {
-        SYSC_CPU->INTR_CTRL_CLR = CO_BIT(0);
+        SYSC_CPU->INTR_CTRL_CLR = CO_BIT(1);
     }
     if (intr & CO_BIT(2))
     {
-        SYSC_CPU->INTR_CTRL_CLR = CO_BIT(0);
+        SYSC_CPU->INTR_CTRL_CLR = CO_BIT(2);
     }
     if (intr & CO_BIT(3))
     {
-        SYSC_CPU->INTR_CTRL_CLR = CO_BIT(0);
+        SYSC_CPU->INTR_CTRL_CLR = CO_BIT(3);
     }
     if (intr & 0xf0)
     {
