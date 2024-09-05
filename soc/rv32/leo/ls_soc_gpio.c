@@ -1078,6 +1078,7 @@ void pinmux_lpc_deinit(void)
 void pinmux_lpc_serirq_init(void)
 {
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0, SYSC_AWO_LPC_SERIRQ_EN, 0x1);
+    io_cfg_input(PD09);
 }
 
 void pinmux_lpc_serirq_deinit(void)
