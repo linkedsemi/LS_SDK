@@ -22,6 +22,13 @@
 
 // #define USB_DP_PAD PD00
 // #define USB_DM_PAD PD01
+#define SPI_FLASH_CLK_PIN   (PQ10)
+#define SPI_FLASH_CS_PIN    (PQ11)
+#define SPI_FLASH_SI_PIN    (PQ12)
+#define SPI_FLASH_SO_PIN    (PQ13)
+#define SPI_FLASH_WP_PIN    (PQ14)
+#define SPI_FLASH_HOLD_PIN  (PQ15)
+
 static gpio_port_pin_t uart1_txd;
 static gpio_port_pin_t uart1_rxd;
 static gpio_port_pin_t uart2_txd;
@@ -847,28 +854,31 @@ void pinmux_dwuart4_deinit()
 
 ROM_SYMBOL void pinmux_hal_flash_init(void)
 {
-    per_func_enable(PQ10, 1);//clk
-    per_func_enable(PQ11, 1);//cs
-    per_func_enable(PQ12, 1);//data0
-    per_func_enable(PQ13, 1);
-    per_func_enable(PQ14, 1);
-    per_func_enable(PQ15, 1);
+    per_func_enable(SPI_FLASH_CLK_PIN, 1);
+    per_func_enable(SPI_FLASH_CS_PIN, 1);
+    per_func_enable(SPI_FLASH_SI_PIN, 1);
+    per_func_enable(SPI_FLASH_SO_PIN, 1);
 }
 
-// ROM_SYMBOL void pinmux_hal_flash_deinit(void)
-// {
-//     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
-// }
+ROM_SYMBOL void pinmux_hal_flash_deinit(void)
+{
+    per_func_enable(SPI_FLASH_CLK_PIN, 0);
+    per_func_enable(SPI_FLASH_CS_PIN, 0);
+    per_func_enable(SPI_FLASH_SI_PIN, 0);
+    per_func_enable(SPI_FLASH_SO_PIN, 0);
+}
 
-// ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
-// {
-//     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x3f);
-// }
+ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
+{
+    per_func_enable(SPI_FLASH_WP_PIN, 1);
+    per_func_enable(SPI_FLASH_HOLD_PIN, 1);
+}
 
-// ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
-// {
-//     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
-// }
+ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
+{
+    per_func_enable(SPI_FLASH_WP_PIN, 0);
+    per_func_enable(SPI_FLASH_HOLD_PIN, 0);
+}
 
 void pinmux_iic1_init(uint8_t scl,uint8_t sda)
 {
