@@ -20,7 +20,7 @@
 #elif __riscv
 // #define LOG_BACKEND (UART_LOG|RAM_LOG)
 // #define LOG_BACKEND (RAM_LOG)
-#define LOG_BACKEND (UART_LOG)
+#define LOG_BACKEND (SEMIHOSTING)
 #else
 #error arch not supported
 #endif

@@ -2,7 +2,7 @@
 #include "compile_flag.h"
 #include "platform.h"
 #include "cpu.h"
-// #include "log.h"
+#include "log.h"
 #include "swint_call_asm.h"
 #include "systick.h"
 #include "ls_hal_flash.h"
@@ -64,7 +64,7 @@ void sys_init_none()
     // flash_swint_init();
     // hal_flash_xip_func_ptr_init();
     io_init();
-    // LOG_INIT();
+    LOG_INIT();
     // low_power_init();
     systick_start();
     // sw_timer_module_init();

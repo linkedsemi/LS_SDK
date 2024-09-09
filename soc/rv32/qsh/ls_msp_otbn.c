@@ -39,6 +39,9 @@ void HAL_LSOTBN_MSP_Init(void)
         __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
         __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     }
+
+    SYSC_CPU->INTR_CTRL_CLR = 0x7ff;
+    SYSC_CPU->INTR_CTRL_MSK = 0x700;
 }
 
 

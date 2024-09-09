@@ -1,0 +1,11 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [    
+    'main.c',
+]
+inc = [
+    '.'
+]
+env.app_build('otbn_p256_ecdsa_verify',src,inc,ble = False)

@@ -62,12 +62,12 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'rv32/qsh/ls_msp_cache.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
-        'src/otbn_text_array/_p256_verify_text.c',
+        'src/otbn/text_array/ecc256_verify_text.c',
+        'src/otbn/ls_hal_otbn_ecc256.c',
         'src/ls_hal_flash_swint.c',
         'src/ls_hal_sha.c',
         'src/ls_hal_sm4.c',
         'src/ls_hal_crc.c',
-        'src/ls_hal_otbn.c',
         # 'src/ls_hal_can.c',
         # 'src/ls_hal_fdcan.c',
         'src/ls_hal_crypt.c',
@@ -107,6 +107,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_iwdgv2.c',
         # 'src/ls_hal_ps2h.c',
         # 'src/ls_hal_pis.c',
+        'src/ls_hal_otbn.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',
@@ -131,6 +132,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),[
         'hal_driver/inc',
         'hal_driver/api',
+        'hal_driver/src/otbn',
         'module/common',
         #'module/calendar',
         # 'module/crc',
