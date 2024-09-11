@@ -616,7 +616,8 @@ bool hcd_port_connect_status(uint8_t rhport)
 void hcd_port_reset(uint8_t rhport)
 {
   (void)rhport;
-  DELAY_US(1000*50);
+  USB0->POWER |= USB_POWER_RESET;
+  DELAY_US(1000*20);
   USB0->POWER &= ~USB_POWER_RESET;
   _hcd.need_reset = false;
 }
