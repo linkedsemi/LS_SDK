@@ -1,0 +1,103 @@
+#ifndef REG_OTBN_TYPE_H_
+#define REG_OTBN_TYPE_H_
+#include <stdint.h>
+
+typedef struct
+{
+    volatile uint32_t INTR_MSK;//0x0
+    volatile uint32_t INTR_CLR;
+    volatile uint32_t INTR_STT;
+    volatile uint32_t INTR_RAW;
+    volatile uint32_t TMS;//0x10
+    volatile uint32_t TDI;
+    volatile uint32_t DW;
+    volatile uint32_t TDO;
+    volatile uint32_t FIFO_PUSH;//0x20
+    volatile uint32_t CTRL;
+    volatile uint32_t TRST;
+    volatile uint32_t FIFO_WREN;
+    volatile uint32_t TDO_FT;//0x30
+} reg_mjtag_t;
+
+enum MJTAG_REG_INTR_FIELD
+{
+    MJTAG_INTR_ALL_MASK = 0x1f,
+    MJTAG_INTR_ALL_POS = 0,
+    MJTAG_INTR_TX_FIFO_FULL_MASK = 0x1,
+    MJTAG_INTR_TX_FIFO_FULL_POS = 0,
+    MJTAG_INTR_TX_FIFO_EMPTY_MASK = 0x2,
+    MJTAG_INTR_TX_FIFO_EMPTY_POS = 1,
+    MJTAG_INTR_RX_FIFO_FULL_MASK = 0x4,
+    MJTAG_INTR_RX_FIFO_FULL_POS = 2,
+    MJTAG_INTR_RX_FIFO_EMPTY_MASK = 0x8,
+    MJTAG_INTR_RX_FIFO_EMPTY_POS = 3,
+    MJTAG_INTR_RX_FIFO_ALMOST_FULL_MASK = 0x10,
+    MJTAG_INTR_RX_FIFO_ALMOST_FULL_POS = 4,
+};
+
+enum MJTAG_REG_TMS_FIELD
+{
+    MJTAG_TMS_MASK = 0xffffffff,
+    MJTAG_TMS_POS= 0,
+};
+
+enum MJTAG_REG_TDI_FIELD
+{
+    MJTAG_TDI_MASK = 0xffffffff,
+    MJTAG_TDI_POS= 0,
+};
+
+enum MJTAG_REG_DW_FIELD
+{
+    MJTAG_DW_MASK = 0x3f,
+    MJTAG_DW_POS= 0,
+};
+
+enum MJTAG_REG_TDO_FIELD
+{
+    MJTAG_TDO_MASK = 0xffffffff,
+    MJTAG_TDO_POS= 0,
+};
+
+enum MJTAG_REG_FIFO_PUSH_FIELD
+{
+    MJTAG_FIFO_PUSH_ALL_MASK = 0x7,
+    MJTAG_FIFO_PUSH_ALL_POS = 0,
+    MJTAG_FIFO_PUSH_TMS_MASK = 0x1,
+    MJTAG_FIFO_PUSH_TMS_POS = 0,
+    MJTAG_FIFO_PUSH_TDI_MASK = 0x2,
+    MJTAG_FIFO_PUSH_TDI_POS = 1,
+    MJTAG_FIFO_PUSH_DW_MASK = 0x4,
+    MJTAG_FIFO_PUSH_DW_POS = 2,
+};
+
+enum MJTAG_REG_CTRL_FIELD
+{
+    MJTAG_CTRL_TCK_DIVIDER_MASK = 0xfff,
+    MJTAG_CTRL_TCK_DIVIDER_POS = 0,
+    MJTAG_CTRL_TXD_CAP_DLY_MASK = 0x1f0000,
+    MJTAG_CTRL_TXD_CAP_DLY_POS = 16,
+    MJTAG_CTRL_RXD_CAP_DLY_MASK = 0x1f000000,
+    MJTAG_CTRL_RXD_CAP_DLY_POS = 24,
+};
+enum MJTAG_REG_TRST_FIELD
+{
+    MJTAG_TRST_CTL_MASK = 0x1,
+    MJTAG_TRST_CTL_POS = 0,
+};
+
+enum MJTAG_REG_FIFO_WREN_FIELD
+{
+    MJTAG_FIFO_WREN_MASK = 0x1,
+    MJTAG_FIFO_WREN_POS = 0,
+};
+
+enum MJTAG_REG_TDO_FT_FIELD
+{
+    MJTAG_TDO_FIFO_THRESHOLD_MASK = 0xf,
+    MJTAG_TDO_FIFO_THRESHOLD_POS = 0,
+};
+
+
+
+#endif

@@ -2769,3 +2769,62 @@ void pinmux_iic2_deinit(void)
 // {
 //     REG_FIELD_WR(SYSC_AWO->PIN_SEL0, SYSC_AWO_CJTAG_EN, 0x0);
 // }
+
+void pinmux_mjtag1_init(void)
+{
+    per_func_enable(PD00, FIOD_MJTAG1_TRST);
+    per_func_enable(PD01, FIOD_MJTAG1_TDI);
+    per_func_enable(PD02, FIOD_MJTAG1_TCK);
+    per_func_enable(PD03, FIOD_MJTAG1_TMS);
+    per_func_enable(PD04, FIOD_MJTAG1_TDO);
+}
+
+void pinmux_mjtag1_deinit(void)
+{
+    per_func_disable(PD00, FIOD_MJTAG1_TRST);
+    per_func_disable(PD01, FIOD_MJTAG1_TDI);
+    per_func_disable(PD02, FIOD_MJTAG1_TCK);
+    per_func_disable(PD03, FIOD_MJTAG1_TMS);
+    per_func_disable(PD04, FIOD_MJTAG1_TDO);
+}
+
+void pinmux_mjtag2_init(void)
+{
+    io_cfg_output(PE12);
+    io_cfg_output(PE00);
+    io_cfg_output(PE01);
+    io_cfg_output(PE07);
+    io_cfg_input(PE08);
+    per_func0_enable(PE12, FIOE_MJTAG2_TRST);
+    per_func0_enable(PE00, FIOE_MJTAG2_TDI);
+    per_func0_enable(PE01, FIOE_MJTAG2_TCK);
+    per_func0_enable(PE07, FIOE_MJTAG2_TMS);
+    per_func0_enable(PE08, FIOE_MJTAG2_TDO);
+}
+
+void pinmux_mjtag2_deinit(void)
+{
+    per_func_disable(PE08, FIOE_MJTAG2_TRST);
+    per_func_disable(PE09, FIOE_MJTAG2_TDI);
+    per_func_disable(PE10, FIOE_MJTAG2_TCK);
+    per_func_disable(PE11, FIOE_MJTAG2_TMS);
+    per_func_disable(PE12, FIOE_MJTAG2_TDO);
+}
+
+void pinmux_mjtag3_init(void)
+{
+    per_func_enable(PF05, FIOF_MJTAG3_TRST);
+    per_func_enable(PF06, FIOF_MJTAG3_TDI);
+    per_func_enable(PF07, FIOF_MJTAG3_TCK);
+    per_func_enable(PF08, FIOF_MJTAG3_TMS);
+    per_func_enable(PF09, FIOF_MJTAG3_TDO);
+}
+
+void pinmux_mjtag3_deinit(void)
+{
+    per_func_disable(PF05, FIOF_MJTAG3_TRST);
+    per_func_disable(PF06, FIOF_MJTAG3_TDI);
+    per_func_disable(PF07, FIOF_MJTAG3_TCK);
+    per_func_disable(PF08, FIOF_MJTAG3_TMS);
+    per_func_disable(PF09, FIOF_MJTAG3_TDO);
+}

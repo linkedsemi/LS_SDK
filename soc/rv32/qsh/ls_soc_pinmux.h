@@ -1590,6 +1590,18 @@ void pinmux_usb_otg_id_init(uint8_t pin);
  */
 void PD00_PD01_PowerOn(void);
 
+void pinmux_mjtag1_init(void);
+
+void pinmux_mjtag1_deinit(void);
+
+void pinmux_mjtag2_init(void);
+
+void pinmux_mjtag2_deinit(void);
+
+void pinmux_mjtag3_init(void);
+
+void pinmux_mjtag3_deinit(void);
+
 #ifdef __cplusplus
 }
 #endif

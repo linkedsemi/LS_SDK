@@ -54,6 +54,10 @@ extern "C" {
 
 #define QSH_SYSC_PER_ADDR          (0x4008FC00)
 
+#define QSH_PER_MJTAG1_ADDR        (0x40092000)
+#define QSH_PER_MJTAG2_ADDR        (0x40092400)
+#define QSH_PER_MJTAG3_ADDR        (0x40092800)
+
 #ifdef __cplusplus
 }
 #endif
