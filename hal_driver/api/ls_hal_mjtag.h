@@ -50,11 +50,11 @@ void HAL_MJTAG_DeInit(MJTAG_HandleTypeDef *mjtag_h);
 
 void HAL_MJTAG_IRQHandler(MJTAG_HandleTypeDef *mjtag_h);
 
-HAL_StatusTypeDef HAL_MJTAG_Transmit_Polling(MJTAG_HandleTypeDef *mjtag_h, MJTAG_Frame_Param *param);
+HAL_StatusTypeDef HAL_MJTAG_TransmitReceive_Polling(MJTAG_HandleTypeDef *mjtag_h, MJTAG_Frame_Param *param);
 
-HAL_StatusTypeDef HAL_MJTAG_Transmit_IT(MJTAG_HandleTypeDef *mjtag_h, MJTAG_Frame_Param *param);
+HAL_StatusTypeDef HAL_MJTAG_TransmitReceive_IT(MJTAG_HandleTypeDef *mjtag_h, MJTAG_Frame_Param *param);
 
-void HAL_MJTAG_Transmit_CallBack(void);
+void HAL_MJTAG_TransmitReceive_CallBack(void);
 
 #ifdef __cplusplus
 }

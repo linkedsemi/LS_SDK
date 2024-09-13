@@ -46,13 +46,13 @@ int main(void)
         if (flag)
         {
             flag = false;
-            HAL_MJTAG_Transmit_IT(&MJTAG_Handler, &param);
+            HAL_MJTAG_TransmitReceive_IT(&MJTAG_Handler, &param);
         }
     }
 }
 
-void HAL_MJTAG_Transmit_CallBack(void)
+void HAL_MJTAG_TransmitReceive_CallBack(void)
 {
-    LOG_I("MJTAG Transmit End... TDO : 0x%x", TDO_BUF[1]);
+    LOG_I("MJTAG TransmitReceive End... TDO : 0x%x", TDO_BUF[1]);
     flag = true;
 }

@@ -42,7 +42,7 @@ int main(void)
         param.tms = TMS_BUF;
         param.bitnum = DW_BUF;
         param.tdi = TDI_BUF;
-        HAL_MJTAG_Transmit_Polling(&MJTAG_Handler, &param);
-        LOG_I("TDO : 0x%x", TDO_BUF[1]);    // IDCODE(reversed)
+        HAL_MJTAG_TransmitReceive_Polling(&MJTAG_Handler, &param);
+        LOG_I("TDO : 0x%x", TDO_BUF[1]);    // IDCODE(reversed)0x8002b1e8
     }
 }
