@@ -54,7 +54,7 @@ HAL_StatusTypeDef HAL_OTBN_DMEM_Write(uint32_t offset, uint32_t *src, uint32_t s
     if (LSOTBN->STATUS != HAL_OTBN_STATUS_IDLE)
         return HAL_BUSY;
 
-    if (((offset + size) > OTBN_IMEM_SIZE) || (offset & 0x3) || (size & 0x3))
+    if (((offset + size) > OTBN_DMEM_SIZE) || (offset & 0x3) || (size & 0x3))
         return HAL_INVALIAD_PARAM;
 
     memcpy32(OTBN_DMEM_OFFSET_PTR(offset), src, size / 4);
@@ -66,7 +66,7 @@ HAL_StatusTypeDef HAL_OTBN_DMEM_Read(uint32_t offset, uint32_t *dst, uint32_t si
     if (LSOTBN->STATUS != HAL_OTBN_STATUS_IDLE)
         return HAL_BUSY;
 
-    if (((offset + size) > OTBN_IMEM_SIZE) || (offset & 0x3) || (size & 0x3))
+    if (((offset + size) > OTBN_DMEM_SIZE) || (offset & 0x3) || (size & 0x3))
         return HAL_INVALIAD_PARAM;
 
     memcpy32(dst, OTBN_DMEM_OFFSET_PTR(offset), size / 4);

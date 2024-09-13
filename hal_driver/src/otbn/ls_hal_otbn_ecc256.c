@@ -1,11 +1,13 @@
 #include "ls_hal_otbn_ecc256.h"
 
-#define OTBN_P256_Verify_X2_OFFSET (0x444)
-#define OTBN_P256_Verify_X_R_OFFSET (0xA0)
+#define ECC256_ECDSA_Verify_X2_OFFSET (0x444)
+#define ECC256_ECDSA_Verify_X_R_OFFSET (0xA0)
 
 extern const char ecc256_verify_text[4040];
+extern const char ecc256_base_mult_text[2368];
+extern const char ecc256_scalar_mult_text[2412];
 
-struct OTBN_ECC_256_CURVE_PARAM {
+struct OTBN_ECC256_CURVE_PARAM {
     const uint32_t b[8];
     const uint32_t p[8];
     const uint32_t r448[8];
@@ -18,7 +20,7 @@ struct OTBN_ECC_256_CURVE_PARAM {
 /****************
  *  Curve P-256
  * *****************/
-static const struct OTBN_ECC_256_CURVE_PARAM P_256 = {
+static const struct OTBN_ECC256_CURVE_PARAM P_256 = {
     {0x27d2604b, 0x3bce3c3e, 0xcc53b0f6, 0x651d06b0, 0x769886bc, 0xb3ebbd55, 0xaa3a93e7, 0x5ac635d8},
     {0xffffffff, 0xffffffff, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000001, 0xffffffff},
     {0xffffffff, 0xfffffffe, 0xfffffffe, 0xffffffff, 0x00000000, 0x00000002, 0x00000003, 0x00000000},
@@ -38,10 +40,10 @@ bool HAL_OTBN_P256_Verify_Polling(struct HAL_OTBN_P256_Verify_Param *verify_para
 
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
 
-    HAL_OTBN_DMEM_Read(OTBN_P256_Verify_X2_OFFSET, &verify_result, 4);
+    HAL_OTBN_DMEM_Read(ECC256_ECDSA_Verify_X2_OFFSET, &verify_result, 4);
     if (verify_result == HARDENED_BOOL_TRUE)
     {
-        HAL_OTBN_DMEM_Read(OTBN_P256_Verify_X_R_OFFSET, verify_param->x_r, 0x20);
+        HAL_OTBN_DMEM_Read(ECC256_ECDSA_Verify_X_R_OFFSET, verify_param->x_r, 0x20);
         if (!memcmp((uint8_t *)verify_param->x_r, (uint8_t *)verify_param->r, 0x20))
             result = true;
     }
@@ -62,10 +64,10 @@ void ECC256_Verify_Cb(void *param)
     flag = true;
     uint32_t verify_result = 0;
     bool result = false;
-    HAL_OTBN_DMEM_Read(OTBN_P256_Verify_X2_OFFSET, &verify_result, 4);
+    HAL_OTBN_DMEM_Read(ECC256_ECDSA_Verify_X2_OFFSET, &verify_result, 4);
     if (verify_result == HARDENED_BOOL_TRUE)
     {
-        HAL_OTBN_DMEM_Read(OTBN_P256_Verify_X_R_OFFSET, verify_param->x_r, 0x20);
+        HAL_OTBN_DMEM_Read(ECC256_ECDSA_Verify_X_R_OFFSET, verify_param->x_r, 0x20);
         if (!memcmp((uint8_t *)verify_param->x_r, (uint8_t *)verify_param->r, 0x20))
             result = true;
     }
@@ -81,4 +83,24 @@ void HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_P256_Verify_Param *verify_p
 
     flag = false;
     HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_Verify_Cb, verify_param);
+}
+
+__attribute__((weak)) void HAL_OTBN_ECC256_ScalarMult_Cb(void) {}
+static void ecc256_scalar_mult_cb(void *param)
+{
+    struct HAL_OTBN_ECC256_ScalarMult_Param *p = param;
+    HAL_OTBN_DMEM_Read(0xc0, p->result_x, 0x20);
+    HAL_OTBN_DMEM_Read(0xe0, p->result_y, 0x20);
+    HAL_OTBN_ECC256_ScalarMult_Cb();
+}
+void HAL_OTBN_ECC256_Scalar_Mult_IT(struct HAL_OTBN_ECC256_ScalarMult_Param *param)
+{
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_scalar_mult_text, sizeof(ecc256_scalar_mult_text));
+    HAL_OTBN_DMEM_Write(0x0, param->scalar, 0x20);
+    HAL_OTBN_DMEM_Write(0x80, param->p_x, 0x20);
+    HAL_OTBN_DMEM_Write(0xa0, param->p_y, 0x20);
+    HAL_OTBN_DMEM_Write(0x100, (uint32_t *)&P_256, sizeof(P_256));
+
+    flag = false;
+    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ecc256_scalar_mult_cb, param);
 }
