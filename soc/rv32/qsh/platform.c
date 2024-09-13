@@ -69,9 +69,11 @@ void sys_init_none()
     systick_start();
     // sw_timer_module_init();
     // HAL_PIS_Init();
+
     pinmux_dwuart1_init(PC03, PC04);
-    pinmux_dwuart2_init(PD06, PD04);
+    // pinmux_dwuart2_init(PD06, PD04);
     pinmux_iic2_init(PB13, PB14);
+    pinmux_iic7_init(PG15, PG14);
 }
 
 void rv_set_int_isr(uint8_t type,void (*isr)())

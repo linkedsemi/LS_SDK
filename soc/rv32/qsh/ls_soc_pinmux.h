@@ -1057,6 +1057,18 @@ void pinmux_iic6_init(uint8_t scl,uint8_t sda);
   */
 void pinmux_iic6_deinit(void);
 
+void pinmux_iic7_init(uint8_t scl,uint8_t sda);
+void pinmux_iic7_deinit(void);
+
+void pinmux_iic8_init(uint8_t scl,uint8_t sda);
+void pinmux_iic8_deinit(void);
+
+void pinmux_iic13_init(uint8_t scl,uint8_t sda);
+void pinmux_iic13_deinit(void);
+
+void pinmux_iic14_init(uint8_t scl,uint8_t sda);
+void pinmux_iic14_deinit(void);
+
 /**
   * @brief Set pin mux function to espi
   */

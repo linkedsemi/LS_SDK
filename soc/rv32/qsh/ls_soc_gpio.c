@@ -53,6 +53,14 @@ static gpio_port_pin_t iic2_sda;
 // static gpio_port_pin_t iic5_scl;
 // static gpio_port_pin_t iic6_sda;
 // static gpio_port_pin_t iic6_scl;
+static gpio_port_pin_t iic7_sda;
+static gpio_port_pin_t iic7_scl;
+static gpio_port_pin_t iic8_sda;
+static gpio_port_pin_t iic8_scl;
+static gpio_port_pin_t iic13_sda;
+static gpio_port_pin_t iic13_scl;
+static gpio_port_pin_t iic14_sda;
+static gpio_port_pin_t iic14_scl;
 // /* spi io init */
 // static gpio_port_pin_t spi2_clk;
 // static gpio_port_pin_t spi2_nss;
@@ -977,6 +985,88 @@ void pinmux_iic2_deinit(void)
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic6_scl));
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic6_sda));
 // }
+
+void pinmux_iic7_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic7_scl = scl;
+    *(uint8_t *)&iic7_sda = sda;
+    uint8_t func_scl = 0;
+    uint8_t func_sda = 0;
+
+    if((scl >= PG00) && (scl <= PG15) && (sda >= PG00) && (sda <= PG15)) {
+        func_scl = FIOG_I2C7_SCL;
+        func_sda = FIOG_I2C7_SDA;
+    } else if((scl >= PK00) && (scl <= PK15) && (sda >= PK00) && (sda <= PK15)) {
+        func_scl = FIOK_I2C7_SCL;
+        func_sda = FIOK_I2C7_SDA;
+    }
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), func_scl);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), func_sda);
+}
+
+void pinmux_iic7_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic7_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic7_sda));
+}
+
+void pinmux_iic8_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic8_scl = scl;
+    *(uint8_t *)&iic8_sda = sda;
+    uint8_t func_scl = 0;
+    uint8_t func_sda = 0;
+
+    if((scl >= PH00) && (scl <= PH15) && (sda >= PH00) && (sda <= PH15)) {
+        func_scl = FIOH_I2C8_SCL;
+        func_sda = FIOH_I2C8_SDA;
+    } else if((scl >= PK00) && (scl <= PK15) && (sda >= PK00) && (sda <= PK15)) {
+        func_scl = FIOK_I2C8_SCL;
+        func_sda = FIOK_I2C8_SDA;
+    }
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), func_scl);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), func_sda);
+}
+
+void pinmux_iic8_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic8_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic8_sda));
+}
+
+void pinmux_iic13_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic13_scl = scl;
+    *(uint8_t *)&iic13_sda = sda;
+
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FIOQ_I2C13_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FIOQ_I2C13_SDA);
+}
+
+void pinmux_iic13_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic13_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic13_sda));
+}
+
+void pinmux_iic14_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic14_scl = scl;
+    *(uint8_t *)&iic14_sda = sda;
+
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FIOQ_I2C14_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FIOQ_I2C14_SDA);
+}
+
+void pinmux_iic14_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic14_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic14_sda));
+}
 
 // void espi_high_speed_init()
 // {
