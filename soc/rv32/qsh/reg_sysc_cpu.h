@@ -777,5 +777,60 @@ enum SYSC_CPU_REG_SPID_RX_ALERT_FIELD
     SYSC_CPU_SPID2_MODE_POS = 20,
 };
 
+static inline void cpu_intr0_unmask(void)
+{
+    SYSC_CPU->APP_CPU_IMSK = 1;
+}
+
+static inline void cpu_intr0_mask(void)
+{
+    SYSC_CPU->APP_CPU_IMSK = 0;
+}
+
+static inline void cpu_intr0_activate(void)
+{
+    SYSC_CPU->APP_CPU_INTR = 1;
+}
+
+static inline void cpu_intr0_clr(void)
+{
+    SYSC_CPU->APP_CPU_INTR = 0;
+}
+
+static inline void cpu_intr1_unmask(void)
+{
+    SYSC_CPU->SEC_CPU_IMSK = 1;
+}
+
+static inline void cpu_intr1_mask(void)
+{
+    SYSC_CPU->SEC_CPU_IMSK = 0;
+}
+
+static inline void cpu_intr1_activate(void)
+{
+    SYSC_CPU->SEC_CPU_INTR = 1;
+}
+
+static inline void cpu_intr1_clr(void)
+{
+    SYSC_CPU->SEC_CPU_INTR = 0;
+}
+
+static inline void app_cpu_reset(void)
+{
+    SYSC_CPU->APP_CPU_SRST = 0;
+}
+
+static inline void app_cpu_dereset(void)
+{
+    SYSC_CPU->APP_CPU_SRST = 1;
+}
+
+static inline void app_cpu_reset_pc(uint32_t addr)
+{
+    SYSC_CPU->APP_CPU_ADDR_CFG = addr;
+}
+
 #endif
 
