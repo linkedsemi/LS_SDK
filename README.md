@@ -81,11 +81,9 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/ecc/ecdsa_it                                                   |        |        |  √     |
 | peripheral/ecc/ecdsa_polling                                              |        |        |  √     |
 | peripheral/gpio                                                           |  √     |  √     |  √     |
-| peripheral/i2c/i2c_dma                                                    |  √     |  √     |  √     |
-| peripheral/i2c/i2c_it                                                     |  √     |  √     |  √     |
-| peripheral/i2c/i2c_polling                                                |  √     |  √     |  √     |
-| peripheral/i2c/ll_i2c_it                                                  |  √     |  √     |  √     |
-| peripheral/i2c/ll_i2c_polling                                             |  √     |  √     |  √     |
+| peripheral/i2c/i2c_master_it                                              |  √     |  √     |  √     |
+| peripheral/i2c/i2c_master_it_mem_read_write                               |  √     |  √     |  √     |
+| peripheral/i2c/i2c_slave_it_mem_read_write                                |  √     |  √     |  √     |
 | peripheral/iap/iap_application                                            |  √     |  √     |  √     |
 | peripheral/iap/iap_bootloader                                             |  √     |  √     |  √     |
 | peripheral/kscan                                                          |        |        |  √     |

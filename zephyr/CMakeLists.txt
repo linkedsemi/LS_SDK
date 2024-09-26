@@ -130,7 +130,7 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_ecc.c
     ../hal_driver/src/ls_hal_can.c
     ../hal_driver/src/ls_hal_fdcan.c
-    ../hal_driver/src/ls_hal_trngv2.c
+    # ../hal_driver/src/ls_hal_trngv2.c
     # ../hal_driver/src/ls_hal_crypt.c
     ../hal_driver/src/ls_hal_qspiv2.c
     ../hal_driver/src/ls_hal_flash_qspiv2.c
@@ -162,7 +162,8 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_cec.c
     ../hal_driver/src/ls_hal_owm.c
     ../hal_driver/src/ls_hal_cap.c
-    ../hal_driver/src/ls_hal_i2c_dma.c
+    # ../hal_driver/src/ls_hal_i2c_dma.c
+    ../hal_driver/src/ls_hal_pis.c
     ../hal_driver/src/ls_hal_ssi_dma.c
     ../hal_driver/src/ls_hal_wwdg.c
     ../hal_driver/src/ls_hal_iwdgv2.c
@@ -179,7 +180,7 @@ if(CONFIG_SOC_LS1010)
     ../soc/rv32/leo/ls_msp_crc.c
     ../soc/rv32/leo/ls_msp_sha.c
     ../soc/rv32/leo/ls_msp_sm4.c
-    ../soc/rv32/leo/ls_msp_trngv2.c
+    # ../soc/rv32/leo/ls_msp_trngv2.c
     ../soc/rv32/leo/ls_msp_touchkey.c
     ../soc/rv32/leo/ls_msp_crypt.c
     ../soc/rv32/leo/ls_msp_adc.c
@@ -189,6 +190,7 @@ if(CONFIG_SOC_LS1010)
     ../soc/rv32/leo/ls_msp_fdcan.c
     ../soc/rv32/leo/ls_msp_spi_i2s.c
     ../soc/rv32/leo/ls_msp_spis.c
+    ../soc/rv32/leo/ls_msp_pis.c
     ../soc/rv32/leo/ls_soc_gpio.c
     # 'rv32/leo/exception_isr.c
     ../soc/rv32/leo/sys_stat.c

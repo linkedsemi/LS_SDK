@@ -8,4 +8,4 @@ src = [
 inc = [
     '.'
 ]
-env.app_build('i2c_polling',src,inc,ble = False)
+env.app_build('i2c_master_it_mem_read_write',src,inc,ble = False)
