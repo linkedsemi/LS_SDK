@@ -182,16 +182,9 @@ void ls_log_init()
     #endif
     #if(LOG_BACKEND&SEMIHOSTING)
     {
-        extern uint8_t i2c_dbg_dat_io;
-        disable_global_irq();
-        if(i2c_dbg_dat_io!=0xff)
-        {
-            while(!semihosting_enabled()){}
-		    semihosting_init();
-        }else if (semihosting_enabled()){
+        if (semihosting_enabled()){
 		    semihosting_init();
         }
-        enable_global_irq();
     }
     #endif
     #if(LOG_BACKEND&RAM_LOG)
