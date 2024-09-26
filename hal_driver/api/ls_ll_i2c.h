@@ -615,15 +615,15 @@ static inline void LL_I2C_SetAddressToSlave(reg_i2c_t *I2Cx, uint32_t Address, u
     if (OwnAddrSize == LL_I2C_OWNADDRESS1_7BIT)
     {
         /* Send slave address */
-        CLEAR_BIT(I2Cx->CR2, I2C_CR2_SADD10_MASK);
-        MODIFY_REG(I2Cx->CR2, I2C_CR2_RD_WEN_MASK | I2C_CR2_SADD1_7_MASK, ((Address << 1) & 0xFE) | ((RWDirection << 10) & I2C_CR2_RD_WEN_MASK));
+        CLEAR_BIT(I2Cx->CR2_0_1, I2C_CR2_SADD10_MASK);
+        MODIFY_REG(I2Cx->CR2_0_1, I2C_CR2_RD_WEN_MASK | I2C_CR2_SADD1_7_MASK, ((Address << 1) & 0xFE) | ((RWDirection << 10) & I2C_CR2_RD_WEN_MASK));
     }
     else
     {
         /* Send header of slave address */
-        SET_BIT(I2Cx->CR2, I2C_CR2_SADD10_MASK);
-        MODIFY_REG(I2Cx->CR2, I2C_CR2_RD_WEN_MASK | I2C_CR2_SADD0_MASK | I2C_CR2_SADD1_7_MASK | I2C_CR2_SADD8_9_MASK, (Address & 0x3FF) | ((RWDirection << 10) & I2C_CR2_RD_WEN_MASK));
-        CLEAR_BIT(I2Cx->CR2, I2C_CR2_HEAD10R_MASK);
+        SET_BIT(I2Cx->CR2_0_1, I2C_CR2_SADD10_MASK);
+        MODIFY_REG(I2Cx->CR2_0_1, I2C_CR2_RD_WEN_MASK | I2C_CR2_SADD0_MASK | I2C_CR2_SADD1_7_MASK | I2C_CR2_SADD8_9_MASK, (Address & 0x3FF) | ((RWDirection << 10) & I2C_CR2_RD_WEN_MASK));
+        CLEAR_BIT(I2Cx->CR2_0_1, I2C_CR2_HEAD10R_MASK);
     }
 }
 
@@ -637,7 +637,7 @@ static inline void LL_I2C_SetAddressToSlave(reg_i2c_t *I2Cx, uint32_t Address, u
  */
 static inline void LL_I2C_SetTransferDirection(reg_i2c_t *I2Cx, uint8_t TransferDirection)
 {
-    MODIFY_REG(I2Cx->CR2, I2C_CR2_RD_WEN_MASK, (TransferDirection << I2C_CR2_RD_WEN_POS) & I2C_CR2_RD_WEN_MASK);
+    MODIFY_REG(I2Cx->CR2_0_1, I2C_CR2_RD_WEN_MASK, (TransferDirection << I2C_CR2_RD_WEN_POS) & I2C_CR2_RD_WEN_MASK);
 }
 
 /**
@@ -647,7 +647,7 @@ static inline void LL_I2C_SetTransferDirection(reg_i2c_t *I2Cx, uint8_t Transfer
  */
 static inline void LL_I2C_SetHEAD10R(reg_i2c_t *I2Cx)
 {
-    SET_BIT(I2Cx->CR2, I2C_CR2_HEAD10R_MASK);
+    SET_BIT(I2Cx->CR2_0_1, I2C_CR2_HEAD10R_MASK);
 }
 
 /**
@@ -659,7 +659,7 @@ static inline void LL_I2C_SetHEAD10R(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_GenerateStartCondition(reg_i2c_t *I2Cx)
 {
-    SET_BIT(I2Cx->CR2, I2C_CR2_START_MASK);
+    SET_BIT(I2Cx->CR2_0_1, I2C_CR2_START_MASK);
 }
 
 /**
@@ -669,7 +669,7 @@ static inline void LL_I2C_GenerateStartCondition(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_GenerateStopCondition(reg_i2c_t *I2Cx)
 {
-    SET_BIT(I2Cx->CR2, I2C_CR2_STOP_MASK);
+    SET_BIT(I2Cx->CR2_0_1, I2C_CR2_STOP_MASK);
 }
 
 /**
@@ -683,7 +683,7 @@ static inline void LL_I2C_GenerateStopCondition(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_AcknowledgeNextData(reg_i2c_t *I2Cx, uint32_t TypeAcknowledge)
 {
-    MODIFY_REG(I2Cx->CR2, I2C_CR2_NACK_MASK, TypeAcknowledge);
+    MODIFY_REG(I2Cx->CR2_0_1, I2C_CR2_NACK_MASK, TypeAcknowledge);
 }
 
 /**
@@ -694,7 +694,7 @@ static inline void LL_I2C_AcknowledgeNextData(reg_i2c_t *I2Cx, uint32_t TypeAckn
  */
 static inline void LL_I2C_SetNumberOfByte(reg_i2c_t *I2Cx, uint8_t NumberOfByte)
 {
-    MODIFY_REG(I2Cx->CR2, I2C_CR2_NBYTES_MASK, (NumberOfByte << I2C_CR2_NBYTES_POS) & I2C_CR2_NBYTES_MASK);
+    MODIFY_REG(I2Cx->CR2_2, I2C_CR2_NBYTES_MASK, (NumberOfByte << I2C_CR2_NBYTES_POS) & I2C_CR2_NBYTES_MASK);
 }
 
 /**
@@ -704,7 +704,7 @@ static inline void LL_I2C_SetNumberOfByte(reg_i2c_t *I2Cx, uint8_t NumberOfByte)
  */
 static inline void LL_I2C_EnableRELOAD(reg_i2c_t *I2Cx)
 {
-    SET_BIT(I2Cx->CR2, I2C_CR2_RELOAD_MASK);
+    SET_BIT(I2Cx->CR2_3, I2C_CR2_RELOAD_MASK);
 }
 
 /**
@@ -714,7 +714,7 @@ static inline void LL_I2C_EnableRELOAD(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_DisableRELOAD(reg_i2c_t *I2Cx)
 {
-    CLEAR_BIT(I2Cx->CR2, I2C_CR2_RELOAD_MASK);
+    CLEAR_BIT(I2Cx->CR2_3, I2C_CR2_RELOAD_MASK);
 }
 
 /**
@@ -724,7 +724,7 @@ static inline void LL_I2C_DisableRELOAD(reg_i2c_t *I2Cx)
  */
 static inline uint32_t LL_I2C_IsEnabledRELOAD(reg_i2c_t *I2Cx)
 {
-    return ((READ_BIT(I2Cx->CR2, I2C_CR2_RELOAD_MASK) == (I2C_CR2_RELOAD_MASK)) ? 1UL : 0UL);
+    return ((READ_BIT(I2Cx->CR2_3, I2C_CR2_RELOAD_MASK) == (I2C_CR2_RELOAD_MASK)) ? 1UL : 0UL);
 }
 
 /**
@@ -734,7 +734,7 @@ static inline uint32_t LL_I2C_IsEnabledRELOAD(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_EnableAutoEnd(reg_i2c_t *I2Cx)
 {
-    SET_BIT(I2Cx->CR2, I2C_CR2_AUTOEND_MASK);
+    SET_BIT(I2Cx->CR2_3, I2C_CR2_AUTOEND_MASK);
 }
 
 /**
@@ -744,7 +744,7 @@ static inline void LL_I2C_EnableAutoEnd(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_DisableAutoEnd(reg_i2c_t *I2Cx)
 {
-    CLEAR_BIT(I2Cx->CR2, I2C_CR2_AUTOEND_MASK);
+    CLEAR_BIT(I2Cx->CR2_3, I2C_CR2_AUTOEND_MASK);
 }
 
 /**
@@ -754,7 +754,7 @@ static inline void LL_I2C_DisableAutoEnd(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_EnablePECByte(reg_i2c_t *I2Cx)
 {
-    SET_BIT(I2Cx->CR2, I2C_CR2_PECBYTE_MASK);
+    SET_BIT(I2Cx->CR2_3, I2C_CR2_PECBYTE_MASK);
 }
 
 /**
@@ -764,7 +764,7 @@ static inline void LL_I2C_EnablePECByte(reg_i2c_t *I2Cx)
  */
 static inline void LL_I2C_DisablePECByte(reg_i2c_t *I2Cx)
 {
-    CLEAR_BIT(I2Cx->CR2, I2C_CR2_PECBYTE_MASK);
+    CLEAR_BIT(I2Cx->CR2_3, I2C_CR2_PECBYTE_MASK);
 }
 
 /******************************************OAR1******************************************/

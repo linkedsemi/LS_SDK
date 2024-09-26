@@ -77,7 +77,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_crypt.c',
         'src/ls_hal_sm4.c',
         'src/ls_hal_i2c.c',
-        'src/ls_hal_i2c_dma.c',
+        # 'src/ls_hal_i2c_dma.c',
         'src/ls_hal_iwdgv2.c',
         # 'src/ls_hal_pdm_dma.c',
         'src/ls_hal_pdm.c',

@@ -5,32 +5,7 @@
 extern "C" {
 #endif
 
-typedef enum
-{
-  HAL_I2C_MODE_NONE               = 0x00U,   /*!< No I2C communication on going             */
-  HAL_I2C_MODE_MASTER             = 0x10U,   /*!< I2C communication is in Master Mode       */
-  HAL_I2C_MODE_SLAVE              = 0x20U,   /*!< I2C communication is in Slave Mode        */
-
-} HAL_I2C_ModeTypeDef;
-typedef enum
-{
-  HAL_I2C_STATE_RESET             = 0x00U,   /*!< Peripheral is not yet Initialized         */
-  HAL_I2C_STATE_READY             = 0x20U,   /*!< Peripheral Initialized and ready for use  */
-  HAL_I2C_STATE_BUSY              = 0x24U,   /*!< An internal process is ongoing            */
-  HAL_I2C_STATE_BUSY_TX           = 0x21U,   /*!< Data Transmission process is ongoing      */
-  HAL_I2C_STATE_BUSY_RX           = 0x22U,   /*!< Data Reception process is ongoing         */
-  HAL_I2C_STATE_LISTEN            = 0x28U,   /*!< Address Listen Mode is ongoing            */
-  HAL_I2C_STATE_BUSY_TX_LISTEN    = 0x29U,   /*!< Address Listen Mode and Data Transmission
-                                                 process is ongoing                         */
-  HAL_I2C_STATE_BUSY_RX_LISTEN    = 0x2AU,   /*!< Address Listen Mode and Data Reception
-                                                 process is ongoing                         */
-  HAL_I2C_STATE_ABORT             = 0x60U,   /*!< Abort user request ongoing                */
-  HAL_I2C_STATE_TIMEOUT           = 0xA0U,   /*!< Timeout state                             */
-  HAL_I2C_STATE_ERROR             = 0xE0U    /*!< Error                                     */
-
-} HAL_I2C_StateTypeDef;
-
-enum
+enum i2c_speed
 {
     I2C_SPEED_NORMAL_100K = 0,
     I2C_SPEED_FAST_400K,
