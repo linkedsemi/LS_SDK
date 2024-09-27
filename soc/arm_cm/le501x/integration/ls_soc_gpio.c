@@ -363,7 +363,7 @@ void pinmux_iis2_master_mck_init(uint8_t mck)
 {
     *(uint8_t *)&i2s2_mck = mck;
     iis_master_mck_io_cfg( mck);    
-    gpio_af_init((gpio_port_pin_t *)&mck,AF_I2S_CLK); 
+    gpio_af_init((gpio_port_pin_t *)&mck,AF_SPI2_MISO); 
 }
 
 void pinmux_iis2_slave_ck_init(uint8_t ck)

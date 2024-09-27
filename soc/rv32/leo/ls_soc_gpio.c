@@ -1543,7 +1543,7 @@ void pinmux_iis2_master_mck_init(uint8_t mck)
     I2C_DBG_IO_CHECK(mck);
     *(uint8_t *)&i2s2_mck = mck;
     iis_master_mck_io_cfg( mck);    
-    per_func_enable(pin2func_io((gpio_port_pin_t *)&mck),SPI2_IIS);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&mck),SPI2_MISO);
 }
 
 void pinmux_iis2_slave_ck_init(uint8_t ck)
@@ -1628,7 +1628,7 @@ void pinmux_iis3_master_mck_init(uint8_t mck)
     I2C_DBG_IO_CHECK(mck);
     *(uint8_t *)&i2s3_mck = mck;
     iis_master_mck_io_cfg( mck);    
-    per_func_enable(pin2func_io((gpio_port_pin_t *)&mck),SPI3_IIS);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&mck),SPI3_MISO);
 }
 
 void pinmux_iis3_slave_ck_init(uint8_t ck)
