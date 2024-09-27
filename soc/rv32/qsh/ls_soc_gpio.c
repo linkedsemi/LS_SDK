@@ -471,12 +471,11 @@ static inline void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,
 //     ext_intr_mask(&V33_RG->GPIO_INTR_MSK[x->port],&V33_RG->GPIO_INTR_CLR[x->port],x->num,edge);
 // }
 
-// void io_vcore_exti_config(uint8_t pin,exti_edge_t edge)
-// {
-//     I2C_DBG_IO_CHECK(pin);
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     ext_intr_mask(&SYSC_AWO->EXTI_MSK[x->port],&SYSC_AWO->EXTI_CLR[x->port],x->num,edge);
-// }
+void io_vcore_exti_config(uint8_t pin,exti_edge_t edge)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    ext_intr_mask(&PMU->GPIO_INTR_MSK[x->port],&PMU->GPIO_INTR_CLR[x->port],x->num,edge);
+}
 
 // void io_exti_config(uint8_t pin,exti_edge_t edge)
 // {
@@ -1952,13 +1951,13 @@ void pinmux_iic14_deinit(void)
 //     io_ae1_enable(PD11, 0);
 // }
 
-// void io_cfg_disable(uint8_t pin)
-// {
-//     I2C_DBG_IO_CHECK(pin);
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     SYSC_AWO->IO[x->port].OE_FIR &= ~(1<<16<<x->num);
-//     SYSC_AWO->IO[x->port].IEN_OD |= 1<<16<<x->num; 
-// }
+void io_cfg_disable(uint8_t pin)
+{
+    // I2C_DBG_IO_CHECK(pin);
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].OE_FIR &= ~(1<<16<<x->num);
+    PMU->IO[x->port].IEN_OD |= 1<<16<<x->num;
+}
 
 // void gpio_ana_func1_deinit(uint8_t ain)
 // {
