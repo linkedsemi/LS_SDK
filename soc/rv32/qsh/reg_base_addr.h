@@ -16,8 +16,8 @@ extern "C" {
 #endif
 
 #define QSH_MEM_ROM_ADDR           (0x01000000)
-#define QSH_MEM_FLASH_ADDR         (0x08000000)
-#define QSH_MEM_CACHE_ADDR         (0x0C000000)
+#define QSH_MEM_CACHE1_ADDR        (0x08000000)
+#define QSH_MEM_CACHE2_ADDR        (0x0C000000)
 #define QSH_MEM_SRAM1_ADDR         (0x10000000)
 #define QSH_MEM_SRAM2_ADDR         (0x10080000)
 #define QSH_MEM_PERIPH_ADDR        (0x40000000)

@@ -865,6 +865,12 @@ ROM_SYMBOL void pinmux_hal_flash_init(void)
     per_func_enable(SPI_FLASH_CS_PIN, 1);
     per_func_enable(SPI_FLASH_SI_PIN, 1);
     per_func_enable(SPI_FLASH_SO_PIN, 1);
+    io_pull_write(SPI_FLASH_SI_PIN, IO_PULL_UP);
+    io_pull_write(SPI_FLASH_SO_PIN, IO_PULL_UP);
+    io_set_pin(SPI_FLASH_CS_PIN);
+    io_cfg_output(SPI_FLASH_CS_PIN);
+    io_clr_pin(SPI_FLASH_CLK_PIN);
+    io_cfg_output(SPI_FLASH_CLK_PIN);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_deinit(void)
@@ -879,6 +885,8 @@ ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
 {
     per_func_enable(SPI_FLASH_WP_PIN, 1);
     per_func_enable(SPI_FLASH_HOLD_PIN, 1);
+    io_pull_write(SPI_FLASH_WP_PIN, IO_PULL_UP);
+    io_pull_write(SPI_FLASH_HOLD_PIN, IO_PULL_UP);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)

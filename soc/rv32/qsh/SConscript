@@ -59,7 +59,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'rv32/qsh/ls_msp_wwdg.c',
         # 'rv32/qsh/ls_msp_ps2h.c',
         # 'rv32/qsh/ls_msp_pis.c',
-        # 'rv32/qsh/ls_msp_cache.c',
+        'rv32/qsh/ls_msp_cache.c',
         'rv32/qsh/ls_msp_mjtag.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
@@ -77,7 +77,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_qspiv2.c',
         'src/ls_hal_flash_qspiv2.c',
         'src/ls_hal_flash.c',
-        # 'src/ls_hal_cache.c',
+        'src/ls_hal_cache.c',
         # 'src/ls_hal_comp.c',
         'src/ls_hal_uart.c',
         'src/ls_hal_dwuart.c',
