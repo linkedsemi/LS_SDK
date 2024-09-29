@@ -30,7 +30,7 @@ static const struct OTBN_ECC256_CURVE_PARAM P_256 = {
     {0x37bf51f5, 0xcbb64068, 0x6b315ece, 0x2bce3357, 0x7c0f9e16, 0x8ee7eb4a, 0xfe1a7f9b, 0x4fe342e2},
 };
 
-bool HAL_OTBN_P256_Verify_Polling(struct HAL_OTBN_P256_Verify_Param *verify_param)
+bool HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_P256_Verify_Param *verify_param)
 {
     uint32_t verify_result = 0;
     bool result = false;
@@ -79,21 +79,22 @@ void HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_P256_Verify_Param *verify_p
 {
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_verify_text, sizeof(ecc256_verify_text));
     HAL_OTBN_DMEM_Write(0x0, (uint32_t *)verify_param, sizeof(struct HAL_OTBN_P256_Verify_Param));
-    HAL_OTBN_DMEM_Write(0xc0, (uint32_t *)&P_256, sizeof(P_256));
+    HAL_OTBN_DMEM_Write(0xc0, (uint32_t *)&P_256, sizeof(P_256));//TODO : Other Curves
 
     flag = false;
     HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_Verify_Cb, verify_param);
 }
 
 __attribute__((weak)) void HAL_OTBN_ECC256_ScalarMult_Cb(void) {}
-static void ecc256_scalar_mult_cb(void *param)
+static void ECC256_ScalarMult_Callback(void *param)
 {
     struct HAL_OTBN_ECC256_ScalarMult_Param *p = param;
     HAL_OTBN_DMEM_Read(0xc0, p->result_x, 0x20);
     HAL_OTBN_DMEM_Read(0xe0, p->result_y, 0x20);
     HAL_OTBN_ECC256_ScalarMult_Cb();
 }
-void HAL_OTBN_ECC256_Scalar_Mult_IT(struct HAL_OTBN_ECC256_ScalarMult_Param *param)
+
+void HAL_OTBN_ECC256_ScalarMult_IT(struct HAL_OTBN_ECC256_ScalarMult_Param *param)
 {
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_scalar_mult_text, sizeof(ecc256_scalar_mult_text));
     HAL_OTBN_DMEM_Write(0x0, param->scalar, 0x20);
@@ -102,5 +103,5 @@ void HAL_OTBN_ECC256_Scalar_Mult_IT(struct HAL_OTBN_ECC256_ScalarMult_Param *par
     HAL_OTBN_DMEM_Write(0x100, (uint32_t *)&P_256, sizeof(P_256));
 
     flag = false;
-    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ecc256_scalar_mult_cb, param);
+    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_ScalarMult_Callback, param);
 }

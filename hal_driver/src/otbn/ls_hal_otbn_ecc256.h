@@ -24,12 +24,12 @@ struct HAL_OTBN_ECC256_ScalarMult_Param
     uint32_t *result_y;
 };
 
-bool HAL_OTBN_P256_Verify_Polling(struct HAL_OTBN_P256_Verify_Param *verify_param);
+bool HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_P256_Verify_Param *verify_param);
 void HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_P256_Verify_Param *verify_param);
 void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(bool result);
 
 void HAL_OTBN_ECC256_ScalarMult_Cb(void);
-void HAL_OTBN_ECC256_Scalar_Mult_IT(struct HAL_OTBN_ECC256_ScalarMult_Param *param);
+void HAL_OTBN_ECC256_ScalarMult_IT(struct HAL_OTBN_ECC256_ScalarMult_Param *param);
 
 #ifdef __cplusplus
 }

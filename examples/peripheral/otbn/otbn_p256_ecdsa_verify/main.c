@@ -20,7 +20,7 @@ int main(void)
     LOG_I(" OTBN P256_ECDSA_Verify_Test Start...");
     HAL_OTBN_Init();
 
-    if (HAL_OTBN_P256_Verify_Polling(&p256_param))
+    if (HAL_OTBN_ECC256_ECDSA_Verify_Polling(&p256_param))
         LOG_I("HAL_OTBN_P256_Verify pass!");
     else
         LOG_I("HAL_OTBN_P256_Verify fail!");

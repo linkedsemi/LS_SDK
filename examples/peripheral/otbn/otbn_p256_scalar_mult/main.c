@@ -26,7 +26,7 @@ int main(void)
 {
     sys_init_none();
     init();
-    HAL_OTBN_ECC256_Scalar_Mult_IT(&param);
+    HAL_OTBN_ECC256_ScalarMult_IT(&param);
 
     while (1) ;
 }
