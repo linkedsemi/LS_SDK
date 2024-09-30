@@ -45,18 +45,26 @@ static gpio_port_pin_t iic1_scl;
 static gpio_port_pin_t iic1_sda;
 static gpio_port_pin_t iic2_scl;
 static gpio_port_pin_t iic2_sda;
-// static gpio_port_pin_t iic3_sda;
-// static gpio_port_pin_t iic3_scl;
-// static gpio_port_pin_t iic4_sda;
-// static gpio_port_pin_t iic4_scl;
-// static gpio_port_pin_t iic5_sda;
-// static gpio_port_pin_t iic5_scl;
-// static gpio_port_pin_t iic6_sda;
-// static gpio_port_pin_t iic6_scl;
+static gpio_port_pin_t iic3_sda;
+static gpio_port_pin_t iic3_scl;
+static gpio_port_pin_t iic4_sda;
+static gpio_port_pin_t iic4_scl;
+static gpio_port_pin_t iic5_sda;
+static gpio_port_pin_t iic5_scl;
+static gpio_port_pin_t iic6_sda;
+static gpio_port_pin_t iic6_scl;
 static gpio_port_pin_t iic7_sda;
 static gpio_port_pin_t iic7_scl;
 static gpio_port_pin_t iic8_sda;
 static gpio_port_pin_t iic8_scl;
+static gpio_port_pin_t iic9_sda;
+static gpio_port_pin_t iic9_scl;
+static gpio_port_pin_t iic10_sda;
+static gpio_port_pin_t iic10_scl;
+static gpio_port_pin_t iic11_sda;
+static gpio_port_pin_t iic11_scl;
+static gpio_port_pin_t iic12_sda;
+static gpio_port_pin_t iic12_scl;
 static gpio_port_pin_t iic13_sda;
 static gpio_port_pin_t iic13_scl;
 static gpio_port_pin_t iic14_sda;
@@ -925,73 +933,65 @@ void pinmux_iic2_deinit(void)
     per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic2_sda));
 }
 
-// void pinmux_iic3_init(uint8_t scl,uint8_t sda)  
-// {
-//     I2C_DBG_IO_CHECK(scl);
-//     I2C_DBG_IO_CHECK(sda);
-//     *(uint8_t *)&iic3_scl = scl;
-//     *(uint8_t *)&iic3_sda = sda;
-//     iic_io_cfg(scl,sda);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&scl), IIC3_SCL);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&sda), IIC3_SDA);
-// }
+void pinmux_iic3_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic3_scl = scl;
+    *(uint8_t *)&iic3_sda = sda;
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FIOC_I2C3_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FIOC_I2C3_SDA);
+}
 
-// void pinmux_iic3_deinit(void)
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic3_scl));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic3_sda));
-// }
+void pinmux_iic3_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic3_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic3_sda));
+}
 
-// void pinmux_iic4_init(uint8_t scl,uint8_t sda)  
-// {
-//     I2C_DBG_IO_CHECK(scl);
-//     I2C_DBG_IO_CHECK(sda);
-//     *(uint8_t *)&iic4_scl = scl;
-//     *(uint8_t *)&iic4_sda = sda;
-//     iic_io_cfg(scl,sda);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&scl), IIC4_SCL);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&sda), IIC4_SDA);
-// }
+void pinmux_iic4_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic4_scl = scl;
+    *(uint8_t *)&iic4_sda = sda;
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FIOD_I2C4_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FIOD_I2C4_SDA);
+}
 
-// void pinmux_iic4_deinit(void)
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic4_scl));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic4_sda));
-// }
+void pinmux_iic4_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic4_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic4_sda));
+}
 
-// void pinmux_iic5_init(uint8_t scl,uint8_t sda)  
-// {
-//     I2C_DBG_IO_CHECK(scl);
-//     I2C_DBG_IO_CHECK(sda);
-//     *(uint8_t *)&iic5_scl = scl;
-//     *(uint8_t *)&iic5_sda = sda;
-//     iic_io_cfg(scl,sda);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&scl), IIC5_SCL);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&sda), IIC5_SDA);
-// }
+void pinmux_iic5_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic5_scl = scl;
+    *(uint8_t *)&iic5_sda = sda;
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FIOE_I2C5_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FIOE_I2C5_SDA);
+}
 
-// void pinmux_iic5_deinit(void)
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic5_scl));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic5_sda));
-// }
+void pinmux_iic5_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic5_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic5_sda));
+}
 
-// void pinmux_iic6_init(uint8_t scl,uint8_t sda)  
-// {
-//     I2C_DBG_IO_CHECK(scl);
-//     I2C_DBG_IO_CHECK(sda);
-//     *(uint8_t *)&iic6_scl = scl;
-//     *(uint8_t *)&iic6_sda = sda;
-//     iic_io_cfg(scl,sda);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&scl), IIC6_SCL);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&sda), IIC6_SDA);
-// }
+void pinmux_iic6_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic6_scl = scl;
+    *(uint8_t *)&iic6_sda = sda;
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FIOF_I2C6_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FIOF_I2C6_SDA);
+}
 
-// void pinmux_iic6_deinit(void)
-// {
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic6_scl));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&iic6_sda));
-// }
+void pinmux_iic6_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic6_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic6_sda));
+}
 
 void pinmux_iic7_init(uint8_t scl,uint8_t sda)  
 {
@@ -1041,6 +1041,89 @@ void pinmux_iic8_deinit(void)
 {
     per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic8_scl));
     per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic8_sda));
+}
+
+void pinmux_iic9_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic9_scl = scl;
+    *(uint8_t *)&iic9_sda = sda;
+    uint8_t func_scl = 0;
+    uint8_t func_sda = 0;
+
+    if((scl >= PI00) && (scl <= PI15)) {
+        func_scl = FIOI_I2C9_SCL;
+        func_sda = FIOI_I2C9_SDA;
+    } else if((scl >= PM00) && (scl <= PM15)) {
+        func_scl = FIOM_I2C9_SCL;
+        func_sda = FIOM_I2C9_SDA;
+    }
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), func_scl);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), func_sda);
+}
+
+void pinmux_iic9_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic9_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic9_sda));
+}
+
+void pinmux_iic10_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic10_scl = scl;
+    *(uint8_t *)&iic10_sda = sda;
+    uint8_t func_scl = 0;
+    uint8_t func_sda = 0;
+
+    if((scl >= PJ00) && (scl <= PJ15)) {
+        func_scl = FIOJ_I2C10_SCL;
+        func_sda = FIOJ_I2C10_SDA;
+    } else if((sda >= PM00) && (sda <= PM15)) {
+        func_scl = FIOM_I2C10_SCL;
+        func_sda = FIOM_I2C10_SDA;
+    }
+
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), func_scl);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), func_sda);
+}
+
+void pinmux_iic10_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic10_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic10_sda));
+}
+
+void pinmux_iic11_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic11_scl = scl;
+    *(uint8_t *)&iic11_sda = sda;
+
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FION_I2C11_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FION_I2C11_SDA);
+}
+
+void pinmux_iic11_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic11_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic11_sda));
+}
+
+void pinmux_iic12_init(uint8_t scl,uint8_t sda)  
+{
+    *(uint8_t *)&iic12_scl = scl;
+    *(uint8_t *)&iic12_sda = sda;
+
+    iic_io_cfg(scl,sda);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&scl), FION_I2C12_SCL);
+    per_func0_enable(pin2func_io((gpio_port_pin_t *)&sda), FION_I2C12_SCL);
+}
+
+void pinmux_iic12_deinit(void)
+{
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic12_scl));
+    per_func0_disable(pin2func_io((gpio_port_pin_t *)&iic12_sda));
 }
 
 void pinmux_iic13_init(uint8_t scl,uint8_t sda)  

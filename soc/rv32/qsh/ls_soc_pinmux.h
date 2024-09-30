@@ -1063,6 +1063,18 @@ void pinmux_iic7_deinit(void);
 void pinmux_iic8_init(uint8_t scl,uint8_t sda);
 void pinmux_iic8_deinit(void);
 
+void pinmux_iic9_init(uint8_t scl,uint8_t sda);
+void pinmux_iic9_deinit(void);
+
+void pinmux_iic10_init(uint8_t scl,uint8_t sda);
+void pinmux_iic10_deinit(void);
+
+void pinmux_iic11_init(uint8_t scl,uint8_t sda);
+void pinmux_iic11_deinit(void);
+
+void pinmux_iic12_init(uint8_t scl,uint8_t sda);
+void pinmux_iic12_deinit(void);
+
 void pinmux_iic13_init(uint8_t scl,uint8_t sda);
 void pinmux_iic13_deinit(void);
 
