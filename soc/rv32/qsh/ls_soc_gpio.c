@@ -509,19 +509,25 @@ static uint8_t pin2func_io(gpio_port_pin_t *x)
     return x->port * 16 + x->num;
 }
 
-static void per_func_enable(uint8_t pin, uint8_t FUNC_num)
+void per_func_enable(uint8_t pin, uint8_t FUNC_num)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_AWO->DIGITAL_FUNC_EN[FUNC_num].IO[x->port / 2] |= 1 << (((x->port % 2) * 16)+ x->num);
 }
 
-static void per_func_disable(uint8_t pin, uint8_t FUNC_num)
+void per_func_disable(uint8_t pin, uint8_t FUNC_num)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_AWO->DIGITAL_FUNC_EN[FUNC_num].IO[x->port / 2] &= ~(1 << (((x->port % 2) * 16)+ x->num));
 }
 
-static void per_func0_enable(uint8_t pin,uint8_t per_func)
+void per_func0_set(uint8_t pin,uint8_t per_func)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    SYSC_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
+}
+
+void per_func0_enable(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
@@ -529,7 +535,7 @@ static void per_func0_enable(uint8_t pin,uint8_t per_func)
     // SYSC_AWO->DIGITAL_FUNC_EN[0].IO[x->port / 2] |= 1 << x->num;
 }
 
-static void per_func0_disable(uint8_t pin)
+void per_func0_disable(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     per_func_disable(pin, 0);
