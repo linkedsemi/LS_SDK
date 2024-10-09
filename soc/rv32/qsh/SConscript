@@ -136,7 +136,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),[
         'hal_driver/inc',
         'hal_driver/api',
-        'hal_driver/src/otbn',
+        'hal_driver/api/otbn',
         'module/common',
         #'module/calendar',
         # 'module/crc',
