@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include "ls_hal_otbn_sha.h"
 #include "platform.h"
-#include "tinycrypt/sha256.h"
 #include "log.h"
 
 extern const char sha256_text[540];
