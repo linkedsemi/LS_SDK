@@ -66,6 +66,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/otbn/text_array/ecc256_base_mult_text.c',
         'src/otbn/text_array/ecc256_ecdsa_verify_text.c',
         'src/otbn/text_array/ecc256_scalar_mult_text.c',
+        'src/otbn/text_array/sha256_text.c',
+        'src/otbn/ls_hal_otbn_sha256.c',
         'src/otbn/ls_hal_otbn_ecc256.c',
         'src/ls_hal_flash_swint.c',
         'src/ls_hal_sha.c',
