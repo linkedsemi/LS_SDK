@@ -56,6 +56,7 @@ static uint8_t remain_data[SHA256_MSG_BLOCK_SIZE];
 void HAL_OTBN_SHA256_Init()
 {
     total_cnt = 0;
+    remain_len = 0;
     index = SHA256_DMEM_MSG_OFFSET;
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sha256_text, SHA256_TEXT_LENTH);
     HAL_OTBN_DMEM_Write(SHA256_DMEM_STATE_OFFSET, state_init, SHA256_DMEM_STATE_SIZE);
@@ -63,9 +64,19 @@ void HAL_OTBN_SHA256_Init()
     HAL_OTBN_DMEM_Write(SHA256_DMEM_K_OFFSET, (uint32_t *)K, SHA256_DMEM_K_SIZE);
 }
 
+static void sha256_msg_write(uint8_t *msg)
+{
+    HAL_OTBN_DMEM_Write(index, (uint32_t *)msg, SHA256_MSG_BLOCK_SIZE);
+    index += SHA256_MSG_BLOCK_SIZE;
+    if (index == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
+    {
+        HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
+        index = SHA256_DMEM_MSG_OFFSET;
+    }
+}
+
 void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
 {   
-    uint32_t wr_len;
     total_cnt += length;
     if (remain_len)
     {
@@ -75,10 +86,9 @@ void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
             remain_len += length;
             return;
         }
-        wr_len = SHA256_MSG_BLOCK_SIZE - remain_len;
+        uint32_t wr_len = SHA256_MSG_BLOCK_SIZE - remain_len;
         memcpy(&remain_data[remain_len], msg, wr_len);
-        HAL_OTBN_DMEM_Write(index, (uint32_t *)remain_data, SHA256_MSG_BLOCK_SIZE);
-        index += SHA256_MSG_BLOCK_SIZE;
+        sha256_msg_write(remain_data);
         remain_len = 0;
         length -= wr_len;
         msg += wr_len;
@@ -86,14 +96,8 @@ void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
 
     for (uint32_t i = 0; i < (length / SHA256_MSG_BLOCK_SIZE); i++)
     {
-        HAL_OTBN_DMEM_Write(index, (uint32_t *)msg, SHA256_MSG_BLOCK_SIZE);
-        index += SHA256_MSG_BLOCK_SIZE;
+        sha256_msg_write(msg);
         msg += SHA256_MSG_BLOCK_SIZE;
-        if (index == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
-        {
-            HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-            index = SHA256_DMEM_MSG_OFFSET;
-        }
     }
     
     if (length % SHA256_MSG_BLOCK_SIZE)
@@ -110,14 +114,8 @@ void HAL_OTBN_SHA256_Final(uint8_t result[0x20])
     remain_data[remain_len++] = 0x80;
     if (remain_len == SHA256_MSG_BLOCK_SIZE)
     {
+        sha256_msg_write(remain_data);
         remain_len = 0;
-        HAL_OTBN_DMEM_Write(index, (uint32_t *)remain_data, SHA256_MSG_BLOCK_SIZE);
-        index += SHA256_MSG_BLOCK_SIZE;
-        if (index == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
-        {
-            HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-            index = SHA256_DMEM_MSG_OFFSET;
-        }
     }
 
     while (remain_len != 0x38)
@@ -125,14 +123,8 @@ void HAL_OTBN_SHA256_Final(uint8_t result[0x20])
         remain_data[remain_len++] = 0x0;
         if (remain_len == SHA256_MSG_BLOCK_SIZE)
         {
+            sha256_msg_write(remain_data);
             remain_len = 0;
-            HAL_OTBN_DMEM_Write(index, (uint32_t *)remain_data, SHA256_MSG_BLOCK_SIZE);
-            index += SHA256_MSG_BLOCK_SIZE;
-            if (index == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
-            {
-                HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-                index = SHA256_DMEM_MSG_OFFSET;
-            }
         }
     }
 
