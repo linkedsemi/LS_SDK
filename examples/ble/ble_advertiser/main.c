@@ -98,7 +98,7 @@ static void create_adv_obj()
 static void start_adv(void)
 {
     LS_ASSERT(adv_obj_hdl != 0xff);
-    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, LS_ADVERTISER_NAME, sizeof(LS_ADVERTISER_NAME));
+    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, LS_ADVERTISER_NAME, sizeof(LS_ADVERTISER_NAME) - 1);
     dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
     LOG_I("adv start");
 }
@@ -109,9 +109,9 @@ static void ls_advertiser_update_adv_data(void)
     {
         static uint8_t adv_data_update_counter = 1;
         uint8_t adv_data_array[28];
-        memcpy((void*)&adv_data_array[0], LS_ADVERTISER_NAME, sizeof(LS_ADVERTISER_NAME));
-        adv_data_array[sizeof(LS_ADVERTISER_NAME)-2] = adv_data_update_counter++ + '0';
-        uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, adv_data_array, sizeof(LS_ADVERTISER_NAME));
+        memcpy((void*)&adv_data_array[0], LS_ADVERTISER_NAME, sizeof(LS_ADVERTISER_NAME) - 1);
+        adv_data_array[sizeof(LS_ADVERTISER_NAME) - 1 - 2] = adv_data_update_counter++ + '0';
+        uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, adv_data_array, sizeof(LS_ADVERTISER_NAME) - 1);
         dev_manager_update_adv_data(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
         update_adv_data_flag = true;
         if (10 == adv_data_update_counter)

@@ -50,7 +50,7 @@
 #define APP_DIS_PNP_ID_LEN              (7)
 
 static uint8_t adv_obj_hdl;
-static uint8_t advertising_data[28] = {11,0x08,'L','i','n','k','e','d','s','e','m','i'};;
+static uint8_t advertising_data[28] = {11,0x08,'L','i','n','k','e','d','s','e','m','i'};
 static uint8_t scan_response_data[31];
 
 static void dis_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx);
