@@ -72,7 +72,7 @@ void HAL_MJTAG_MSP_DeInit(struct __MJTAG_HandleTypeDef *inst)
         csi_vic_disable_irq(QSH_MJTAG2_IRQn);
         break;
     case (uint32_t)MJTAG3:
-        SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_MJTAG1_MASK;
+        SYSC_PER->PD_PER_CLKG2 = SYSC_PER_CLKG_CLR_MJTAG3_MASK;
         csi_vic_disable_irq(QSH_MJTAG3_IRQn);
         break;
     default:

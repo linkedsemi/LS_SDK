@@ -1,5 +1,5 @@
-#ifndef REG_OTBN_TYPE_H_
-#define REG_OTBN_TYPE_H_
+#ifndef REG_MJTAG_TYPE_H_
+#define REG_MJTAG_TYPE_H_
 #include <stdint.h>
 
 typedef struct
