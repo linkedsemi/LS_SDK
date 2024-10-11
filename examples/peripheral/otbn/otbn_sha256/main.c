@@ -6,7 +6,7 @@
 
 extern const char sha256_text[540];
 
-static uint8_t result[32];  //38D18DA8209A9EA9AB6B811AAF6967688CE28995C2B666F39CE68E704AC27B90
+static uint8_t result[32];  //0x81c03b03b75b7779ed13fb36038795a81a1f7f642f5c4a1fc8e391e1930bfd08
 int main(void)
 {
     sys_init_none();
