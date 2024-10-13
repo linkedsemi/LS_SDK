@@ -18,11 +18,17 @@ extern const unsigned char one_bits[];
 #define ARRAY_NB_COLUMNS(array)  (sizeof((array[0]))/sizeof((array)[0][0]))
 
 /// Macro to get a structure from one of its structure field
+#ifndef CONTAINER_OF
 #define CONTAINER_OF(ptr, type, member)    ((type *)( (char *)ptr - offsetof(type,member) ))
+#endif
 
+#ifndef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
+#endif
 
+#ifndef MAX
 #define MAX(a,b) ((a)>(b)?(a):(b))
+#endif
 
 #define CEILING(dividend,divisor) (((dividend) + ((divisor) - 1))/(divisor))
 
