@@ -16,6 +16,8 @@ void HAL_LSOTBN_MSP_Init(void);
 
 void HAL_LSOTBN_MSP_DeInit(void);
 
+void HAL_OTBN_SYSC_IRQHandler();
+
 #ifdef __cplusplus
 }
 #endif

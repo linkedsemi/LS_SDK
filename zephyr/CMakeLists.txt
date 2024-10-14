@@ -273,6 +273,7 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32/qsh
     ../hal_driver/inc
     ../hal_driver/api
+    ../hal_driver/api/otbn
     ../module/common
     ../module/debug
     ../module/debug/RTT
@@ -283,6 +284,7 @@ if(CONFIG_SOC_LSQSH)
         ../module/common
         ../module/crc
         ../module/debug
+        ../module/debug/semihosting/riscv/
         ../module/debug/RTT
         ../module/static_buffer
   )
@@ -295,11 +297,23 @@ if(CONFIG_SOC_LSQSH)
     ../module/common/async_call.c
     ../module/crc/crc16.c
     ../module/debug/ls_dbg.c
+    ../module/debug/log.c
     ../module/debug/RTT/SEGGER_RTT.c
     ../module/static_buffer/linked_buffer.c
     ../module/static_buffer/fifo.c
     ../hal_driver/src/ls_hal_uart.c
     ../hal_driver/src/ls_hal_dwuart.c
+    ../hal_driver/src/ls_hal_sha.c
+    ../hal_driver/src/ls_hal_sm4.c
+    ../hal_driver/src/ls_hal_crypt.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sha256.c
+    ../hal_driver/src/otbn/ls_hal_otbn_ecc256.c
+    ../hal_driver/src/otbn/text_array/ecc256_base_mult_text.c
+    ../hal_driver/src/otbn/text_array/ecc256_ecdsa_verify_text.c
+    ../hal_driver/src/otbn/text_array/ecc256_scalar_mult_text.c
+    ../hal_driver/src/otbn/text_array/sha256_text.c
+    ../hal_driver/src/ls_hal_otbn.c
+    ../soc/rv32/qsh/ls_msp_otbn.c
     ../soc/rv32/systick.c
     ../soc/rv32/int_call_asm.S
     ../soc/rv32/qsh/cpu.c

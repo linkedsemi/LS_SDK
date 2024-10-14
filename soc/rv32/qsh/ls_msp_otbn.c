@@ -7,8 +7,6 @@
 
 #define CO_BIT(pos) (1UL<<(pos))
 
-static void HAL_OTBN_SYSC_IRQHandler();
-
 void HAL_LSOTBN_MSP_Init(void)
 {
     SYSC_CPU->PD_CPU_CLKG[1] = SYSC_CPU_CLKG_CLR_OTBN_MASK;
@@ -51,7 +49,7 @@ void HAL_LSOTBN_MSP_DeInit(void)
     csi_vic_disable_irq(QSH_OTBN_IRQn);
 }
 
-static void HAL_OTBN_SYSC_IRQHandler()
+void HAL_OTBN_SYSC_IRQHandler()
 {
     uint32_t intr = SYSC_CPU->INTR_CTRL_STT;
     if (intr & CO_BIT(0))
