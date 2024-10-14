@@ -13,8 +13,6 @@
 #define SHA256_DMEM_MSG_SIZE            (0x800)
 
 #define SHA256_MSG_BLOCK_SIZE       (0x40)
-#define SHA256_TEXT_LENTH (540)
-extern const char sha256_text[SHA256_TEXT_LENTH];
 
 static uint32_t state_init[8] = {
     0x5be0cd19, 0x1f83d9ab, 0x9b05688c, 0x510e527f,
