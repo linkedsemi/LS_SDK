@@ -1,5 +1,8 @@
 #include "ls_hal_otbn_sha.h"
 
+#define SHA256_TEXT_LENTH           (540)
+extern const char sha256_text[SHA256_TEXT_LENTH];
+
 #define SHA256_IMEM_BLOCKNUM_OFFSET (0x0)
 #define SHA256_IMEM_BLOCKNUM_DATA   (0x00000f13)
 

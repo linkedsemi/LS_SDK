@@ -9,10 +9,6 @@ extern "C" {
 #define SHA256_RESULT_SIZE          (0x20)
 #define SHA384_RESULT_SIZE          (0x30)
 #define SHA512_RESULT_SIZE          (0x40)
-#define SHA256_TEXT_LENTH           (540)
-#define SHA512_TEXT_LENTH           (1588)
-extern const char sha256_text[SHA256_TEXT_LENTH];
-extern const char sha512_text[SHA512_TEXT_LENTH];
 
 void HAL_OTBN_SHA256_Init();
 void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length);

@@ -13,7 +13,7 @@ int main(void)
     HAL_OTBN_Init();
     
     HAL_OTBN_SHA384_Init();
-    HAL_OTBN_SHA384_Update((uint8_t *)sha384_text, SHA384_TEXT_LENTH);
+    HAL_OTBN_SHA384_Update((uint8_t *)string, 3);
     HAL_OTBN_SHA384_Final(result);
     LOG_HEX((uint8_t *)result, SHA384_RESULT_SIZE);
 

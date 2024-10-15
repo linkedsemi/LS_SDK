@@ -4,16 +4,16 @@
 #include "platform.h"
 #include "log.h"
 
-extern const char sha256_text[540];
-
-static uint8_t result[32];  //0x81c03b03b75b7779ed13fb36038795a81a1f7f642f5c4a1fc8e391e1930bfd08
+static uint8_t string[] = "abc";
+static uint8_t result[32];
+// 0xBA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD
 int main(void)
 {
     sys_init_none();
     HAL_OTBN_Init();
-    
+
     HAL_OTBN_SHA256_Init();
-    HAL_OTBN_SHA256_Update((uint8_t *)sha256_text, 540);
+    HAL_OTBN_SHA256_Update((uint8_t *)string, 3);
     HAL_OTBN_SHA256_Final(result);
     LOG_HEX((uint8_t *)result, 0x20);
 

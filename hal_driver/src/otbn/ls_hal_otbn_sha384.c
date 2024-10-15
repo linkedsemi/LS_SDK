@@ -1,5 +1,8 @@
 #include "ls_hal_otbn_sha.h"
 
+#define SHA512_TEXT_LENTH           (1588)
+extern const char sha512_text[SHA512_TEXT_LENTH];
+
 #define SHA384_DMEM_STATE_OFFSET        (0x0)
 #define SHA384_DMEM_STATE_SIZE              (0x100)
 #define SHA384_DMEM_MSG_OFFSET          (0x100)
