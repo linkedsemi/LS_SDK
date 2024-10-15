@@ -1,31 +1,31 @@
 #include "ls_hal_otbn_sha.h"
 
-#define SHA384_DMEM_STATE_OFFSET        (0x0)
-#define SHA384_DMEM_STATE_SIZE              (0x100)
-#define SHA384_DMEM_MSG_OFFSET          (0x100)
-#define SHA384_DMEM_MSG_SIZE                (0x800)
-#define SHA384_DMEM_N_CHUNKS_OFFSET     (0x900)
-#define SHA384_DMEM_PTR_STATE_OFFSET    (0x904)
-#define SHA384_DMEM_PTR_MSG_OFFSET      (0x908)
-#define SHA384_DMEM_K_OFFSET            (0x920)
-#define SHA384_DMEM_K_SIZE                  (0x280)
+#define SHA512_DMEM_STATE_OFFSET        (0x0)
+#define SHA512_DMEM_STATE_SIZE              (0x100)
+#define SHA512_DMEM_MSG_OFFSET          (0x100)
+#define SHA512_DMEM_MSG_SIZE                (0x800)
+#define SHA512_DMEM_N_CHUNKS_OFFSET     (0x900)
+#define SHA512_DMEM_PTR_STATE_OFFSET    (0x904)
+#define SHA512_DMEM_PTR_MSG_OFFSET      (0x908)
+#define SHA512_DMEM_K_OFFSET            (0x920)
+#define SHA512_DMEM_K_SIZE                  (0x280)
 
-#define SHA384_MSG_BLOCK_SIZE       (0x80)
+#define SHA512_MSG_BLOCK_SIZE       (0x80)
 
 static uint32_t index;
 static uint32_t total_cnt;
 static uint32_t remain_len;
-static uint8_t remain_data[SHA384_MSG_BLOCK_SIZE];
+static uint8_t remain_data[SHA512_MSG_BLOCK_SIZE];
 
 static uint64_t state_init[] = {
-    0xcbbb9d5dc1059ed8, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x629a292a367cd507, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x9159015a3070dd17, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x152fecd8f70e5939, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x67332667ffc00b31, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x8eb44a8768581511, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0xdb0c2e0d64f98fa7, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x47b5481dbefa4fa4, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,};
+    0x6a09e667f3bcc908, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0xbb67ae8584caa73b, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x3c6ef372fe94f82b, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0xa54ff53a5f1d36f1, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x510e527fade682d1, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x9b05688c2b3e6c1f, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x1f83d9abfb41bd6b, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x5be0cd19137e2179, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,};
 
 static uint64_t K[] = {
     0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
@@ -49,32 +49,33 @@ static uint64_t K[] = {
     0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
     0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817};
 
-static void SHA384_BlockNumber_Update(uint32_t number)
+static void SHA512_BlockNumber_Update(uint32_t number)
 {
     uint32_t n_checks = number;
-    HAL_OTBN_DMEM_Write(SHA384_DMEM_N_CHUNKS_OFFSET, &n_checks, sizeof(uint32_t));
+    HAL_OTBN_DMEM_Write(SHA512_DMEM_N_CHUNKS_OFFSET, &n_checks, sizeof(uint32_t));
 }
 
-void HAL_OTBN_SHA384_Init()
+void HAL_OTBN_SHA512_Init()
 {
     total_cnt = 0;
     remain_len = 0;
-    index = SHA384_DMEM_MSG_OFFSET;
-    uint32_t state_ptr = SHA384_DMEM_STATE_OFFSET;
-    uint32_t msg_ptr = SHA384_DMEM_MSG_OFFSET;
+    index = SHA512_DMEM_MSG_OFFSET;
+    uint32_t state_ptr = SHA512_DMEM_STATE_OFFSET;
+    uint32_t msg_ptr = SHA512_DMEM_MSG_OFFSET;
     HAL_OTBN_DMEM_Set(0x0, 0x0, OTBN_DMEM_SIZE);
+    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sha512_text, SHA512_TEXT_LENTH);
-    HAL_OTBN_DMEM_Write(SHA384_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA384_DMEM_STATE_SIZE);
-    HAL_OTBN_DMEM_Write(SHA384_DMEM_K_OFFSET, (uint32_t *)K, SHA384_DMEM_K_SIZE);
-    HAL_OTBN_DMEM_Write(SHA384_DMEM_PTR_STATE_OFFSET, &state_ptr, sizeof(uint32_t));
-    HAL_OTBN_DMEM_Write(SHA384_DMEM_PTR_MSG_OFFSET, &msg_ptr, sizeof(uint32_t));
-    SHA384_BlockNumber_Update(0x10);
+    HAL_OTBN_DMEM_Write(SHA512_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA512_DMEM_STATE_SIZE);
+    HAL_OTBN_DMEM_Write(SHA512_DMEM_K_OFFSET, (uint32_t *)K, SHA512_DMEM_K_SIZE);
+    HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_STATE_OFFSET, &state_ptr, sizeof(uint32_t));
+    HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_MSG_OFFSET, &msg_ptr, sizeof(uint32_t));
+    SHA512_BlockNumber_Update(0x10);
 }
 
-static void SHA384_msg_write(uint8_t *msg)
+static void SHA512_msg_write(uint8_t *msg)
 {
     uint8_t dword[8];
-    uint64_t sha384_buffer[0x10];
+    uint64_t sha512_buffer[0x10];
     for (uint8_t i = 0; i < 0x10; i++)
     {
         dword[7] = *msg++;
@@ -85,82 +86,82 @@ static void SHA384_msg_write(uint8_t *msg)
         dword[2] = *msg++;
         dword[1] = *msg++;
         dword[0] = *msg++;
-        sha384_buffer[i] = *(uint64_t *)dword;
+        sha512_buffer[i] = *(uint64_t *)dword;
     }
-    HAL_OTBN_DMEM_Write(index, (uint32_t *)sha384_buffer, SHA384_MSG_BLOCK_SIZE);
-    index += SHA384_MSG_BLOCK_SIZE;
-    if (index == (SHA384_DMEM_MSG_SIZE + SHA384_DMEM_MSG_OFFSET))
+    HAL_OTBN_DMEM_Write(index, (uint32_t *)sha512_buffer, SHA512_MSG_BLOCK_SIZE);
+    index += SHA512_MSG_BLOCK_SIZE;
+    if (index == (SHA512_DMEM_MSG_SIZE + SHA512_DMEM_MSG_OFFSET))
     {
         HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-        index = SHA384_DMEM_MSG_OFFSET;
+        index = SHA512_DMEM_MSG_OFFSET;
     }
 }
 
-void HAL_OTBN_SHA384_Update(uint8_t *msg, uint32_t length)
+void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length)
 {   
     total_cnt += length;
     if (remain_len)
     {
-        if ((length + remain_len) < SHA384_MSG_BLOCK_SIZE)
+        if ((length + remain_len) < SHA512_MSG_BLOCK_SIZE)
         {
             memcpy(&remain_data[remain_len], msg, length);
             remain_len += length;
             return;
         }
-        uint32_t wr_len = SHA384_MSG_BLOCK_SIZE - remain_len;
+        uint32_t wr_len = SHA512_MSG_BLOCK_SIZE - remain_len;
         memcpy(&remain_data[remain_len], msg, wr_len);
-        SHA384_msg_write(remain_data);
+        SHA512_msg_write(remain_data);
         remain_len = 0;
         length -= wr_len;
         msg += wr_len;
     }
 
-    for (uint32_t i = 0; i < (length / SHA384_MSG_BLOCK_SIZE); i++)
+    for (uint32_t i = 0; i < (length / SHA512_MSG_BLOCK_SIZE); i++)
     {
-        SHA384_msg_write(msg);
-        msg += SHA384_MSG_BLOCK_SIZE;
+        SHA512_msg_write(msg);
+        msg += SHA512_MSG_BLOCK_SIZE;
     }
     
-    if (length % SHA384_MSG_BLOCK_SIZE)
+    if (length % SHA512_MSG_BLOCK_SIZE)
     {
-        memcpy(&remain_data[remain_len], msg, length % SHA384_MSG_BLOCK_SIZE);
-        remain_len = length % SHA384_MSG_BLOCK_SIZE;
+        memcpy(&remain_data[remain_len], msg, length % SHA512_MSG_BLOCK_SIZE);
+        remain_len = length % SHA512_MSG_BLOCK_SIZE;
     }
 }
 
-void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
+void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE])
 {
     uint64_t bit_cnt = total_cnt * 8;
 
     remain_data[remain_len++] = 0x80;
-    if (remain_len == SHA384_MSG_BLOCK_SIZE)
+    if (remain_len == SHA512_MSG_BLOCK_SIZE)
     {
-        SHA384_msg_write(remain_data);
+        SHA512_msg_write(remain_data);
         remain_len = 0;
     }
 
-    while (remain_len != (SHA384_MSG_BLOCK_SIZE - 8))
+    while (remain_len != (SHA512_MSG_BLOCK_SIZE - 8))
     {
         remain_data[remain_len++] = 0x0;
-        if (remain_len == SHA384_MSG_BLOCK_SIZE)
+        if (remain_len == SHA512_MSG_BLOCK_SIZE)
         {
-            SHA384_msg_write(remain_data);
+            SHA512_msg_write(remain_data);
             remain_len = 0;
         }
     }
 
     for (uint8_t i = 0; i < 8; i++)
     {
-        remain_data[SHA384_MSG_BLOCK_SIZE - 1 - i] = (uint8_t)(bit_cnt >> (8 * i));
+        remain_data[SHA512_MSG_BLOCK_SIZE - 1 - i] = (uint8_t)(bit_cnt >> (8 * i));
     }
-    SHA384_msg_write((uint8_t *)remain_data);
-    SHA384_BlockNumber_Update((index - SHA384_DMEM_MSG_OFFSET) / SHA384_MSG_BLOCK_SIZE);
+    SHA512_msg_write((uint8_t *)remain_data);
+    SHA512_BlockNumber_Update((index - SHA512_DMEM_MSG_OFFSET) / SHA512_MSG_BLOCK_SIZE);
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
 
     uint64_t rs;
-    for (uint8_t i = 0; i < 6; i++)
+    for (uint8_t i = 0; i < 8; i++)
     {
-        HAL_OTBN_DMEM_Read(SHA384_DMEM_STATE_OFFSET + i * 0x20, (uint32_t *)&rs, sizeof(uint64_t));
+        HAL_OTBN_DMEM_Read(SHA512_DMEM_STATE_OFFSET + i * 0x20, (uint32_t *)&rs, sizeof(uint64_t));
         *result++ = (uint8_t)(rs >> 56);
         *result++ = (uint8_t)(rs >> 48);
         *result++ = (uint8_t)(rs >> 40);
