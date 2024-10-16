@@ -4,7 +4,7 @@
 #include "ls_hal_otbn_ecc256.h"
 #include "log.h"
 
-static struct HAL_OTBN_P256_Verify_Param p256_param =
+static struct HAL_OTBN_ECC256_Verify_Param p256_param =
 {
     .msg = {0x4456fd21 ,0x400bdd7d ,0xb54d7452 ,0x17d015f1 ,0x90d4d90b ,0xb028ad8a ,0x6ce90fef ,0x06d71207},
     .r = {0x80a9674a ,0x1147ea56 ,0x0c7d87dd ,0x99504edd ,0xbe064de2 ,0x6b35843c ,0x7dd27f33 ,0x815215ad},
