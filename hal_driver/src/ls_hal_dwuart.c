@@ -189,7 +189,7 @@ HAL_StatusTypeDef HAL_DWUART_Receive(DWUART_HandleTypeDef *hdwuart, uint8_t *pDa
 
 void DWUART_RXFIFO_Change(DWUART_HandleTypeDef *hdwuart)
 {
-    if (hdwuart->Rx_Env.Interrupt.XferCount >= 16)
+    if (hdwuart->Rx_Env.Transfer.XferCount >= 16)
     {
         REG_FIELD_WR(hdwuart->DWUARTX->IIR_FCR, DWUART_RCVR, DWUART_FIFO_RECEIVE_TRIGGER_16BYTE);
     }
@@ -208,9 +208,9 @@ HAL_StatusTypeDef HAL_DWUART_Transmit_IT(DWUART_HandleTypeDef *hdwuart, uint8_t 
             return HAL_INVALIAD_PARAM;
         }
 
-        hdwuart->Tx_Env.Interrupt.pBuffPtr = pData;
-        hdwuart->Tx_Env.Interrupt.XferCount = Size;
-        hdwuart->Tx_Env.Interrupt.OriginalLength = Size;
+        hdwuart->Tx_Env.Transfer.pBuffPtr = pData;
+        hdwuart->Tx_Env.Transfer.XferCount = Size;
+        hdwuart->Tx_Env.Transfer.OriginalLength = Size;
         hdwuart->gState = HAL_DWUART_STATE_BUSY_TX;
 
         REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ETBEI, 1);
@@ -231,9 +231,9 @@ HAL_StatusTypeDef HAL_DWUART_Receive_IT(DWUART_HandleTypeDef *hdwuart, uint8_t *
             return HAL_INVALIAD_PARAM;
         }
 
-        hdwuart->Rx_Env.Interrupt.pBuffPtr = pData;
-        hdwuart->Rx_Env.Interrupt.XferCount = Size;
-        hdwuart->Rx_Env.Interrupt.OriginalLength = Size;
+        hdwuart->Rx_Env.Transfer.pBuffPtr = pData;
+        hdwuart->Rx_Env.Transfer.XferCount = Size;
+        hdwuart->Rx_Env.Transfer.OriginalLength = Size;
         hdwuart->RxState = HAL_DWUART_STATE_BUSY_RX;
 
         DWUART_RXFIFO_Change(hdwuart);
@@ -255,10 +255,10 @@ static void DWUART_Receive_IT(DWUART_HandleTypeDef *hdwuart, bool timeout)
         {
             while (hdwuart->DWUARTX->RFL > 1U)
             {
-                *hdwuart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
-                if (--hdwuart->Rx_Env.Interrupt.XferCount == 1U)
+                *hdwuart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
+                if (--hdwuart->Rx_Env.Transfer.XferCount == 1U)
                 {
-                    *hdwuart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
+                    *hdwuart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
                     hdwuart->RxState = HAL_DWUART_STATE_READY;
                     REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ERBFI, 0);
                     REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ELSI, 0);
@@ -268,12 +268,12 @@ static void DWUART_Receive_IT(DWUART_HandleTypeDef *hdwuart, bool timeout)
             }
             if (timeout)
             {
-                *hdwuart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
-                hdwuart->Rx_Env.Interrupt.XferCount--;
+                *hdwuart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
+                hdwuart->Rx_Env.Transfer.XferCount--;
                 hdwuart->RxState = HAL_DWUART_STATE_READY;
                 REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ERBFI, 0);
                 REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ELSI, 0);
-                HAL_DWUART_RxRTOCallback(hdwuart, hdwuart->Rx_Env.Interrupt.OriginalLength - hdwuart->Rx_Env.Interrupt.XferCount);
+                HAL_DWUART_RxRTOCallback(hdwuart, hdwuart->Rx_Env.Transfer.OriginalLength - hdwuart->Rx_Env.Transfer.XferCount);
                 return;
             }
         }
@@ -281,8 +281,8 @@ static void DWUART_Receive_IT(DWUART_HandleTypeDef *hdwuart, bool timeout)
         {
             while (hdwuart->DWUARTX->RFL > 0U)
             {
-                *hdwuart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
-                if (--hdwuart->Rx_Env.Interrupt.XferCount == 0U)
+                *hdwuart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(hdwuart->DWUARTX->RBR_THR_DLL & 0xff);
+                if (--hdwuart->Rx_Env.Transfer.XferCount == 0U)
                 {
                     hdwuart->RxState = HAL_DWUART_STATE_READY;
                     REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ERBFI, 0);
@@ -300,7 +300,7 @@ static void DWUART_Transmit_IT(DWUART_HandleTypeDef *hdwuart)
 {
     if (hdwuart->gState == HAL_DWUART_STATE_BUSY_TX)
     {
-        if (hdwuart->Tx_Env.Interrupt.XferCount == 0U)
+        if (hdwuart->Tx_Env.Transfer.XferCount == 0U)
         {
             REG_FIELD_WR(hdwuart->DWUARTX->DLH_IER, DWUART_ETBEI, 0);
             hdwuart->gState = HAL_DWUART_STATE_READY;
@@ -309,8 +309,8 @@ static void DWUART_Transmit_IT(DWUART_HandleTypeDef *hdwuart)
         }
         else
         {
-            hdwuart->DWUARTX->RBR_THR_DLL = *hdwuart->Tx_Env.Interrupt.pBuffPtr++ & 0xff;
-            hdwuart->Tx_Env.Interrupt.XferCount--;
+            hdwuart->DWUARTX->RBR_THR_DLL = *hdwuart->Tx_Env.Transfer.pBuffPtr++ & 0xff;
+            hdwuart->Tx_Env.Transfer.XferCount--;
         }
     }
 }
