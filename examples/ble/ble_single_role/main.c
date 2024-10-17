@@ -308,7 +308,7 @@ static void create_adv_obj()
 static void start_adv(void)
 {
     LS_ASSERT(adv_obj_hdl != 0xff);
-    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME));
+    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME) - 1);
     dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
 }
 #endif
@@ -593,7 +593,7 @@ static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con
 {
     LS_ASSERT(dev_name_ptr);
     dev_name_ptr->value = (uint8_t*)UART_SVC_ADV_NAME;
-    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME);
+    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME) - 1;
 }
 static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
 {
@@ -899,8 +899,8 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         struct adv_payload_struct adv_data_name;
         if (dev_manager_adv_report_parse(GAP_ADV_TYPE_SHORTENED_NAME, &evt->adv_report, &adv_data_name))
         {
-            if (adv_data_name.size == sizeof(UART_SVC_ADV_NAME) &&
-                0 == memcmp((void*)adv_data_name.p_data, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME)))
+            if (adv_data_name.size == (sizeof(UART_SVC_ADV_NAME) - 1) &&
+                0 == memcmp((void*)adv_data_name.p_data, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME) - 1))
             {
                 if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
                 {

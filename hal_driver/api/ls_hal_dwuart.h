@@ -115,7 +115,7 @@ struct DWUartDMAEnv
     bool                               Channel_Done;
 };
 
-struct DWUartInterruptEnv
+struct DWUartTransferEnv
 {
     uint8_t                            *pBuffPtr;      /*!< Pointer to DWUART Tx transfer Buffer */
     uint16_t                           XferCount;      /*!< DWUART Tx Transfer Counter           */
@@ -127,10 +127,10 @@ typedef struct __DWUART_HandleTypeDef
     reg_dwuart_t                       *DWUARTX;
     DWUART_InitTypeDef                 Init;
     void                               *DMAC_Instance;
-    union
+    struct
     {
         struct DWUartDMAEnv            DMA;
-        struct DWUartInterruptEnv      Interrupt;
+        struct DWUartTransferEnv       Transfer;
     } Tx_Env, Rx_Env;
     HAL_DWUART_StateTypeDef            gState; /*!< DWUART state information related to global Handle management
                                               and also related to Tx operations.
