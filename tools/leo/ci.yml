@@ -48,11 +48,6 @@ leo_sha_polling_build:
   script:
     - cd examples/peripheral/sha/sha_polling && scons flags=-Werror ic=leo
 
-leo_sha_it_build:
-  stage: build
-  script:
-    - cd examples/peripheral/sha/sha_it && scons flags=-Werror ic=leo
-
 leo_sm4_polling_build:
   stage: build
   script:
