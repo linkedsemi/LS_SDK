@@ -96,7 +96,6 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/pwm                                                            |        |        |  √     |
 | peripheral/rtc                                                            |  √     |        |        |
 | peripheral/rtcv2                                                          |        |  √     |  √     |
-| peripheral/sha/sha_it                                                     |        |  √     |  √     |
 | peripheral/sha/sha_polling                                                |        |  √     |  √     |
 | peripheral/sm4/sm4_it                                                     |        |  √     |  √     |
 | peripheral/sm4/sm4_polling                                                |        |  √     |  √     |

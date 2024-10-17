@@ -83,10 +83,10 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         huart->gState = HAL_UART_STATE_BUSY_TX;
         /* Init tickstart for timeout managment */
         //TODO
-        huart->Tx_Env.Interrupt.XferCount = Size;
+        huart->Tx_Env.Transfer.XferCount = Size;
         if (Timeout != HAL_MAX_DELAY)
         {
-            while (huart->Tx_Env.Interrupt.XferCount > 0U )
+            while (huart->Tx_Env.Transfer.XferCount > 0U )
             {
                 if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFEM))
                 {
@@ -96,9 +96,9 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
                else
                 {
                     //Transmit FIFO Not Full
-                    huart->Tx_Env.Interrupt.XferCount--;
+                    huart->Tx_Env.Transfer.XferCount--;
                     huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
-                    if (huart->Tx_Env.Interrupt.XferCount == 0)
+                    if (huart->Tx_Env.Transfer.XferCount == 0)
                     {
                         break;
                     }
@@ -113,12 +113,12 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         }
         else
         {
-            while (huart->Tx_Env.Interrupt.XferCount > 0U )
+            while (huart->Tx_Env.Transfer.XferCount > 0U )
             {   
                 // Wait until TX fifo not empty
                 if(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_TFNF))
                 {
-                    huart->Tx_Env.Interrupt.XferCount--;
+                    huart->Tx_Env.Transfer.XferCount--;
                     huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
                 }
             }
@@ -153,11 +153,11 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         /* Init tickstart for timeout managment */
         //todo
     
-        huart->Rx_Env.Interrupt.XferCount = Size;
+        huart->Rx_Env.Transfer.XferCount = Size;
         if(Timeout !=HAL_MAX_DELAY)
         {
             /* Check the remain data to be received */
-            while (huart->Rx_Env.Interrupt.XferCount > 0U)
+            while (huart->Rx_Env.Transfer.XferCount > 0U)
             {
                 if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_RFNE))
                 {
@@ -166,18 +166,18 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
                 }
                else
                 {
-                    huart->Rx_Env.Interrupt.XferCount--;
+                    huart->Rx_Env.Transfer.XferCount--;
                     *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
                 }
             }
         }
         else
         {
-            while (huart->Rx_Env.Interrupt.XferCount > 0U)
+            while (huart->Rx_Env.Transfer.XferCount > 0U)
             {
                 if(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_RFNE))
                 {
-                    huart->Rx_Env.Interrupt.XferCount--;
+                    huart->Rx_Env.Transfer.XferCount--;
                     *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
                 }
             }
@@ -206,14 +206,14 @@ HAL_StatusTypeDef HAL_UART_ReceiveToIdle(UART_HandleTypeDef *huart, uint8_t *pDa
         }
 
         huart->RxState = HAL_UART_STATE_BUSY_RX;
-        huart->Rx_Env.Interrupt.XferCount = Size;
+        huart->Rx_Env.Transfer.XferCount = Size;
         REG_FIELD_WR(huart->UARTX->LCR, UART_LCR_RTOEN, 1);
 
         /* Initialize output number of received elements */
         *RxLen = 0U;
 
         /* as long as data have to be received */
-        while (huart->Rx_Env.Interrupt.XferCount > 0)
+        while (huart->Rx_Env.Transfer.XferCount > 0)
         {
             if ((systick_get_value() - tickstart) > timeout)
             {
@@ -229,7 +229,7 @@ HAL_StatusTypeDef HAL_UART_ReceiveToIdle(UART_HandleTypeDef *huart, uint8_t *pDa
                 huart->UARTX->ICR = UART_IT_RTO;
                 *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
                 *RxLen += 1U;
-                huart->Rx_Env.Interrupt.XferCount--;
+                huart->Rx_Env.Transfer.XferCount--;
                 huart->RxState = HAL_UART_STATE_READY;
                 REG_FIELD_WR(huart->UARTX->LCR, UART_LCR_RTOEN, 0);
                 return HAL_OK;
@@ -237,19 +237,19 @@ HAL_StatusTypeDef HAL_UART_ReceiveToIdle(UART_HandleTypeDef *huart, uint8_t *pDa
 
             if (REG_FIELD_RD(huart->UARTX->SR, UART_SR_RFNE))
             {
-                if (REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_RXFL) > 1 || huart->Rx_Env.Interrupt.XferCount == 1)
+                if (REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_RXFL) > 1 || huart->Rx_Env.Transfer.XferCount == 1)
                 {
                     *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
                     /* Increment number of received elements */
                     *RxLen += 1U;
-                    huart->Rx_Env.Interrupt.XferCount--;
+                    huart->Rx_Env.Transfer.XferCount--;
                 }
             }
         }
         huart->RxState = HAL_UART_STATE_READY;
         REG_FIELD_WR(huart->UARTX->LCR, UART_LCR_RTOEN, 0);
         /* Set number of received elements in output parameter : RxLen */
-        *RxLen = Size - huart->Rx_Env.Interrupt.XferCount;
+        *RxLen = Size - huart->Rx_Env.Transfer.XferCount;
         /* At end of Rx process, restore huart->RxState to Ready */
         huart->RxState = HAL_UART_STATE_READY;
 
@@ -272,13 +272,13 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
             return HAL_INVALIAD_PARAM;
         }
         REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_DMAEN,0);
-        huart->Tx_Env.Interrupt.pBuffPtr = pData;
-        huart->Tx_Env.Interrupt.XferCount = Size;
+        huart->Tx_Env.Transfer.pBuffPtr = pData;
+        huart->Tx_Env.Transfer.XferCount = Size;
         huart->gState = HAL_UART_STATE_BUSY_TX;
         LL_UART_SetTXTL(huart->UARTX,FIFO_TRABSMIT_TRIGGER_0BYTE);
         huart->UARTX->ICR = UART_IT_TXS;
-        huart->Tx_Env.Interrupt.XferCount--; 
-        huart->UARTX->TBR = (*huart->Tx_Env.Interrupt.pBuffPtr++ & (uint8_t)0xFF);
+        huart->Tx_Env.Transfer.XferCount--; 
+        huart->UARTX->TBR = (*huart->Tx_Env.Transfer.pBuffPtr++ & (uint8_t)0xFF);
         huart->UARTX->IER = UART_IT_TXS;
         return HAL_OK;
     }
@@ -299,10 +299,10 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
             return HAL_INVALIAD_PARAM;
         }
         REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_DMAEN,0);
-        huart->Rx_Env.Interrupt.pBuffPtr = pData;
-        huart->Rx_Env.Interrupt.XferCount = Size;
+        huart->Rx_Env.Transfer.pBuffPtr = pData;
+        huart->Rx_Env.Transfer.XferCount = Size;
         huart->RxState = HAL_UART_STATE_BUSY_RX;
-        if(huart->Rx_Env.Interrupt.XferCount<8)
+        if(huart->Rx_Env.Transfer.XferCount<8)
         {
             LL_UART_SetRXTL(huart->UARTX,FIFO_RECEIVE_TRIGGER_1BYTE);
         }
@@ -330,10 +330,10 @@ HAL_StatusTypeDef HAL_UART_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *
             return HAL_INVALIAD_PARAM;
         }
         REG_FIELD_WR(huart->UARTX->MCR, UART_MCR_DMAEN, 0);
-        huart->Rx_Env.Interrupt.pBuffPtr = pData;
-        huart->Rx_Env.Interrupt.XferCount = Size;
+        huart->Rx_Env.Transfer.pBuffPtr = pData;
+        huart->Rx_Env.Transfer.XferCount = Size;
         huart->RxState = HAL_UART_STATE_BUSY_RX;
-        if (huart->Rx_Env.Interrupt.XferCount < 8)
+        if (huart->Rx_Env.Transfer.XferCount < 8)
         {
             LL_UART_SetRXTL(huart->UARTX, FIFO_RECEIVE_TRIGGER_1BYTE);
         }
@@ -402,7 +402,7 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
     {
         if(!REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_TXFL))
         {
-            if (huart->Tx_Env.Interrupt.XferCount == 0U)
+            if (huart->Tx_Env.Transfer.XferCount == 0U)
             {
                 huart->UARTX->IDR = UART_IT_TXS;
                 /* Tx process is ended, restore huart->gState to Ready */
@@ -413,12 +413,12 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
             {
                 while(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_TFNF))
                 {
-                    if (huart->Tx_Env.Interrupt.XferCount == 0U)
+                    if (huart->Tx_Env.Transfer.XferCount == 0U)
                     {
                         break;
                     }
-                    huart->Tx_Env.Interrupt.XferCount--;
-                    huart->UARTX->TBR = (*huart->Tx_Env.Interrupt.pBuffPtr++ & (uint8_t)0xFF);
+                    huart->Tx_Env.Transfer.XferCount--;
+                    huart->UARTX->TBR = (*huart->Tx_Env.Transfer.pBuffPtr++ & (uint8_t)0xFF);
                 }
             }
         }
@@ -438,18 +438,18 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
             /* When using RTO, ensure that the FIFO is not empty */
             for (; fifo_level > 1; fifo_level--)
             {
-                *huart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
-                if (--huart->Rx_Env.Interrupt.XferCount == 1U)
+                *huart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+                if (--huart->Rx_Env.Transfer.XferCount == 1U)
                 {
                     /* Read the remaining 1 byte of data */
-                    *huart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+                    *huart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
                     LL_UART_SetRXTL(huart->UARTX, FIFO_RECEIVE_TRIGGER_8BYTE);
                     huart->RxState = HAL_UART_STATE_READY;
                     huart->UARTX->IDR = UART_IT_RXRD | UART_IT_RTO;
                     HAL_UART_RxCpltCallback(huart);
                     return;
                 }
-                if (huart->Rx_Env.Interrupt.XferCount < 0x08)
+                if (huart->Rx_Env.Transfer.XferCount < 0x08)
                 {
                     LL_UART_SetRXTL(huart->UARTX, FIFO_RECEIVE_TRIGGER_1BYTE);
                 }
@@ -464,8 +464,8 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
             /* The RTO is not opened */
             for (; fifo_level > 0; fifo_level--)
             {
-                *huart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
-                if (--huart->Rx_Env.Interrupt.XferCount == 0U)
+                *huart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+                if (--huart->Rx_Env.Transfer.XferCount == 0U)
                 {
                     LL_UART_SetRXTL(huart->UARTX, FIFO_RECEIVE_TRIGGER_8BYTE);
                     huart->RxState = HAL_UART_STATE_READY;
@@ -473,7 +473,7 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
                     HAL_UART_RxCpltCallback(huart);
                     return;
                 }
-                if (huart->Rx_Env.Interrupt.XferCount < 0x08)
+                if (huart->Rx_Env.Transfer.XferCount < 0x08)
                 {
                     LL_UART_SetRXTL(huart->UARTX, FIFO_RECEIVE_TRIGGER_1BYTE);
                 }
@@ -495,13 +495,13 @@ static void UART_ReceiveToIdle_IT(UART_HandleTypeDef *huart)
         fifo_level = REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_RXFL);
         for (; fifo_level > 0; fifo_level--)
         {
-            *huart->Rx_Env.Interrupt.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
-            huart->Rx_Env.Interrupt.XferCount--;
+            *huart->Rx_Env.Transfer.pBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+            huart->Rx_Env.Transfer.XferCount--;
         }
         LL_UART_SetRXTL(huart->UARTX, FIFO_RECEIVE_TRIGGER_8BYTE);
         huart->RxState = HAL_UART_STATE_READY;
         huart->UARTX->IDR = UART_IT_RXRD | UART_IT_RTO;
-        HAL_UART_RxToIdleCpltCallback(huart, huart->Rx_Env.Interrupt.XferCount);
+        HAL_UART_RxToIdleCpltCallback(huart, huart->Rx_Env.Transfer.XferCount);
         return;
     }
 }

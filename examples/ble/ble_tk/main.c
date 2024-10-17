@@ -306,7 +306,7 @@ static void get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con
 {
     LS_ASSERT(dev_name_ptr);
     dev_name_ptr->value = (uint8_t*)UART_SVC_ADV_NAME;
-    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME);
+    dev_name_ptr->length = sizeof(UART_SVC_ADV_NAME) - 1;
 }
 static void get_appearance(struct gap_dev_info_appearance *dev_appearance_ptr, uint8_t con_idx)
 {
@@ -405,7 +405,7 @@ static void create_adv_obj()
 static void start_adv(void)
 {
     LS_ASSERT(adv_obj_hdl != 0xff);
-    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME));
+    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME) - 1);
     dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
     LOG_I("adv start");
 }
