@@ -26,6 +26,7 @@ static void test()
     LOG_I("Curve P256 ScalarMult :");
     HAL_OTBN_ECC256_ScalarMult_IT(HAL_OTBN_ECC256_CURVE_P256, &param);
     while (flag) ;
+    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
     
     flag = true;
     param.scalar = sm2_k;
@@ -35,6 +36,8 @@ static void test()
     param.result_y = result_y;
     LOG_I("Curve SM2 ScalarMult :");
     HAL_OTBN_ECC256_ScalarMult_IT(HAL_OTBN_ECC256_CURVE_SM2, &param);
+    while (flag) ;
+    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
 }
 
 int main(void)

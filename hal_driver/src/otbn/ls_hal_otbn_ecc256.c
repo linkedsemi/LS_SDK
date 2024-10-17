@@ -141,7 +141,6 @@ static void ECC256_ScalarMult_Callback(void *param)
     struct HAL_OTBN_ECC256_ScalarMult_Param *p = param;
     HAL_OTBN_DMEM_Read(ECC256_DMEM_SCALARMULT_RESULT_X_OFFSET, p->result_x, 0x20);
     HAL_OTBN_DMEM_Read(ECC256_DMEM_SCALARMULT_RESULT_Y_OFFSET, p->result_y, 0x20);
-    // HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
     HAL_OTBN_ECC256_ScalarMult_Cb();
 }
 
