@@ -298,6 +298,7 @@ if(CONFIG_SOC_LSQSH)
     ../module/crc/crc16.c
     ../module/debug/ls_dbg.c
     ../module/debug/log.c
+    ../module/debug/semihosting/riscv/semihosting.c
     ../module/debug/RTT/SEGGER_RTT.c
     ../module/static_buffer/linked_buffer.c
     ../module/static_buffer/fifo.c
