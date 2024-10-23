@@ -111,8 +111,8 @@ HAL_StatusTypeDef HAL_LSSHA_Final(uint8_t *digest)
     byte_update(0x80);
     while(current_block_bytes!=SHA_PADDING_MOD)
     {
-        byte_update(0x00);
         sha_start(false);
+        byte_update(0x00);
     }
     byte_update(total_length>>56);
     byte_update(total_length>>48);
