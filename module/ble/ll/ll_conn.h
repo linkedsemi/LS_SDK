@@ -408,6 +408,7 @@ struct ll_conn_env{
     struct tx_desc *tx_desc_buf;
     uint8_t tx_desc_idx;
     uint8_t prog_tx_desc_idx;
+    uint8_t prog_count;
     #endif
 };
 
