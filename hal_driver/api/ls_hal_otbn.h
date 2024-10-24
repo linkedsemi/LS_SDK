@@ -1,5 +1,6 @@
 #ifndef LS_HAL_OTBN_H_
 #define LS_HAL_OTBN_H_
+#include "reg_otbn_type.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
