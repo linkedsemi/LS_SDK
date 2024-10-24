@@ -336,7 +336,7 @@ static void start_adv(void)
 {
     uint16_t uuid_value = 0x1812;
     LS_ASSERT(adv_obj_hdl != 0xff);
-    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 2, GAP_ADV_TYPE_SHORTENED_NAME, LS_HID_ADV_NAME, sizeof(LS_HID_ADV_NAME),
+    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 2, GAP_ADV_TYPE_SHORTENED_NAME, LS_HID_ADV_NAME, sizeof(LS_HID_ADV_NAME) - 1,
                                                                  GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID, &uuid_value, sizeof(uuid_value));
     dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
     LOG_I("adv start");

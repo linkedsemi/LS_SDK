@@ -48,11 +48,6 @@ leo_sha_polling_build:
   script:
     - cd examples/peripheral/sha/sha_polling && scons flags=-Werror ic=leo
 
-leo_sha_it_build:
-  stage: build
-  script:
-    - cd examples/peripheral/sha/sha_it && scons flags=-Werror ic=leo
-
 leo_sm4_polling_build:
   stage: build
   script:
@@ -78,30 +73,20 @@ leo_gpio_build:
   script:
     - cd examples/peripheral/gpio && scons flags=-Werror ic=leo
 
-leo_i2c_it_build:
+leo_i2c_master_it_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_it && scons flags=-Werror ic=leo
+    - cd examples/peripheral/i2c/i2c_master_it && scons flags=-Werror ic=leo
 
-leo_ll_i2c_it_build:
+leo_i2c_master_it_mem_read_write_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/ll_i2c_it && scons flags=-Werror ic=leo
+    - cd examples/peripheral/i2c/i2c_master_it_mem_read_write && scons flags=-Werror ic=leo
 
-leo_ll_i2c_polling_build:
+leo_i2c_slave_it_mem_read_write_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/ll_i2c_polling && scons flags=-Werror ic=leo
-
-leo_i2c_polling_build:
-  stage: build
-  script:
-    - cd examples/peripheral/i2c/i2c_polling && scons flags=-Werror ic=leo
-
-leo_i2c_dma_build:
-  stage: build
-  script:
-    - cd examples/peripheral/i2c/i2c_dma && scons flags=-Werror ic=leo
+    - cd examples/peripheral/i2c/i2c_slave_it_mem_read_write && scons flags=-Werror ic=leo
 
 leo_software_calendar_build:
   stage: build

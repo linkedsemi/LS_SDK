@@ -9,7 +9,9 @@ extern "C" {
 typedef struct
 {
     volatile uint32_t CR1;
-    volatile uint32_t CR2;
+    volatile uint16_t CR2_0_1;
+    volatile uint8_t CR2_2;
+    volatile uint8_t CR2_3;
     volatile uint32_t OAR1;
     volatile uint32_t OAR2;
     volatile uint32_t TIMINGR;
@@ -57,7 +59,7 @@ enum I2C_REG_CR1_FIELD
     I2C_CR1_RXFTH_POS = 28,
 };
 
-enum I2C_REG_CR2_FIELD
+enum I2C_REG_CR2_0_1_FIELD
 {
     I2C_CR2_SADD0_MASK = 0x1,
     I2C_CR2_SADD0_POS = 0,
@@ -77,15 +79,24 @@ enum I2C_REG_CR2_FIELD
     I2C_CR2_STOP_POS = 14,
     I2C_CR2_NACK_MASK = 0x8000,
     I2C_CR2_NACK_POS = 15,
-    I2C_CR2_NBYTES_MASK = 0xFF0000,
-    I2C_CR2_NBYTES_POS = 16,
-    I2C_CR2_RELOAD_MASK = 0x1000000,
-    I2C_CR2_RELOAD_POS = 24, 
-    I2C_CR2_AUTOEND_MASK = 0x2000000,
-    I2C_CR2_AUTOEND_POS = 25,
-    I2C_CR2_PECBYTE_MASK = 0x4000000,
-    I2C_CR2_PECBYTE_POS = 26,
 };
+
+enum I2C_REG_CR2_2_FIELD
+{
+    I2C_CR2_NBYTES_MASK = 0xFF,
+    I2C_CR2_NBYTES_POS = 0,
+};
+
+enum I2C_REG_CR2_3_FIELD
+{
+    I2C_CR2_RELOAD_MASK = 0x1,
+    I2C_CR2_RELOAD_POS = 0, 
+    I2C_CR2_AUTOEND_MASK = 0x2,
+    I2C_CR2_AUTOEND_POS = 1,
+    I2C_CR2_PECBYTE_MASK = 0x4,
+    I2C_CR2_PECBYTE_POS = 2,
+};
+
 enum I2C_REG_OAR1_FIELD
 {
     I2C_OAR1_OA10_MASK = 0x1,

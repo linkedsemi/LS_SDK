@@ -19,9 +19,9 @@ static const uint32_t ciphertext_sm3[8] = {
     0xd5339620, 0x1e34260d, 0xaa20ce75, 0x4897615c, 0x51ad9f0c, 0xedcf9ea9, 0x63008679, 0x3d914c08};
 
 uint8_t plainbuffer[64];
-uint32_t cipherbuffer_sha256[8];
-uint32_t cipherbuffer_sha224[7];
-uint32_t cipherbuffer_sm3[8];
+uint8_t cipherbuffer_sha256[0x20];
+uint8_t cipherbuffer_sha224[0x1C];
+uint8_t cipherbuffer_sm3[0x20];
 
 static void sha_init(void)
 {
@@ -30,8 +30,9 @@ static void sha_init(void)
 
 static void sha_crypt_test(void)
 {
-
-    HAL_LSSHA_SHA256(plaintext, sizeof(plaintext), cipherbuffer_sha256);
+    HAL_LSSHA_SHA256_Init();
+    HAL_LSSHA_Update(plaintext, sizeof(plaintext));
+    HAL_LSSHA_Final(cipherbuffer_sha256);
     if(!memcmp(cipherbuffer_sha256, ciphertext_sha256, sizeof(cipherbuffer_sha256)))
     {
         LOG_I("SHA256_ENCRYPT_TEST_SUCCESS!");
@@ -41,7 +42,9 @@ static void sha_crypt_test(void)
         LOG_I("SHA256_ENCRYPT_TEST_FAIL!");
     }
 
-    HAL_LSSHA_SHA224(plaintext,sizeof(plaintext),cipherbuffer_sha224);
+    HAL_LSSHA_SHA224_Init();
+    HAL_LSSHA_Update(plaintext,sizeof(plaintext));
+    HAL_LSSHA_Final(cipherbuffer_sha224);
     if(!memcmp(cipherbuffer_sha224, ciphertext_sha224, sizeof(cipherbuffer_sha224)))
     {
         LOG_I("SHA224_ENCRYPT_TEST_SUCCESS!");
@@ -51,7 +54,9 @@ static void sha_crypt_test(void)
         LOG_I("SHA224_ENCRYPT_TEST_FAIL!");
     }
 
-    HAL_LSSHA_SM3(plaintext, sizeof(plaintext), cipherbuffer_sm3);
+    HAL_LSSHA_SM3_Init();
+    HAL_LSSHA_Update(plaintext, sizeof(plaintext));
+    HAL_LSSHA_Final(cipherbuffer_sm3);
     if (!memcmp(cipherbuffer_sm3, ciphertext_sm3, sizeof(cipherbuffer_sm3)))
     {
         LOG_I("SM3_ENCRYPT_TEST_SUCCESS!");

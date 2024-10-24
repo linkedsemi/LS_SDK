@@ -184,25 +184,6 @@ lm3050_sha_polling_iar_build:
   script:
     - cd examples/peripheral/sha/sha_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sha_polling.ewp -build * -log all
 
-lm3050_sha_it_build:
-  stage: build
-  script:
-    - cd examples/peripheral/sha/sha_it && scons flags=-Werror ic=lm3050
-
-lm3050_sha_it_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/sha/sha_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b sha_it.uvprojx -o UVBuild/build.txt -j0 || type UVBuild/build.txt
-
-lm3050_sha_it_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/sha/sha_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" sha_it.ewp -build * -log all
-
 lm3050_sm4_polling_build:
   stage: build
   script:
@@ -298,100 +279,62 @@ lm3050_gpio_iar_build:
   script:
     - cd examples/peripheral/gpio/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" gpio.ewp -build * -log all    
 
-lm3050_i2c_it_build:
+lm3050_i2c_master_it_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/i2c_it && scons flags=-Werror ic=lm3050
+    - cd examples/peripheral/i2c/i2c_master_it && scons flags=-Werror ic=lm3050
 
-lm3050_i2c_it_keil_build:
+lm3050_i2c_master_it_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_it.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/i2c/i2c_master_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_master_it.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_i2c_it_iar_build:
+lm3050_i2c_master_it_iar_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_it.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_master_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_master_it.ewp -build * -log all    
 
-lm3050_ll_i2c_it_build:
+lm3050_i2c_master_it_mem_read_write_build:
   stage: build
   script:
-    - cd examples/peripheral/i2c/ll_i2c_it && scons flags=-Werror ic=lm3050
+    - cd examples/peripheral/i2c/i2c_master_it_mem_read_write && scons flags=-Werror ic=lm3050
 
-lm3050_ll_i2c_it_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/i2c/ll_i2c_it/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_it.uvprojx -o UVBuild/build.txt -j0
-
-lm3050_ll_i2c_it_iar_build:
+lm3050_i2c_master_it_mem_read_write_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_it/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_i2c_it.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_master_it_mem_read_write/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_master_it_mem_read_write.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_ll_i2c_polling_build:
-  stage: build
-  script:
-    - cd examples/peripheral/i2c/ll_i2c_polling && scons flags=-Werror ic=lm3050
-
-lm3050_ll_i2c_polling_keil_build:
+lm3050_i2c_master_it_mem_read_write_iar_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b ll_i2c_polling.uvprojx -o UVBuild/build.txt -j0
+    - cd examples/peripheral/i2c/i2c_master_it_mem_read_write/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_master_it_mem_read_write.ewp -build * -log all    
 
-lm3050_ll_i2c_polling_iar_build:
+lm3050_i2c_slave_it_mem_read_write_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_slave_it_mem_read_write && scons flags=-Werror ic=lm3050
+
+lm3050_i2c_slave_it_mem_read_write_keil_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/ll_i2c_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" ll_i2c_polling.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_slave_it_mem_read_write/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_slave_it_mem_read_write.uvprojx -o UVBuild/build.txt -j0
 
-lm3050_i2c_polling_build:
-  stage: build
-  script:
-    - cd examples/peripheral/i2c/i2c_polling && scons flags=-Werror ic=lm3050
-
-lm3050_i2c_polling_keil_build:
+lm3050_i2c_slave_it_mem_read_write_iar_build:
   stage: build
   rules:
     - !reference [.release_rule, rules]
   script:
-    - cd examples/peripheral/i2c/i2c_polling/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_polling.uvprojx -o UVBuild/build.txt -j0
-
-lm3050_i2c_polling_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/i2c/i2c_polling/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_polling.ewp -build * -log all    
-
-lm3050_i2c_dma_build:
-  stage: build
-  script:
-    - cd examples/peripheral/i2c/i2c_dma && scons flags=-Werror ic=lm3050
-
-lm3050_i2c_dma_keil_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/i2c/i2c_dma/lm3050/uvision5/ && C:/Keil_v5/UV4/UV4.exe -b i2c_dma.uvprojx -o UVBuild/build.txt -j0
-
-lm3050_i2c_dma_iar_build:
-  stage: build
-  rules:
-    - !reference [.release_rule, rules]
-  script:
-    - cd examples/peripheral/i2c/i2c_dma/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_dma.ewp -build * -log all    
+    - cd examples/peripheral/i2c/i2c_slave_it_mem_read_write/lm3050/iar/ && "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\iarbuild.exe" i2c_slave_it_mem_read_write.ewp -build * -log all    
 
 lm3050_software_calendar_build:
   stage: build

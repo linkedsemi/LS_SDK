@@ -547,8 +547,8 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         struct adv_payload_struct adv_data_name;
         if (dev_manager_adv_report_parse(GAP_ADV_TYPE_SHORTENED_NAME, &evt->adv_report, &adv_data_name))
         {
-            if (adv_data_name.size == sizeof(UART_SVC_ADV_NAME) &&
-                0 == memcmp((void*)adv_data_name.p_data, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME)))
+            if (adv_data_name.size == (sizeof(UART_SVC_ADV_NAME) - 1) &&
+                0 == memcmp((void*)adv_data_name.p_data, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME) - 1))
             {
                 if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
                 {
