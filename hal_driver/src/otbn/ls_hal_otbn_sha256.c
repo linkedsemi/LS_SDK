@@ -59,10 +59,12 @@ void HAL_OTBN_SHA256_Init()
     total_cnt = 0;
     remain_len = 0;
     index = SHA256_DMEM_MSG_OFFSET;
+    HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sha256_text, SHA256_TEXT_LENTH);
     HAL_OTBN_DMEM_Write(SHA256_DMEM_STATE_OFFSET, state_init, SHA256_DMEM_STATE_SIZE);
     HAL_OTBN_DMEM_Write(SHA256_DMEM_MASK_OFFSET, bswap32_mask, SHA256_DMEM_MASK_SIZE);
     HAL_OTBN_DMEM_Write(SHA256_DMEM_K_OFFSET, (uint32_t *)K, SHA256_DMEM_K_SIZE);
+    Sha256_BlockNumber_Update(0x20);
 }
 
 static void sha256_msg_write(uint8_t *msg)

@@ -67,13 +67,12 @@ void HAL_OTBN_SHA512_Init()
     index = SHA512_DMEM_MSG_OFFSET;
     uint32_t state_ptr = SHA512_DMEM_STATE_OFFSET;
     uint32_t msg_ptr = SHA512_DMEM_MSG_OFFSET;
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
+    HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sha512_text, SHA512_TEXT_LENTH);
     HAL_OTBN_DMEM_Write(SHA512_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA512_DMEM_STATE_SIZE);
     HAL_OTBN_DMEM_Write(SHA512_DMEM_K_OFFSET, (uint32_t *)K, SHA512_DMEM_K_SIZE);
     HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_STATE_OFFSET, &state_ptr, sizeof(uint32_t));
     HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_MSG_OFFSET, &msg_ptr, sizeof(uint32_t));
-    HAL_OTBN_DMEM_Set(SHA512_DMEM_BSS_START, 0x0, SHA512_DMEM_BSS_SIZE);
     SHA512_BlockNumber_Update(0x10);
 }
 
