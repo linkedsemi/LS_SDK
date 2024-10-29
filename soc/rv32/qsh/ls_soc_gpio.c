@@ -14,14 +14,6 @@
 #include "compile_flag.h"
 // #include "common.h"
 
-// #if BOOT_RAM
-// #define I2C_DBG_IO_CHECK(x)
-// #else
-// #define I2C_DBG_IO_CHECK(x)     if(i2c_dbg_io_check(x)){return;}
-// #endif
-
-// #define USB_DP_PAD PD00
-// #define USB_DM_PAD PD01
 #define SPI_FLASH_CLK_PIN   (PQ10)
 #define SPI_FLASH_CS_PIN    (PQ11)
 #define SPI_FLASH_SI_PIN    (PQ12)
@@ -879,16 +871,6 @@ ROM_SYMBOL void pinmux_hal_flash_init(void)
     per_func_enable(SPI_FLASH_CS_PIN, 1);
     per_func_enable(SPI_FLASH_SI_PIN, 1);
     per_func_enable(SPI_FLASH_SO_PIN, 1);
-    io_pull_write(SPI_FLASH_SI_PIN, IO_PULL_UP);
-    io_pull_write(SPI_FLASH_SO_PIN, IO_PULL_UP);
-    io_set_pin(SPI_FLASH_CS_PIN);
-    io_cfg_output(SPI_FLASH_CS_PIN);
-    io_clr_pin(SPI_FLASH_CLK_PIN);
-    io_cfg_output(SPI_FLASH_CLK_PIN);
-    io_set_pin(SPI_FLASH_WP_PIN);
-    io_cfg_output(SPI_FLASH_WP_PIN);
-    io_set_pin(SPI_FLASH_HOLD_PIN);
-    io_cfg_output(SPI_FLASH_HOLD_PIN);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_deinit(void)
