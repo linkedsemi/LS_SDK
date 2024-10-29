@@ -12,6 +12,7 @@
 #include "ll_hci.h"
 #include "evt_ctrl.h"
 #include "ll_env.h"
+#include "fifo.h"
 #define LLCP_PDU_CTRDATA_MAX_LENGTH 24
 #define CCM_PACKET_COUNTER_SIZE 5
 #define SESS_KEY_DIV_LEN    0x08
@@ -333,27 +334,27 @@ enum tx_ctrl_buf_idx
     LLCP_TX_BUF_LOCAL_PROCEDURE,
     LLCP_TX_BUF_PEER_PROCEDURE,
     LLCP_TX_BUF_MAX,
+    LLCP_TX_BUF_INVALID = 0xff,
 };
 
 enum llcp_tx_ctrl_status
 {
     LLCP_TX_IDLE,
+    LLCP_TX_PENDING,
     LLCP_TX_ONGOING,
     LLCP_TX_ACKED,
 };
 
-struct hci_air_tx_type
-{
-    struct co_list_hdr hdr;
-    uint16_t type;
-    enum llcp_tx_ctrl_status status;
-};
-
-#define LLCP_AIR_TX_TYPE (0xffff)
 
 struct llcp_tx_pdu_env
 {
-    struct hci_air_tx_type llcp_tx[LLCP_TX_BUF_MAX];
+    #ifdef LE501X
+    struct fifo_env ongoing;
+    uint8_t ongoing_buf[LLCP_TX_BUF_MAX];
+    #else
+    enum tx_ctrl_buf_idx curr_idx;
+    #endif
+    enum llcp_tx_ctrl_status status[LLCP_TX_BUF_MAX];
     struct llcp_termination_pdu terminate;
     struct llcp_normal_pdu local_proc;
     struct llcp_normal_pdu peer_proc;
@@ -369,7 +370,7 @@ struct ll_ctrl_procedure
 struct ll_conn_env{
     struct ll_evt evt;
     struct co_list pending_tx;
-    struct hci_air_tx_type *tx;
+    struct hci_acl_air_tx_data *tx;
     struct hci_acl_air_rx_data *rx;
     timer_t supv_to_timer;
     struct ll_ctrl_procedure local;
@@ -408,6 +409,7 @@ struct ll_conn_env{
     struct tx_desc *tx_desc_buf;
     uint8_t tx_desc_idx;
     uint8_t prog_tx_desc_idx;
+    uint8_t prog_count;
     #endif
 };
 
