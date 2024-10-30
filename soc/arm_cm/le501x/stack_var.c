@@ -25,6 +25,7 @@ __attribute((weak)) void (*app_init_fn)(void);
 __attribute((weak)) void (*platform_reset_fn)(uint32_t);
 __attribute((weak)) uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 __attribute((weak)) void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
+__attribute((weak)) void (*ecc_p256_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
 __attribute((weak)) void (*exit_critical_fn)(uint32_t);
 __attribute((weak)) uint32_t (*enter_critical_fn)(void);
 __attribute((weak)) void (*stack_reset_hook_fn)(void);
@@ -281,4 +282,17 @@ void ll_stack_var_ptr_init()
     mult_mtu_exch_enable = false;
 
     ll_stack_buffer_init(ENV_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
+}
+
+void ls_controller_var_ptr_init(void)
+{
+    stack_assert_asm_fn = stack_assert_asm;
+    ecc_p256_calc_fn = ecc_calc_start;
+    rand_fn = rand;
+    enter_critical_fn = enter_critical;
+    exit_critical_fn = exit_critical;
+    
+    ll_buf_init();
+    io_set_pin_fn = io_set_pin;
+    io_clr_pin_fn = io_clr_pin;
 }

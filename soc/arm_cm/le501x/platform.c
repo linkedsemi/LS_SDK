@@ -494,6 +494,7 @@ void sys_init_24g(void)
 }
 
 void ll_stack_var_ptr_init(void);
+void ls_controller_var_ptr_init(void);
 
 static void ll_var_init()
 {
@@ -516,7 +517,23 @@ void sys_init_ll()
     mac_init();
     irq_init();
     modem_rf_init();
-    systick_start();
+}
+
+void sys_init_ls_controller(void)
+{
+    analog_init();
+    bb_mem_clr();
+    ls_controller_var_ptr_init();
+    hal_flash_drv_var_init(true,false);
+    flash_swint_init();
+    io_init();
+    LOG_INIT();
+    HAL_PIS_Init();
+    calc_acc_init();
+    cpu_sleep_recover_init();
+    mac_init();
+    irq_init();
+    modem_rf_init();
 }
 
 void platform_reset(uint32_t error)
