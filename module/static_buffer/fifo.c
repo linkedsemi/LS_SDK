@@ -124,3 +124,45 @@ ROM_SYMBOL bool dword_fifo_get(struct fifo_env *ptr,void *data)
         return true;
     }
 }
+
+
+bool byte_fifo_put(struct fifo_env *ptr,uint8_t *data)
+{
+    if(sw_fifo_full(ptr))
+    {
+        return false;
+    }else
+    {
+        uint8_t *elem = ptr->buf;
+        elem[GET_WR_IDX(ptr)] = *data;
+        if(ptr->wr_idx + 1 == 2*ptr->length)
+        {
+            ptr->wr_idx = 0;
+        }else
+        {
+            ptr->wr_idx = ptr->wr_idx + 1;
+        }
+        return true;
+    }
+}
+
+bool byte_fifo_get(struct fifo_env *ptr,uint8_t *data)
+{
+    if(sw_fifo_empty(ptr))
+    {
+        return false;
+    }else
+    {
+        uint8_t *elem = ptr->buf;
+        *data = elem[GET_RD_IDX(ptr)];
+        if(ptr->rd_idx + 1 == 2*ptr->length)
+        {
+            ptr->rd_idx = 0;
+        }else
+        {
+            ptr->rd_idx = ptr->rd_idx + 1;
+        }
+        return true;
+    }
+}
+

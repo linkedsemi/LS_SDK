@@ -32,6 +32,10 @@ void sw_fifo_flush(struct fifo_env *ptr);
 
 uint16_t sw_fifo_element_amount(struct fifo_env *ptr);
 
+bool byte_fifo_put(struct fifo_env *ptr,uint8_t *data);
+
+bool byte_fifo_get(struct fifo_env *ptr,uint8_t *data);
+
 bool general_fifo_put(struct fifo_env *ptr,void *data);
 
 bool dword_fifo_put(struct fifo_env *ptr,void *data);
