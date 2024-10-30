@@ -32,6 +32,8 @@ int main(void)
 {
     sys_init_none();
     HAL_OTBN_Init();
+    bool result = HAL_OTBN_SM2_Verify_Polling(&Param);
+    LOG_I("OTBN SM2 Verify result : %d ", result);
     HAL_OTBN_SM2_Verify_IT(&Param);
     
     while (1) ;

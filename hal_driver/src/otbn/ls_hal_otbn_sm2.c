@@ -62,6 +62,42 @@ const static struct OTBN_SM2_CURVE SM2 = {
     .Gy =   {0x2139F0A0, 0x02DF32E5, 0xC62A4740, 0xD0A9877C, 0x6B692153, 0x59BDCEE3, 0xF4F6779C, 0xBC3736A2},
 };
 
+bool HAL_OTBN_SM2_Verify_Polling(struct HAL_OTBN_SM2_Verify_Param *param)
+{
+    uint32_t func = SM2_FUNC_VERIFY;
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
+    HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_CURVE_P_OFFSET, (uint32_t *)&SM2, SM2_DMEM_CURVE_P_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_MSG_OFFSET, param->msg, SM2_DMEM_MSG_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_R_OFFSET, param->r, SM2_DMEM_R_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_S_OFFSET, param->s, SM2_DMEM_S_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, param->x, SM2_DMEM_X_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, param->y, SM2_DMEM_Y_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &func, sizeof(uint32_t));
+    
+    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
+    
+    uint8_t x_r[SM2_DMEM_X_R_SIZE];
+    HAL_OTBN_DMEM_Read(SM2_DMEM_X_R_OFFSET, (uint32_t *)x_r, SM2_DMEM_X_R_SIZE);
+    return !memcmp(param->r, x_r, SM2_DMEM_X_R_SIZE);
+}
+
+bool HAL_OTBN_SM2_ValidPoint_Polling(uint8_t *x, uint8_t *y)
+{
+    uint32_t data = SM2_FUNC_VALIDPOINT;
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
+    HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_CURVE_P_OFFSET, (uint32_t *)&SM2, SM2_DMEM_CURVE_P_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, (uint32_t *)x, SM2_DMEM_X_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, (uint32_t *)y, SM2_DMEM_Y_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &data, sizeof(uint32_t));
+    
+    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
+    
+    HAL_OTBN_DMEM_Read(SM2_DMEM_X_R_OFFSET, &data, sizeof(uint32_t));
+    return data;
+}
+
 __attribute__((weak)) void HAL_OTBN_SM2_ScalarMult_CallBack() {}
 __attribute__((weak)) void HAL_OTBN_SM2_Verify_CallBack(bool result) {}
 __attribute__((weak)) void HAL_OTBN_SM2_ValidPoint_CallBack(bool result) {}
