@@ -29,6 +29,8 @@ HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data,
 
 HAL_StatusTypeDef HAL_HMAC_SHA224(uint32_t out[SHA224_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
+HAL_StatusTypeDef HAL_HMAC_SM3(uint32_t out[SM3_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
+
 bool HAL_KDF_SM3(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len);
 
 void LSSHA_IRQHandler(void);

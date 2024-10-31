@@ -152,3 +152,36 @@ void HAL_OTBN_SHA256_Final(uint8_t result[0x20])
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
 }
 
+void HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+{
+    uint8_t kh[SHA256_RESULT_SIZE];
+    HAL_OTBN_SHA256_Init();
+
+    if (key_len > HMAC_B)
+    {
+        HAL_OTBN_SHA256_Update(key, key_len);
+        HAL_OTBN_SHA256_Final(kh);
+        key_len = SHA256_RESULT_SIZE;
+        key = kh;
+    }
+
+    uint8_t kx[HMAC_B];
+    for (uint32_t i = 0; i < key_len; i++)
+        kx[i] = HMAC_I_PAD ^ key[i];
+    for (uint32_t i = key_len; i < HMAC_B; i++)
+        kx[i] = HMAC_I_PAD ^ 0;
+
+    HAL_OTBN_SHA256_Update(kx, HMAC_B);
+    HAL_OTBN_SHA256_Update(data, data_len);
+    HAL_OTBN_SHA256_Final(out);
+    HAL_OTBN_SHA256_Init();
+
+    for (uint8_t i = 0; i < key_len; i++)
+        kx[i] = HMAC_O_PAD ^ key[i];
+    for (uint8_t i = key_len; i < HMAC_B; i++)
+        kx[i] = HMAC_O_PAD ^ 0;
+
+    HAL_OTBN_SHA256_Update(kx, HMAC_B);
+    HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE);
+    HAL_OTBN_SHA256_Final(out);
+}

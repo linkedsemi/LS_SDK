@@ -6,6 +6,10 @@
 extern "C" {
 #endif
 
+#define HMAC_B 64
+#define HMAC_I_PAD 0x36
+#define HMAC_O_PAD 0x5C
+
 #define SHA256_RESULT_SIZE          (0x20)
 #define SHA384_RESULT_SIZE          (0x30)
 #define SHA512_RESULT_SIZE          (0x40)
@@ -13,14 +17,17 @@ extern "C" {
 void HAL_OTBN_SHA256_Init();
 void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA256_Final(uint8_t result[SHA256_RESULT_SIZE]);
+void HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
 void HAL_OTBN_SHA384_Init();
 void HAL_OTBN_SHA384_Update(uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE]);
+void HAL_OTBN_SHA384_HMAC(uint8_t out[SHA384_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
 void HAL_OTBN_SHA512_Init();
 void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA512_Final(uint8_t result[SHA384_RESULT_SIZE]);
+void HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
 
 #ifdef __cplusplus

@@ -141,6 +141,7 @@ HAL_StatusTypeDef HAL_LSSHA_Final(uint8_t *digest)
 #define O_PAD 0x5C
 #define SHA256_DIGEST_SIZE 32
 #define SHA224_DIGEST_SIZE 28
+#define SM3_DIGEST_SIZE 32
 
 HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
 {
@@ -236,6 +237,69 @@ HAL_StatusTypeDef HAL_HMAC_SHA224(uint32_t out[SHA224_WORDS_NUM], uint8_t *data,
 
     HAL_LSSHA_Update(kx, B);
     HAL_LSSHA_Update((uint8_t *)out, SHA224_DIGEST_SIZE);
+    HAL_LSSHA_Final((uint8_t *)out);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_HMAC_SM3(uint32_t out[SM3_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+{
+    uint32_t kh[SM3_WORDS_NUM];
+    HAL_LSSHA_SM3_Init();
+
+    /*
+     * If the key length is bigger than the buffer size B, apply the hash
+     * function to it first and use the result instead.
+     */
+    if (key_len > B)
+    {
+        HAL_LSSHA_Update(key, key_len);
+        HAL_LSSHA_Final((uint8_t *)kh);
+        key_len = SM3_DIGEST_SIZE;
+        key = (uint8_t *)kh;
+    }
+
+    /*
+     * (1) append zeros to the end of K to create a B byte string
+     *     (e.g., if K is of length 20 bytes and B=64, then K will be
+     *     appended with 44 zero bytes 0x00)
+     * (2) XOR (bitwise exclusive-OR) the B byte string computed in step
+     *     (1) with ipad
+     */
+    uint8_t kx[B];
+    for (uint32_t i = 0; i < key_len; i++)
+        kx[i] = I_PAD ^ key[i];
+    for (uint32_t i = key_len; i < B; i++)
+        kx[i] = I_PAD ^ 0;
+
+    /*
+     * (3) append the stream of data 'text' to the B byte string resulting
+     *     from step (2)
+     * (4) apply H to the stream generated in step (3)
+     */
+    HAL_LSSHA_Update(kx, B);
+    HAL_LSSHA_Update(data, data_len);
+    HAL_LSSHA_Final((uint8_t *)out);
+    HAL_LSSHA_SM3_Init();
+
+    /*
+     * (5) XOR (bitwise exclusive-OR) the B byte string computed in
+     *     step (1) with opad
+     *
+     * NOTE: The "kx" variable is reused.
+     */
+    for (uint8_t i = 0; i < key_len; i++)
+        kx[i] = O_PAD ^ key[i];
+    for (uint8_t i = key_len; i < B; i++)
+        kx[i] = O_PAD ^ 0;
+
+    /*
+     * (6) append the H result from step (4) to the B byte string
+     *     resulting from step (5)
+     * (7) apply H to the stream generated in step (6) and output
+     *     the result
+     */
+    HAL_LSSHA_Update(kx, B);
+    HAL_LSSHA_Update((uint8_t *)out, SM3_DIGEST_SIZE);
     HAL_LSSHA_Final((uint8_t *)out);
     return HAL_OK;
 }
