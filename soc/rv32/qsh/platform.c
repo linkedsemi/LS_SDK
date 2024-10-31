@@ -47,21 +47,23 @@ __attribute__((weak)) void SystemInit(){
 //     }
 // }
 
-// static void flash_swint_init()
-// {
-//     rv_set_int_isr(FLASH_SWINT_NUM,FLASH_SWINT_HANDLER);
-//     CLIC->CLICINT[FLASH_SWINT_NUM].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
-//     csi_vic_set_prio(FLASH_SWINT_NUM,0xf);
-//     csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
-//     csi_vic_enable_irq(FLASH_SWINT_NUM);
-// }
-
+static void flash_swint_init()
+{
+    rv_set_int_isr(FLASH_SWINT_NUM,FLASH_SWINT_HANDLER);
+    CLIC->CLICINT[FLASH_SWINT_NUM].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+    csi_vic_set_prio(FLASH_SWINT_NUM,0xf);
+    csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
+    csi_vic_enable_irq(FLASH_SWINT_NUM);
+}
 
 void sys_init_none()
 {
+    flash_swint_init();
+    hal_flash_init();
+    hal_flash_dual_mode_set(1);
+
     // clk_flash_init();
     // set_all_irq_priority_to_lowest_level();
-    // flash_swint_init();
     // hal_flash_xip_func_ptr_init();
     io_init();
     LOG_INIT();

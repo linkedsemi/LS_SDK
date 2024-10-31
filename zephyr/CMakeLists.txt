@@ -326,6 +326,11 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32/qsh/sys_stat.c
     ../soc/rv32/qsh/platform.c
     ../module/static_buffer/fifo.c
+    ../hal_driver/src/ls_hal_qspiv2.c
+    ../hal_driver/src/ls_hal_flash_qspiv2.c
+    ../hal_driver/src/ls_hal_flash.c
+    ../hal_driver/src/ls_hal_flash_swint.c
+    ../soc/rv32/leo/ls_msp_qspiv2.c
   )
 
   zephyr_linker_sources(
