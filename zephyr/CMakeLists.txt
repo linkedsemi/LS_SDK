@@ -16,13 +16,21 @@ if(CONFIG_SOC_LE5010)
     ../module/debug
     ../module/tinyfs
     ../module/ble
+    ../module/ble/ll
     ../module/static_buffer
   )
 
   zephyr_library_sources(
+    ../module/ble/ll_buf.c
+    ../module/common/async_call.c
+    ../module/common/circular_doubly_linked_list.c
+    ../module/common/linked_async_framework.c
+    ../module/common/sw_timer.c
     ../module/common/common.c
     ../module/debug/ls_dbg.c
     ../module/debug/log.c
+    ../module/static_buffer/fifo.c
+    ../module/static_buffer/linked_buffer.c
     ../hal_driver/src/calc_div.c
     ../hal_driver/src/ls_hal_trng.c
     ../hal_driver/src/ls_hal_flash.c
@@ -51,7 +59,7 @@ if(CONFIG_SOC_LE5010)
   )
 
   zephyr_link_libraries(
-    ll_fw
+    ls_ble_controller
     -L${CMAKE_CURRENT_SOURCE_DIR}/../soc/arm_cm/le501x/bin
   )
 
@@ -65,12 +73,14 @@ if(CONFIG_SOC_LE5010)
     reset_retain.ld
   )
 
+  zephyr_compile_definitions(LE501X)
+
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/le501x/info_sbl_merge.py 
-    ${ZEPHYR_CURRENT_MODULE_DIR}/soc/arm_cm/le501x/bin/bram.bin 0x18026000 ${CMAKE_BINARY_DIR}/zephyr/info_sbl.hex)
+    ${ZEPHYR_CURRENT_MODULE_DIR}/soc/arm_cm/le501x/bin/bram.bin 0x18002000 ${CMAKE_BINARY_DIR}/zephyr/info_sbl.hex)
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/hexmerge.py 
-    ${CMAKE_BINARY_DIR}/zephyr/info_sbl.hex ${ZEPHYR_CURRENT_MODULE_DIR}/soc/arm_cm/le501x/bin/ll_fw.hex 
+    ${CMAKE_BINARY_DIR}/zephyr/info_sbl.hex
     ${CMAKE_BINARY_DIR}/zephyr/${CONFIG_KERNEL_BIN_NAME}.hex > production.hex)
 endif()
 
