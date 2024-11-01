@@ -4,7 +4,7 @@ tool = ARGUMENTS.get('tool','riscv-gcc')
 env.Tool(tool,toolpath = ['$SDK_ROOT/tools'])
 
 env['COMPILER'] = 'gnu'
-env['CCFLAGS'] = ' -mabi=$ABI -march=$ARCH -mshorten-memrefs -mstrict-align -msave-restore -malign-data=natural -fshort-enums -fshort-wchar -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
+env['CCFLAGS'] = ' -mabi=$ABI -march=$ARCH -mshorten-memrefs -mstrict-align -msave-restore -malign-data=natural -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall '
 env['CFLAGS'] = ' -std=c11 '
 env['CXXFLAGS'] = ' -std=c++11 -fno-exceptions  -fno-rtti -fno-unwind-tables -fno-threadsafe-statics '
 env['ASFLAGS'] = ' -c ${CCFLAGS} ${_CPPDEFFLAGS} '
