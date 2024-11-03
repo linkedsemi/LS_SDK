@@ -195,16 +195,16 @@ void HAL_OTBN_SHA384_HMAC(uint8_t out[SHA384_RESULT_SIZE], uint8_t *data, uint32
     for (uint32_t i = key_len; i < HMAC_B; i++)
         kx[i] = HMAC_I_PAD ^ 0;
 
+    HAL_OTBN_SHA384_Init();
     HAL_OTBN_SHA384_Update(kx, HMAC_B);
     HAL_OTBN_SHA384_Update(data, data_len);
     HAL_OTBN_SHA384_Final(out);
-    HAL_OTBN_SHA384_Init();
-
     for (uint8_t i = 0; i < key_len; i++)
         kx[i] = HMAC_O_PAD ^ key[i];
     for (uint8_t i = key_len; i < HMAC_B; i++)
         kx[i] = HMAC_O_PAD ^ 0;
 
+    HAL_OTBN_SHA384_Init();
     HAL_OTBN_SHA384_Update(kx, HMAC_B);
     HAL_OTBN_SHA384_Update(out, SHA384_RESULT_SIZE);
     HAL_OTBN_SHA384_Final(out);

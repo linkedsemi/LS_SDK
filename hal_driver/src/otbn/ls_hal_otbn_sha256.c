@@ -171,16 +171,17 @@ void HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32
     for (uint32_t i = key_len; i < HMAC_B; i++)
         kx[i] = HMAC_I_PAD ^ 0;
 
+    HAL_OTBN_SHA256_Init();
     HAL_OTBN_SHA256_Update(kx, HMAC_B);
     HAL_OTBN_SHA256_Update(data, data_len);
     HAL_OTBN_SHA256_Final(out);
-    HAL_OTBN_SHA256_Init();
 
     for (uint8_t i = 0; i < key_len; i++)
         kx[i] = HMAC_O_PAD ^ key[i];
     for (uint8_t i = key_len; i < HMAC_B; i++)
         kx[i] = HMAC_O_PAD ^ 0;
 
+    HAL_OTBN_SHA256_Init();
     HAL_OTBN_SHA256_Update(kx, HMAC_B);
     HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE);
     HAL_OTBN_SHA256_Final(out);
