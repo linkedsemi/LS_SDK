@@ -142,7 +142,7 @@ void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
         remain_len = 0;
     }
 
-    while (remain_len != (SHA384_MSG_BLOCK_SIZE - 8))
+    while (remain_len != (SHA384_MSG_BLOCK_SIZE - 16))
     {
         remain_data[remain_len++] = 0x0;
         if (remain_len == SHA384_MSG_BLOCK_SIZE)
@@ -151,6 +151,8 @@ void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
             remain_len = 0;
         }
     }
+    memset(&remain_data[remain_len], 0x0, 0x8);
+    remain_len += 8;
 
     for (uint8_t i = 0; i < 8; i++)
     {
