@@ -6,7 +6,6 @@
 extern "C" {
 #endif
 
-#define HMAC_B 0x40
 #define HMAC_I_PAD 0x36
 #define HMAC_O_PAD 0x5C
 
