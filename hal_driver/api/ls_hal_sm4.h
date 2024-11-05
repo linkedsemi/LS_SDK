@@ -91,6 +91,8 @@ void HAL_SM4_KeyExpansion_Complete_Callback();
 
 void HAL_SM4_IRQHandler(void);
 
+void HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out);
+
 #ifdef __cplusplus
 }
 #endif
