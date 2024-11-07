@@ -22,6 +22,7 @@ extern "C" {
 #define QSH_MEM_SRAM2_ADDR         (0x10080000)
 #define QSH_MEM_PERIPH_ADDR        (0x40000000)
 
+#define FLASH_BASE_ADDR            (0x08000000)
 #define QSH_PER_QSPI1_ADDR         (0x40000000)
 #define QSH_PER_QSPI2_ADDR         (0x40001000)
 #define QSH_PER_USB1_ADDR          (0x40002000)
