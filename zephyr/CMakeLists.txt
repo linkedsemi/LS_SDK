@@ -296,8 +296,6 @@ if(CONFIG_SOC_LSQSH)
     ../module/common/linked_async_framework.c
     ../module/common/async_call.c
     ../module/crc/crc16.c
-    ../module/debug/ls_dbg.c
-    ../module/debug/log.c
     ../module/debug/semihosting/riscv/semihosting.c
     ../module/debug/RTT/SEGGER_RTT.c
     ../module/static_buffer/linked_buffer.c

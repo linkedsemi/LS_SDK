@@ -66,7 +66,9 @@ void sys_init_none()
     // set_all_irq_priority_to_lowest_level();
     // hal_flash_xip_func_ptr_init();
     io_init();
+#if !defined(KERNEL)
     LOG_INIT();
+#endif
     // low_power_init();
     systick_start();
     // sw_timer_module_init();
