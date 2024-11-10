@@ -343,5 +343,6 @@ if(CONFIG_SOC_LSQSH)
     reset_retain.ld
   )
 
+  zephyr_compile_definitions(CONFIG_FSTACK_PROTECTOR)
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
 endif()
