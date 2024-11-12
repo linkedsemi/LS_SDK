@@ -98,5 +98,6 @@ __attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
 
 void XIP_BANNED_FUNC(sync_for_xip_stop,)
 {
-    while ((PMU->IO[13].DIN & 1 << 8) ==0);
+    /* wait for CS_N release */
+    while (io_get_input_val(PQ11) == 0);
 }
