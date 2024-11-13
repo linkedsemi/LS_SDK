@@ -261,16 +261,16 @@ uint8_t HAL_DWUART_RX_DMA_Handshake_Get(DWUART_HandleTypeDef *inst)
 
 __attribute__((weak)) void LL_UART1_Handler() {}
 
-// void LL_UART1_MSP_Init(void)
-// {
-//     rv_set_int_isr(UART1_IRQn, LL_UART1_Handler);
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_UART1, 1);
-// }
+void LL_UART1_MSP_Init(void)
+{
+    rv_set_int_isr(QSH_UART1_IRQn, LL_UART1_Handler);
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
+}
 
-// void LL_UART1_MSP_DeInit(void)
-// {
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART1, 1);
-// }
+void LL_UART1_MSP_DeInit(void)
+{
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART1_MASK;
+}
 
 __attribute__((weak)) void LL_UART2_Handler() {}
 
@@ -280,10 +280,10 @@ void LL_UART2_MSP_Init(void)
     SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
 }
 
-// void LL_UART2_MSP_DeInit(void)
-// {
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART2, 1);
-// }
+void LL_UART2_MSP_DeInit(void)
+{
+    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART2_MASK;
+}
 
 // __attribute__((weak)) void LL_UART3_Handler() {}
 
