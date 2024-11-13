@@ -321,6 +321,12 @@ void io_cfg_input(uint8_t pin)
     PMU->IO[x->port].IEN_OD &= ~(1<<16<<x->num);
 }
 
+void io_cfg_input_pure(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    PMU->IO[x->port].IEN_OD &= ~(1<<16<<x->num);
+}
+
 void io_write_pin(uint8_t pin,uint8_t val)
 {
     if(val)

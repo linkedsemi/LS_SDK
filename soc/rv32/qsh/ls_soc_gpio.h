@@ -73,10 +73,16 @@ void io_cfg_opendrain(uint8_t pin);
 void io_cfg_pushpull(uint8_t pin);
 
 /**
-  * @brief GPIO config input
+  * @brief GPIO config input and disable output
   * @param  pin  Specific GPIO pin
   */
 void io_cfg_input(uint8_t pin);
+
+/**
+  * @brief GPIO just config input, not disable output
+  * @param  pin  Specific GPIO pin
+  */
+void io_cfg_input_pure(uint8_t pin);
 
 /**
   * @brief GPIO input disable
