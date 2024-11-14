@@ -13,7 +13,7 @@
 #define SEMIHOSTING 8
 
 #ifndef LOG_BACKEND
-#define LOG_BACKEND (UART_LOG)
+#define LOG_BACKEND (SEMIHOSTING)
 #endif
 
 #define RAM_LOG_BUF_SIZE 10000
