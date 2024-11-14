@@ -1,8 +1,11 @@
 #include "ls_hal_sm4.h"
 #include "ls_msp_sm4.h"
 #include "field_manipulate.h"
+#include <string.h>
 #include "ls_dbg.h"
-#include "log.h"
+
+#define SM4_BLOCK_SIZE (0x10)
+
 static const uint8_t *crypt_in;
 static uint8_t *crypt_out;
 static bool writeflag;
@@ -122,6 +125,34 @@ HAL_StatusTypeDef HAL_SM4_Decrypt(const uint8_t *data, uint8_t *result, uint32_t
     sm4_calculate();
     return HAL_OK;
 }
+
+void HAL_SM4_CTR_Crypt(uint8_t cnt_p[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out)
+{
+    uint32_t i,length;
+    uint8_t cnt[SM4_BLOCK_SIZE];
+    uint8_t result[SM4_BLOCK_SIZE];
+
+    memcpy(cnt,cnt_p,SM4_BLOCK_SIZE);
+    REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_DEC, 0);
+    do
+    {
+        sm4_data_length_inout_config(cnt, 0x10, result);
+        sm4_calculate();
+        length = (in_len > SM4_BLOCK_SIZE )? SM4_BLOCK_SIZE : in_len;
+        for (i = 0; i < length; i++)
+        {
+            *out++ = result[i] ^ *in++;
+        }
+        in_len -= length;
+        cnt[SM4_BLOCK_SIZE - 1]++;
+        for (i = 1; i < SM4_BLOCK_SIZE; i++)
+        {
+            if (cnt[SM4_BLOCK_SIZE - i] == 0x00)
+                cnt[SM4_BLOCK_SIZE - i - 1]++;
+        }
+    } while (in_len);
+}
+
 
 HAL_StatusTypeDef HAL_SM4_Encrypt_IT(const uint8_t *data, uint8_t *result, uint32_t length)
 {

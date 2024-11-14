@@ -414,6 +414,44 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t
     return HAL_OK;
 }
 
+static void aes_ctr_enc(uint8_t *cnt_p)
+{
+    uint32_t i,length;
+    uint8_t cnt[AES_BLOCK_SIZE];
+    uint8_t result[AES_BLOCK_SIZE];
+
+    BLOCK_SIZE = AES_BLOCK_SIZE;
+    memcpy(cnt,cnt_p,AES_BLOCK_SIZE);
+    aes_config(false, false, true, false);
+    do
+    {
+        block_data_in(cnt);
+        REG_FIELD_WR(LSCRYPT->CR,CRYPT_GO,1);
+        while (REG_FIELD_RD(LSCRYPT->SR, CRYPT_AESRIF) == 0);
+        LSCRYPT->ICFR = CRYPT_AESIF_MASK;
+        block_data_out(result);
+        length = (length_residue > AES_BLOCK_SIZE )? AES_BLOCK_SIZE : length_residue;
+        for (i = 0; i < length; i++)
+        {
+            *current_out++ = result[i] ^ *current_in++;
+        }
+        length_residue -= length;
+        cnt[AES_BLOCK_SIZE - 1]++;
+        for (i = 1; i < AES_BLOCK_SIZE; i++)
+        {
+            if (cnt[AES_BLOCK_SIZE - i] == 0x00)
+                cnt[AES_BLOCK_SIZE - i - 1]++;
+        }
+    } while (length_residue);
+}
+
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out)
+{
+    crypt_in_out_length_set(in, out, in_len);
+    aes_ctr_enc((uint8_t *)cnt);
+    return HAL_OK;
+}
+
 HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
 { 
     length_check(AES_MODE,ENCRYPT,plaintextlength,ciphertextlength);

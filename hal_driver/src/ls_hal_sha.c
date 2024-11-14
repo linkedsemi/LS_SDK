@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include <string.h>
 #include "ls_hal_sha.h"
 #include "ls_msp_sha.h"
 #include "field_manipulate.h"
@@ -246,6 +246,35 @@ HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint32_
     HAL_LSSHA_Update(data, length);
     HAL_LSSHA_Final((uint8_t *)hash_val);
     return HAL_OK;
+}
+
+bool HAL_KDF_SM3(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
+{
+    uint32_t ct = 0x1;
+    uint8_t Data[4];
+	uint32_t digest_len = 0x20;
+	uint8_t digest[0x20];
+	uint32_t index = (out_len + 0x1f) / 0x20;
+
+    if (Z == NULL || out_len == 0 || Zlen == 0 || out == NULL)
+        return false;
+
+    for (uint32_t i = 0; i < index; i++)
+    {
+        Data[0] = (ct >> 24) & 0xFF;
+        Data[1] = (ct >> 16) & 0xFF;
+        Data[2] = (ct >> 8) & 0xFF;
+        Data[3] = (ct >> 0) & 0xFF;
+        HAL_LSSHA_SM3_Init();
+        HAL_LSSHA_Update(Z, Zlen);
+        HAL_LSSHA_Update(Data, 4);
+        HAL_LSSHA_Final(digest);
+        if ((i == index - 1) && (out_len % 0x20 != 0))
+                digest_len = (out_len) % 0x20;
+        memcpy(out + 0x20 * i, digest, digest_len);
+        ct++;
+    }
+    return true;
 }
 
 void LSSHA_IRQHandler(void){}

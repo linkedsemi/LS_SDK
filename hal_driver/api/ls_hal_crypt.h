@@ -118,6 +118,8 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t
  */
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength);
 
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out);
+
 /** \brief LSCRYPT AES ECB Encrypt (Interrupt Mode)
  *  \param[in] plaintext Input data
  *  \param[in] plaintextlength Input data Length

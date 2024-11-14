@@ -34,7 +34,7 @@ exception_entry:
     .cfi_offset ra,-0x4c
     bgtz    t1, trap_handler
 int_call:
-    csrrwi  t0, mnxti, 8
+    csrrsi  t0, mnxti, 8
     beqz    t0, exception_exit
     lw      t0, 0(t0)
     jalr    t0   
