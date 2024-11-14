@@ -410,6 +410,7 @@ struct ll_conn_env{
     uint8_t tx_desc_idx;
     uint8_t prog_tx_desc_idx;
     uint8_t prog_count;
+    bool cs_lastempty;
     #endif
 };
 
