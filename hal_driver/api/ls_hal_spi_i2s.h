@@ -2,7 +2,7 @@
 #define LS_HAL_SPI_H_
 #include "HAL_def.h"
 #include "field_manipulate.h"
-#include "ls_msp_spi_i2s.h"
+#include "reg_spi_type.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +49,8 @@ typedef struct
   * @}
   */
 
+struct __SPI_HandleTypeDef;
+struct __I2S_HandleTypeDef;
 /**
   * @brief  Transfer Environment
   */
