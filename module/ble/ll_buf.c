@@ -15,8 +15,8 @@
 #define LL_CONNECTION_MAX 1
 #define SCAN_RX_BUF_NUM (5)
 #define SECOND_SCAN_BUF_NUM (0)
-#define HCI_ACL_DATA_RX_BUFFER_NUM (2*LL_CONNECTION_MAX)  //tx_data_buf_num
-#define HCI_ACL_DATA_TX_BUFFER_NUM 10//(2*LL_CONNECTION_MAX)
+#define LL_CONN_TX_BUFFER_NUM (2*LL_CONNECTION_MAX)  //tx_data_buf_num
+#define LL_CONN_RX_BUFFER_NUM 10//(2*LL_CONNECTION_MAX)
 #define LL_SYNC_ENV_NUM 0
 #define SYNC_RX_BUF_NUM 0
 #define HCI_TX_ELEMENT_MAX_NUM 10
@@ -56,11 +56,11 @@ extern linked_buffer_t *sync_rx_buf_ptr;
 
 //ll_conn
 DEF_LINKED_BUF(ll_conn_buf,struct ll_conn_env,LL_CONNECTION_MAX);
-DEF_LINKED_BUF(ll_conn_rx_buf, struct hci_acl_air_rx_data, HCI_ACL_DATA_TX_BUFFER_NUM);
-DEF_LINKED_BUF(hci_acl_data_rx_buf, struct hci_acl_air_tx_data, HCI_ACL_DATA_RX_BUFFER_NUM);
+DEF_LINKED_BUF(ll_conn_rx_buf, struct hci_acl_air_rx_data, LL_CONN_RX_BUFFER_NUM);
+DEF_LINKED_BUF(ll_conn_tx_buf, struct hci_acl_air_tx_data, LL_CONN_TX_BUFFER_NUM);
 extern linked_buffer_t *ll_conn_buf_ptr;
 extern linked_buffer_t *ll_conn_rx_buf_ptr;
-extern linked_buffer_t *hci_acl_data_rx_buf_ptr;
+extern linked_buffer_t *ll_conn_tx_buf_ptr;
 
 //ll_hci
 DEF_LINKED_BUF(hci_tx_element_buf, struct hci_tx_element, HCI_TX_ELEMENT_MAX_NUM);
@@ -96,7 +96,7 @@ extern void (*hci_reset_reset_buf_fn)(void);
 
 #ifdef LE501X
 #define TX_DESC_NUM (20)
-#define RX_DESC_NUM (HCI_ACL_DATA_TX_BUFFER_NUM - 1)
+#define RX_DESC_NUM (LL_CONN_RX_BUFFER_NUM - 1)
 struct rx_desc rx_desc_buf[RX_DESC_NUM];
 struct tx_desc tx_desc_buf[LL_CONNECTION_MAX][TX_DESC_NUM];
 static void tx_rx_desc_buf_init()
@@ -119,14 +119,14 @@ static void adv_report_cache_reset(void)
     INIT_SW_CACHE(adv_rx_cache);
 }
 
-static void hci_acl_data_rx_buf_init()
+static void ll_conn_tx_buf_init()
 {
-    hci_acl_data_rx_buf_ptr = &hci_acl_data_rx_buf;
+    ll_conn_tx_buf_ptr = &ll_conn_tx_buf;
 }
 
-static void hci_acl_data_rx_buf_reset()
+static void ll_conn_tx_buf_reset()
 {
-    INIT_LINKED_BUF(hci_acl_data_rx_buf);
+    INIT_LINKED_BUF(ll_conn_tx_buf);
 }
 
 static void rx_buf_list_init()
@@ -247,7 +247,7 @@ static void sw_timer_buf_reset()
 void hci_reset_reset_buf()
 {
     adv_report_cache_reset();
-    hci_acl_data_rx_buf_reset();
+    ll_conn_tx_buf_reset();
     rx_buf_list_reset();
     //tx_desc_list_reset();
     ll_conn_buf_reset();
@@ -277,10 +277,10 @@ void ll_buf_init()
     per_adv_list_size = PER_ADV_LIST_SIZE;
     white_list_size = WHITE_LIST_SIZE;
     conn_data_max_len = CONN_DATA_MAX_LEN;
-    tx_data_buf_num = HCI_ACL_DATA_RX_BUFFER_NUM;
+    tx_data_buf_num = LL_CONN_TX_BUFFER_NUM;
     ll_default_tx_pwr = 0x7;
     adv_report_cache_init();
-    hci_acl_data_rx_buf_init();
+    ll_conn_tx_buf_init();
     rx_buf_list_init();
     ll_conn_buf_init();
     ll_ext_scan_buf_init();

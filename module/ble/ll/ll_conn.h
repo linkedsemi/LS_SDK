@@ -463,9 +463,9 @@ bool htimer_conn_evt_header_rx(struct ll_evt *evt,bool third_byte,uint8_t *remai
 
 enum ll_evt_transition_type htimer_conn_tx_end(struct ll_evt *evt);
 
-void rx_buf_release_protected_swint(struct hci_acl_air_rx_data *ptr);
+void ll_conn_rx_buf_release_protected_swint(struct hci_acl_air_rx_data *ptr);
 
-struct hci_acl_air_tx_data *hci_acl_data_rx_buf_alloc(void);
+struct hci_acl_air_tx_data *ll_conn_tx_buf_alloc(void);
 
 enum ll_evt_transition_type htimer_conn_evt_sync_timeout(struct ll_evt *evt);
 
