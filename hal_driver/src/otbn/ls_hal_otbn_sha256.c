@@ -188,3 +188,51 @@ void HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32
     HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE);
     HAL_OTBN_SHA256_Final(out);
 }
+
+bool HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
+                          uint8_t *ikm, uint32_t ikm_len,
+                          uint8_t *info, uint32_t info_len,
+                          uint8_t *okm, uint32_t okm_len)
+{
+    uint8_t T[SHA256_RESULT_SIZE];
+    uint8_t prk[SHA256_RESULT_SIZE];
+    uint8_t nullsalt[SHA256_RESULT_SIZE];
+    uint8_t temp_buf[SHA256_RESULT_SIZE];
+    uint32_t N, T_len, where, i, total_len;
+
+    if (salt == NULL)
+    {
+        salt = nullsalt;
+        salt_len = SHA256_RESULT_SIZE;
+        memset(salt, 0, salt_len);
+    }
+    HAL_OTBN_SHA256_HMAC(prk, ikm, ikm_len, salt, salt_len);
+
+    if (info == NULL)
+    {
+        info = (uint8_t *)"";
+        info_len = 0;
+    }
+    if (okm == NULL)
+        return false;
+    N = okm_len / SHA256_RESULT_SIZE;
+    if ((okm_len % SHA256_RESULT_SIZE) != 0)
+        N++;
+    if (N > 0xff)
+        return false;
+    T_len = 0;
+    where = 0;
+    for (i = 1; i <= N; i++)
+    {
+        uint8_t c = i;
+        memcpy(temp_buf, T, T_len);
+        memcpy(temp_buf + T_len, info, info_len);
+        memcpy(temp_buf + T_len + info_len, &c, 1);
+        total_len = T_len + info_len + 1;
+        HAL_OTBN_SHA256_HMAC(T, temp_buf, total_len, prk, SHA256_RESULT_SIZE);
+        memcpy(okm + where, T, (i != N) ? SHA256_RESULT_SIZE : (okm_len - where));
+        where += SHA256_RESULT_SIZE;
+        T_len = SHA256_RESULT_SIZE;
+    }
+    return true;
+}
