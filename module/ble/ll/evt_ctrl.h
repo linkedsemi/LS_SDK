@@ -364,7 +364,7 @@ extern uint8_t em_adv_rx_buf[];
 uint32_t htimer_current_get();
 __attribute__((always_inline)) static inline uint8_t htimer_irq1_mask_status_get()
 {
-    return REG_FIELD_RD(MAC->INTCNTL1,RWMAC_TIMESTAMPTGT1INTMSK);
+    return REG_FIELD_RD(MAC->INTCNTL1,RWMAC_TIMESTAMPTGT1INT);
 }
 
 __attribute__((always_inline)) static inline bool mac_fifo_empty()
