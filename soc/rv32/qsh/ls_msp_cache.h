@@ -8,11 +8,11 @@
 extern "C" {
 #endif
 
-#ifdef QSH_SYSC_CACHE1_ADDR
-#define LSCACHE ((reg_lscache_t *)QSH_SYSC_CACHE1_ADDR)
+#ifdef QSH_APB_CACHE1_ADDR
+#define LSCACHE ((reg_lscache_t *)QSH_APB_CACHE1_ADDR)
 #endif
 
-#ifdef QSH_SYSC_CACHE2_ADDR
+#ifdef QSH_APB_CACHE2_ADDR
 #define LSCACHE2 ((reg_lscache_t *)QSH_SYSC_CACHE2_ADDR)
 #endif
 

@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef QSH_PER_SHA_ADDR
-#define LSSHA ((reg_sha_t *)QSH_PER_SHA_ADDR)
+#ifdef QSH_APB_SHA_ADDR
+#define LSSHA ((reg_sha_t *)QSH_APB_SHA_ADDR)
 #endif
 
 

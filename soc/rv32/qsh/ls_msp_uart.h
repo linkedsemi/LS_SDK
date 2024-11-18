@@ -8,17 +8,17 @@
 extern "C" {
 #endif
 
-#ifdef QSH_PER_UART1_ADDR
-#define UART1 ((reg_uart_t *)QSH_PER_UART1_ADDR) /*!< LSUART Macro for Register Access*/
+#ifdef QSH_APB_UART1_ADDR
+#define UART1 ((reg_uart_t *)QSH_APB_UART1_ADDR) /*!< LSUART Macro for Register Access*/
 #endif
-#ifdef QSH_PER_UART2_ADDR
-#define UART2 ((reg_uart_t *)QSH_PER_UART2_ADDR)
+#ifdef QSH_APB_UART2_ADDR
+#define UART2 ((reg_uart_t *)QSH_APB_UART2_ADDR)
 #endif
-#ifdef QSH_PER_DWUART1_ADDR
-#define DWUART1 ((reg_dwuart_t *)QSH_PER_DWUART1_ADDR)
+#ifdef QSH_APB_DWUART1_ADDR
+#define DWUART1 ((reg_dwuart_t *)QSH_APB_DWUART1_ADDR)
 #endif
-#ifdef QSH_PER_DWUART2_ADDR
-#define DWUART2 ((reg_dwuart_t *)QSH_PER_DWUART2_ADDR)
+#ifdef QSH_APB_DWUART2_ADDR
+#define DWUART2 ((reg_dwuart_t *)QSH_APB_DWUART2_ADDR)
 #endif
 
 

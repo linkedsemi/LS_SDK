@@ -6,8 +6,8 @@
 extern "C" {
 #endif
 
-#ifdef QSH_PER_DWTRNG_ADDR
-#define DWTRNG ((reg_dwtrng_t *)QSH_PER_DWTRNG_ADDR)
+#ifdef QSH_AHB_DWTRNG_ADDR
+#define DWTRNG ((reg_dwtrng_t *)QSH_AHB_DWTRNG_ADDR)
 #endif
 
 void HAL_DWTRNG_MSP_Init(void);
