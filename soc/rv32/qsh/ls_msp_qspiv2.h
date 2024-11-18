@@ -8,11 +8,11 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_QSPI1_ADDR
-#define LSQSPIV2 ((reg_lsqspiv2_t *) QSH_APB_QSPI1_ADDR)
+#ifdef QSH_AHB_QSPI1_ADDR
+#define LSQSPIV2 ((reg_lsqspiv2_t *) QSH_AHB_QSPI1_ADDR)
 #endif
-#ifdef QSH_APB_QSPI2_ADDR
-#define LSQSPIV2_2 ((reg_lsqspiv2_t *) QSH_APB_QSPI2_ADDR)
+#ifdef QSH_AHB_QSPI2_ADDR
+#define LSQSPIV2_2 ((reg_lsqspiv2_t *) QSH_AHB_QSPI2_ADDR)
 #endif
 
 extern uint32_t (*qspiv2_global_int_disable_fn)();
