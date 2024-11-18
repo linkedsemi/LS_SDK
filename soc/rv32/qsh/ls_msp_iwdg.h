@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_PMU_WDT_ADDR
-#define LSIWDG ((reg_iwdg_t *)QSH_APB_PMU_WDT_ADDR) /*!< LSIWDG Macro for Register Access*/
+#ifdef QSH_PMU_WDT_ADDR
+#define LSIWDG ((reg_iwdg_t *)QSH_PMU_WDT_ADDR) /*!< LSIWDG Macro for Register Access*/
 #endif
 
 
