@@ -305,13 +305,20 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/ls_hal_sha.c
     ../hal_driver/src/ls_hal_sm4.c
     ../hal_driver/src/ls_hal_crypt.c
+    ../hal_driver/src/ls_hal_otbn.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha256.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sha384.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sha512.c
     ../hal_driver/src/otbn/ls_hal_otbn_ecc256.c
+    ../hal_driver/src/otbn/ls_hal_otbn_ecc384.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sm2.c
     ../hal_driver/src/otbn/text_array/ecc256_base_mult_text.c
     ../hal_driver/src/otbn/text_array/ecc256_ecdsa_verify_text.c
     ../hal_driver/src/otbn/text_array/ecc256_scalar_mult_text.c
+    ../hal_driver/src/otbn/text_array/ecc384_ecdsa_verify_text.c
     ../hal_driver/src/otbn/text_array/sha256_text.c
-    ../hal_driver/src/ls_hal_otbn.c
+    ../hal_driver/src/otbn/text_array/sha512_text.c
+    ../hal_driver/src/otbn/text_array/sm2_text.c
     ../soc/rv32/qsh/ls_msp_otbn.c
     ../soc/rv32/systick.c
     ../soc/rv32/int_call_asm.S
