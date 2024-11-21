@@ -32,10 +32,12 @@ HAL_StatusTypeDef HAL_TRNG_GenerateRandomNumber(uint32_t *random32bit)
     send_cmd(3);
     send_cmd(6);
     *random32bit = DWTRNG->RAND[0];
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_TRNG_GenerateRandomNumber_IT(void)
 {
+    return HAL_OK;
 }
 
 __attribute__((weak)) void HAL_TRNG_ReadyDataCallback(uint32_t random32bit){}

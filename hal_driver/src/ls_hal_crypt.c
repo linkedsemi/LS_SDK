@@ -414,14 +414,12 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t
     return HAL_OK;
 }
 
-static void aes_ctr_enc(uint8_t *cnt_p)
+static void aes_ctr_enc(uint8_t *cnt)
 {
     uint32_t i,length;
-    uint8_t cnt[AES_BLOCK_SIZE];
     uint8_t result[AES_BLOCK_SIZE];
 
     BLOCK_SIZE = AES_BLOCK_SIZE;
-    memcpy(cnt,cnt_p,AES_BLOCK_SIZE);
     aes_config(false, false, true, false);
     do
     {
@@ -437,7 +435,7 @@ static void aes_ctr_enc(uint8_t *cnt_p)
         }
         length_residue -= length;
         cnt[AES_BLOCK_SIZE - 1]++;
-        for (i = 1; i < AES_BLOCK_SIZE; i++)
+        for (i = 1; i <= AES_BLOCK_SIZE; i++)
         {
             if (cnt[AES_BLOCK_SIZE - i] == 0x00)
                 cnt[AES_BLOCK_SIZE - i - 1]++;

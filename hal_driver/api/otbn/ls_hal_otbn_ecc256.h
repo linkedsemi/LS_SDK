@@ -36,7 +36,7 @@ void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(bool result);
 
 void HAL_OTBN_ECC256_ScalarMult_Cb(void);
 void HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
-
+void HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
 #ifdef __cplusplus
 }
 #endif
