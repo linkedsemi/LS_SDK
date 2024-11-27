@@ -418,11 +418,13 @@ static void aes_ctr_enc(uint8_t *cnt)
 {
     uint32_t i,length;
     uint8_t result[AES_BLOCK_SIZE];
+    uint8_t flag[0x10];
 
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, false, true, false);
     do
     {
+        memset(flag, 0, 0x10);
         block_data_in(cnt);
         REG_FIELD_WR(LSCRYPT->CR,CRYPT_GO,1);
         while (REG_FIELD_RD(LSCRYPT->SR, CRYPT_AESRIF) == 0);
@@ -434,12 +436,18 @@ static void aes_ctr_enc(uint8_t *cnt)
             *current_out++ = result[i] ^ *current_in++;
         }
         length_residue -= length;
-        cnt[AES_BLOCK_SIZE - 1]++;
-        for (i = 1; i <= AES_BLOCK_SIZE; i++)
+        if (++cnt[AES_BLOCK_SIZE - 1] == 0x00)
+            flag[AES_BLOCK_SIZE - 2] = true;
+        for (i = AES_BLOCK_SIZE - 1; i > 0; i--)
         {
-            if (cnt[AES_BLOCK_SIZE - i] == 0x00)
-                cnt[AES_BLOCK_SIZE - i - 1]++;
+            if (flag[i])
+            {
+                if (++cnt[i] == 0x00)
+                    flag[i - 1] = true;
+            }
         }
+        if (flag[0])
+            cnt[0]++;
     } while (length_residue);
 }
 
