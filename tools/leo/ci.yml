@@ -83,6 +83,11 @@ leo_i2c_master_it_mem_read_write_build:
   script:
     - cd examples/peripheral/i2c/i2c_master_it_mem_read_write && scons flags=-Werror ic=leo
 
+leo_i2c_master_polling_mem_read_write_build:
+  stage: build
+  script:
+    - cd examples/peripheral/i2c/i2c_master_polling_mem_read_write && scons flags=-Werror ic=leo
+
 leo_i2c_slave_it_mem_read_write_build:
   stage: build
   script:
