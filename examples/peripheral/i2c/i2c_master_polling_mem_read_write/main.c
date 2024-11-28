@@ -7,9 +7,6 @@
 
 static I2C_HandleTypeDef g_i2cHandle;
 
-static volatile uint8_t g_memReadOverFlag = 0;
-static volatile uint8_t g_memWriteOverFlag = 0;
-
 static void iic_init(void)
 {
     g_i2cHandle.Instance = I2C1;
@@ -43,53 +40,35 @@ int main()
 
     /* 寄存器地址 */
     uint16_t regAddr = 0x1234;
-
+    HAL_StatusTypeDef retVal = HAL_OK;
     while(1) {
         /* 从寄存器地址0x1234，读取两个字节的数据 */
         uint8_t regData[2] = {0};
-        g_memReadOverFlag = 0;
-        HAL_I2C_Mem_Read_IT(&g_i2cHandle, I2C_ADDRESS, regAddr, sizeof(regAddr), &regData[0], sizeof(regData));
-        while (g_memReadOverFlag == 0); /* 等待读寄存器操作完成 */
-
-        /* 打印读到的寄存器数据 */
-        LOG_RAW("rxData: ");
-        for (uint8_t i = 0; i < 2; i++) {
-            LOG_RAW("%lx, ", regData[i]);
+        retVal = HAL_I2C_Mem_Read(&g_i2cHandle, I2C_ADDRESS, regAddr, sizeof(regAddr), &regData[0], sizeof(regData));
+        if (retVal != HAL_OK) {
+            LOG_RAW("mem read fail %x\r\n", retVal);
+        } else {     
+            /* 打印读到的寄存器数据 */
+            LOG_RAW("rxData: ");
+            for (uint8_t i = 0; i < 2; i++) {
+                LOG_RAW("%lx, ", regData[i]);
+            }
+            LOG_RAW("\r\n");
         }
-        LOG_RAW("\r\n");
 
         /* 往寄存器地址0x1234，写入两个字节的数据0x55和0xAA */
         regData[0] = 0x55;
         regData[1] = 0xAA;
-        g_memWriteOverFlag = 0;
-        HAL_I2C_Mem_Write_IT(&g_i2cHandle, I2C_ADDRESS, regAddr, sizeof(regAddr), &regData[0], sizeof(regData));
-        while (g_memWriteOverFlag == 0); /* 等待写寄存器操作完成 */
+        retVal = HAL_I2C_Mem_Write(&g_i2cHandle, I2C_ADDRESS, regAddr, sizeof(regAddr), &regData[0], sizeof(regData));
+        if (retVal != HAL_OK) {
+            LOG_RAW("mem write fail %x\r\n", retVal);
+        }
 
         /* 延迟1s */
         DELAY_US(1000 * 1000);
     }
 
-    
     return 0;
-}
-
-/* 主机发送完成回调 */
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-    LOG_I("HAL_I2C_MasterTxCpltCallback\r\n");
-    if (g_memWriteOverFlag == 0) {
-        g_memWriteOverFlag = 1;
-    }
-}
-
-/* 主机接收完中断回调 */
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{ 
-    LOG_RAW("HAL_I2C_MasterRxCpltCallback\r\n");
-    if (g_memReadOverFlag == 0) {
-        g_memReadOverFlag = 1;
-    }
-
 }
 
 /* i2c错误回调 */
