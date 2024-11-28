@@ -130,10 +130,12 @@ void HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, ui
 {
     uint32_t i,length;
     uint8_t result[SM4_BLOCK_SIZE];
+    uint8_t flag[SM4_BLOCK_SIZE];
 
     REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_DEC, 0);
     do
     {
+        memset(flag, 0, SM4_BLOCK_SIZE);
         sm4_data_length_inout_config(cnt, 0x10, result);
         sm4_calculate();
         length = (in_len > SM4_BLOCK_SIZE )? SM4_BLOCK_SIZE : in_len;
@@ -142,12 +144,18 @@ void HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, ui
             *out++ = result[i] ^ *in++;
         }
         in_len -= length;
-        cnt[SM4_BLOCK_SIZE - 1]++;
-        for (i = 1; i <= SM4_BLOCK_SIZE; i++)
+        if (++cnt[SM4_BLOCK_SIZE - 1] == 0x00)
+            flag[SM4_BLOCK_SIZE - 2] = true;
+        for (i = SM4_BLOCK_SIZE - 1; i > 0; i--)
         {
-            if (cnt[SM4_BLOCK_SIZE - i] == 0x00)
-                cnt[SM4_BLOCK_SIZE - i - 1]++;
+            if (flag[i])
+            {
+                if (++cnt[i] == 0x00)
+                    flag[i - 1] = true;
+            }
         }
+        if (flag[0])
+            cnt[0]++;
     } while (in_len);
 }
 
