@@ -71,7 +71,7 @@ bool HAL_OTBN_ECC384_ECDSA_Verify_Polling(enum HAL_OTBN_ECC384_CURVES curve, str
     
     uint8_t x_r[ECC384_DMEM_X_R_SIZE];
     HAL_OTBN_DMEM_Read(ECC384_DMEM_X_R_OFFSET, (uint32_t *)x_r, ECC384_DMEM_X_R_SIZE);
-    return !memcmp(verify_param->sign_r, x_r, ECC384_DMEM_X_R_SIZE);
+    return !memcmp(verify_param->sign_r, x_r, 0x30);
 }
 
 void ECC384_ecdsa_verify_cb(void *param)
