@@ -64,7 +64,7 @@ HAL_StatusTypeDef HAL_PS2H_Init(PS2H_HandleTypeDef *hps2h, PS2H_Param *param)
 
 HAL_StatusTypeDef HAL_PS2H_DeInit(PS2H_HandleTypeDef *hps2h)
 {
-    HAL_PS2H_DeInit(hps2h);
+    HAL_PS2H_MSP_DeInit(hps2h);
 
     hps2h->State = HAL_PS2H_STATE_RESET;
     return HAL_OK;
