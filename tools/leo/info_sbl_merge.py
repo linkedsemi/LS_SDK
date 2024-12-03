@@ -8,11 +8,14 @@ SECP256K1_USED = 0
 
 UART_CMD_MASK = 0xffffffff
 
+PUBLIC_KEY_END_OFFSET = 128
+SBL_IMAGE_OFFSET = 0x1000
+
 sbl_file = open(sys.argv[1],'rb')
 sbl_data = sbl_file.read()
 test_word0 = 0xa5a53c3c
 test_word1 = 0x5a5ac3c3
-sbl_offset = 0x80
+sbl_offset = SBL_IMAGE_OFFSET
 sbl_length = len(sbl_data)
 sbl_crc = zlib.crc32(sbl_data)
 sbl_crc_bytes = struct.pack("I",sbl_crc)
@@ -27,12 +30,15 @@ head_crc_bytes = struct.pack("I",head_crc)
 
 dummy_array = struct.pack('24B', *[0xff] * 24)
 key_array = struct.pack('64B', *[0xff] * 64)
+dummy_array2_length = SBL_IMAGE_OFFSET-PUBLIC_KEY_END_OFFSET
+dummy_array2 = struct.pack(f'{dummy_array2_length}B', *[0xff] * dummy_array2_length)
 
 with open(sys.argv[2],'wb') as out:
     out.write(info_head)
     out.write(head_crc_bytes)
     out.write(dummy_array)
     out.write(key_array)
+    out.write(dummy_array2)
     out.write(sbl_data)
     out.write(sbl_crc_bytes)
     out.close()

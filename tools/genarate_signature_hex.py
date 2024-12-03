@@ -12,7 +12,7 @@ import base64
 FEATUERE_MASK_OFFSET = 24
 SBL_LEN_OFFSET = 12
 VK_STR_OFFSET = 0x40
-SBL_OFFSET = 0X80
+SBL_OFFSET = 0X1000
 
 def save_to_file(file_name, contents):
     fh = open(file_name, 'wb')
@@ -35,12 +35,12 @@ def bytes_to_hex_string(data):
 if sys.argv[1] == "ic=lm3050":
     print("ic=lm3050")
     HEADER_CRC_OFFSET = 0x1c
-    APP_ADD = 0X500
+    APP_ADD = 0X1500
     FLASH_BASE_ADD = 0X800000
 elif sys.argv[1] == "ic=leo":
     print("ic=leo")
     HEADER_CRC_OFFSET = 0x24
-    APP_ADD = 0X800
+    APP_ADD = 0X1800
     FLASH_BASE_ADD = 0X8000000
 else:
     print("Invalid IC,Use ic=lm3050 or ic=leo")

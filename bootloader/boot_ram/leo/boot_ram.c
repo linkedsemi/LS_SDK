@@ -12,8 +12,8 @@
 #include "ls_hal_sha.h"
 #include "../../module/micro-ecc/uECC.h"
 
-#define APP_ADDR 0x8000800
-#define APP_OFFSET 0x800
+#define FLASH_ADDR 0x8000000
+#define APP_OFFSET 0x1800
 #define APP_SIGN_OFFSET APP_OFFSET - 0x40
 #define APP_SIZE_INFO APP_OFFSET - 0x44
 
@@ -119,7 +119,7 @@ bool sign_verification(uint8_t *signature)
     uint32_t digest[SHA256_WORDS_NUM];
     hal_flash_quad_io_read(APP_SIZE_INFO, (uint8_t *)&app_len,sizeof(app_len));
     HAL_LSSHA_Init();
-    HAL_LSSHA_SHA256((void *)APP_ADDR,app_len,digest);
+    HAL_LSSHA_SHA256((void *)(FLASH_ADDR+APP_OFFSET),app_len,digest);
     HAL_LSSHA_DeInit();
     uECC_Curve curve = secp256k1 ? uECC_secp256k1() : uECC_secp256r1();
     uint8_t result =  uECC_verify(pub_key,(uint8_t *)digest,32,signature,curve);
@@ -159,5 +159,5 @@ void boot_ram_start()
     lscache_cache_enable(1);
     hal_flash_xip_func_ptr_init();
     ecc_verify();
-    boot_app(APP_ADDR);
+    boot_app(FLASH_ADDR+APP_OFFSET);
 }

@@ -34,6 +34,7 @@ extern "C" {
   * @}
   */
 
+#define HAL_I2C_POLL_TIMEOUT_MS 10
 
 /**
  *  @defgroup I2C_addressing_mode I2C addressing mode.
@@ -85,8 +86,14 @@ enum i2c_state
 {
   HAL_I2C_STATE_BUSY_TX = 0x1,
   HAL_I2C_STATE_BUSY_RX = 0x2,
-  HAL_I2C_STATE_ADDR_MATCHED = 0x4,
+  HAL_I2C_STATE_NEED_RESTART = 0x4,
   HAL_I2C_STATE_LISTEN  = 0x8,
+};
+
+enum i2c_dir
+{
+  HAL_I2C_WRITE_DIR = 0x0,
+  HAL_I2C_READ_DIR = 0x1,
 };
 
 /**
@@ -95,7 +102,7 @@ enum i2c_state
 struct I2cTransferEnv
 {
     uint8_t                       *pBuffPtr;      /*!< Pointer to I2C transfer Buffer */
-    uint16_t                      XferCount;      /*!< I2C Transfer Counter           */
+    uint16_t                      XferCount;      /*!< I2C Transfer Counter          */
 };
 
 struct i2c_timing
@@ -128,6 +135,14 @@ typedef struct __I2C_HandleTypeDef
 HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c);
 
 HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c);
+
+HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
+
+HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
+
+HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,uint16_t MemAddSize, uint8_t *pData, uint16_t Size);
+
+HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress,uint16_t MemAddSize, uint8_t *pData, uint16_t Size);
 
 HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint8_t Size);
 
