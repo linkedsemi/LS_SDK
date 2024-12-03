@@ -33,7 +33,7 @@ bool HAL_OTBN_SHA384_HKDF(uint8_t *salt, uint32_t salt_len,
 
 void HAL_OTBN_SHA512_Init();
 void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length);
-void HAL_OTBN_SHA512_Final(uint8_t result[SHA384_RESULT_SIZE]);
+void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE]);
 void HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
