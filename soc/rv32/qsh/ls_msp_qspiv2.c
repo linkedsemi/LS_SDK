@@ -10,23 +10,12 @@ ROM_SYMBOL void (*qspiv2_global_int_restore_fn)(uint32_t);
 
 #if defined(BOOT_ROM)
 void qspiv2_global_int_dummy(){}
-void XIP_BANNED_FUNC(lsqspiv2_msp_init)
+void qspiv2_global_int_ctrl_fn_init()
 {
-    SYSC_CPU->PD_CPU_CLKG[0] = SYSC_CPU_CLKG_SET_QSPI1_MASK;
-    __NOP(); __NOP();
-    SYSC_CPU->PD_CPU_CLKG[0] = SYSC_CPU_CLKG_CLR_QSPI1_MASK;
-    __NOP(); __NOP();
-    SYSC_CPU->PD_CPU_SRST[0] = SYSC_CPU_SRST_CLR_QSPI1_MASK;
-    __NOP(); __NOP();
-    SYSC_CPU->PD_CPU_SRST[0] = SYSC_CPU_SRST_SET_QSPI1_MASK;
-    __NOP(); __NOP();
-    SYSC_CPU->PD_CPU_CLKG[0] = SYSC_CPU_CLKG_SET_QSPI1_MASK;
     qspiv2_global_int_disable_fn = (void *)qspiv2_global_int_dummy;
     qspiv2_global_int_restore_fn = (void *)qspiv2_global_int_dummy;
 }
-#else
-
-#if FLASH_PROG_ALGO==1
+#elif defined(FLASH_PROG_ALGO)
 void qspiv2_global_int_ctrl_fn_init(){}
 #else
 void qspiv2_global_int_ctrl_fn_init()
@@ -49,4 +38,3 @@ void XIP_BANNED_FUNC(lsqspiv2_msp_init)
     SYSC_CPU->PD_CPU_CLKG[0] = SYSC_CPU_CLKG_SET_QSPI1_MASK;
     qspiv2_global_int_ctrl_fn_init();
 }
-#endif

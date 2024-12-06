@@ -29,7 +29,7 @@ struct OTBN_ECC384_CURVE {
  *  Curve SM2 
  * 
  * *****************/
-const static struct OTBN_ECC384_CURVE P384 = {
+static const struct OTBN_ECC384_CURVE P384 = {
     .b  = {0xd3ec2aef, 0x2a85c8ed, 0x8a2ed19d, 0xc656398d, 0x5013875a, 0x0314088f, 0xfe814112, 0x181d9c6e,
            0xe3f82d19, 0x988e056b, 0xe23ee7e4, 0xb3312fa7, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
     .p  = {0xffffffff, 0x00000000, 0x00000000, 0xffffffff, 0xfffffffe, 0xffffffff, 0xffffffff, 0xffffffff,

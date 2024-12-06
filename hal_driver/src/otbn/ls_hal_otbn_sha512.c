@@ -12,8 +12,6 @@ extern const char sha512_text[SHA512_TEXT_LENTH];
 #define SHA512_DMEM_PTR_MSG_OFFSET      (0x908)
 #define SHA512_DMEM_K_OFFSET            (0x920)
 #define SHA512_DMEM_K_SIZE                  (0x280)
-#define SHA512_DMEM_BSS_START            (0x400)
-#define SHA512_DMEM_BSS_SIZE                (0xc)
 
 #define SHA512_MSG_BLOCK_SIZE       (0x80)
 
@@ -22,7 +20,7 @@ static uint32_t total_cnt;
 static uint32_t remain_len;
 static uint8_t remain_data[SHA512_MSG_BLOCK_SIZE];
 
-static uint64_t state_init[] = {
+static const uint64_t state_init[] = {
     0x6a09e667f3bcc908, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
     0xbb67ae8584caa73b, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
     0x3c6ef372fe94f82b, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
@@ -32,7 +30,7 @@ static uint64_t state_init[] = {
     0x1f83d9abfb41bd6b, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
     0x5be0cd19137e2179, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,};
 
-static uint64_t K[] = {
+static const uint64_t K[] = {
     0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
     0x3956c25bf348b538, 0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
     0xd807aa98a3030242, 0x12835b0145706fbe, 0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,

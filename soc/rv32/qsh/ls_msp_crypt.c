@@ -26,12 +26,12 @@ void HAL_LSCRYPT_MSP_DeInit(void)
 
 void HAL_LSCRYPT_MSP_Busy_Set(void)
 {
-    crypt_status_set(true);
+    // crypt_status_set(true);
 }
 
 void HAL_LSCRYPT_MSP_Idle_Set(void)
 {
-    crypt_status_set(false);
+    // crypt_status_set(false);
 }
 
 
