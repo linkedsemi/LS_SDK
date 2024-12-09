@@ -53,10 +53,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART1_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
         rv_set_int_isr(QSH_UART1_IRQn,UART1_Handler);
-        UART_inst_env[0] = inst;
         csi_vic_clear_pending_irq(QSH_UART1_IRQn);
         csi_vic_enable_irq(QSH_UART1_IRQn);
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
+        UART_inst_env[0] = inst;
     break;
    case (uint32_t)UART2:
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART2_MASK;
@@ -64,10 +63,9 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
         SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART2_N_MASK;
         SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
         rv_set_int_isr(QSH_UART2_IRQn,UART2_Handler);
-        UART_inst_env[1] = inst;
         csi_vic_clear_pending_irq(QSH_UART2_IRQn);
         csi_vic_enable_irq(QSH_UART2_IRQn);
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
+        UART_inst_env[1] = inst;
     break;
     }
 }

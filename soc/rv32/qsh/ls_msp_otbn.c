@@ -23,25 +23,29 @@ void HAL_LSOTBN_MSP_Init(void)
     SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_FIPS_MASK;
     for (uint8_t i = 0; i < 8; i++)
     {
-        SYSC_CPU->EDN_URND_BUS = i;
+        SYSC_CPU->EDN_URND_BUS = i + 1;
         SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_ACK_MASK;
         SYSC_CPU->OTBN_CTRL1 &= ~SYSC_CPU_EDN_URND_ACK_MASK;
         __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
         __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     }
+    
     for (uint8_t i = 0; i < 8; i++)
     {
-        SYSC_CPU->EDN_URND_BUS = i;
+        SYSC_CPU->EDN_URND_BUS = i + 1;
         SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_ACK_MASK;
         SYSC_CPU->OTBN_CTRL1 &= ~SYSC_CPU_EDN_URND_ACK_MASK;
         __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
         __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     }
 
-    SYSC_CPU->INTR_CTRL_CLR = 0x7ff;
-    SYSC_CPU->INTR_CTRL_MSK = 0x700;
+    SYSC_CPU->INTR_CTRL_CLR = FIELD_BUILD(SYSC_CPU_OTBN_EDN_RND_REQ_MSK, 1) |
+                              FIELD_BUILD(SYSC_CPU_OTBN_EDN_URND_REQ_MSK, 1) |
+                              FIELD_BUILD(SYSC_CPU_OTBN_OTP_REQ_MSK, 1);
+    SYSC_CPU->INTR_CTRL_MSK = FIELD_BUILD(SYSC_CPU_OTBN_EDN_RND_REQ_MSK, 1) |
+                              FIELD_BUILD(SYSC_CPU_OTBN_EDN_URND_REQ_MSK, 1) |
+                              FIELD_BUILD(SYSC_CPU_OTBN_OTP_REQ_MSK, 1);
 }
-
 
 void HAL_LSOTBN_MSP_DeInit(void)
 {
