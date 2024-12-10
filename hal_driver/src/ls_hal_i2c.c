@@ -548,9 +548,21 @@ void HAL_I2C_IRQHandler(I2C_HandleTypeDef *hi2c)
             hi2c->Instance->ICR = I2C_INT_RXNE_MASK;
         }else
         {
+            #if defined(LE501X)||defined(LM3050)
+            while ((hi2c->Instance->SR & I2C_SR_RXNE_MASK) != 0) {
+                if (hi2c->Rx_Env.XferCount == 0) {
+                    break;
+                }
+                hi2c->Rx_Env.XferCount--;
+                LS_ASSERT(hi2c->Rx_Env.pBuffPtr);
+                *hi2c->Rx_Env.pBuffPtr++ = hi2c->Instance->RXDR;
+            }
+            #else
             hi2c->Rx_Env.XferCount--;
             LS_ASSERT(hi2c->Rx_Env.pBuffPtr);
             *hi2c->Rx_Env.pBuffPtr++ = hi2c->Instance->RXDR;
+            #endif
+
             hi2c->Instance->ICR = I2C_INT_RXNE_MASK;
             if(hi2c->State & HAL_I2C_STATE_LISTEN)
             {
