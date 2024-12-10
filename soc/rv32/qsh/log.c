@@ -30,24 +30,23 @@ static void log_uart_tx(char *ptr,int len)
 {
     while (len)
     {
-        if (REG_FIELD_RD(UART2->SR, UART_SR_TFNF))
+        if (REG_FIELD_RD(UART1->SR, UART_SR_TFNF))
         {
             len--;
-            UART2->TBR = (*ptr++ & (uint8_t)0xFF);
+            UART1->TBR = (*ptr++ & (uint8_t)0xFF);
         }
     }
 }
 
 static void log_uart_init()
 {
-    pinmux_uart2_init(LOG_UART_TXD, LOG_UART_RXD);
-    io_pull_write(LOG_UART_RXD, IO_PULL_UP);
-    LL_UART2_MSP_Init();
-    REG_FIELD_WR(UART2->LCR, UART_LCR_BRWEN, 1);
-    UART2->BRR = LOG_UART_BAUDRATE;
-    REG_FIELD_WR(UART2->LCR, UART_LCR_BRWEN, 0);
-    UART2->FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
-    UART2->LCR = FIELD_BUILD(UART_LCR_DLS, LOG_UART_WORDLENGTH) |
+    pinmux_uart1_init(LOG_UART_TXD, LOG_UART_RXD);
+    LL_UART1_MSP_Init();
+    REG_FIELD_WR(UART1->LCR, UART_LCR_BRWEN, 1);
+    UART1->BRR = LOG_UART_BAUDRATE;
+    REG_FIELD_WR(UART1->LCR, UART_LCR_BRWEN, 0);
+    UART1->FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
+    UART1->LCR = FIELD_BUILD(UART_LCR_DLS, LOG_UART_WORDLENGTH) |
                  FIELD_BUILD(UART_LCR_STOP, LOG_UART_STOPBITS) |
                  FIELD_BUILD(UART_LCR_PARITY, LOG_UART_PARITY) |
                  FIELD_BUILD(UART_LCR_MSB, LOG_UART_MSBEN);
@@ -55,8 +54,8 @@ static void log_uart_init()
 
 static void log_uart_deinit()
 {
-    LL_UART2_MSP_DeInit();
-    pinmux_uart2_deinit();
+    LL_UART1_MSP_DeInit();
+    pinmux_uart1_deinit();
 }
 
 void uart_log_pause()

@@ -1,5 +1,6 @@
 #include "ls_hal_otbn.h"
 #include "ls_msp_otbn.h"
+#include "field_manipulate.h"
 #include "reg_sysc_cpu.h"
 #include "core_rv32.h"
 #include "platform.h"
@@ -19,24 +20,17 @@ void HAL_LSOTBN_MSP_Init(void)
     rv_set_int_isr(QSH_SYSC_OTBN_IRQn, HAL_OTBN_SYSC_IRQHandler);
     csi_vic_clear_pending_irq(QSH_SYSC_OTBN_IRQn);
     csi_vic_enable_irq(QSH_SYSC_OTBN_IRQn);
-    
-    SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_FIPS_MASK;
-    for (uint8_t i = 0; i < 8; i++)
+
+    REG_FIELD_WR(SYSC_CPU->OTBN_CTRL1, SYSC_CPU_EDN_URND_FIPS, 1);
+    REG_FIELD_WR(SYSC_CPU->INTR_CTRL_MSK, SYSC_CPU_OTBN_EDN_URND_REQ_MSK, 0);
+
+    for (uint8_t i = 0; i < 16; i++)
     {
+        while (!REG_FIELD_RD(SYSC_CPU->INTR_CTRL_RAW, SYSC_CPU_OTBN_EDN_URND_REQ_RAW)) ;
+        SYSC_CPU->INTR_CTRL_CLR = SYSC_CPU_OTBN_EDN_URND_REQ_CLR_MASK;
         SYSC_CPU->EDN_URND_BUS = i + 1;
-        SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_ACK_MASK;
-        SYSC_CPU->OTBN_CTRL1 &= ~SYSC_CPU_EDN_URND_ACK_MASK;
-        __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-        __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    }
-    
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        SYSC_CPU->EDN_URND_BUS = i + 1;
-        SYSC_CPU->OTBN_CTRL1 |= SYSC_CPU_EDN_URND_ACK_MASK;
-        SYSC_CPU->OTBN_CTRL1 &= ~SYSC_CPU_EDN_URND_ACK_MASK;
-        __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-        __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+        REG_FIELD_WR(SYSC_CPU->OTBN_CTRL1, SYSC_CPU_EDN_URND_ACK, 1);
+        REG_FIELD_WR(SYSC_CPU->OTBN_CTRL1, SYSC_CPU_EDN_URND_ACK, 0);
     }
 
     SYSC_CPU->INTR_CTRL_CLR = FIELD_BUILD(SYSC_CPU_OTBN_EDN_RND_REQ_MSK, 1) |
