@@ -13,8 +13,6 @@ extern const char sha512_text[SHA512_TEXT_LENTH];
 #define SHA512_DMEM_K_OFFSET            (0x920)
 #define SHA512_DMEM_K_SIZE                  (0x280)
 
-#define SHA512_BLOCK_SIZE               (0x80)
-
 static uint8_t sha512_hmac_kx[SHA512_BLOCK_SIZE];
 static uint8_t sha512_hmac_kh[SHA512_RESULT_SIZE];
 static uint8_t *sha512_hmac_key;

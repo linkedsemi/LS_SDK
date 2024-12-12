@@ -13,9 +13,16 @@ extern "C" {
 #define SHA384_RESULT_SIZE          (0x30)
 #define SHA512_RESULT_SIZE          (0x40)
 
+#define SHA256_BLOCK_SIZE           (0x40)
+#define SHA384_BLOCK_SIZE           (0x80)
+#define SHA512_BLOCK_SIZE           (0x80)
+
 void HAL_OTBN_SHA256_Init();
 void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA256_Final(uint8_t result[SHA256_RESULT_SIZE]);
+void HAL_OTBN_SHA256_HMAC_SetKey(uint8_t *key, uint32_t key_size);
+void HAL_OTBN_SHA256_HMAC_Update(uint8_t *msg, uint32_t msg_size);
+void HAL_OTBN_SHA256_HMAC_Final(uint8_t *out);
 void HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 bool HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
@@ -25,6 +32,9 @@ bool HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
 void HAL_OTBN_SHA384_Init();
 void HAL_OTBN_SHA384_Update(uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE]);
+void HAL_OTBN_SHA384_HMAC_SetKey(uint8_t *key, uint32_t key_size);
+void HAL_OTBN_SHA384_HMAC_Update(uint8_t *msg, uint32_t msg_size);
+void HAL_OTBN_SHA384_HMAC_Final(uint8_t *out);
 void HAL_OTBN_SHA384_HMAC(uint8_t out[SHA384_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 bool HAL_OTBN_SHA384_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
@@ -34,6 +44,9 @@ bool HAL_OTBN_SHA384_HKDF(uint8_t *salt, uint32_t salt_len,
 void HAL_OTBN_SHA512_Init();
 void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE]);
+void HAL_OTBN_SHA512_HMAC_SetKey(uint8_t *key, uint32_t key_size);
+void HAL_OTBN_SHA512_HMAC_Update(uint8_t *msg, uint32_t msg_size);
+void HAL_OTBN_SHA512_HMAC_Final(uint8_t *out);
 void HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
