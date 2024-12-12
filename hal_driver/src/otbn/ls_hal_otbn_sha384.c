@@ -13,12 +13,16 @@ extern const char sha512_text[SHA512_TEXT_LENTH];
 #define SHA384_DMEM_K_OFFSET            (0x920)
 #define SHA384_DMEM_K_SIZE                  (0x280)
 
-#define SHA384_MSG_BLOCK_SIZE       (0x80)
+#define SHA384_BLOCK_SIZE               (0x80)
 
+static uint8_t sha384_hmac_kx[SHA384_BLOCK_SIZE];
+static uint8_t sha384_hmac_kh[SHA384_RESULT_SIZE];
+static uint8_t *sha384_hmac_key;
+static uint32_t sha384_hmac_key_size;
 static uint32_t index;
 static uint32_t total_cnt;
 static uint32_t remain_len;
-static uint8_t remain_data[SHA384_MSG_BLOCK_SIZE];
+static uint8_t remain_data[SHA384_BLOCK_SIZE];
 
 static const uint64_t state_init[] = {
     0xcbbb9d5dc1059ed8, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
@@ -90,8 +94,8 @@ static void SHA384_msg_write(uint8_t *msg)
         dword[0] = *msg++;
         sha384_buffer[i] = *(uint64_t *)dword;
     }
-    HAL_OTBN_DMEM_Write(index, (uint32_t *)sha384_buffer, SHA384_MSG_BLOCK_SIZE);
-    index += SHA384_MSG_BLOCK_SIZE;
+    HAL_OTBN_DMEM_Write(index, (uint32_t *)sha384_buffer, SHA384_BLOCK_SIZE);
+    index += SHA384_BLOCK_SIZE;
     if (index == (SHA384_DMEM_MSG_SIZE + SHA384_DMEM_MSG_OFFSET))
     {
         HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
@@ -104,13 +108,13 @@ void HAL_OTBN_SHA384_Update(uint8_t *msg, uint32_t length)
     total_cnt += length;
     if (remain_len)
     {
-        if ((length + remain_len) < SHA384_MSG_BLOCK_SIZE)
+        if ((length + remain_len) < SHA384_BLOCK_SIZE)
         {
             memcpy(&remain_data[remain_len], msg, length);
             remain_len += length;
             return;
         }
-        uint32_t wr_len = SHA384_MSG_BLOCK_SIZE - remain_len;
+        uint32_t wr_len = SHA384_BLOCK_SIZE - remain_len;
         memcpy(&remain_data[remain_len], msg, wr_len);
         SHA384_msg_write(remain_data);
         remain_len = 0;
@@ -118,16 +122,16 @@ void HAL_OTBN_SHA384_Update(uint8_t *msg, uint32_t length)
         msg += wr_len;
     }
 
-    for (uint32_t i = 0; i < (length / SHA384_MSG_BLOCK_SIZE); i++)
+    for (uint32_t i = 0; i < (length / SHA384_BLOCK_SIZE); i++)
     {
         SHA384_msg_write(msg);
-        msg += SHA384_MSG_BLOCK_SIZE;
+        msg += SHA384_BLOCK_SIZE;
     }
     
-    if (length % SHA384_MSG_BLOCK_SIZE)
+    if (length % SHA384_BLOCK_SIZE)
     {
-        memcpy(&remain_data[remain_len], msg, length % SHA384_MSG_BLOCK_SIZE);
-        remain_len = length % SHA384_MSG_BLOCK_SIZE;
+        memcpy(&remain_data[remain_len], msg, length % SHA384_BLOCK_SIZE);
+        remain_len = length % SHA384_BLOCK_SIZE;
     }
 }
 
@@ -136,16 +140,16 @@ void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
     uint64_t bit_cnt = total_cnt * 8;
 
     remain_data[remain_len++] = 0x80;
-    if (remain_len == SHA384_MSG_BLOCK_SIZE)
+    if (remain_len == SHA384_BLOCK_SIZE)
     {
         SHA384_msg_write(remain_data);
         remain_len = 0;
     }
 
-    while (remain_len != (SHA384_MSG_BLOCK_SIZE - 16))
+    while (remain_len != (SHA384_BLOCK_SIZE - 16))
     {
         remain_data[remain_len++] = 0x0;
-        if (remain_len == SHA384_MSG_BLOCK_SIZE)
+        if (remain_len == SHA384_BLOCK_SIZE)
         {
             SHA384_msg_write(remain_data);
             remain_len = 0;
@@ -156,10 +160,10 @@ void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
 
     for (uint8_t i = 0; i < 8; i++)
     {
-        remain_data[SHA384_MSG_BLOCK_SIZE - 1 - i] = (uint8_t)(bit_cnt >> (8 * i));
+        remain_data[SHA384_BLOCK_SIZE - 1 - i] = (uint8_t)(bit_cnt >> (8 * i));
     }
     SHA384_msg_write((uint8_t *)remain_data);
-    SHA384_BlockNumber_Update((index - SHA384_DMEM_MSG_OFFSET) / SHA384_MSG_BLOCK_SIZE);
+    SHA384_BlockNumber_Update((index - SHA384_DMEM_MSG_OFFSET) / SHA384_BLOCK_SIZE);
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
 
     uint64_t rs;
@@ -178,14 +182,56 @@ void HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
 }
 
-#define HMAC_B 0x80
+void HAL_OTBN_SHA384_HMAC_SetKey(uint8_t *key, uint32_t key_size)
+{
+    sha384_hmac_key_size = key_size;
+    sha384_hmac_key = key;
+    if (sha384_hmac_key_size > SHA384_BLOCK_SIZE)
+    {
+        HAL_OTBN_SHA384_Init();
+        HAL_OTBN_SHA384_Update(sha384_hmac_key, sha384_hmac_key_size);
+        HAL_OTBN_SHA384_Final(sha384_hmac_kh);
+
+        sha384_hmac_key = sha384_hmac_kh;
+        sha384_hmac_key_size = SHA512_RESULT_SIZE;
+    }
+
+    for (uint8_t i = 0; i < sha384_hmac_key_size; i++)
+        sha384_hmac_kx[i] = HMAC_I_PAD ^ sha384_hmac_key[i];
+    for (uint8_t i = sha384_hmac_key_size; i < SHA384_BLOCK_SIZE; i++)
+        sha384_hmac_kx[i] = HMAC_I_PAD ^ 0;
+
+    HAL_OTBN_SHA384_Init();
+    HAL_OTBN_SHA384_Update(sha384_hmac_kx, SHA384_BLOCK_SIZE);
+}
+
+void HAL_OTBN_SHA384_HMAC_Update(uint8_t *msg, uint32_t msg_size)
+{
+    HAL_OTBN_SHA384_Update(msg, msg_size);
+}
+
+void HAL_OTBN_SHA384_HMAC_Final(uint8_t *out)
+{
+    HAL_OTBN_SHA384_Final(out);
+
+    for (uint8_t i = 0; i < sha384_hmac_key_size; i++)
+        sha384_hmac_kx[i] = HMAC_O_PAD ^ sha384_hmac_key[i];
+    for (uint8_t i = sha384_hmac_key_size; i < SHA384_BLOCK_SIZE; i++)
+        sha384_hmac_kx[i] = HMAC_O_PAD ^ 0;
+
+    HAL_OTBN_SHA384_Init();
+    HAL_OTBN_SHA384_Update(sha384_hmac_kx, SHA384_BLOCK_SIZE);
+    HAL_OTBN_SHA384_Update(out, SHA384_RESULT_SIZE);
+    HAL_OTBN_SHA384_Final(out);
+}
+
 void HAL_OTBN_SHA384_HMAC(uint8_t out[SHA384_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
 {
     uint8_t kh[SHA384_RESULT_SIZE];
-    uint8_t kx[HMAC_B];
+    uint8_t kx[SHA384_BLOCK_SIZE];
     uint8_t i;
 
-    if (key_len > HMAC_B)
+    if (key_len > SHA384_BLOCK_SIZE)
     {
         HAL_OTBN_SHA384_Init();
         HAL_OTBN_SHA384_Update(key, key_len);
@@ -196,20 +242,20 @@ void HAL_OTBN_SHA384_HMAC(uint8_t out[SHA384_RESULT_SIZE], uint8_t *data, uint32
 
     for (uint32_t i = 0; i < key_len; i++)
         kx[i] = HMAC_I_PAD ^ key[i];
-    for (uint32_t i = key_len; i < HMAC_B; i++)
+    for (uint32_t i = key_len; i < SHA384_BLOCK_SIZE; i++)
         kx[i] = HMAC_I_PAD ^ 0;
 
     HAL_OTBN_SHA384_Init();
-    HAL_OTBN_SHA384_Update(kx, HMAC_B);
+    HAL_OTBN_SHA384_Update(kx, SHA384_BLOCK_SIZE);
     HAL_OTBN_SHA384_Update(data, data_len);
     HAL_OTBN_SHA384_Final(out);
     for (i = 0; i < key_len; i++)
         kx[i] = HMAC_O_PAD ^ key[i];
-    for (i = key_len; i < HMAC_B; i++)
+    for (i = key_len; i < SHA384_BLOCK_SIZE; i++)
         kx[i] = HMAC_O_PAD ^ 0;
 
     HAL_OTBN_SHA384_Init();
-    HAL_OTBN_SHA384_Update(kx, HMAC_B);
+    HAL_OTBN_SHA384_Update(kx, SHA384_BLOCK_SIZE);
     HAL_OTBN_SHA384_Update(out, SHA384_RESULT_SIZE);
     HAL_OTBN_SHA384_Final(out);
 }
@@ -222,8 +268,7 @@ bool HAL_OTBN_SHA384_HKDF(uint8_t *salt, uint32_t salt_len,
     uint8_t T[SHA384_RESULT_SIZE];
     uint8_t prk[SHA384_RESULT_SIZE];
     uint8_t nullsalt[SHA384_RESULT_SIZE];
-    uint8_t temp_buf[SHA384_RESULT_SIZE];
-    uint32_t N, T_len, where, i, total_len;
+    uint32_t N, T_len, where;
 
     if (salt == NULL)
     {
@@ -247,14 +292,14 @@ bool HAL_OTBN_SHA384_HKDF(uint8_t *salt, uint32_t salt_len,
         return false;
     T_len = 0;
     where = 0;
-    for (i = 1; i <= N; i++)
+    for (uint8_t i = 1; i <= N; i++)
     {
-        uint8_t c = i;
-        memcpy(temp_buf, T, T_len);
-        memcpy(temp_buf + T_len, info, info_len);
-        memcpy(temp_buf + T_len + info_len, &c, 1);
-        total_len = T_len + info_len + 1;
-        HAL_OTBN_SHA384_HMAC(T, temp_buf, total_len, prk, SHA384_RESULT_SIZE);
+        HAL_OTBN_SHA384_HMAC_SetKey(prk, SHA384_RESULT_SIZE);
+        if (T_len != 0x0)
+            HAL_OTBN_SHA384_HMAC_Update(T, T_len);
+        HAL_OTBN_SHA384_HMAC_Update(info, info_len);
+        HAL_OTBN_SHA384_HMAC_Update(&i, 1);
+        HAL_OTBN_SHA384_HMAC_Final(T);
         memcpy(okm + where, T, (i != N) ? SHA384_RESULT_SIZE : (okm_len - where));
         where += SHA384_RESULT_SIZE;
         T_len = SHA384_RESULT_SIZE;

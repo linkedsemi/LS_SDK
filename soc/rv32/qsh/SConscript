@@ -74,6 +74,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/otbn/text_array/sha512_text.c',
         'src/otbn/text_array/sm2_text.c',
         'src/otbn/ls_hal_otbn_sm2.c',
+        'src/otbn/ls_hal_otbn_hash.c',
         'src/otbn/ls_hal_otbn_sha256.c',
         'src/otbn/ls_hal_otbn_sha384.c',
         'src/otbn/ls_hal_otbn_sha512.c',
