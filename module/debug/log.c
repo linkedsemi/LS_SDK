@@ -35,6 +35,8 @@ void ram_log_print(char *ptr, int len);
 
 #if (LOG_BACKEND&UART_LOG)
 
+bool loguart_disable;
+
 static void log_uart_tx(char *ptr,int len)
 {
     while (len)

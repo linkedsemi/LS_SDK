@@ -33,7 +33,7 @@ void uart_log_pause();
 void uart_log_resume();
 extern void (*log_output_fn)(bool linefeed,const char *format,...);
 extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
-
+extern bool loguart_disable;
 
 #if (LOG_LVL >= LVL_DBG) && (GLOBAL_OUTPUT_LVL >= LVL_DBG)
     #define log_d(TAG, ...)           log_output_fn(true,"D/" TAG":" __VA_ARGS__)
@@ -59,14 +59,14 @@ extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_lengt
     #define log_e(TAG, ...)
 #endif 
 
-#define LOG_D(...)  log_d(LOG_TAG,__VA_ARGS__)
-#define LOG_I(...)  log_i(LOG_TAG,__VA_ARGS__)
-#define LOG_W(...)  log_w(LOG_TAG,__VA_ARGS__)
-#define LOG_E(...)  log_e(LOG_TAG,__VA_ARGS__)
+#define LOG_D(...)  if(!loguart_disable) log_d(LOG_TAG,__VA_ARGS__)
+#define LOG_I(...)  if(!loguart_disable) log_i(LOG_TAG,__VA_ARGS__)
+#define LOG_W(...)  if(!loguart_disable) log_w(LOG_TAG,__VA_ARGS__)
+#define LOG_E(...)  if(!loguart_disable) log_e(LOG_TAG,__VA_ARGS__)
 #if (GLOBAL_OUTPUT_LVL)
-#define LOG_RAW(...)                        log_output_fn(false, __VA_ARGS__)
-#define LOG_HEX(data_pointer,data_length)   log_hex_output_fn(data_pointer,data_length)
-#define LOG_INIT()  ls_log_init()
+#define LOG_RAW(...) if(!loguart_disable)  log_output_fn(false, __VA_ARGS__)
+#define LOG_HEX(data_pointer,data_length)   if(!loguart_disable)  log_hex_output_fn(data_pointer,data_length)
+#define LOG_INIT()  if(!loguart_disable)  ls_log_init()
 #else
 #define LOG_RAW(...)             
 #define LOG_HEX(data_pointer,data_length)  
