@@ -33,6 +33,9 @@ extern "C" {
 #define SDK_LCLK_HZ (32768)
 #endif
 
+#ifndef LOG_UART_INST
+#define LOG_UART_INST (LOG_UART1)
+#endif
 #ifndef LOG_UART_TXD
 #define LOG_UART_TXD (PA11)
 #endif
