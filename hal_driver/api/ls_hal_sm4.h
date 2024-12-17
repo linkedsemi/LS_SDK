@@ -93,6 +93,32 @@ void HAL_SM4_IRQHandler(void);
 
 void HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out);
 
+
+typedef struct 
+{
+    uint8_t counter[0x10];
+    uint8_t h[0x10];
+    uint8_t prime[0x10];
+    uint8_t j0[0x10];
+    uint64_t big_h[2];
+    uint64_t x[2];
+    uint32_t counter_size;
+    uint32_t data_size;
+    uint32_t aad_size;
+} sm4_gcm_env;
+
+void HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size);
+void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
+                                        uint8_t *in, uint32_t in_size,
+                                        uint8_t *aad, uint32_t aad_size);
+bool HAL_SM4_GCM_Decrypt_Final(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
+
+bool HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+                                              uint8_t *nonce, uint32_t nonce_size,
+                                              uint8_t *tag, uint32_t tag_size,
+                                              uint8_t *aad, uint32_t aad_size,
+                                              uint8_t *out);
+                 
 #ifdef __cplusplus
 }
 #endif

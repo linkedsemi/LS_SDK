@@ -257,6 +257,31 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt,bool CBC,uint32_t length);
  */
 void HAL_LSCRYPT_DES_Complete_Callback(bool Encrypt,bool CBC,uint32_t length);
 
+typedef struct 
+{
+    uint8_t counter[0x10];
+    uint8_t h[0x10];
+    uint8_t prime[0x10];
+    uint8_t j0[0x10];
+    uint64_t big_h[2];
+    uint64_t x[2];
+    uint32_t counter_size;
+    uint32_t data_size;
+    uint32_t aad_size;
+} aes_gcm_env;
+
+void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size);
+void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
+                                        uint8_t *in, uint32_t in_size,
+                                        uint8_t *aad, uint32_t aad_size);
+bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
+
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+                                              uint8_t *nonce, uint32_t nonce_size,
+                                              uint8_t *tag, uint32_t tag_size,
+                                              uint8_t *aad, uint32_t aad_size,
+                                              uint8_t *out);
+                                              
 void HAL_LSCRYPT_IRQHandler(void);
 
 /** @}*/
