@@ -190,6 +190,8 @@ static void block_crypt(uint8_t *in, uint8_t *out)
 				   (((x) & 0xff0000) << 24) | \
 				   (((x) & 0xff00) << 40) | \
 				   (((x) & 0xff) << 56)))
+
+#if !defined(KERNEL)
 #define UNALIGNED_PUT(v, p)                                             \
 do {   ;                                                                 \
 	struct __attribute__((__packed__)) {                            \
@@ -197,6 +199,7 @@ do {   ;                                                                 \
 	} *__p = (__typeof__(__p)) (p);                                 \
 	__p->__v = (v);                                               \
 } while (false)
+#endif
 
 static inline void mem_xor_n(uint8_t *dst, const uint8_t *src1, const uint8_t *src2, size_t len)
 {
