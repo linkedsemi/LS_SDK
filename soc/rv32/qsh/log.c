@@ -19,14 +19,13 @@
 #define RAM_LOG_BUF_SIZE 10000
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
 char ram_array[RAM_LOG_BUF_SIZE];
+bool loguart_disable = false;
 int count = 0;
 __attribute((weak)) void (*log_output_fn)(bool linefeed, const char *format, ...);
 __attribute((weak)) void (*log_hex_output_fn)(const void *data_pointer, uint16_t data_length);
 void ram_log_print(char *ptr, int len);
 
 #if (LOG_BACKEND&UART_LOG)
-
-bool loguart_disable = false;
 
 #if (LOG_UART_INST == LOG_UART1)
 #define LOG_UART  UART1

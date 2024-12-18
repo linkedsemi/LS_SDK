@@ -1,6 +1,10 @@
     .option rvc
     .align 1
+#if (ROM_CODE==1 || BOOT_RAM==1 || defined(FLASH_PROG_ALGO))
+    .section .text.rv32_delay_asm,"x"
+#else
     .section .xip_banned.rv32_delay_asm,"x"
+#endif
     .globl rv32_delay_asm
     .type rv32_delay_asm,%function
 rv32_delay_asm:
