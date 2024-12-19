@@ -276,7 +276,7 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
                                         uint8_t *aad, uint32_t aad_size);
 bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+bool HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                                               uint8_t *nonce, uint32_t nonce_size,
                                               uint8_t *tag, uint32_t tag_size,
                                               uint8_t *aad, uint32_t aad_size,

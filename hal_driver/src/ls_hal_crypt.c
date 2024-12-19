@@ -701,7 +701,7 @@ static bool aes_gcm_dec(uint8_t *in, uint8_t *nonce, uint32_t nonce_size, uint8_
     return true;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+bool HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                                               uint8_t *nonce, uint32_t nonce_size,
                                               uint8_t *tag, uint32_t tag_size,
                                               uint8_t *aad, uint32_t aad_size,
@@ -716,7 +716,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, false, true, false);
     crypt_in_out_length_set(in, out, in_size);
-    return aes_gcm_dec(in, nonce, nonce_size, tag, tag_size, aad, aad_size) ? HAL_OK : HAL_ERROR;
+    return aes_gcm_dec(in, nonce, nonce_size, tag, tag_size, aad, aad_size);
 }
 
 void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size)
