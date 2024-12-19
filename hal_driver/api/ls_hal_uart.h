@@ -96,7 +96,7 @@ struct UartDMAEnv
 /**
   * @brief  UART Interrupt TX Environment
   */
-struct Transfer_Env
+struct Uart_Transfer_Env
 {
     uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
     uint16_t                      XferCount;      /*!< UART Tx Transfer Counter           */
@@ -113,7 +113,7 @@ typedef struct __UART_HandleTypeDef
     void                          *DMAC_Instance;
     struct{
         struct UartDMAEnv DMA;
-        struct Transfer_Env Transfer;
+        struct Uart_Transfer_Env Transfer;
     }Tx_Env,Rx_Env;
 
     HAL_UART_StateTypeDef         gState;           /*!< UART state information related to global Handle management
