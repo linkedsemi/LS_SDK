@@ -913,6 +913,17 @@ void tmall_mesh_add_subscription(uint16_t element, uint8_t model_lid, uint16_t g
  * @param group_address
  */
 void tmall_mesh_delete_subscription(uint16_t element, uint8_t model_lid, uint16_t group_address);
+
+/**
+ * @brief App requests to save config param of mesh in sig mesh stack right now,   but exclude seq_iv
+ */
+void ls_sig_mesh_config_save_req(void);
+/**
+ * @brief App requests to save iv_seq param by period time
+ * 
+ * @param param_save_period_s
+ */
+void ls_sig_mesh_config_save_period_req(uint32_t param_save_period_s);
 /** @} */
 
 #ifdef __cplusplus
