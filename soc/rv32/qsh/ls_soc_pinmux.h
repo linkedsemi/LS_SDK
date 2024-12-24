@@ -7,9 +7,9 @@ extern "C" {
 #endif
 
 
-void per_func_enable(uint8_t pin, uint8_t FUNC_num);
+void per_func_enable(uint8_t pin, uint8_t func_num);
 
-void per_func_disable(uint8_t pin, uint8_t FUNC_num);
+void per_func_disable(uint8_t pin, uint8_t func_num);
 
 void per_func0_set(uint8_t pin,uint8_t per_func);
 

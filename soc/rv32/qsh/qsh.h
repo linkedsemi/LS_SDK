@@ -5,138 +5,144 @@
 extern "C" {
 #endif
 
-typedef enum IRQn
-{
-  RV_SOFT_IRQn              = 3,
-  RV_TIME_IRQn              = 7,
-  RV_EXT_IRQn               = 11,
-  
-  QSH_PMU_0_IRQn            = 16,
-  QSH_PMU_1_IRQn            = 17,
-  QSH_PMU_2_IRQn            = 18,
-  QSH_PMU_3_IRQn            = 19,
-  QSH_PMU_4_IRQn            = 20,
-  QSH_PMU_5_IRQn            = 21,
-  
-  QSH_SEC_CPU_IRQn          = 26,
-  QSH_APP_CPU_IRQn          = 27,
-  QSH_USB1_IRQn             = 28,
-  QSH_USB2_IRQn             = 29,
-  QSH_QSPI1_IRQn            = 30,
-  QSH_CACHE1_IRQn           = 31,
-  QSH_QSPI2_IRQn            = 32,
-  QSH_CACHE2_IRQn           = 33,
-  QSH_DMAC1_IRQn            = 34,
-  QSH_DMAC2_IRQn            = 35,
-  QSH_ESPI1_IRQn            = 36,
-  QSH_ESPI2_IRQn            = 37,
-  QSH_LPC_IRQn              = 38,
-  QSH_FDCAN_IRQn            = 39,
-  QSH_RGMII_IRQn            = 40,
-  QSH_EMMC_IRQn             = 41,
-  QSH_LTPI_IRQn             = 42,
-  QSH_HSE_IRQn              = 43,
-  QSH_CRYPT_IRQn            = 44,
-  QSH_ECC_IRQn              = 45,
-  QSH_SHA_IRQn              = 46,
-  QSH_SM4_IRQn              = 47,
-  QSH_OTBN_IRQn             = 48,
-  QSH_SYSC_OTBN_IRQn        = 49,
-  QSH_SYSC_SPID1_IRQn       = 50,
-  QSH_SYSC_SPID2_IRQn       = 51,
-  
-  QSH_SPID1_IRQn            = 54,
-  QSH_SPID2_IRQn            = 55,
-  QSH_ADTIM1_IRQn           = 56,
-  QSH_ADTIM2_IRQn           = 57,
-  QSH_GPTIMA1_IRQn          = 58,
-  QSH_GPTIMA2_IRQn          = 59,
-  QSH_GPTIMB1_IRQn          = 60,
-  QSH_GPTIMC1_IRQn          = 61,
-  QSH_BSTIM1_IRQn           = 62,
-  QSH_BSTIM2_IRQn           = 63,
-  QSH_PWM_IRQn              = 64,
-  QSH_CAP_IRQn              = 65,
-  QSH_I2C1_IRQn             = 66,
-  QSH_I2C2_IRQn             = 67,
-  QSH_I2C3_IRQn             = 68,
-  QSH_I2C4_IRQn             = 69,
-  QSH_I2C5_IRQn             = 70,
-  QSH_I2C6_IRQn             = 71,
-  QSH_I2C7_IRQn             = 72,
-  QSH_I2C8_IRQn             = 73,
-  QSH_I2C9_IRQn             = 74,
-  QSH_I2C10_IRQn            = 75,
-  QSH_I2C11_IRQn            = 76,
-  QSH_I2C12_IRQn            = 77,
-  QSH_I2C13_IRQn            = 78,
-  QSH_I2C14_IRQn            = 79,
-  QSH_I3C1_IRQn             = 80,
-  QSH_I3C2_IRQn             = 81,
-  QSH_I3C3_IRQn             = 80,
-  QSH_I3C4_IRQn             = 83,
-  QSH_I3C5_IRQn             = 80,
-  QSH_I3C6_IRQn             = 85,
-  QSH_I3C7_IRQn             = 86,
-  QSH_I3C8_IRQn             = 87,
-  QSH_I3C9_IRQn             = 88,
-  QSH_I3C10_IRQn            = 89,
-  QSH_I3C11_IRQn            = 90,
-  QSH_I3C12_IRQn            = 91,
-  QSH_I3C13_IRQn            = 92,
-  QSH_I3C14_IRQn            = 93,
-  QSH_UART1_IRQn            = 94,
-  QSH_UART2_IRQn            = 95,
-  QSH_DWUART1_IRQn          = 96,
-  QSH_DWUART2_IRQn          = 97,
-  QSH_DWUART3_IRQn          = 98,
-  QSH_DWUART4_IRQn          = 99,
-  QSH_SPI1_IRQn             = 100,
-  QSH_SPI2_IRQn             = 101,
-  QSH_SPI3_IRQn             = 102,
-  QSH_SPI4_IRQn             = 103,
-  QSH_SPIS1_IRQn            = 104,
-  QSH_SPIS2_IRQn            = 105,
-  QSH_ADC1_IRQn             = 106,
-  QSH_ADC2_IRQn             = 107,
-  QSH_ADC3_IRQn             = 108,
-  QSH_EXTI1_IRQn            = 109,
-  QSH_EXTI2_IRQn            = 110,
-  QSH_EXTI3_IRQn            = 111,
-  QSH_EXTI4_IRQn            = 112,
-  QSH_IWDT1_IRQn            = 113,
-  QSH_IWDT2_IRQn            = 114,
-  QSH_WWDT1_IRQn            = 115,
-  QSH_WWDT2_IRQn            = 116,
-  QSH_SPIM1_IRQn            = 117,
-  QSH_SPIM2_IRQn            = 118,
-  QSH_SMBF1_IRQn            = 119,
-  QSH_SMBF2_IRQn            = 120,
-  QSH_SMBF3_IRQn            = 121,
-  QSH_SMBF4_IRQn            = 122,
-  QSH_MJTAG1_IRQn           = 123,
-  QSH_MJTAG2_IRQn           = 124,
-  QSH_MJTAG3_IRQn           = 125,
-  QSH_SGPIO_MST_IRQn        = 126,
-  QSH_PS2IF1_IRQn           = 127,
-  QSH_PS2IF2_IRQn           = 128,
-  QSH_OWM_IRQn              = 129,
-  QSH_CEC_IRQn              = 130,
-  QSH_KSCAN_IRQn            = 131,
-  QSH_PECI_IRQn             = 132,
-  QSH_TRNG_IRQn             = 133,
-  QSH_PDM_IRQn              = 134,
-  QSH_FILTER_IRQn           = 135,
-  QSH_SCAL_IRQn             = 136,
-  QSH_GPIO_MON_IRQn         = 137,
+#define RV_SOFT_IRQN          3
+#define RV_TIME_IRQN          7
+#define RV_EXT_IRQN          11
+#define PMU_RTC_IRQN         16
+#define PMU_WDT_IRQN         17
+#define PMU_TIM_IRQN         18
+#define PMU_EXT_IRQN         19
+#define PMU_LVD_IRQN         20
+#define PMU_CASEOPEN_IRQN    21
+#define PMU_PASSTHROUGH_IRQN 22
 
-  IRQn_MAX,
-} IRQn_Type;
+#define SYSC_SEC_CPU_IRQN    26
+#define SYSC_APP_CPU_IRQN    27
+#define USB1_IRQN            28
+#define USB2_IRQN            29
+#define QSPI1_IRQN           30
+#define QSPI1_CCH_IRQN       31
+#define QSPI2_IRQN           32
+#define QSPI2_CCH_IRQN       33
+#define DMAC1_IRQN           34
+#define DMAC2_IRQN           35
+#define ESPI1_IRQN           36
+#define ESPI2_IRQN           37
+#define LPC1_IRQN            38
+#define LPC2_IRQN            39
+#define ETH1_IRQN            40
+#define ETH1_TX_IRQN         41
+#define ETH1_RX_IRQN         42
+#define ETH2_IRQN            43
+#define ETH2_TX_IRQN         44
+#define ETH2_RX_IRQN         45
+#define EMMC1_IRQN           46
+#define EMMC1_WAKEUP_IRQN    47
+#define EMMC2_IRQN           48
+#define EMMC2_WAKEUP_IRQN    49
+#define CALC_AES256_IRQN     50
+#define CALC_SHA256_IRQN     51
+#define CALC_SM4_IRQN        52
+#define NIST_TRNG_IRQN       53
+#define OBTN_IRQN            54
+#define OTBN_SYSC_IRQN       55
+#define HSE_IRQN             60
+#define FDCAN_IRQN           61
+#define LTPI_IRQN            62
+#define OTP_CTRL_IRQN        63
+#define PSRAM_IRQN           64
+#define PSRAM_SEC_IRQN       65
+#define PSRAM_NSEC_IRQN      66
+#define SPI3_IRQN            67
+#define SPI4_IRQN            68
+#define SPIS1_IRQN           69
+#define SPIS2_IRQN           70
+
+#define ADTIM1_IRQN          86
+#define ADTIM2_IRQN          87
+#define GPTIMA1_IRQN         88
+#define GPTIMA2_IRQN         89
+#define GPTIMB1_IRQN         90
+#define GPTIMC1_IRQN         91
+#define BSTIM1_IRQN          92
+#define BSTIM2_IRQN          93
+#define PWM_IRQN             94
+#define CAP_IRQN             95
+#define I2C1_IRQN            96
+#define I2C2_IRQN            97
+#define I2C3_IRQN            98
+#define I2C4_IRQN            99
+#define I2C5_IRQN            100
+#define I2C6_IRQN            101
+#define I2C7_IRQN            102
+#define I2C8_IRQN            103
+#define I2C9_IRQN            104
+#define I2C10_IRQN           105
+#define I2C11_IRQN           106
+#define I2C12_IRQN           107
+#define I2C13_IRQN           108
+#define I2C14_IRQN           109
+#define I2C15_IRQN           110
+#define I2C16_IRQN           111
+#define I3C1_IRQN            112
+#define I3C2_IRQN            113
+#define I3C3_IRQN            114
+#define I3C4_IRQN            115
+#define I3C5_IRQN            116
+#define I3C6_IRQN            117
+#define I3C7_IRQN            118
+#define I3C8_IRQN            119
+#define I3C9_IRQN            120
+#define I3C10_IRQN           121
+#define I3C11_IRQN           122
+#define I3C12_IRQN           123
+#define I3C13_IRQN           124
+#define I3C14_IRQN           125
+#define UART1_IRQN           126
+#define UART2_IRQN           127
+#define UART3_IRQN           128
+#define UART4_IRQN           129
+#define UART5_IRQN           130
+#define UART6_IRQN           131
+#define UART7_IRQN           132
+#define UART8_IRQN           133
+#define UART9_IRQN           134
+#define UART10_IRQN          135
+#define UART11_IRQN          136
+#define UART12_IRQN          137
+#define SPI1_IRQN            138
+#define SPI2_IRQN            139
+#define ADC1_IRQN            140
+#define ADC2_IRQN            141
+#define PARAL_IRQN           142
+#define EXTI1_IRQN           143
+#define EXTI2_IRQN           144
+#define EXTI3_IRQN           145
+#define EXTI4_IRQN           146
+#define IWDT1_IRQN           147
+#define IWDT2_IRQN           148
+#define WWDT1_IRQN           149
+#define WWDT2_IRQN           150
+#define SGPIO1_MST_IRQN      151
+#define SGPIO2_MST_IRQN      152
+#define SGPIO1_MON_IRQN      153
+#define SGPIO2_MON_IRQN      154
+#define MJTAG1_IRQN          159
+#define MJTAG2_IRQN          160
+#define MJTAG3_IRQN          161
+#define PS2IF1_IRQN          163
+#define PS2IF2_IRQN          164
+#define OWM_IRQN             165
+#define CEC_IRQN             166
+#define KSCAN_IRQN           167
+#define PECI1_IRQN           168
+#define PECI2_IRQN           169
+#define TRNG_IRQN            170
+#define PDM_IRQN             171
+#define IRQN_MAX             176
 
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif

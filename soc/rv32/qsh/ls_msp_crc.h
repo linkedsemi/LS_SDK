@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_CRC_ADDR
-#define LSCRC ((reg_calc_crc_t *)QSH_APB_CRC_ADDR)
+#ifdef SEC_CALC_CRC_ADDR
+#define LSCRC ((reg_calc_crc_t *)SEC_CALC_CRC_ADDR)
 #endif
 
 void HAL_LSCRC_MSP_Init(void);

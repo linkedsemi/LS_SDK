@@ -6,10 +6,10 @@
 extern "C" {
 #endif
 
-#ifdef QSH_AHB_OTBN_ADDR
-#define LSOTBN ((reg_otbn_t *)QSH_AHB_OTBN_ADDR)
-#define OTBN_IMEM_ADDR (QSH_AHB_OTBN_ADDR + 0x4000)
-#define OTBN_DMEM_ADDR (QSH_AHB_OTBN_ADDR + 0x8000)
+#ifdef SEC_OTBN_ADDR
+#define LSOTBN ((reg_otbn_t *)SEC_OTBN_ADDR)
+#define OTBN_IMEM_ADDR (SEC_OTBN_ADDR + 0x4000)
+#define OTBN_DMEM_ADDR (SEC_OTBN_ADDR + 0x8000)
 #endif
 
 void HAL_LSOTBN_MSP_Init(void);

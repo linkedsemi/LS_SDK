@@ -3,7 +3,8 @@
 #include "ls_hal_dwuart.h"
 #include "field_manipulate.h"
 #include "exception_isr.h"
-#include "reg_sysc_per.h"
+#include "reg_sysc_sec_per.h"
+#include "reg_sysc_app_per.h"
 #include "dmac_config.h"
 #include "core_rv32.h"
 #include "sys_stat.h"
@@ -48,23 +49,23 @@ void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
     switch((uint32_t)inst->UARTX)
     {
     case (uint32_t)UART1:
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART1_MASK;
-        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART1_N_MASK;
-        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART1_N_MASK;
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
-        rv_set_int_isr(QSH_UART1_IRQn,UART1_Handler);
-        csi_vic_clear_pending_irq(QSH_UART1_IRQn);
-        csi_vic_enable_irq(QSH_UART1_IRQn);
+        SYSC_SEC_PER->PD_PER_CLKG0 = SYSC_SEC_PER_CLKG_CLR_UART1_MASK;
+        SYSC_SEC_PER->PD_PER_SRST0 = SYSC_SEC_PER_SRST_CLR_UART1_N_MASK;
+        SYSC_SEC_PER->PD_PER_SRST0 = SYSC_SEC_PER_SRST_SET_UART1_N_MASK;
+        SYSC_SEC_PER->PD_PER_CLKG0 = SYSC_SEC_PER_CLKG_SET_UART1_MASK;
+        rv_set_int_isr(UART1_IRQN,UART1_Handler);
+        csi_vic_clear_pending_irq(UART1_IRQN);
+        csi_vic_enable_irq(UART1_IRQN);
         UART_inst_env[0] = inst;
     break;
    case (uint32_t)UART2:
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART2_MASK;
-        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_UART2_N_MASK;
-        SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_UART2_N_MASK;
-        SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
-        rv_set_int_isr(QSH_UART2_IRQn,UART2_Handler);
-        csi_vic_clear_pending_irq(QSH_UART2_IRQn);
-        csi_vic_enable_irq(QSH_UART2_IRQn);
+        SYSC_APP_PER->PD_PER_CLKG1 = SYSC_APP_PER_CLKG_CLR_UART2_MASK;
+        SYSC_APP_PER->PD_PER_SRST1 = SYSC_APP_PER_SRST_CLR_UART2_N_MASK;
+        SYSC_APP_PER->PD_PER_SRST1 = SYSC_APP_PER_SRST_SET_UART2_N_MASK;
+        SYSC_APP_PER->PD_PER_CLKG1 = SYSC_APP_PER_CLKG_SET_UART2_MASK;
+        rv_set_int_isr(UART2_IRQN,UART2_Handler);
+        csi_vic_clear_pending_irq(UART2_IRQN);
+        csi_vic_enable_irq(UART2_IRQN);
         UART_inst_env[1] = inst;
     break;
     }
@@ -75,12 +76,12 @@ void HAL_UART_MSP_DeInit(UART_HandleTypeDef *inst)
     switch((uint32_t)inst->UARTX)
     {
     case (uint32_t)UART1:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART1, 1);
-        csi_vic_disable_irq(QSH_UART1_IRQn);
+        REG_FIELD_WR(SYSC_SEC_PER->PD_PER_CLKG0, SYSC_SEC_PER_CLKG_CLR_UART1, 1);
+        csi_vic_disable_irq(UART1_IRQN);
     break;
     case (uint32_t)UART2:
-        REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART2, 1);
-        csi_vic_disable_irq(QSH_UART2_IRQn);
+        REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_CLR_UART2, 1);
+        csi_vic_disable_irq(UART2_IRQN);
     break;
     }
 }
@@ -90,22 +91,22 @@ void HAL_DWUART_MSP_Init(DWUART_HandleTypeDef *inst)
     switch ((uint32_t)inst->DWUARTX)
     {
     // case (uint32_t)DWUART1:
-    //     SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_DWUART1_N_MASK;
-    //     SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_DWUART1_N_MASK;
+    //     SYSC_APP_PER->PD_PER_SRST1 = SYSC_APP_PER_SRST_CLR_DWUART1_N_MASK;
+    //     SYSC_APP_PER->PD_PER_SRST1 = SYSC_APP_PER_SRST_SET_DWUART1_N_MASK;
     //     rv_set_int_isr(QSH_DWUART1_IRQn, DWUART1_Handler);
     //     DWUART_inst_env[0] = inst;
     //     csi_vic_clear_pending_irq(QSH_DWUART1_IRQn);
     //     csi_vic_enable_irq(QSH_DWUART1_IRQn);
-    //     SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_DWUART1_MASK;
+    //     SYSC_APP_PER->PD_PER_CLKG1 = SYSC_APP_PER_CLKG_SET_DWUART1_MASK;
     // break;
     // case (uint32_t)DWUART2:
-    //     SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_CLR_DWUART2_N_MASK;
-    //     SYSC_PER->PD_PER_SRST1 = SYSC_PER_SRST_SET_DWUART2_N_MASK;
+    //     SYSC_APP_PER->PD_PER_SRST1 = SYSC_APP_PER_SRST_CLR_DWUART2_N_MASK;
+    //     SYSC_APP_PER->PD_PER_SRST1 = SYSC_APP_PER_SRST_SET_DWUART2_N_MASK;
     //     rv_set_int_isr(DWUART2_IRQn, DWUART2_Handler);
     //     DWUART_inst_env[1] = inst;
     //     csi_vic_clear_pending_irq(DWUART2_IRQn);
     //     csi_vic_enable_irq(DWUART2_IRQn);
-    //     SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_DWUART2_MASK;
+    //     SYSC_APP_PER->PD_PER_CLKG1 = SYSC_APP_PER_CLKG_SET_DWUART2_MASK;
     // break;
     }
 }
@@ -115,11 +116,11 @@ void HAL_DWUART_MSP_DeInit(DWUART_HandleTypeDef *inst)
     switch ((uint32_t)inst->DWUARTX)
     {
     // case (uint32_t)DWUART1:
-    //     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_DWUART1, 1);
+    //     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_CLR_DWUART1, 1);
     //     csi_vic_disable_irq(QSH_DWUART1_IRQn);
     //     break;
     // case (uint32_t)DWUART2:
-    //     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_DWUART2, 1);
+    //     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_CLR_DWUART2, 1);
     //     csi_vic_disable_irq(DWUART2_IRQn);
     //     break;
     }
@@ -261,26 +262,26 @@ __attribute__((weak)) void LL_UART1_Handler() {}
 
 void LL_UART1_MSP_Init(void)
 {
-    rv_set_int_isr(QSH_UART1_IRQn, LL_UART1_Handler);
-    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART1_MASK;
+    rv_set_int_isr(UART1_IRQN, LL_UART1_Handler);
+    SYSC_SEC_PER->PD_PER_CLKG0 = SYSC_SEC_PER_CLKG_SET_UART1_MASK;
 }
 
 void LL_UART1_MSP_DeInit(void)
 {
-    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART1_MASK;
+    SYSC_SEC_PER->PD_PER_CLKG0 = SYSC_SEC_PER_CLKG_CLR_UART1_MASK;
 }
 
 __attribute__((weak)) void LL_UART2_Handler() {}
 
 void LL_UART2_MSP_Init(void)
 {
-    rv_set_int_isr(QSH_UART2_IRQn, LL_UART2_Handler);
-    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_SET_UART2_MASK;
+    rv_set_int_isr(UART2_IRQN, LL_UART2_Handler);
+    SYSC_APP_PER->PD_PER_CLKG1 = SYSC_APP_PER_CLKG_SET_UART2_MASK;
 }
 
 void LL_UART2_MSP_DeInit(void)
 {
-    SYSC_PER->PD_PER_CLKG1 = SYSC_PER_CLKG_CLR_UART2_MASK;
+    SYSC_APP_PER->PD_PER_CLKG1 = SYSC_APP_PER_CLKG_CLR_UART2_MASK;
 }
 
 // __attribute__((weak)) void LL_UART3_Handler() {}
@@ -288,12 +289,12 @@ void LL_UART2_MSP_DeInit(void)
 // void LL_UART3_MSP_Init(void)
 // {
 //     rv_set_int_isr(UART3_IRQn, LL_UART3_Handler);
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_UART3, 1);
+//     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_SET_UART3, 1);
 // }
 
 // void LL_UART3_MSP_DeInit(void)
 // {
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_UART3, 1);
+//     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_CLR_UART3, 1);
 // }
 
 // __attribute__((weak)) void LL_DWUART1_Handler() {}
@@ -301,12 +302,12 @@ void LL_UART2_MSP_DeInit(void)
 // void LL_DWUART1_MSP_Init(void)
 // {
 //     rv_set_int_isr(QSH_DWUART1_IRQn, LL_DWUART1_Handler);
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_DWUART1, 1);
+//     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_SET_DWUART1, 1);
 // }
 
 // void LL_DWUART1_MSP_DeInit(void)
 // {
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_DWUART1, 1);
+//     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_CLR_DWUART1, 1);
 // }
 
 // __attribute__((weak)) void LL_DWUART2_Handler() {}
@@ -314,10 +315,10 @@ void LL_UART2_MSP_DeInit(void)
 // void LL_DWUART2_MSP_Init(void)
 // {
 //     rv_set_int_isr(DWUART2_IRQn, LL_DWUART2_Handler);
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_SET_DWUART2, 1);
+//     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_SET_DWUART2, 1);
 // }
 
 // void LL_DWUART2_MSP_DeInit(void)
 // {
-//     REG_FIELD_WR(SYSC_PER->PD_PER_CLKG1, SYSC_PER_CLKG_CLR_DWUART2, 1);
+//     REG_FIELD_WR(SYSC_APP_PER->PD_PER_CLKG1, SYSC_APP_PER_CLKG_CLR_DWUART2, 1);
 // }

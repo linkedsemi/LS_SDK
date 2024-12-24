@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_CRYPT_ADDR
-#define LSCRYPT ((reg_crypt_t *)QSH_APB_CRYPT_ADDR)
+#ifdef SEC_CALC_AES_ADDR
+#define LSCRYPT ((reg_crypt_t *)SEC_CALC_AES_ADDR)
 #endif
 
 void HAL_LSCRYPT_MSP_Init(void);

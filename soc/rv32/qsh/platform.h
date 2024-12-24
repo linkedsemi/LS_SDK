@@ -5,7 +5,8 @@
 #include "sdk_config.h"
 #include "core_rv32.h"
 #include "qsh.h"
-#include "reg_sysc_cpu.h"
+#include "reg_sysc_sec_cpu.h"
+#include "reg_sysc_app_cpu.h"
 
 __attribute__((always_inline)) static inline void e906_init()
 {
@@ -25,6 +26,7 @@ void rv32_delay_asm(uint32_t,uint32_t);
 
 void SWINT_Handler_ASM();
 
+void flash_swint_init();
 
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler
@@ -35,62 +37,62 @@ void SWINT_Handler_ASM();
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
-#define FLASH_SWINT_NUM RV_SOFT_IRQn
+#define FLASH_SWINT_NUM RV_SOFT_IRQN
 #define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
 
 static inline void cpu_intr0_unmask(void)
 {
-    SYSC_CPU->APP_CPU_IMSK = 1;
+    SYSC_APP_CPU->APP_CPU_IMSK = 1;
 }
 
 static inline void cpu_intr0_mask(void)
 {
-    SYSC_CPU->APP_CPU_IMSK = 0;
+    SYSC_APP_CPU->APP_CPU_IMSK = 0;
 }
 
 static inline void cpu_intr0_activate(void)
 {
-    SYSC_CPU->APP_CPU_INTR = 1;
+    SYSC_APP_CPU->APP_CPU_INTR = 1;
 }
 
 static inline void cpu_intr0_clr(void)
 {
-    SYSC_CPU->APP_CPU_INTR = 0;
+    SYSC_APP_CPU->APP_CPU_INTR = 0;
 }
 
 static inline void cpu_intr1_unmask(void)
 {
-    SYSC_CPU->SEC_CPU_IMSK = 1;
+    SYSC_SEC_CPU->SEC_CPU_IMSK = 1;
 }
 
 static inline void cpu_intr1_mask(void)
 {
-    SYSC_CPU->SEC_CPU_IMSK = 0;
+    SYSC_SEC_CPU->SEC_CPU_IMSK = 0;
 }
 
 static inline void cpu_intr1_activate(void)
 {
-    SYSC_CPU->SEC_CPU_INTR = 1;
+    SYSC_SEC_CPU->SEC_CPU_INTR = 1;
 }
 
 static inline void cpu_intr1_clr(void)
 {
-    SYSC_CPU->SEC_CPU_INTR = 0;
+    SYSC_SEC_CPU->SEC_CPU_INTR = 0;
 }
 
 static inline void app_cpu_reset(void)
 {
-    SYSC_CPU->APP_CPU_SRST = 0;
+    SYSC_SEC_CPU->APP_CPU_SRST = 0;
 }
 
 static inline void app_cpu_dereset(void)
 {
-    SYSC_CPU->APP_CPU_SRST = 1;
+    SYSC_SEC_CPU->APP_CPU_SRST = 1;
 }
 
 static inline void app_cpu_reset_pc(uint32_t addr)
 {
-    SYSC_CPU->APP_CPU_ADDR_CFG = addr;
+    SYSC_SEC_CPU->APP_CPU_ADDR_CFG = addr;
 }
 
 #endif

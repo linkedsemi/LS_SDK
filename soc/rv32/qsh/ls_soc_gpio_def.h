@@ -1,7 +1,7 @@
 #ifndef LS_SOC_GPIO_DEF_H_
 #define LS_SOC_GPIO_DEF_H_
 
-//LSGPIOA
+//GPIOA
 #define PA00 (0x00)   /*!< GPIOA00 selected */
 #define PA01 (0x01)   /*!< GPIOA01 selected */
 #define PA02 (0x02)   /*!< GPIOA02 selected */
@@ -18,7 +18,7 @@
 #define PA13 (0x0d)   /*!< GPIOA13 selected */
 #define PA14 (0x0e)   /*!< GPIOA14 selected */
 #define PA15 (0x0f)   /*!< GPIOA15 selected */
-//LSGPIOB
+//GPIOB
 #define PB00 (0x10)   /*!< GPIOB00 selected */
 #define PB01 (0x11)   /*!< GPIOB01 selected */
 #define PB02 (0x12)   /*!< GPIOB02 selected */
@@ -35,7 +35,7 @@
 #define PB13 (0x1d)   /*!< GPIOB13 selected */
 #define PB14 (0x1e)   /*!< GPIOB14 selected */
 #define PB15 (0x1f)   /*!< GPIOB15 selected */
-//LSGPIOC
+//GPIOC
 #define PC00 (0x20)   /*!< GPIOC00 selected */
 #define PC01 (0x21)   /*!< GPIOC01 selected */
 #define PC02 (0x22)   /*!< GPIOC02 selected */
@@ -52,7 +52,7 @@
 #define PC13 (0x2d)   /*!< GPIOC13 selected */
 #define PC14 (0x2e)   /*!< GPIOC14 selected */
 #define PC15 (0x2f)   /*!< GPIOC15 selected */
-//LSGPIOD
+//GPIOD
 #define PD00 (0x30)   /*!< GPIOD00 selected */
 #define PD01 (0x31)   /*!< GPIOD01 selected */
 #define PD02 (0x32)   /*!< GPIOD02 selected */
@@ -69,7 +69,7 @@
 #define PD13 (0x3d)   /*!< GPIOD13 selected */
 #define PD14 (0x3e)   /*!< GPIOD14 selected */
 #define PD15 (0x3f)   /*!< GPIOD15 selected */
-//LSGPIOE
+//GPIOE
 #define PE00 (0x40)   /*!< GPIOE00 selected */
 #define PE01 (0x41)   /*!< GPIOE01 selected */
 #define PE02 (0x42)   /*!< GPIOE02 selected */
@@ -86,7 +86,7 @@
 #define PE13 (0x4d)   /*!< GPIOE13 selected */
 #define PE14 (0x4e)   /*!< GPIOE14 selected */
 #define PE15 (0x4f)   /*!< GPIOE15 selected */
-//LSGPIOF
+//GPIOF
 #define PF00 (0x50)   /*!< GPIOF00 selected */
 #define PF01 (0x51)   /*!< GPIOF01 selected */
 #define PF02 (0x52)   /*!< GPIOF02 selected */
@@ -103,7 +103,7 @@
 #define PF13 (0x5d)   /*!< GPIOF13 selected */
 #define PF14 (0x5e)   /*!< GPIOF14 selected */
 #define PF15 (0x5f)   /*!< GPIOF15 selected */
-//LSGPIOG
+//GPIOG
 #define PG00 (0x60)   /*!< GPIOG00 selected */
 #define PG01 (0x61)   /*!< GPIOG01 selected */
 #define PG02 (0x62)   /*!< GPIOG02 selected */
@@ -120,7 +120,7 @@
 #define PG13 (0x6d)   /*!< GPIOG13 selected */
 #define PG14 (0x6e)   /*!< GPIOG14 selected */
 #define PG15 (0x6f)   /*!< GPIOG15 selected */
-//LSGPIOH
+//GPIOH
 #define PH00 (0x70)   /*!< GPIOH00 selected */
 #define PH01 (0x71)   /*!< GPIOH01 selected */
 #define PH02 (0x72)   /*!< GPIOH02 selected */
@@ -137,7 +137,7 @@
 #define PH13 (0x7d)   /*!< GPIOH13 selected */
 #define PH14 (0x7e)   /*!< GPIOH14 selected */
 #define PH15 (0x7f)   /*!< GPIOH15 selected */
-//LSGPIOI
+//GPIOI
 #define PI00 (0x80)   /*!< GPIOI00 selected */
 #define PI01 (0x81)   /*!< GPIOI01 selected */
 #define PI02 (0x82)   /*!< GPIOI02 selected */
@@ -154,7 +154,7 @@
 #define PI13 (0x8d)   /*!< GPIOI13 selected */
 #define PI14 (0x8e)   /*!< GPIOI14 selected */
 #define PI15 (0x8f)   /*!< GPIOI15 selected */
-//LSGPIOJ
+//GPIOJ
 #define PJ00 (0x90)   /*!< GPIOJ00 selected */
 #define PJ01 (0x91)   /*!< GPIOJ01 selected */
 #define PJ02 (0x92)   /*!< GPIOJ02 selected */
@@ -171,7 +171,7 @@
 #define PJ13 (0x9d)   /*!< GPIOJ13 selected */
 #define PJ14 (0x9e)   /*!< GPIOJ14 selected */
 #define PJ15 (0x9f)   /*!< GPIOJ15 selected */
-//LSGPIOK
+//GPIOK
 #define PK00 (0xa0)   /*!< GPIOK00 selected */
 #define PK01 (0xa1)   /*!< GPIOK01 selected */
 #define PK02 (0xa2)   /*!< GPIOK02 selected */
@@ -188,7 +188,7 @@
 #define PK13 (0xad)   /*!< GPIOK13 selected */
 #define PK14 (0xae)   /*!< GPIOK14 selected */
 #define PK15 (0xaf)   /*!< GPIOK15 selected */
-//LSGPIOM
+//GPIOM
 #define PM00 (0xb0)   /*!< GPIOM00 selected */
 #define PM01 (0xb1)   /*!< GPIOM01 selected */
 #define PM02 (0xb2)   /*!< GPIOM02 selected */
@@ -205,7 +205,7 @@
 #define PM13 (0xbd)   /*!< GPIOM13 selected */
 #define PM14 (0xbe)   /*!< GPIOM14 selected */
 #define PM15 (0xbf)   /*!< GPIOM15 selected */
-//LSGPION
+//GPION
 #define PN00 (0xc0)   /*!< GPION00 selected */
 #define PN01 (0xc1)   /*!< GPION01 selected */
 #define PN02 (0xc2)   /*!< GPION02 selected */
@@ -222,7 +222,7 @@
 #define PN13 (0xcd)   /*!< GPION13 selected */
 #define PN14 (0xce)   /*!< GPION14 selected */
 #define PN15 (0xcf)   /*!< GPION15 selected */
-//LSGPIOQ
+//GPIOQ
 #define PQ00 (0xd0)   /*!< GPIOQ00 selected */
 #define PQ01 (0xd1)   /*!< GPIOQ01 selected */
 #define PQ02 (0xd2)   /*!< GPIOQ02 selected */
@@ -239,7 +239,7 @@
 #define PQ13 (0xdd)   /*!< GPIOQ13 selected */
 #define PQ14 (0xde)   /*!< GPIOQ14 selected */
 #define PQ15 (0xdf)   /*!< GPIOQ15 selected */
-//LSGPIOT
+//GPIOT
 #define PT00 (0xe0)   /*!< GPIOT00 selected */
 #define PT01 (0xe1)   /*!< GPIOT01 selected */
 #define PT02 (0xe2)   /*!< GPIOT02 selected */

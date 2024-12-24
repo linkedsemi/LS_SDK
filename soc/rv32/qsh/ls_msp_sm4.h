@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_SM4_ADDR
-#define LSSM4 ((reg_sm4_t *)QSH_APB_SM4_ADDR)
+#ifdef SEC_CALC_SM4_ADDR
+#define LSSM4 ((reg_sm4_t *)SEC_CALC_SM4_ADDR)
 #endif
 
 void HAL_LSSM4_MSP_Init(void);

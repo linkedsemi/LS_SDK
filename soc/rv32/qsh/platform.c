@@ -5,16 +5,14 @@
 #include "log.h"
 #include "swint_call_asm.h"
 #include "systick.h"
-#include "ls_hal_flash.h"
 #include "exception_isr.h"
 #include "ls_soc_gpio.h"
-#include "reg_pmu.h"
 #include "field_manipulate.h"
 #include "qsh.h"
 
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
-__attribute__((aligned(64))) void (*interrupt_vector[IRQn_MAX])();
+__attribute__((aligned(64))) void (*interrupt_vector[IRQN_MAX])();
 
 __attribute__((weak)) void SystemInit(){
     e906_init();
@@ -41,13 +39,13 @@ __attribute__((weak)) void SystemInit(){
 // static void set_all_irq_priority_to_lowest_level()
 // {
 //     uint8_t i;
-//     for(i=0;i<IRQn_MAX;++i)
+//     for(i=0;i<IRQN_MAX;++i)
 //     {
 //         csi_vic_set_prio(i,0);
 //     }
 // }
 
-static void flash_swint_init()
+void flash_swint_init()
 {
     rv_set_int_isr(FLASH_SWINT_NUM,FLASH_SWINT_HANDLER);
     CLIC->CLICINT[FLASH_SWINT_NUM].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
@@ -58,10 +56,6 @@ static void flash_swint_init()
 
 void sys_init_none()
 {
-    flash_swint_init();
-    hal_flash_init();
-    hal_flash_dual_mode_set(1);
-
     // clk_flash_init();
     // set_all_irq_priority_to_lowest_level();
     // hal_flash_xip_func_ptr_init();

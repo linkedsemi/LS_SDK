@@ -1,0 +1,779 @@
+#ifndef REG_SEC_PMU_RG_TYPE_H_
+#define REG_SEC_PMU_RG_TYPE_H_
+#include <stdint.h>
+#include "reg_base_addr.h"
+
+#define SEC_PMU ((reg_sec_pmu_rg_t *)SEC_PMU_RG_SEC_ADDR)
+
+typedef struct
+{
+    volatile uint32_t SFT_CTRL00; //0x0
+    volatile uint32_t SFT_CTRL01; //0x4
+    volatile uint32_t SFT_CTRL02; //0x8
+    volatile uint32_t SFT_CTRL03; //0xc
+    volatile uint32_t MISC_CTRL0; //0x10
+    volatile uint32_t TRIM0; //0x14
+    volatile uint32_t ANA_PMU_CTRL; //0x18
+    volatile uint32_t WKUP_CTRL; //0x1c
+    volatile uint32_t WKUP_TIM0; //0x20
+    volatile uint32_t WKUP_TIM1; //0x24
+    volatile uint32_t RST_SFT; //0x28
+    volatile uint32_t CLKG_SRST; //0x2c
+    volatile uint32_t PMU_SET_VAL; //0x30
+    volatile uint32_t PWR_CTRL; //0x34
+    volatile uint32_t HSE_CAP; //0x38
+    volatile uint32_t PMU_STATUS; //0x3c
+    volatile uint32_t RESERVED0[16];
+    volatile uint32_t GPIOA_INTR_MSK; //0x80
+    volatile uint32_t RESERVED1[1];
+    volatile uint32_t GPIOC_INTR_MSK; //0x88
+    volatile uint32_t RESERVED2[1];
+    volatile uint32_t GPIOE_INTR_MSK; //0x90
+    volatile uint32_t RESERVED3[3];
+    volatile uint32_t GPIOI_INTR_MSK; //0xa0
+    volatile uint32_t RESERVED4[1];
+    volatile uint32_t GPIOK_INTR_MSK; //0xa8
+    volatile uint32_t RESERVED5[5];
+    volatile uint32_t GPIOA_INTR_CLR; //0xc0
+    volatile uint32_t RESERVED6[1];
+    volatile uint32_t GPIOC_INTR_CLR; //0xc8
+    volatile uint32_t RESERVED7[1];
+    volatile uint32_t GPIOE_INTR_CLR; //0xd0
+    volatile uint32_t RESERVED8[3];
+    volatile uint32_t GPIOI_INTR_CLR; //0xe0
+    volatile uint32_t RESERVED9[1];
+    volatile uint32_t GPIOK_INTR_CLR; //0xe8
+    volatile uint32_t RESERVED10[5];
+    volatile uint32_t GPIOA_INTR_STT; //0x100
+    volatile uint32_t RESERVED11[1];
+    volatile uint32_t GPIOC_INTR_STT; //0x108
+    volatile uint32_t RESERVED12[1];
+    volatile uint32_t GPIOE_INTR_STT; //0x110
+    volatile uint32_t RESERVED13[3];
+    volatile uint32_t GPIOI_INTR_STT; //0x120
+    volatile uint32_t RESERVED14[1];
+    volatile uint32_t GPIOK_INTR_STT; //0x128
+    volatile uint32_t RESERVED15[5];
+    volatile uint32_t GPIOA_INTR_RAW; //0x140
+    volatile uint32_t RESERVED16[1];
+    volatile uint32_t GPIOC_INTR_RAW; //0x148
+    volatile uint32_t RESERVED17[1];
+    volatile uint32_t GPIOE_INTR_RAW; //0x150
+    volatile uint32_t RESERVED18[3];
+    volatile uint32_t GPIOI_INTR_RAW; //0x160
+    volatile uint32_t RESERVED19[1];
+    volatile uint32_t GPIOK_INTR_RAW; //0x168
+    volatile uint32_t RESERVED20[5];
+    volatile uint32_t IOA_LOCK; //0x180
+    volatile uint32_t IOA_PU0_PU1; //0x184
+    volatile uint32_t IOA_PU2_PD; //0x188
+    volatile uint32_t IOA_REN; //0x18c
+    volatile uint32_t IOA_DS0_DS1; //0x190
+    volatile uint32_t IOA_DS2_AE; //0x194
+    volatile uint32_t IOA_FIR_ODE; //0x198
+    volatile uint32_t RESERVED21[9];
+    volatile uint32_t IOC_LOCK; //0x1c0
+    volatile uint32_t IOC_PU0_PU1; //0x1c4
+    volatile uint32_t IOC_PU2_PD; //0x1c8
+    volatile uint32_t IOC_REN; //0x1cc
+    volatile uint32_t IOC_DS0_DS1; //0x1d0
+    volatile uint32_t IOC_DS2_AE; //0x1d4
+    volatile uint32_t IOC_FIR_ODE; //0x1d8
+    volatile uint32_t IOC_ST_SL; //0x1dc
+    volatile uint32_t RESERVED22[8];
+    volatile uint32_t IOE_LOCK; //0x200
+    volatile uint32_t IOE_PU0_PU1; //0x204
+    volatile uint32_t IOE_PU2_PD; //0x208
+    volatile uint32_t IOE_REN; //0x20c
+    volatile uint32_t IOE_DS0_DS1; //0x210
+    volatile uint32_t IOE_DS2_AE; //0x214
+    volatile uint32_t IOE_FIR_ODE; //0x218
+    volatile uint32_t IOE_ST_SL; //0x21c
+    volatile uint32_t RESERVED23[24];
+    volatile uint32_t IOI_LOCK; //0x280
+    volatile uint32_t IOI_PU0_PU1; //0x284
+    volatile uint32_t IOI_PU2_PD; //0x288
+    volatile uint32_t IOI_REN; //0x28c
+    volatile uint32_t IOI_DS0_DS1; //0x290
+    volatile uint32_t IOI_DS2_AE; //0x294
+    volatile uint32_t IOI_FIR_ODE; //0x298
+    volatile uint32_t IOI_ST_SL; //0x29c
+    volatile uint32_t RESERVED24[8];
+    volatile uint32_t IOK_LOCK; //0x2c0
+    volatile uint32_t IOK_PU0_PU1; //0x2c4
+    volatile uint32_t IOK_PU2_PD; //0x2c8
+    volatile uint32_t IOK_REN; //0x2cc
+    volatile uint32_t IOK_DS0_DS1; //0x2d0
+    volatile uint32_t IOK_DS2_AE; //0x2d4
+    volatile uint32_t IOK_FIR_ODE; //0x2d8
+    volatile uint32_t IOK_ST_SL; //0x2dc
+    volatile uint32_t RESERVED25[32];
+    volatile uint32_t IOA_DIN_OE; //0x360
+    volatile uint32_t IOA_DOT; //0x364
+    volatile uint32_t RESERVED26[2];
+    volatile uint32_t IOC_DIN_OE; //0x370
+    volatile uint32_t IOC_DOT; //0x374
+    volatile uint32_t RESERVED27[2];
+    volatile uint32_t IOE_DIN_OE; //0x380
+    volatile uint32_t IOE_DOT; //0x384
+    volatile uint32_t RESERVED28[6];
+    volatile uint32_t IOI_DIN_OE; //0x3a0
+    volatile uint32_t IOI_DOT; //0x3a4
+    volatile uint32_t RESERVED29[2];
+    volatile uint32_t IOK_DIN_OE; //0x3b0
+    volatile uint32_t IOK_DOT; //0x3b4
+    volatile uint32_t RESERVED30[10];
+    volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
+    volatile uint32_t MODE_PAD_PU_PD; //0x3e4
+    volatile uint32_t MODE_PAD_REN_DS0; //0x3e8
+    volatile uint32_t MODE_PAD_DS1_FIR; //0x3ec
+}reg_sec_pmu_rg_t;
+
+enum SEC_PMU_RG_REG_SFT_CTRL00_FIELD
+{
+    SEC_PMU_RG_SFT_CTRL00_MASK = (int)0xffffffff,
+    SEC_PMU_RG_SFT_CTRL00_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_SFT_CTRL01_FIELD
+{
+    SEC_PMU_RG_SFT_CTRL01_MASK = (int)0xffffffff,
+    SEC_PMU_RG_SFT_CTRL01_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_SFT_CTRL02_FIELD
+{
+    SEC_PMU_RG_SFT_CTRL02_MASK = (int)0xffffffff,
+    SEC_PMU_RG_SFT_CTRL02_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_SFT_CTRL03_FIELD
+{
+    SEC_PMU_RG_SFT_CTRL03_MASK = (int)0xffffffff,
+    SEC_PMU_RG_SFT_CTRL03_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_MISC_CTRL0_FIELD
+{
+    SEC_PMU_RG_LVD33_INTR_EN_MASK = (int)0x1,
+    SEC_PMU_RG_LVD33_INTR_EN_POS = 0,
+    SEC_PMU_RG_LVD33_POL_MASK = (int)0x2,
+    SEC_PMU_RG_LVD33_POL_POS = 1,
+    SEC_PMU_RG_LVD33_INTR_CLR_MASK = (int)0x4,
+    SEC_PMU_RG_LVD33_INTR_CLR_POS = 2,
+    SEC_PMU_RG_CLK_LDO1_VSEL_MASK = (int)0x70,
+    SEC_PMU_RG_CLK_LDO1_VSEL_POS = 4,
+    SEC_PMU_RG_CLK_LDO2_VSEL_MASK = (int)0x700,
+    SEC_PMU_RG_CLK_LDO2_VSEL_POS = 8,
+    SEC_PMU_RG_HSI_FC_EN_MASK = (int)0x800,
+    SEC_PMU_RG_HSI_FC_EN_POS = 11,
+    SEC_PMU_RG_USB1_CID_MASK = (int)0x3000,
+    SEC_PMU_RG_USB1_CID_POS = 12,
+    SEC_PMU_RG_PD_ADC12_MASK = (int)0x4000,
+    SEC_PMU_RG_PD_ADC12_POS = 14,
+    SEC_PMU_RG_LKRST_TIM_MASK = (int)0x3f0000,
+    SEC_PMU_RG_LKRST_TIM_POS = 16,
+    SEC_PMU_RG_LKRST_EN_MASK = (int)0x400000,
+    SEC_PMU_RG_LKRST_EN_POS = 22,
+    SEC_PMU_RG_LKRST_POL_MASK = (int)0x800000,
+    SEC_PMU_RG_LKRST_POL_POS = 23,
+    SEC_PMU_RG_LKRST_SEL_MASK = (int)0x1f000000,
+    SEC_PMU_RG_LKRST_SEL_POS = 24,
+    SEC_PMU_RG_BOR09_CTRL_MASK = (int)0xe0000000,
+    SEC_PMU_RG_BOR09_CTRL_POS = 29,
+};
+
+enum SEC_PMU_RG_REG_TRIM0_FIELD
+{
+    SEC_PMU_RG_SPI_CODE_MASK = (int)0xfff,
+    SEC_PMU_RG_SPI_CODE_POS = 0,
+    SEC_PMU_RG_HSE_CTRL_MASK = (int)0x7000,
+    SEC_PMU_RG_HSE_CTRL_POS = 12,
+    SEC_PMU_RG_LDO_PECI_VSEL_MASK = (int)0xf0000,
+    SEC_PMU_RG_LDO_PECI_VSEL_POS = 16,
+    SEC_PMU_RG_LDO_PECI_EN_MASK = (int)0x100000,
+    SEC_PMU_RG_LDO_PECI_EN_POS = 20,
+    SEC_PMU_RG_BG_TESTEN_MASK = (int)0x800000,
+    SEC_PMU_RG_BG_TESTEN_POS = 23,
+    SEC_PMU_RG_XO32K_CODE_MASK = (int)0x1000000,
+    SEC_PMU_RG_XO32K_CODE_POS = 24,
+    SEC_PMU_RG_XO32K_OE_BYP_MASK = (int)0x2000000,
+    SEC_PMU_RG_XO32K_OE_BYP_POS = 25,
+    SEC_PMU_RG_RCO_I_ADJ_MASK = (int)0x4000000,
+    SEC_PMU_RG_RCO_I_ADJ_POS = 26,
+    SEC_PMU_RG_MSI_CAL_MASK = (int)0xf0000000,
+    SEC_PMU_RG_MSI_CAL_POS = 28,
+};
+
+enum SEC_PMU_RG_REG_ANA_PMU_CTRL_FIELD
+{
+    SEC_PMU_RG_LPLDO_TRIM_MASK = (int)0xf,
+    SEC_PMU_RG_LPLDO_TRIM_POS = 0,
+    SEC_PMU_RG_HPLDO_TRIM_MASK = (int)0xf0,
+    SEC_PMU_RG_HPLDO_TRIM_POS = 4,
+    SEC_PMU_RG_BG_CTRL_MASK = (int)0xfff00,
+    SEC_PMU_RG_BG_CTRL_POS = 8,
+    SEC_PMU_RG_BOR33_CTRL_MASK = (int)0xf00000,
+    SEC_PMU_RG_BOR33_CTRL_POS = 20,
+    SEC_PMU_RG_LVD33_CTRL_MASK = (int)0x1f000000,
+    SEC_PMU_RG_LVD33_CTRL_POS = 24,
+    SEC_PMU_RG_BATDET_CTRL_MASK = (int)0xe0000000,
+    SEC_PMU_RG_BATDET_CTRL_POS = 29,
+};
+
+enum SEC_PMU_RG_REG_WKUP_CTRL_FIELD
+{
+    SEC_PMU_RG_WKUP_MSK_MASK = (int)0x7f,
+    SEC_PMU_RG_WKUP_MSK_POS = 0,
+    SEC_PMU_RG_SWD_IO_WKUP_EN_MASK = (int)0x10000,
+    SEC_PMU_RG_SWD_IO_WKUP_EN_POS = 16,
+    SEC_PMU_RG_WKUP0_SYNC_SEL_MASK = (int)0x100000,
+    SEC_PMU_RG_WKUP0_SYNC_SEL_POS = 20,
+    SEC_PMU_RG_WKUP1_SYNC_SEL_MASK = (int)0x200000,
+    SEC_PMU_RG_WKUP1_SYNC_SEL_POS = 21,
+};
+
+enum SEC_PMU_RG_REG_WKUP_TIM0_FIELD
+{
+    SEC_PMU_RG_STB_BG_M1_MASK = (int)0xffff,
+    SEC_PMU_RG_STB_BG_M1_POS = 0,
+    SEC_PMU_RG_STB_PSW_M1_MASK = (int)0xff0000,
+    SEC_PMU_RG_STB_PSW_M1_POS = 16,
+    SEC_PMU_RG_STB_HSI_M1_MASK = (int)0xf0000000,
+    SEC_PMU_RG_STB_HSI_M1_POS = 28,
+};
+
+enum SEC_PMU_RG_REG_WKUP_TIM1_FIELD
+{
+    SEC_PMU_RG_STB_CLK_M1_MASK = (int)0xfff,
+    SEC_PMU_RG_STB_CLK_M1_POS = 0,
+    SEC_PMU_RG_STB_LDO_M1_MASK = (int)0xfff000,
+    SEC_PMU_RG_STB_LDO_M1_POS = 12,
+};
+
+enum SEC_PMU_RG_REG_RST_SFT_FIELD
+{
+    SEC_PMU_RG_RST_FROM_SFT_MASK = (int)0x1,
+    SEC_PMU_RG_RST_FROM_SFT_POS = 0,
+    SEC_PMU_RG_CLK_SEL_LSC_MASK = (int)0x30,
+    SEC_PMU_RG_CLK_SEL_LSC_POS = 4,
+    SEC_PMU_RG_RST_SRC_CLR_MASK = (int)0x100,
+    SEC_PMU_RG_RST_SRC_CLR_POS = 8,
+};
+
+enum SEC_PMU_RG_REG_CLKG_SRST_FIELD
+{
+    SEC_PMU_RG_CLKG_SET_WDT_MASK = (int)0x4,
+    SEC_PMU_RG_CLKG_SET_WDT_POS = 2,
+    SEC_PMU_RG_CLKG_CLR_WDT_MASK = (int)0x8,
+    SEC_PMU_RG_CLKG_CLR_WDT_POS = 3,
+};
+
+enum SEC_PMU_RG_REG_PMU_SET_VAL_FIELD
+{
+    SEC_PMU_RG_CLK_SET_LSE_MASK = (int)0x1,
+    SEC_PMU_RG_CLK_SET_LSE_POS = 0,
+    SEC_PMU_RG_CLK_SET_HSI_MASK = (int)0x2,
+    SEC_PMU_RG_CLK_SET_HSI_POS = 1,
+    SEC_PMU_RG_CLK_SET_HSE_MASK = (int)0x4,
+    SEC_PMU_RG_CLK_SET_HSE_POS = 2,
+    SEC_PMU_RG_SRAM_DS_SET_MASK = (int)0xfff00,
+    SEC_PMU_RG_SRAM_DS_SET_POS = 8,
+    SEC_PMU_RG_PMU_SET_TGGL_MASK = (int)0x80000000,
+    SEC_PMU_RG_PMU_SET_TGGL_POS = 31,
+};
+
+enum SEC_PMU_RG_REG_PWR_CTRL_FIELD
+{
+    SEC_PMU_RG_HPLDO_PD_EN_MASK = (int)0x2,
+    SEC_PMU_RG_HPLDO_PD_EN_POS = 1,
+    SEC_PMU_RG_BG_PD_EN_MASK = (int)0x4,
+    SEC_PMU_RG_BG_PD_EN_POS = 2,
+    SEC_PMU_RG_BGIB_PD_EN_MASK = (int)0x8,
+    SEC_PMU_RG_BGIB_PD_EN_POS = 3,
+    SEC_PMU_RG_MSI_PD_EN_MASK = (int)0x10,
+    SEC_PMU_RG_MSI_PD_EN_POS = 4,
+    SEC_PMU_RG_LSI_PD_EN_MASK = (int)0x20,
+    SEC_PMU_RG_LSI_PD_EN_POS = 5,
+    SEC_PMU_RG_LSE_PD_EN_MASK = (int)0x40,
+    SEC_PMU_RG_LSE_PD_EN_POS = 6,
+    SEC_PMU_RG_HSE_PD_EN_MASK = (int)0x80,
+    SEC_PMU_RG_HSE_PD_EN_POS = 7,
+    SEC_PMU_RG_HSI_PD_EN_MASK = (int)0x100,
+    SEC_PMU_RG_HSI_PD_EN_POS = 8,
+    SEC_PMU_RG_SRAM_DS_PD_EN_MASK = (int)0x200,
+    SEC_PMU_RG_SRAM_DS_PD_EN_POS = 9,
+    SEC_PMU_RG_LSE_PU_EN_MASK = (int)0x400,
+    SEC_PMU_RG_LSE_PU_EN_POS = 10,
+    SEC_PMU_RG_HSE_PU_EN_MASK = (int)0x800,
+    SEC_PMU_RG_HSE_PU_EN_POS = 11,
+    SEC_PMU_RG_SRAM_DS_PU_EN_MASK = (int)0x1000,
+    SEC_PMU_RG_SRAM_DS_PU_EN_POS = 12,
+    SEC_PMU_RG_RCO_BIAS_FC_MASK = (int)0x2000,
+    SEC_PMU_RG_RCO_BIAS_FC_POS = 13,
+    SEC_PMU_RG_PD_GPIO_SEL_MASK = (int)0x4000,
+    SEC_PMU_RG_PD_GPIO_SEL_POS = 14,
+    SEC_PMU_RG_HPSW1_PD_EN_MASK = (int)0x10000,
+    SEC_PMU_RG_HPSW1_PD_EN_POS = 16,
+    SEC_PMU_RG_HPSW2_PD_EN_MASK = (int)0x20000,
+    SEC_PMU_RG_HPSW2_PD_EN_POS = 17,
+    SEC_PMU_RG_SRAM0_PD_EN_MASK = (int)0x40000,
+    SEC_PMU_RG_SRAM0_PD_EN_POS = 18,
+    SEC_PMU_RG_SRAM1_PD_EN_MASK = (int)0x80000,
+    SEC_PMU_RG_SRAM1_PD_EN_POS = 19,
+    SEC_PMU_RG_SRAM2_PD_EN_MASK = (int)0x100000,
+    SEC_PMU_RG_SRAM2_PD_EN_POS = 20,
+    SEC_PMU_RG_SRAM3_PD_EN_MASK = (int)0x200000,
+    SEC_PMU_RG_SRAM3_PD_EN_POS = 21,
+    SEC_PMU_RG_SRAM4_PD_EN_MASK = (int)0x400000,
+    SEC_PMU_RG_SRAM4_PD_EN_POS = 22,
+    SEC_PMU_RG_SRAM5_PD_EN_MASK = (int)0x800000,
+    SEC_PMU_RG_SRAM5_PD_EN_POS = 23,
+    SEC_PMU_RG_SRAM6_PD_EN_MASK = (int)0x1000000,
+    SEC_PMU_RG_SRAM6_PD_EN_POS = 24,
+    SEC_PMU_RG_SRAM7_PD_EN_MASK = (int)0x2000000,
+    SEC_PMU_RG_SRAM7_PD_EN_POS = 25,
+    SEC_PMU_RG_SRAM8_PD_EN_MASK = (int)0x4000000,
+    SEC_PMU_RG_SRAM8_PD_EN_POS = 26,
+    SEC_PMU_RG_SRAM9_PD_EN_MASK = (int)0x8000000,
+    SEC_PMU_RG_SRAM9_PD_EN_POS = 27,
+    SEC_PMU_RG_SRAM10_PD_EN_MASK = (int)0x10000000,
+    SEC_PMU_RG_SRAM10_PD_EN_POS = 28,
+    SEC_PMU_RG_SRAM11_PD_EN_MASK = (int)0x20000000,
+    SEC_PMU_RG_SRAM11_PD_EN_POS = 29,
+};
+
+enum SEC_PMU_RG_REG_HSE_CAP_FIELD
+{
+    SEC_PMU_RG_HSE_CAP_MASK = (int)0x3f,
+    SEC_PMU_RG_HSE_CAP_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_PMU_STATUS_FIELD
+{
+    SEC_PMU_RG_LSE_EN_MASK = (int)0x1,
+    SEC_PMU_RG_LSE_EN_POS = 0,
+    SEC_PMU_RG_HSI_EN_MASK = (int)0x2,
+    SEC_PMU_RG_HSI_EN_POS = 1,
+    SEC_PMU_RG_HSE_EN_MASK = (int)0x4,
+    SEC_PMU_RG_HSE_EN_POS = 2,
+    SEC_PMU_RG_VREF_OK_MASK = (int)0x8,
+    SEC_PMU_RG_VREF_OK_POS = 3,
+    SEC_PMU_RG_SRAM_DS_MASK = (int)0x7f00,
+    SEC_PMU_RG_SRAM_DS_POS = 8,
+    SEC_PMU_RG_EXTI_INTR_MASK = (int)0x10000,
+    SEC_PMU_RG_EXTI_INTR_POS = 16,
+    SEC_PMU_RG_LVD33_INTR_MASK = (int)0x20000,
+    SEC_PMU_RG_LVD33_INTR_POS = 17,
+    SEC_PMU_RG_LVD33_DTCT_MASK = (int)0x40000,
+    SEC_PMU_RG_LVD33_DTCT_POS = 18,
+    SEC_PMU_RG_RST_SRC_MASK = (int)0x7f000000,
+    SEC_PMU_RG_RST_SRC_POS = 24,
+};
+
+enum SEC_PMU_RG_REG_IOA_LOCK_FIELD
+{
+    SEC_PMU_RG_GPIOA_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_LOCK_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOA_PU0_PU1_FIELD
+{
+    SEC_PMU_RG_GPIOA_PU0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_PU0_POS = 0,
+    SEC_PMU_RG_GPIOA_PU1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_PU1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_PU2_PD_FIELD
+{
+    SEC_PMU_RG_GPIOA_PU2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_PU2_POS = 0,
+    SEC_PMU_RG_GPIOA_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_PD_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_REN_FIELD
+{
+    SEC_PMU_RG_GPIOA_REN0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_REN0_POS = 0,
+    SEC_PMU_RG_GPIOA_REN1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_REN1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_DS0_DS1_FIELD
+{
+    SEC_PMU_RG_GPIOA_DS0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_DS0_POS = 0,
+    SEC_PMU_RG_GPIOA_DS1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_DS1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_DS2_AE_FIELD
+{
+    SEC_PMU_RG_GPIOA_DS2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_DS2_POS = 0,
+    SEC_PMU_RG_GPIOA_AE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_AE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_FIR_ODE_FIELD
+{
+    SEC_PMU_RG_GPIOA_FIR_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_FIR_POS = 0,
+    SEC_PMU_RG_GPIOA_ODE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_ODE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_LOCK_FIELD
+{
+    SEC_PMU_RG_GPIOC_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_LOCK_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOC_PU0_PU1_FIELD
+{
+    SEC_PMU_RG_GPIOC_PU0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_PU0_POS = 0,
+    SEC_PMU_RG_GPIOC_PU1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_PU1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_PU2_PD_FIELD
+{
+    SEC_PMU_RG_GPIOC_PU2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_PU2_POS = 0,
+    SEC_PMU_RG_GPIOC_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_PD_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_REN_FIELD
+{
+    SEC_PMU_RG_GPIOC_REN0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_REN0_POS = 0,
+    SEC_PMU_RG_GPIOC_REN1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_REN1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_DS0_DS1_FIELD
+{
+    SEC_PMU_RG_GPIOC_DS0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_DS0_POS = 0,
+    SEC_PMU_RG_GPIOC_DS1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_DS1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_DS2_AE_FIELD
+{
+    SEC_PMU_RG_GPIOC_DS2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_DS2_POS = 0,
+    SEC_PMU_RG_GPIOC_AE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_AE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_FIR_ODE_FIELD
+{
+    SEC_PMU_RG_GPIOC_FIR_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_FIR_POS = 0,
+    SEC_PMU_RG_GPIOC_ODE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_ODE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_ST_SL_FIELD
+{
+    SEC_PMU_RG_GPIOC_ST_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_ST_POS = 0,
+    SEC_PMU_RG_GPIOC_SL_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_SL_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_LOCK_FIELD
+{
+    SEC_PMU_RG_GPIOE_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_LOCK_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOE_PU0_PU1_FIELD
+{
+    SEC_PMU_RG_GPIOE_PU0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_PU0_POS = 0,
+    SEC_PMU_RG_GPIOE_PU1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_PU1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_PU2_PD_FIELD
+{
+    SEC_PMU_RG_GPIOE_PU2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_PU2_POS = 0,
+    SEC_PMU_RG_GPIOE_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_PD_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_REN_FIELD
+{
+    SEC_PMU_RG_GPIOE_REN0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_REN0_POS = 0,
+    SEC_PMU_RG_GPIOE_REN1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_REN1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_DS0_DS1_FIELD
+{
+    SEC_PMU_RG_GPIOE_DS0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_DS0_POS = 0,
+    SEC_PMU_RG_GPIOE_DS1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_DS1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_DS2_AE_FIELD
+{
+    SEC_PMU_RG_GPIOE_DS2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_DS2_POS = 0,
+    SEC_PMU_RG_GPIOE_AE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_AE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_FIR_ODE_FIELD
+{
+    SEC_PMU_RG_GPIOE_FIR_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_FIR_POS = 0,
+    SEC_PMU_RG_GPIOE_ODE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_ODE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_ST_SL_FIELD
+{
+    SEC_PMU_RG_GPIOE_ST_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_ST_POS = 0,
+    SEC_PMU_RG_GPIOE_SL_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_SL_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_LOCK_FIELD
+{
+    SEC_PMU_RG_GPIOI_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_LOCK_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOI_PU0_PU1_FIELD
+{
+    SEC_PMU_RG_GPIOI_PU0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_PU0_POS = 0,
+    SEC_PMU_RG_GPIOI_PU1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_PU1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_PU2_PD_FIELD
+{
+    SEC_PMU_RG_GPIOI_PU2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_PU2_POS = 0,
+    SEC_PMU_RG_GPIOI_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_PD_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_REN_FIELD
+{
+    SEC_PMU_RG_GPIOI_REN0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_REN0_POS = 0,
+    SEC_PMU_RG_GPIOI_REN1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_REN1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_DS0_DS1_FIELD
+{
+    SEC_PMU_RG_GPIOI_DS0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_DS0_POS = 0,
+    SEC_PMU_RG_GPIOI_DS1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_DS1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_DS2_AE_FIELD
+{
+    SEC_PMU_RG_GPIOI_DS2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_DS2_POS = 0,
+    SEC_PMU_RG_GPIOI_AE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_AE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_FIR_ODE_FIELD
+{
+    SEC_PMU_RG_GPIOI_FIR_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_FIR_POS = 0,
+    SEC_PMU_RG_GPIOI_ODE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_ODE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_ST_SL_FIELD
+{
+    SEC_PMU_RG_GPIOI_ST_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_ST_POS = 0,
+    SEC_PMU_RG_GPIOI_SL_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_SL_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_LOCK_FIELD
+{
+    SEC_PMU_RG_GPIOK_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_LOCK_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOK_PU0_PU1_FIELD
+{
+    SEC_PMU_RG_GPIOK_PU0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_PU0_POS = 0,
+    SEC_PMU_RG_GPIOK_PU1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_PU1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_PU2_PD_FIELD
+{
+    SEC_PMU_RG_GPIOK_PU2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_PU2_POS = 0,
+    SEC_PMU_RG_GPIOK_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_PD_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_REN_FIELD
+{
+    SEC_PMU_RG_GPIOK_REN0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_REN0_POS = 0,
+    SEC_PMU_RG_GPIOK_REN1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_REN1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_DS0_DS1_FIELD
+{
+    SEC_PMU_RG_GPIOK_DS0_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_DS0_POS = 0,
+    SEC_PMU_RG_GPIOK_DS1_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_DS1_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_DS2_AE_FIELD
+{
+    SEC_PMU_RG_GPIOK_DS2_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_DS2_POS = 0,
+    SEC_PMU_RG_GPIOK_AE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_AE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_FIR_ODE_FIELD
+{
+    SEC_PMU_RG_GPIOK_FIR_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_FIR_POS = 0,
+    SEC_PMU_RG_GPIOK_ODE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_ODE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_ST_SL_FIELD
+{
+    SEC_PMU_RG_GPIOK_ST_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_ST_POS = 0,
+    SEC_PMU_RG_GPIOK_SL_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_SL_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_DIN_OE_FIELD
+{
+    SEC_PMU_RG_GPIOA_DIN_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_DIN_POS = 0,
+    SEC_PMU_RG_GPIOA_OE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOA_OE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOA_DOT_FIELD
+{
+    SEC_PMU_RG_GPIOA_DOT_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOA_DOT_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOC_DIN_OE_FIELD
+{
+    SEC_PMU_RG_GPIOC_DIN_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_DIN_POS = 0,
+    SEC_PMU_RG_GPIOC_OE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOC_OE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOC_DOT_FIELD
+{
+    SEC_PMU_RG_GPIOC_DOT_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOC_DOT_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOE_DIN_OE_FIELD
+{
+    SEC_PMU_RG_GPIOE_DIN_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_DIN_POS = 0,
+    SEC_PMU_RG_GPIOE_OE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOE_OE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOE_DOT_FIELD
+{
+    SEC_PMU_RG_GPIOE_DOT_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOE_DOT_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOI_DIN_OE_FIELD
+{
+    SEC_PMU_RG_GPIOI_DIN_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_DIN_POS = 0,
+    SEC_PMU_RG_GPIOI_OE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOI_OE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOI_DOT_FIELD
+{
+    SEC_PMU_RG_GPIOI_DOT_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOI_DOT_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_IOK_DIN_OE_FIELD
+{
+    SEC_PMU_RG_GPIOK_DIN_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_DIN_POS = 0,
+    SEC_PMU_RG_GPIOK_OE_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIOK_OE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_IOK_DOT_FIELD
+{
+    SEC_PMU_RG_GPIOK_DOT_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIOK_DOT_POS = 0,
+};
+
+enum SEC_PMU_RG_REG_MODE_PAD_LOCK_ST_FIELD
+{
+    SEC_PMU_RG_MODE_PAD_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_LOCK_POS = 0,
+    SEC_PMU_RG_MODE_PAD_ST_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_ST_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_MODE_PAD_PU_PD_FIELD
+{
+    SEC_PMU_RG_MODE_PAD_PU_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_PU_POS = 0,
+    SEC_PMU_RG_MODE_PAD_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_PD_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_MODE_PAD_REN_DS0_FIELD
+{
+    SEC_PMU_RG_MODE_PAD_REN_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_REN_POS = 0,
+    SEC_PMU_RG_MODE_PAD_DS0_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_DS0_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_MODE_PAD_DS1_FIR_FIELD
+{
+    SEC_PMU_RG_MODE_PAD_DS1_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_DS1_POS = 0,
+    SEC_PMU_RG_MODE_PAD_FIR_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_FIR_POS = 16,
+};
+
+#endif
+

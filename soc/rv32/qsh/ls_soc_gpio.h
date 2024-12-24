@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "ls_soc_gpio_def.h"
 #include "ls_soc_pinmux.h"
+#include "reg_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,10 +29,13 @@ typedef enum
 /**@brief IO pull type */
 typedef enum
 {
-    IO_PULL_DISABLE = 0,
-    IO_PULL_UP = 0x1,
-    IO_PULL_DOWN = 0x2,
-    IO_PULL_UP_DOWN = (IO_PULL_UP|IO_PULL_DOWN),
+    IO_PULL_DISABLE,
+    IO_PULL_UP0,
+    IO_PULL_UP1,
+    IO_PULL_UP2,
+    IO_PULL_DOWN,
+    IO_PULL_UP,
+    IO_PULL_UP_DOWN,
 }io_pull_type_t;
 
 typedef enum
@@ -206,10 +210,8 @@ void io_v33_exti_config(uint8_t pin,exti_edge_t edge);
   * @param  edge edges for IO interrupts 
   */
 void io_exti_config(uint8_t pin,exti_edge_t edge);
-/** @}*/
 
-
-/** @}*/
+reg_gpio_t *pin_to_controller(uint8_t pin);
 
 #ifdef __cplusplus
 }
