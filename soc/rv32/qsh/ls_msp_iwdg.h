@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifdef SEC_PMU_WDT_ADDR
-#define LSIWDG ((reg_iwdg_t *)SEC_PMU_WDT_ADDR) /*!< LSIWDG Macro for Register Access*/
+#ifdef SEC_IWDT1_ADDR
+#define LSIWDG ((reg_iwdg_t *)SEC_IWDT1_ADDR) /*!< LSIWDG Macro for Register Access*/
 #endif
 
 

@@ -40,8 +40,8 @@ extern "C" {
 #define EMMC1_WAKEUP_IRQN    47
 #define EMMC2_IRQN           48
 #define EMMC2_WAKEUP_IRQN    49
-#define CALC_AES256_IRQN     50
-#define CALC_SHA256_IRQN     51
+#define CALC_CRYPT_IRQN      50
+#define CALC_SHA_IRQN        51
 #define CALC_SM4_IRQN        52
 #define NIST_TRNG_IRQN       53
 #define OBTN_IRQN            54

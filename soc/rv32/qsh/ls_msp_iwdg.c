@@ -1,12 +1,13 @@
 #include "ls_msp_iwdg.h"
-#include "reg_pmu.h"
+#include "reg_sec_pmu_rg.h"
+
 void HAL_IWDG_MSP_Init()
 {
-    PMU->CLKG_SRST = PMU_RG_CLKG_CLR_WDT_MASK;
-    PMU->CLKG_SRST = PMU_RG_CLKG_SET_WDT_MASK;
+    SEC_PMU->CLKG_SRST = SEC_PMU_RG_CLKG_CLR_WDT_MASK;
+    SEC_PMU->CLKG_SRST = SEC_PMU_RG_CLKG_SET_WDT_MASK;
 }
 
 void HAL_IWDG_MSP_DeInit()
 {
-    PMU->CLKG_SRST = PMU_RG_CLKG_CLR_WDT_MASK;
+    SEC_PMU->CLKG_SRST = SEC_PMU_RG_CLKG_CLR_WDT_MASK;
 }

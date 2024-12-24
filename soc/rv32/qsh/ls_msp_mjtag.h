@@ -6,14 +6,14 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_MJTAG1_ADDR
-#define MJTAG1 ((reg_mjtag_t *)QSH_APB_MJTAG1_ADDR)
+#ifdef APP_MJTAG1_ADDR
+#define MJTAG1 ((reg_mjtag_t *)APP_MJTAG1_ADDR)
 #endif
-#ifdef QSH_APB_MJTAG2_ADDR
-#define MJTAG2 ((reg_mjtag_t *)QSH_APB_MJTAG2_ADDR)
+#ifdef APP_MJTAG2_ADDR
+#define MJTAG2 ((reg_mjtag_t *)APP_MJTAG2_ADDR)
 #endif
-#ifdef QSH_APB_MJTAG3_ADDR
-#define MJTAG3 ((reg_mjtag_t *)QSH_APB_MJTAG3_ADDR)
+#ifdef APP_MJTAG3_ADDR
+#define MJTAG3 ((reg_mjtag_t *)APP_MJTAG3_ADDR)
 #endif
 
 struct __MJTAG_HandleTypeDef;

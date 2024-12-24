@@ -1,5 +1,5 @@
-#ifndef REG_SEC_PMU_RG_TYPE_H_
-#define REG_SEC_PMU_RG_TYPE_H_
+#ifndef REG_GPIO_H_
+#define REG_GPIO_H_
 #include <stdint.h>
 #include "reg_base_addr.h"
 

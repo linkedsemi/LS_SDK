@@ -7,10 +7,7 @@
 
 typedef struct
 {
-    volatile uint32_t SFT_CTRL00; //0x0
-    volatile uint32_t SFT_CTRL01; //0x4
-    volatile uint32_t SFT_CTRL02; //0x8
-    volatile uint32_t SFT_CTRL03; //0xc
+    volatile uint32_t SFT_CTRL[4]; //0x0
     volatile uint32_t MISC_CTRL0; //0x10
     volatile uint32_t TRIM0; //0x14
     volatile uint32_t ANA_PMU_CTRL; //0x18
