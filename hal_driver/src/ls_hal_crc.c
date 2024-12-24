@@ -204,10 +204,8 @@ ROM_SYMBOL uint32_t HAL_LSCRC_Bit_Reverse(uint32_t in,uint8_t bitwidth)
     return LSCRC->CRC_RSLT;
 }
 
-#include "log.h"
 ROM_SYMBOL uint32_t HAL_LSCRC_CRC_CALC(const struct crc_param *cfg,const uint8_t *data,uint32_t length)
 {
-    LOG_HEX(data, length);
     LSCRC->CRC_PARAM = cfg->poly<<(32-cfg->bitwidth);
     LSCRC->CRC_INIT = cfg->init<<(32-cfg->bitwidth);
     LSCRC->CRC_START = 1;
