@@ -8,13 +8,16 @@ extern "C" {
 #endif
 
 #ifdef SEC_IWDT1_ADDR
-#define LSIWDG ((reg_iwdg_t *)SEC_IWDT1_ADDR) /*!< LSIWDG Macro for Register Access*/
+#define SEC_IWDG ((reg_iwdg_t *)SEC_IWDT1_ADDR) /*!< LSIWDG Macro for Register Access*/
+#endif
+#ifdef APP_IWDT2_ADDR
+#define APP_IWDG ((reg_iwdg_t *)APP_IWDT2_ADDR) /*!< LSIWDG Macro for Register Access*/
 #endif
 
 
-void HAL_IWDG_MSP_Init(void);
+void HAL_IWDG_MSP_Init(reg_iwdg_t *iwdg);
 
-void HAL_IWDG_MSP_DeInit(void);
+void HAL_IWDG_MSP_DeInit(reg_iwdg_t *iwdg);
 
 #ifdef __cplusplus
 }
