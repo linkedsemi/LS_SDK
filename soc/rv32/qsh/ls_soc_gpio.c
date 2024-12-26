@@ -9,16 +9,6 @@
 #include "reg_gpio.h"
 #include "compile_flag.h"
 
-#define DEBUG_CJTAG_TCK     (PN06)
-#define DEBUG_CJTAG_TMS     (PN07)
-
-#define SPI_FLASH_CLK_PIN   (PA00)
-#define SPI_FLASH_CS_PIN    (PA01)
-#define SPI_FLASH_SI_PIN    (PA02)
-#define SPI_FLASH_SO_PIN    (PA03)
-#define SPI_FLASH_WP_PIN    (PA04)
-#define SPI_FLASH_HOLD_PIN  (PA05)
-
 static gpio_port_pin_t uart1_txd;
 static gpio_port_pin_t uart1_rxd;
 static gpio_port_pin_t uart2_txd;
@@ -934,32 +924,32 @@ void pinmux_dwuart4_deinit()
 
 ROM_SYMBOL void pinmux_hal_flash_init(void)
 {
-    per_func_enable(SPI_FLASH_CLK_PIN, 2);
-    per_func_enable(SPI_FLASH_CS_PIN, 2);
-    per_func_enable(SPI_FLASH_SI_PIN, 2);
-    per_func_enable(SPI_FLASH_SO_PIN, 2);
+    per_func_enable(QSPI1_CLK_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_CSN_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_IO0_SI_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_IO1_SO_PIN, PINMUX_FUNC3);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_deinit(void)
 {
-    per_func_disable(SPI_FLASH_CLK_PIN, 2);
-    per_func_disable(SPI_FLASH_CS_PIN, 2);
-    per_func_disable(SPI_FLASH_SI_PIN, 2);
-    per_func_disable(SPI_FLASH_SO_PIN, 2);
+    per_func_disable(QSPI1_CLK_PIN, PINMUX_FUNC3);
+    per_func_disable(QSPI1_CSN_PIN, PINMUX_FUNC3);
+    per_func_disable(QSPI1_IO0_SI_PIN, PINMUX_FUNC3);
+    per_func_disable(QSPI1_IO1_SO_PIN, PINMUX_FUNC3);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
 {
-    per_func_enable(SPI_FLASH_WP_PIN, 2);
-    per_func_enable(SPI_FLASH_HOLD_PIN, 2);
-    io_pull_write(SPI_FLASH_WP_PIN, IO_PULL_UP);
-    io_pull_write(SPI_FLASH_HOLD_PIN, IO_PULL_UP);
+    per_func_enable(QSPI1_IO2_WP_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_IO3_HOLD_PIN, PINMUX_FUNC3);
+    io_pull_write(QSPI1_IO2_WP_PIN, IO_PULL_UP);
+    io_pull_write(QSPI1_IO3_HOLD_PIN, IO_PULL_UP);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
 {
-    per_func_disable(SPI_FLASH_WP_PIN, 2);
-    per_func_disable(SPI_FLASH_HOLD_PIN, 2);
+    per_func_disable(QSPI1_IO2_WP_PIN, 2);
+    per_func_disable(QSPI1_IO3_HOLD_PIN, 2);
 }
 
 // void pinmux_iic1_init(uint8_t scl,uint8_t sda)

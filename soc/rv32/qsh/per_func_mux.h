@@ -475,6 +475,31 @@ extern "C" {
 #define FIOT_USB20_DBG12    30
 #define FIOT_USB20_DBG13    31
 
+#define PINMUX_FUNC1 0
+#define PINMUX_FUNC2 1
+#define PINMUX_FUNC3 2
+#define PINMUX_FUNC4 3
+
+#define PINMUX_FUNC_START PINMUX_FUNC1
+#define PINMUX_FUNC_END   PINMUX_FUNC4
+
+#define QSPI1_CLK_PIN      (PA00)
+#define QSPI1_CSN_PIN      (PA01)
+#define QSPI1_IO0_SI_PIN   (PA02)
+#define QSPI1_IO1_SO_PIN   (PA03)
+#define QSPI1_IO2_WP_PIN   (PA04)
+#define QSPI1_IO3_HOLD_PIN (PA05)
+
+#define SPI_FLASH_CLK_PIN  (QSPI1_CLK_PIN)
+#define SPI_FLASH_CS_PIN   (QSPI1_CSN_PIN)
+#define SPI_FLASH_SI_PIN   (QSPI1_IO0_SI_PIN)
+#define SPI_FLASH_SO_PIN   (QSPI1_IO1_SO_PIN)
+#define SPI_FLASH_WP_PIN   (QSPI1_IO2_WP_PIN)
+#define SPI_FLASH_HOLD_PIN (QSPI1_IO3_HOLD_PIN)
+
+#define DEBUG_CJTAG_TCK     (PN06)
+#define DEBUG_CJTAG_TMS     (PN07)
+
 #ifdef __cplusplus
 }
 #endif

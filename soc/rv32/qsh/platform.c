@@ -8,6 +8,7 @@
 #include "exception_isr.h"
 #include "ls_soc_gpio.h"
 #include "field_manipulate.h"
+#include "per_func_mux.h"
 #include "qsh.h"
 
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
@@ -93,5 +94,5 @@ __attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
 void XIP_BANNED_FUNC(sync_for_xip_stop,)
 {
     /* wait for CS_N release */
-    while (io_get_input_val(PQ11) == 0);
+    while (io_get_input_val(QSPI1_CSN_PIN) == 0);
 }
