@@ -129,7 +129,7 @@ void do_hal_flash_read_reg(void *param);
 
 void do_hal_flash_chip_erase(void *param);
 
-void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode);
+void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint32_t length,uint8_t opcode);
 
 void sync_for_xip_stop(void);
 

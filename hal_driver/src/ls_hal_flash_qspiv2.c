@@ -268,7 +268,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flash_read_func,void *param)
     lsqspiv2_stg_read_write(param);
 }
 
-static void hal_flash_read_loop(struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint32_t offset,uint16_t length)
+static void hal_flash_read_loop(struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint32_t offset,uint32_t length)
 {
     while(length)
     {
@@ -287,7 +287,7 @@ static void hal_flash_read_loop(struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint
     }
 }
 
-ROM_SYMBOL void hal_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
+ROM_SYMBOL void hal_flash_quad_io_read(uint32_t offset, uint8_t * data, uint32_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -313,7 +313,7 @@ ROM_SYMBOL void hal_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t
     hal_flash_read_loop(&cfg,QUAD_IO_READ_OPCODE,offset,length);
 }
 
-ROM_SYMBOL void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length)
+ROM_SYMBOL void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint32_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -339,7 +339,7 @@ ROM_SYMBOL void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t le
     hal_flash_read_loop(&cfg,DUAL_IO_READ_OPCODE,offset,length);
 }
 
-ROM_SYMBOL void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode)
+ROM_SYMBOL void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint32_t length,uint8_t opcode)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 39;

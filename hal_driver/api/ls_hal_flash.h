@@ -107,23 +107,23 @@ void hal_flash_sector_erase(uint32_t offset);
 /** \brief Chip Erase */
 void hal_flash_chip_erase(void);
 
-void hal_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length);
+void hal_flash_multi_io_read(uint32_t offset,uint8_t *data,uint32_t length);
 
-void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length);
+void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint32_t length);
 
 /** \brief Quad IO Read
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  *  \param[out] data The pointer of the data buffer
  *  \param[in] length Data length in bytes
  */
-void hal_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length);
+void hal_flash_quad_io_read(uint32_t offset,uint8_t *data,uint32_t length);
 
 /** \brief Fast Read
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  *  \param[out] data The pointer of the data buffer
  *  \param[in] length Data length in bytes
  */
-void hal_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length);
+void hal_flash_fast_read(uint32_t offset,uint8_t *data,uint32_t length);
 
 /** \brief Read SFDP
  *  \param[in] offset Offset

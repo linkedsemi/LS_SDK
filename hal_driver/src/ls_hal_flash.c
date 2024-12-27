@@ -182,7 +182,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(flash_writing_critical,void (*func)(void *),void
 #endif
 #endif
 
-ROM_SYMBOL void hal_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length)
+ROM_SYMBOL void hal_flash_multi_io_read(uint32_t offset,uint8_t *data,uint32_t length)
 {
     if(hal_flash_dual_mode_get())
     {
@@ -353,7 +353,7 @@ ROM_SYMBOL uint32_t hal_flash_total_size_get(void)
     return 1<<capacity_id;
 }
 
-ROM_SYMBOL void hal_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
+ROM_SYMBOL void hal_flash_fast_read(uint32_t offset, uint8_t * data, uint32_t length)
 {
     hal_flash_read_24bit_addr_8bit_dummy(offset,data,length,FAST_READ_OPCODE);
 }
