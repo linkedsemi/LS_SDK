@@ -16,7 +16,11 @@ void qspiv2_global_int_ctrl_fn_init()
     qspiv2_global_int_restore_fn = (void *)qspiv2_global_int_dummy;
 }
 #elif defined(FLASH_PROG_ALGO)
-void qspiv2_global_int_ctrl_fn_init(){}
+void qspiv2_global_int_dummy(){}
+void qspiv2_global_int_ctrl_fn_init(){
+    qspiv2_global_int_disable_fn = (void *)qspiv2_global_int_dummy;
+    qspiv2_global_int_restore_fn = (void *)qspiv2_global_int_dummy;
+}
 #else
 void qspiv2_global_int_ctrl_fn_init()
 {

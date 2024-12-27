@@ -8,12 +8,12 @@
 extern "C" {
 #endif
 
-#ifdef QSH_APB_CACHE1_ADDR
-#define LSCACHE ((reg_lscache_t *)QSH_APB_CACHE1_ADDR)
+#ifdef SEC_QSPI1_CCH_ADDR
+#define LSCACHE ((reg_lscache_t *)SEC_QSPI1_CCH_ADDR)
 #endif
 
-#ifdef QSH_APB_CACHE2_ADDR
-#define LSCACHE2 ((reg_lscache_t *)QSH_SYSC_CACHE2_ADDR)
+#ifdef APP_QSPI2_CCH_ADDR
+#define LSCACHE2 ((reg_lscache_t *)APP_QSPI2_CCH_ADDR)
 #endif
 
 void lscache_msp_init(void);
