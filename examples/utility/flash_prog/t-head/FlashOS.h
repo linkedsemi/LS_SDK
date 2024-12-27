@@ -29,4 +29,10 @@ struct FlashDevice {
   char VendorName[128]; // Vendor Name
 };
 
+#if defined(QSH)
+#define G_RWBUFFER_SIZE (204800)
+#else
+#define G_RWBUFFER_SIZE (1024)
+#endif
+
 #endif // __CSKY_FLASH_OS_H__

@@ -3,7 +3,7 @@
 
 
 
-#define SDK_HCLK_MHZ (144)
+#define SDK_HCLK_MHZ (50)
 
 
 

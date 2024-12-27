@@ -1,3 +1,4 @@
+#include "FlashOS.h"
 /*
  * NOTING : this file read only.
  */
@@ -19,7 +20,7 @@ int flashChecksum(char*dst, int length, int checksum);
 int flashTest();
 
 void __bkpt_label();
-int g_rwBuffer[1024];
+int g_rwBuffer[G_RWBUFFER_SIZE];
 int g_dstAddress = 0;
 int g_length = 0;
 int g_checksum = 0;

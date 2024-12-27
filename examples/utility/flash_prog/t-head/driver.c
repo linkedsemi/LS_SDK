@@ -2,11 +2,14 @@
  * Driver for flash program.
  */
 #include "ls_hal_flash.h"
+#include "ls_hal_cache.h"
 #include "reg_base_addr.h"
 #include "platform.h"
 #include "ls_soc_gpio.h"
 #include "cpu.h"
 #include "ls_hal_cache.h"
+#include "FlashOS.h"
+
 /**
  * ERROR TYPE. MUST NOT BE MODIFIED
  */
@@ -19,6 +22,20 @@
 #define ERROR_UNINIT	-206
 #define ERROR_CHECKSUM  -207
 
+extern int g_rwBuffer[G_RWBUFFER_SIZE];
+
+#if defined(LEO)
+static void io_pull_up_cfg()
+{
+    io_pull_write(PD04, IO_PULL_UP);
+    io_pull_write(PC13, IO_PULL_UP);
+}
+#elif defined(QSH)
+static void io_pull_up_cfg()
+{
+}
+#endif
+
 /**
  * Customize this method to perform any initialization
  * needed to access your flash device.
@@ -29,19 +46,27 @@
 int  flashInit(){
     disable_global_irq();
     lscache_cache_disable();
-    io_pull_write(PD04, IO_PULL_UP);
-    io_pull_write(PC13, IO_PULL_UP);
+    io_pull_up_cfg();
     pinmux_hal_flash_init();
     hal_flash_dual_mode_set(true);
     hal_flash_drv_var_init(false,false);
     hal_flash_xip_func_ptr_dummy();
     hal_flash_init();
+#if defined(LEO)
     clk_flash_init();
+#endif
+
+    // to programm flash after xip
+    hal_flash_xip_mode_reset();
+
     hal_flash_software_reset();
     DELAY_US(500);
     hal_flash_release_from_deep_power_down();
     DELAY_US(100);
+
+#if !defined(QSH)
     hal_flash_qe_status_read_and_set();
+#endif
     return 0;
 }
 
@@ -185,12 +210,25 @@ int flashChipErase( ){
  * 
  */
 int flashChecksum(char*dst, int length, int checksum) {
-    int i, sum = 0;
-    hal_flash_xip_start();
-    for (i = 0; i < length; i++) {
-        sum += dst[i];
+    int sum = 0;
+    int remain = length % sizeof(g_rwBuffer);
+    int current = 0;
+    char *p_buf = (char *)g_rwBuffer;
+
+    for(int i = 0; i < length / sizeof(g_rwBuffer); i++) {
+        flashRead(p_buf, dst + current, sizeof(g_rwBuffer));
+        for (int i = 0; i < sizeof(g_rwBuffer); i++) {
+            sum += p_buf[i];
+        }
+        current += sizeof(g_rwBuffer);
     }
-    hal_flash_xip_stop();
+    if (remain) {
+        flashRead(p_buf, dst + current, remain);
+        for (int i = 0; i < remain; i++) {
+            sum += p_buf[i];
+        }
+    }
+
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
 
