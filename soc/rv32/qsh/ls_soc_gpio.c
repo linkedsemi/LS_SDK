@@ -419,12 +419,14 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
         GPIO->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
 
         GPIO->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
     case IO_PULL_UP0:
         GPIO->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
 
         GPIO->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
         GPIO->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         GPIO->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
     case IO_PULL_UP1:
         GPIO->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
 
@@ -432,6 +434,7 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 
         GPIO->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         GPIO->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
     case IO_PULL_UP2:
         GPIO->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
         GPIO->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
