@@ -286,11 +286,11 @@ void io_init(void)
 
 reg_gpio_t *pin_to_controller(uint8_t pin)
 {
-    if((pin >= PA00 && pin <= PA15)
-     ||(pin >= PC00 && pin <= PC15)
-     ||(pin >= PE00 && pin <= PE15)
-     ||(pin >= PI00 && pin <= PI15)
-     ||(pin >= PK00 && pin <= PK15)) {
+    if((pin >= PA00 && pin <= PA05)
+     ||(pin >= PC00 && pin <= PC03)
+     ||(pin >= PE04 && pin <= PE07)
+     ||(pin >= PI04 && pin <= PI05)
+     ||(pin >= PK03 && pin <= PK04)) {
         return SEC_GPIO;
     } else {
         return APP_GPIO;
