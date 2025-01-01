@@ -10,7 +10,8 @@ struct reg_peci_t
     volatile uint32_t INTR_RAW;
     volatile uint32_t PECI_CTRL;
     volatile uint32_t TXRX_REQ;
-    volatile uint32_t RESERVED0[2];
+    volatile uint32_t PECI_CTRL2;
+    volatile uint32_t RESERVED0;
     volatile uint32_t PECI_A_TIM0;
     volatile uint32_t PECI_A_TIM1;
     volatile uint32_t PECI_M_TIM0;
@@ -56,6 +57,12 @@ enum PECI_REG_TXRX_REQ_FIELD
 {
     PECI_TXRX_REQ_MASK = (int)0x1,
     PECI_TXRX_REQ_POS = 0,
+};
+
+enum PECI_REG_PECI_CTRL2_FIELD
+{
+    PECI_BIT_REVERSE_MASK = (int)0x1,
+    PECI_BIT_REVERSE_POS = 0,
 };
 
 enum PECI_REG_PECI_A_TIM0_FIELD
