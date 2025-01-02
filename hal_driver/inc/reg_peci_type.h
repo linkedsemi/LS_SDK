@@ -2,7 +2,7 @@
 #define REG_PECI_TYPE_H_
 #include <stdint.h>
 
-struct reg_peci_t
+typedef struct
 {
     volatile uint32_t INTR_MSK;
     volatile uint32_t INTR_CLR;
@@ -29,7 +29,7 @@ struct reg_peci_t
     volatile uint32_t RX_DAT3;
     volatile uint32_t RX_DAT4;
     volatile uint32_t RX_DAT5;
-};
+} reg_peci_t;
 
 enum PECI_REG_INTR_MSK_FIELD
 {
