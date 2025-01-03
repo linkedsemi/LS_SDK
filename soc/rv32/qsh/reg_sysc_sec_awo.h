@@ -27,6 +27,9 @@ typedef struct
     volatile uint32_t CPU_CDBGPWRUPACK; //0x44
     volatile uint32_t DPLL_LOCK; //0x48
     volatile uint32_t RESERVED3[1];
+#if 1
+    volatile uint32_t FUNC_IO_LOCK[15]; //0x50
+#else
     volatile uint32_t FUNC_IOA_LOCK; //0x50
     volatile uint32_t FUNC_IOB_LOCK; //0x54
     volatile uint32_t FUNC_IOC_LOCK; //0x58
@@ -42,6 +45,7 @@ typedef struct
     volatile uint32_t FUNC_ION_LOCK; //0x80
     volatile uint32_t FUNC_IOQ_LOCK; //0x84
     volatile uint32_t FUNC_IOT_LOCK; //0x88
+#endif
 } reg_sysc_sec_awo_t;
 
 enum SYSC_SEC_AWO_REG_SLP_HLD_CTRL_FIELD {
