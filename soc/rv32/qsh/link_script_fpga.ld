@@ -1,8 +1,8 @@
 MEMORY
 {
-    ROM (rx) : ORIGIN = 0x01000000, LENGTH = 0x8000
-    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 0x20000
-    RAM (wx) : ORIGIN = 0x10000000, LENGTH = 0x100000
+    ROM (rx) 	: ORIGIN = 0x01000000, LENGTH = 0x8000
+    FLASH (rx)	: ORIGIN = 0x08000000, LENGTH = 0x20000
+    RAM (wx) 	: ORIGIN = 0x10000000, LENGTH = 0x100000
 }
 ENTRY(Reset_Handler)
 SECTIONS
@@ -10,8 +10,7 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.text.Reset_Handler))
-		*(.text* .*srodata*)
-		KEEP(*(.rodata._p256_verify_text))
+		*(.text* .*srodata* .*rodata*)
 		*(.xip_banned*)
 		*(.ABS*)
 		. = ALIGN(8);

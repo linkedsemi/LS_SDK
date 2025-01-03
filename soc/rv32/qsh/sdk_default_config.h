@@ -37,10 +37,10 @@ extern "C" {
 #define LOG_UART_INST (LOG_UART1)
 #endif
 #ifndef LOG_UART_TXD
-#define LOG_UART_TXD (PA11)
+#define LOG_UART_TXD (PN04)
 #endif
 #ifndef LOG_UART_RXD
-#define LOG_UART_RXD (PA12)
+#define LOG_UART_RXD (PN03)
 #endif
 #ifndef LOG_UART_BAUDRATE
 #define LOG_UART_BAUDRATE UART_BAUDRATE_115200

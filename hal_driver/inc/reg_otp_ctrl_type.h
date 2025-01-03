@@ -1,0 +1,223 @@
+#ifndef REG_OTP_CTRL_TYPE_H_
+#define REG_OTP_CTRL_TYPE_H_
+#include <stdint.h>
+
+typedef struct
+{
+    volatile uint32_t SOFT_REQ; // 0x0
+    volatile uint32_t READY;    // 0x4
+    volatile uint32_t WR_LEN;   // 0x8
+    volatile uint32_t RD_LEN;   // 0xc
+    volatile uint32_t TIME0;    // 0x10
+    volatile uint32_t TIME1;    // 0x14
+    volatile uint32_t PIN;      // 0x18
+    volatile uint32_t CTRL;     // 0x1c
+    volatile uint32_t RD_FORBIDDEN_ADDR[4];
+    volatile uint32_t WR_FORBIDDEN_ADDR[4];
+    volatile uint32_t WR_DATA;      // 0x40
+    volatile uint32_t RD_DATA;      // 0x44
+    volatile uint32_t WR_FIFO_CTRL; // 0x48
+    volatile uint32_t RD_FIFO_CTRL; // 0x4c
+    volatile uint32_t INTR_MSK;     // 0x50
+    volatile uint32_t INTR_CLR;     // 0x54
+    volatile uint32_t INTR_STT;     // 0x58
+    volatile uint32_t INTR_RAW;     // 0x5c
+} reg_otp_ctrl_t;
+
+enum OTP_CTRL_REG_SOFT_REQ_FIELD
+{
+    OTP_CTRL_SOFT_REQ_MASK = (int)0x1,
+    OTP_CTRL_SOFT_REQ_POS = 0,
+};
+
+enum OTP_CTRL_REG_READY_FIELD
+{
+    OTP_CTRL_READY_FSM_STT_MASK = (int)0x1c0,
+    OTP_CTRL_READY_FSM_STT_POS = 6,
+    OTP_CTRL_READY_POWER_READY_MASK = (int)0x3c,
+    OTP_CTRL_READY_POWER_READY_POS = 2,
+    OTP_CTRL_READY_WRITE_EN_MASK = (int)0x2,
+    OTP_CTRL_READY_WRITE_EN_POS = 1,
+    OTP_CTRL_READY_READ_EN_MASK = (int)0x1,
+    OTP_CTRL_READY_READ_EN_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_LEN_FIELD
+{
+    OTP_CTRL_WFIFO_FULL_EN_MASK = (int)0x1000,
+    OTP_CTRL_WFIFO_FULL_EN_POS = 12,
+    OTP_CTRL_WR_LEN_MASK = (int)0xfff,
+    OTP_CTRL_WR_LEN_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_LEN_FIELD
+{
+    OTP_CTRL_RFIFO_FULL_EN_MASK = (int)0x1000,
+    OTP_CTRL_RFIFO_FULL_EN_POS = 12,
+    OTP_CTRL_RD_LEN_MASK = (int)0xfff,
+    OTP_CTRL_RD_LEN_POS = 0,
+};
+
+enum OTP_CTRL_REG_TIME0_FIELD
+{
+    OTP_CTRL_TIME0_TPW_MASK = (int)0x3ff00000,
+    OTP_CTRL_TIME0_TPW_POS = 20,
+    OTP_CTRL_TIME0_TPPS_MASK = (int)0xffc00,
+    OTP_CTRL_TIME0_TPPS_POS = 10,
+    OTP_CTRL_TIME0_TCS_MASK = (int)0x3ff,
+    OTP_CTRL_TIME0_TCS_POS = 0,
+};
+
+enum OTP_CTRL_REG_TIME1_FIELD
+{
+    OTP_CTRL_TIME1_TPPR_MASK = (int)0x3ff00000,
+    OTP_CTRL_TIME1_TPPR_POS = 20,
+    OTP_CTRL_TIME1_TPPH_MASK = (int)0xffc00,
+    OTP_CTRL_TIME1_TPPH_POS = 10,
+    OTP_CTRL_TIME1_TPWI_MASK = (int)0x3ff,
+    OTP_CTRL_TIME1_TPWI_POS = 0,
+};
+
+enum OTP_CTRL_REG_PIN_FIELD
+{
+    OTP_CTRL_PIN_REP_MASK = (int)0x1000000,
+    OTP_CTRL_PIN_REP_POS = 24,
+    OTP_CTRL_PIN_PTM_MASK = (int)0xe00000,
+    OTP_CTRL_PIN_PTM_POS = 21,
+    OTP_CTRL_PIN_PCE_MASK = (int)0x100000,
+    OTP_CTRL_PIN_PCE_POS = 20,
+    OTP_CTRL_PIN_PA_MASK = (int)0xfff00,
+    OTP_CTRL_PIN_PA_POS = 8,
+    OTP_CTRL_PIN_PPROG_MASK = (int)0x80,
+    OTP_CTRL_PIN_PPROG_POS = 7,
+    OTP_CTRL_PIN_PAIO_MASK = (int)0x70,
+    OTP_CTRL_PIN_PAIO_POS = 4,
+    OTP_CTRL_PIN_PAS_MASK = (int)0x8,
+    OTP_CTRL_PIN_PAS_POS = 3,
+    OTP_CTRL_PIN_PTR_MASK = (int)0x4,
+    OTP_CTRL_PIN_PTR_POS = 2,
+    OTP_CTRL_PIN_PTC_MASK = (int)0x2,
+    OTP_CTRL_PIN_PTC_POS = 1,
+    OTP_CTRL_PIN_PTRIM_MASK = (int)0x1,
+    OTP_CTRL_PIN_PTRIM_POS = 0,
+};
+
+enum OTP_CTRL_REG_CTRL_FIELD
+{
+    OTP_CTRL_CTRL_1LEN_MODE_MASK = (int)0x10,
+    OTP_CTRL_CTRL_1LEN_MODE_POS = 4,
+    OTP_CTRL_CTRL_PCLK_DIV_MASK = (int)0xf,
+    OTP_CTRL_CTRL_PCLK_DIV_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_ADDR0_FIELD
+{
+    OTP_CTRL_RD_ADDR0_MASK = (int)0xffffffff,
+    OTP_CTRL_RD_ADDR0_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_ADDR1_FIELD
+{
+    OTP_CTRL_RD_ADDR1_MASK = (int)0xffffffff,
+    OTP_CTRL_RD_ADDR1_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_ADDR2_FIELD
+{
+    OTP_CTRL_RD_ADDR2_MASK = (int)0xffffffff,
+    OTP_CTRL_RD_ADDR2_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_ADDR3_FIELD
+{
+    OTP_CTRL_RD_ADDR3_MASK = (int)0xffffffff,
+    OTP_CTRL_RD_ADDR3_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_ADDR0_FIELD
+{
+    OTP_CTRL_WR_ADDR0_MASK = (int)0xffffffff,
+    OTP_CTRL_WR_ADDR0_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_ADDR1_FIELD
+{
+    OTP_CTRL_WR_ADDR1_MASK = (int)0xffffffff,
+    OTP_CTRL_WR_ADDR1_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_ADDR2_FIELD
+{
+    OTP_CTRL_WR_ADDR2_MASK = (int)0xffffffff,
+    OTP_CTRL_WR_ADDR2_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_ADDR3_FIELD
+{
+    OTP_CTRL_WR_ADDR3_MASK = (int)0xffffffff,
+    OTP_CTRL_WR_ADDR3_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_DATA_FIELD
+{
+    OTP_CTRL_WR_DATA_MASK = (int)0xffffffff,
+    OTP_CTRL_WR_DATA_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_DATA_FIELD
+{
+    OTP_CTRL_RD_DATA_MASK = (int)0xffffffff,
+    OTP_CTRL_RD_DATA_POS = 0,
+};
+
+enum OTP_CTRL_REG_WR_FIFO_CTRL_FIELD
+{
+    OTP_CTRL_WR_FIFO_EMPTY_MASK = (int)0x8,
+    OTP_CTRL_WR_FIFO_EMPTY_POS = 3,
+    OTP_CTRL_WR_FIFO_FULL_MASK = (int)0x4,
+    OTP_CTRL_WR_FIFO_FULL_POS = 2,
+    OTP_CTRL_WR_FIFO_RCLR_MASK = (int)0x2,
+    OTP_CTRL_WR_FIFO_RCLR_POS = 1,
+    OTP_CTRL_WR_FIFO_WCLR_MASK = (int)0x1,
+    OTP_CTRL_WR_FIFO_WCLR_POS = 0,
+};
+
+enum OTP_CTRL_REG_RD_FIFO_CTRL_FIELD
+{
+    OTP_CTRL_RD_FIFO_LEVEL_MASK = (int)0xf0,
+    OTP_CTRL_RD_FIFO_LEVEL_POS = 4,
+    OTP_CTRL_RD_FIFO_EMPTY_MASK = (int)0x8,
+    OTP_CTRL_RD_FIFO_EMPTY_POS = 3,
+    OTP_CTRL_RD_FIFO_FULL_MASK = (int)0x4,
+    OTP_CTRL_RD_FIFO_FULL_POS = 2,
+    OTP_CTRL_RD_FIFO_RCLR_MASK = (int)0x2,
+    OTP_CTRL_RD_FIFO_RCLR_POS = 1,
+    OTP_CTRL_RD_FIFO_WCLR_MASK = (int)0x1,
+    OTP_CTRL_RD_FIFO_WCLR_POS = 0,
+};
+
+enum OTP_CTRL_REG_INTR_MSK_FIELD
+{
+    OTP_CTRL_INTR_MSK_FINISH_MASK = (int)0x1,
+    OTP_CTRL_INTR_MSK_FINISH_POS = 0,
+};
+
+enum OTP_CTRL_REG_INTR_CLR_FIELD
+{
+    OTP_CTRL_INTR_CLR_FINISH_MASK = (int)0x1,
+    OTP_CTRL_INTR_CLR_FINISH_POS = 0,
+};
+
+enum OTP_CTRL_REG_INTR_STT_FIELD
+{
+    OTP_CTRL_INTR_STT_FINISH_MASK = (int)0x1,
+    OTP_CTRL_INTR_STT_FINISH_POS = 0,
+};
+
+enum OTP_CTRL_REG_INTR_RAW_FIELD
+{
+    OTP_CTRL_INTR_RAW_FINISH_MASK = (int)0x1,
+    OTP_CTRL_INTR_RAW_FINISH_POS = 0,
+};
+
+#endif

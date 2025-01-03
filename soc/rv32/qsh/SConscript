@@ -33,6 +33,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'rv32/qsh/ls_msp_dwtrng.c',
         'rv32/qsh/ls_msp_iwdg.c',
         'rv32/qsh/ls_msp_otbn.c',
+        'rv32/qsh/ls_msp_otp_ctrl.c',
         # 'rv32/qsh/ls_msp_touchkey.c',
         # 'rv32/qsh/ls_msp_adc.c',
         # 'rv32/qsh/ls_msp_dac.c',
@@ -125,6 +126,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_ps2h.c',
         # 'src/ls_hal_pis.c',
         'src/ls_hal_otbn.c',
+        'src/ls_hal_otp_ctrl.c',
         'src/ls_hal_mjtag.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
