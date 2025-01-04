@@ -20,6 +20,9 @@ extern void (*qspiv2_global_int_restore_fn)(uint32_t);
 
 void lsqspiv2_msp_init(void);
 
+/* qspiv2_global_int_ctrl_fn_init for FPGA*/
+void qspiv2_global_int_ctrl_fn_init();
+
 #ifdef __cplusplus
 }
 #endif
