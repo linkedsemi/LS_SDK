@@ -199,6 +199,8 @@ do {   ;                                                                 \
 	} *__p = (__typeof__(__p)) (p);                                 \
 	__p->__v = (v);                                               \
 } while (false)
+#else
+#include <zephyr/toolchain.h>
 #endif
 
 static inline void mem_xor_n(uint8_t *dst, const uint8_t *src1, const uint8_t *src2, size_t len)
