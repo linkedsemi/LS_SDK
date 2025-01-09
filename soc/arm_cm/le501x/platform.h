@@ -86,6 +86,8 @@ uint32_t get_app_image_base(void);
 
 void LVD33_Handler(void);
 
+void lvd33_irq_enable();
+
 void lvd33_config(void);
 
 void lvd33_enable(void);

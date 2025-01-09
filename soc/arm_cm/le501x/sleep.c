@@ -319,6 +319,7 @@ void deep_sleep()
     ble_wkup_status_set(true);
     ble_radio_en_sync();
     systick_start();
+    lvd33_irq_enable();
     uart_log_resume();
 }
 

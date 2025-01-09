@@ -137,8 +137,9 @@ static uint32_t flash_data_storage_base_offset()
     return config_word_get(DATA_STORAGE_BASE_OFFSET);
 }
 
-static void lvd33_irq_enable()
+void lvd33_irq_enable()
 {
+    REG_FIELD_WR(SYSCFG->RSTST,SYSCFG_LVD33_FLAG,1);
     __NVIC_ClearPendingIRQ(LVD33_IRQn);
     __NVIC_EnableIRQ(LVD33_IRQn);
 }
@@ -147,12 +148,12 @@ void irq_reinit()
 {
     irq_priority();
     NVIC->ISER[0] = 1<<QSPI_IRQn|1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
-    lvd33_irq_enable();
 }
 
 static void irq_init()
 {
     irq_reinit();
+    lvd33_irq_enable();
     ble_irq_clr_and_enable();
 }
 
