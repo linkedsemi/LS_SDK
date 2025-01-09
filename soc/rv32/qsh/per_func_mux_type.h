@@ -13,6 +13,10 @@ extern "C" {
 #define PINMUX_FUNC_START PINMUX_FUNC1
 #define PINMUX_FUNC_END   PINMUX_FUNC4
 
+#define FUNC1_IDX_MAX  32
+#define FUNC_GPIO      (FUNC1_IDX_MAX+1)
+#define FUNC_NULL      (FUNC1_IDX_MAX+2)
+
 #ifdef __cplusplus
 }
 #endif

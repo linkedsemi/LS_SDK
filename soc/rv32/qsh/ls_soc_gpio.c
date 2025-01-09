@@ -594,6 +594,37 @@ void per_func0_disable(uint8_t pin)
     SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] &= ~(0xff << ((x->num % 4) * 8));
 }
 
+void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint32_t alt)
+{
+    for (uint8_t i = PINMUX_FUNC_START; i <= PINMUX_FUNC_END; i++) {
+        per_func_disable(pin, i);
+    }
+    switch (func) {
+    case PINMUX_FUNC1:
+        switch (alt) {
+        case FUNC_NULL:
+            io_cfg_disable(pin);
+            __fallthrough;
+        case FUNC_GPIO:
+            return; //no func enable. return here
+        default:
+            per_func0_set(pin, alt);
+            break;
+        }
+        __fallthrough;
+    case PINMUX_FUNC2:
+        __fallthrough;
+    case PINMUX_FUNC3:
+        __fallthrough;
+    case PINMUX_FUNC4:
+        per_func_enable(pin, func);
+    default:
+        break;
+    }
+
+    return;
+}
+
 // static void iic_io_cfg(uint8_t scl,uint8_t sda)
 // {
 //     io_cfg_input(scl);

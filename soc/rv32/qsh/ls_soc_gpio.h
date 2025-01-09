@@ -212,6 +212,7 @@ void io_v33_exti_config(uint8_t pin,exti_edge_t edge);
 void io_exti_config(uint8_t pin,exti_edge_t edge);
 
 reg_gpio_t *pin_to_controller(uint8_t pin);
+void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint32_t alt);
 
 #ifdef __cplusplus
 }
