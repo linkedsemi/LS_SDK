@@ -7,6 +7,7 @@
 #include "systick.h"
 #include "exception_isr.h"
 #include "ls_soc_gpio.h"
+#include "ls_hal_flash.h"
 #include "field_manipulate.h"
 #include "per_func_mux.h"
 #include "qsh.h"
@@ -59,11 +60,22 @@ void sys_init_none()
 {
     // clk_flash_init();
     // set_all_irq_priority_to_lowest_level();
-    // hal_flash_xip_func_ptr_init();
     io_init();
-#if !defined(KERNEL)
     LOG_INIT();
-#endif
+
+    // pinmux_hal_flash_init();
+    // pinmux_hal_flash_quad_init();
+    // flash_swint_init();
+    // hal_flash_drv_var_init(false, false);
+    // hal_flash_xip_func_ptr_init();
+    
+    // hal_flash_init();
+    // hal_flash_xip_mode_reset();
+    // hal_flash_software_reset();
+    // hal_flash_release_from_deep_power_down();
+    // hal_flash_qe_status_read_and_set();
+    // hal_flash_xip_start();
+
     // low_power_init();
     systick_start();
     // sw_timer_module_init();

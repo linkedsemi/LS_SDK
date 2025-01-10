@@ -3,7 +3,6 @@
 #include "field_manipulate.h"
 #include "platform.h"
 
-#define BLOCK_BYTES (0x20)
 #define ONEBIT_BYTES (0x20)
 #define FIFO_DEPTH_BYTES (0x20)
 
@@ -20,46 +19,22 @@ static void otp_check_power_ready()
     }
 }
 
-/*
-static bool otp_write_en_check(uint32_t offset, uint32_t length)
-{
-    bool return_val = true;
-    uint32_t bit_start = offset / ONEBIT_BYTES;
-    uint32_t bit_end = (offset + length - 1) / ONEBIT_BYTES;
-
-    for (uint32_t i = bit_start; i <= bit_end; i++)
-    {
-        if (OTP_CTRL->WR_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20))
-            return_val = false;
-    }
-
-    return return_val;
-}
-
-static bool otp_read_en_check(uint32_t offset, uint32_t size)
-{
-    bool return_val = true;
-    uint32_t bit_start = offset / ONEBIT_BYTES;
-    uint32_t bit_end = (offset + size - 1) / ONEBIT_BYTES;
-
-    for (uint32_t i = bit_start; i <= bit_end; i++)
-    {
-        if (OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20))
-            return_val = false;
-    }
-
-    return return_val;
-}
-*/
-
 void HAL_OTP_CTRL_Init()
 {
     HAL_MSP_OTP_CTRL_Init();
 
     otp_check_power_ready();
+
+    REG_FIELD_WR(OTP_CTRL->PIN, OTP_CTRL_PIN_PTRIM, 1);
+
+#ifndef ROM_CODE
+    DELAY_US(50);
+#else
+    DELAY_US(50);//TODO
+#endif
 }
 
-void HAL_OTP_CTRL_SET_WR_Addr(uint32_t addr[0x4])
+void HAL_OTP_SET_WR_Addr(uint32_t addr[0x4])
 {
     for (uint8_t i = 0; i < 0x4; i++)
     {
@@ -67,7 +42,7 @@ void HAL_OTP_CTRL_SET_WR_Addr(uint32_t addr[0x4])
     }
 }
 
-void HAL_OTP_CTRL_SET_RD_Addr(uint32_t addr[0x4])
+void HAL_OTP_SET_RD_Addr(uint32_t addr[0x4])
 {
     for (uint8_t i = 0; i < 0x4; i++)
     {
@@ -75,7 +50,7 @@ void HAL_OTP_CTRL_SET_RD_Addr(uint32_t addr[0x4])
     }
 }
 
-HAL_StatusTypeDef HAL_OTP_CTRL_Write_bit(uint32_t offset, uint8_t bit_field)
+HAL_StatusTypeDef HAL_OTP_Write_bit(uint32_t offset, uint8_t bit_field)
 {
     uint8_t byte = 0;
 
@@ -84,7 +59,7 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Write_bit(uint32_t offset, uint8_t bit_field)
     
     otp_check_power_ready();
 
-    HAL_StatusTypeDef result_val = HAL_OTP_CTRL_Read(offset, &byte, 1);  
+    HAL_StatusTypeDef result_val = HAL_OTP_Read(offset, &byte, 1);  
     if (result_val != HAL_OK)
         return result_val;
     
@@ -113,28 +88,29 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Write_bit(uint32_t offset, uint8_t bit_field)
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_OTP_CTRL_Write_256bit(uint32_t offset, uint8_t *data, uint32_t size)
+HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
 {
-    uint8_t *p_o = (uint8_t *)otp_buffer;
-    if ((size % BLOCK_BYTES) || (size > 0x40))
+    uint32_t i;
+    uint8_t *p_buffer = (uint8_t *)otp_buffer;
+    if ((length % sizeof(uint32_t)) || (length > 0x40))
         return HAL_INVALIAD_PARAM;
-    
+
     otp_check_power_ready();
 
-    HAL_StatusTypeDef result_val = HAL_OTP_CTRL_Read(offset, p_o, size);
+    HAL_StatusTypeDef result_val = HAL_OTP_Read(offset, p_buffer, length);
     if (result_val != HAL_OK)
         return result_val;
 
-    for (uint32_t i = 0; i < size; i++)
+    for (i = 0; i < length; i++)
     {
-        p_o[i] = data[i] | ~p_o[i];
+        p_buffer[i] = data[i] | ~p_buffer[i];
     }
 
     OTP_CTRL->SOFT_REQ = 0;
     OTP_CTRL->INTR_CLR = OTP_CTRL_INTR_CLR_FINISH_MASK;
     OTP_CTRL->INTR_MSK = 0;
     REG_FIELD_WR(OTP_CTRL->CTRL, OTP_CTRL_CTRL_1LEN_MODE, 0);
-    OTP_CTRL->WR_LEN = FIELD_BUILD(OTP_CTRL_WR_LEN, size - 1) |
+    OTP_CTRL->WR_LEN = FIELD_BUILD(OTP_CTRL_WR_LEN, length - 1) |
                        FIELD_BUILD(OTP_CTRL_WFIFO_FULL_EN, 1);
     OTP_CTRL->READY = OTP_CTRL_READY_WRITE_EN_MASK;
     OTP_CTRL->WR_FIFO_CTRL = OTP_CTRL_WR_FIFO_RCLR_MASK | OTP_CTRL_WR_FIFO_WCLR_MASK;
@@ -145,23 +121,15 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Write_256bit(uint32_t offset, uint8_t *data, uint
                     FIELD_BUILD(OTP_CTRL_PIN_PAIO, 0) | FIELD_BUILD(OTP_CTRL_PIN_PAS, 0) |
                     FIELD_BUILD(OTP_CTRL_PIN_PTC, 0) | FIELD_BUILD(OTP_CTRL_PIN_PTR, 0) |
                     FIELD_BUILD(OTP_CTRL_PIN_PTM, 2);
-
-    for (uint32_t i = 0; i < 8; i++)
-    {
-        OTP_CTRL->WR_DATA = otp_buffer[i];
-    }
     OTP_CTRL->SOFT_REQ = OTP_CTRL_SOFT_REQ_MASK;
 
-    uint32_t *ptr = &otp_buffer[9];
-    size -= 0x20;
-
-    while (size)
+    i = 0;
+    while (length)
     {
         if ((OTP_CTRL->WR_FIFO_CTRL & OTP_CTRL_WR_FIFO_FULL_MASK) == 0)
         {
-            OTP_CTRL->WR_DATA = *ptr;
-            ptr += 1;
-            size -= 4;
+            OTP_CTRL->WR_DATA = otp_buffer[i++];
+            length -= 4;
         }
     }
 
@@ -170,10 +138,10 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Write_256bit(uint32_t offset, uint8_t *data, uint
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_OTP_CTRL_Read(uint32_t offset, uint8_t *data, uint32_t size)
+HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 {
-    uint32_t remain_length = size % FIFO_DEPTH_BYTES;
-    uint32_t length = size - remain_length;
+    uint8_t remain_length = length & 0x3;
+    uint32_t len = (length + 0x3) & ~0x3;
 
     otp_check_power_ready();
 
@@ -181,7 +149,7 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Read(uint32_t offset, uint8_t *data, uint32_t siz
     OTP_CTRL->INTR_MSK = 0;
     OTP_CTRL->INTR_CLR = OTP_CTRL_INTR_CLR_FINISH_MASK;
     REG_FIELD_WR(OTP_CTRL->CTRL, OTP_CTRL_CTRL_1LEN_MODE, 0);
-    OTP_CTRL->RD_LEN = FIELD_BUILD(OTP_CTRL_RD_LEN, length - 1) |
+    OTP_CTRL->RD_LEN = FIELD_BUILD(OTP_CTRL_RD_LEN, len - 1) |
                        FIELD_BUILD(OTP_CTRL_RFIFO_FULL_EN, 1);
     OTP_CTRL->READY = OTP_CTRL_READY_READ_EN_MASK;
     OTP_CTRL->RD_FIFO_CTRL = OTP_CTRL_RD_FIFO_RCLR_MASK | OTP_CTRL_RD_FIFO_WCLR_MASK;
@@ -194,7 +162,7 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Read(uint32_t offset, uint8_t *data, uint32_t siz
                     FIELD_BUILD(OTP_CTRL_PIN_PTM, 0);
     OTP_CTRL->SOFT_REQ = OTP_CTRL_SOFT_REQ_MASK;
 
-    while (length) /* unit:256bit */
+    while (length - remain_length)
     {
         if ((OTP_CTRL->RD_FIFO_CTRL & OTP_CTRL_RD_FIFO_EMPTY_MASK) == 0)
         {
@@ -207,22 +175,14 @@ HAL_StatusTypeDef HAL_OTP_CTRL_Read(uint32_t offset, uint8_t *data, uint32_t siz
         }
     }
 
-    if (remain_length) /* unit:8bit */
+    if (remain_length)
     {
-        OTP_CTRL->SOFT_REQ = 0;
-        REG_FIELD_WR(OTP_CTRL->CTRL, OTP_CTRL_CTRL_1LEN_MODE, 1);
-        while (remain_length)
+        while (OTP_CTRL->RD_FIFO_CTRL & OTP_CTRL_RD_FIFO_EMPTY_MASK) ;
+        uint32_t temp_data = OTP_CTRL->RD_DATA;
+
+        for (uint8_t i = 0; i < remain_length; i++)
         {
-            OTP_CTRL->SOFT_REQ = 0;
-
-            REG_FIELD_WR(OTP_CTRL->PIN, OTP_CTRL_PIN_PA, offset + size - remain_length);
-            OTP_CTRL->INTR_CLR = OTP_CTRL_INTR_CLR_FINISH_MASK;
-            OTP_CTRL->SOFT_REQ = OTP_CTRL_SOFT_REQ_MASK;
-
-            while (OTP_CTRL->INTR_RAW == 0)
-                ;
-            *data++ = (uint8_t)OTP_CTRL->RD_DATA;
-            remain_length--;
+            data[i] = (temp_data >> (8 * i)) & 0xff;
         }
     }
 

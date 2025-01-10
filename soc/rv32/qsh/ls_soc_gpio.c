@@ -962,6 +962,7 @@ ROM_SYMBOL void pinmux_hal_flash_init(void)
     per_func_enable(QSPI1_CSN_PIN, PINMUX_FUNC3);
     per_func_enable(QSPI1_IO0_SI_PIN, PINMUX_FUNC3);
     per_func_enable(QSPI1_IO1_SO_PIN, PINMUX_FUNC3);
+    io_cfg_input(QSPI1_CLK_PIN);
     io_cfg_input(QSPI1_CSN_PIN);
     io_cfg_input(QSPI1_IO0_SI_PIN);
     io_cfg_input(QSPI1_IO1_SO_PIN);
