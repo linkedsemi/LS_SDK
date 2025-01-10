@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include "common.h"
 #include "ls_soc_gpio.h"
 #include "field_manipulate.h"
 #include "per_func_mux.h"
