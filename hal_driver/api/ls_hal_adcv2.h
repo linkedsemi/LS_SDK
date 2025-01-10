@@ -3,7 +3,10 @@
 #include <stdbool.h>
 #include "HAL_def.h"
 #include "ls_msp_adc.h"
-
+#include "sdk_config.h"
+#if DMACV3
+#include "ls_hal_dmacv3.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,6 +108,14 @@ typedef struct
                                    This parameter must be a number between Min_Data = 0x000 and Max_Data = 0xFFF. */
 } ADC_AnalogWDGConfTypeDef;
 
+#if DMACV3
+/// ADC PingPong Buffer Pointer Structure 
+struct ADC_PingPong_Bufptr
+{
+    uint16_t *Bufptr[2];    /**< Configure the pointer array to accept ADC data */
+};
+#endif
+
 /**
   * @brief  ADC DMA Environment 
   */
@@ -112,6 +123,9 @@ typedef struct
  struct AdcDMAEnv
 {
     void                          (*Callback)(struct __ADC_HandleTypeDef *);
+    #if DMACV3
+    struct                        dma_lli LLI[2];
+    #endif
     uint8_t                       DMA_Channel;
 };
 
@@ -525,7 +539,15 @@ HAL_StatusTypeDef HAL_ADC_LoopChannel_Start_DMA(ADC_HandleTypeDef* hadc, uint16_
   * @retval HAL status.
   */
 HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc);
-
+#ifdef DMACV3
+/** \brief ADC Transfer Data Configuration (DMA PingPong Mode)
+ *   \param[in] hadc ADC handle
+ *   \param[in] Buff The Buffer pointer to accept ADC data ::ADC_PingPong_Bufptr
+ *   \param[in] Num Accept the size of Buff data 
+ *   \return Status
+ */
+HAL_StatusTypeDef HAL_ADC_PingPong_Transfer_Config_DMA(ADC_HandleTypeDef *hadc,struct ADC_PingPong_Bufptr *Buff,uint16_t Num);
+#endif
 /** @}*/
 
 

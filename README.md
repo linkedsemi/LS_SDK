@@ -51,6 +51,7 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/adcv2/adc_multi_channel                                        |        |  √     |  √     |
 | peripheral/adcv2/adc_multi_channel_dma                                    |        |  √     |  √     |
 | peripheral/adcv2/adc_single_channel                                       |        |  √     |  √     |
+| peripheral/adcv2/adc_pingpong_dma                                         |        |        |  √     |
 | peripheral/can/CAN_LoopBack                                               |        |  √     |  √     |
 | peripheral/can/CAN_Normal                                                 |        |  √     |  √     |
 | peripheral/cap/cap_it                                                     |        |        |  √     |
