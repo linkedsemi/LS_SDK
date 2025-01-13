@@ -56,21 +56,40 @@ static void otp_test_write_forbid()
     LOG_I("Set OTP write forbid...");
     LOG_HEX(write_forbidden, 0x10);
 
+    memset(buffer, 0x0, 0x60);
+    if (HAL_OTP_Write(0x10, buffer, 0x20) != HAL_OK)
+    {
+        LOG_I("OTP write_data fail...");
+        error();
+    }
+    LOG_I("OTP write -addr:0x%x -length:0x%x", 0x10, 0x20);
+
+    HAL_OTP_Read(0x0, buffer1, 0x60);
+    LOG_I("otp read -addr:0x%x -length:0x%x", 0x0, 0x60);
+    LOG_HEX(buffer1, 0x60);
+
+    if (HAL_OTP_Write(0x30, buffer, 0x20) != HAL_OK)
+    {
+        LOG_I("OTP write_data fail...");
+        error();
+    }
+    LOG_I("OTP write -addr:0x%x -length:0x%x", 0x30, 0x20);
+
     HAL_OTP_Read(0x0, buffer1, 0x60);
     LOG_I("otp read -addr:0x%x -length:0x%x", 0x0, 0x60);
     LOG_HEX(buffer1, 0x60);
 
     if (!memcmp(buffer, buffer1, TEST_LENGTH))
     {
-        LOG_I("OTP read forbid fail...");
+        LOG_I("OTP write forbid fail...");
         error();
     }
-    LOG_I("OTP read forbid ok...");
+    LOG_I("OTP write forbid ok...");
 }
 
 static void otp_test_read_forbid()
 {
-    read_forbidden[TEST_ADDR >> 0x10] = 0x4;
+    read_forbidden[TEST_ADDR >> 0x10] = 0x2;
     HAL_OTP_SET_RD_Addr(read_forbidden);
     LOG_I("Set OTP read forbid...");
     LOG_HEX(read_forbidden, 0x10);
@@ -78,8 +97,8 @@ static void otp_test_read_forbid()
     HAL_OTP_Read(TEST_ADDR, buffer1, 0x50);
     LOG_I("otp read -addr:0x%x -length:0x%x", TEST_ADDR, 0x50);
     LOG_HEX(buffer1, 0x50);
-    HAL_OTP_Read(0x20, buffer2, 0x60);
-    LOG_I("otp read -addr:0x%x -length:0x%x", 0x20, 0x60);
+    HAL_OTP_Read(0x0, buffer2, 0x60);
+    LOG_I("otp read -addr:0x%x -length:0x%x", 0x0, 0x60);
     LOG_HEX(buffer2, 0x60);
     if (!memcmp(buffer, buffer1, TEST_LENGTH))
     {
