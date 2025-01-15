@@ -20,6 +20,8 @@ void HAL_LSSHA_MSP_Busy_Set(void);
 
 void HAL_LSSHA_MSP_Idle_Set(void);
 
+uint8_t HAL_SHA_DMA_Handshake_Get(void);
+
 #ifdef __cplusplus
 }
 #endif

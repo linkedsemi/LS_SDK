@@ -21,14 +21,16 @@ typedef struct
     volatile uint32_t FDCAN_TIMESTAMP_L; //0x34
     volatile uint32_t FDCAN_TIM_CTRL; //0x38
     volatile uint32_t RESERVED2[1];
-    volatile uint32_t DMAC1_CH01_SEL; //0x40
-    volatile uint32_t DMAC1_CH23_SEL; //0x44
-    volatile uint32_t DMAC1_CH45_SEL; //0x48
-    volatile uint32_t DMAC1_CH67_SEL; //0x4c
-    volatile uint32_t DMAC2_CH01_SEL; //0x50
-    volatile uint32_t DMAC2_CH23_SEL; //0x54
-    volatile uint32_t DMAC2_CH45_SEL; //0x58
-    volatile uint32_t DMAC2_CH67_SEL; //0x5c
+    volatile uint32_t DMAC1_CH_SEL[4];
+    // volatile uint32_t DMAC1_CH01_SEL; //0x40
+    // volatile uint32_t DMAC1_CH23_SEL; //0x44
+    // volatile uint32_t DMAC1_CH45_SEL; //0x48
+    // volatile uint32_t DMAC1_CH67_SEL; //0x4c
+    volatile uint32_t DMAC2_CH_SEL[4];
+    // volatile uint32_t DMAC2_CH01_SEL; //0x50
+    // volatile uint32_t DMAC2_CH23_SEL; //0x54
+    // volatile uint32_t DMAC2_CH45_SEL; //0x58
+    // volatile uint32_t DMAC2_CH67_SEL; //0x5c
     volatile uint32_t ETH1_PHY_CTRL; //0x60
     volatile uint32_t RESERVED3[1];
     volatile uint32_t ETH2_PHY_CTRL; //0x68

@@ -161,6 +161,8 @@ extern "C" {
 #define DMA_CRYPT_RD        153
 #define DMA_ECC             154
 
+#define DMA_SHA512          172
+#define DMA_SHA256          173
 
 #ifdef __cplusplus
 }

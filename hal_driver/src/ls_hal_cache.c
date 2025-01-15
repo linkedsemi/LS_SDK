@@ -8,6 +8,8 @@ void XIP_BANNED_FUNC(lscache_cache_enable,uint8_t prefetch)
 {
     lscache_msp_init();
     LSCACHE->CCR = FIELD_BUILD(LSCACHE_SET_PREFETCH, prefetch) | FIELD_BUILD(LSCACHE_EN, 1);
+    while (!(LSCACHE->SR & 0x4)) ;
+    while ((LSCACHE->SR & 0x4)) ;
 }
 
 

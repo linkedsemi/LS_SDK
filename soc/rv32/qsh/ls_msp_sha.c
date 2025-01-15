@@ -1,11 +1,10 @@
 #include "ls_msp_sha.h"
-#include "reg_sysc_sec_cpu.h"
-#include "qsh.h"
-#include "platform.h"
 #include "ls_hal_sha.h"
+#include "reg_sysc_sec_cpu.h"
 #include "exception_isr.h"
+#include "dmac_config.h"
 #include "core_rv32.h"
-#include "sys_stat.h"
+#include "qsh.h"
 
 void HAL_LSSHA_MSP_Init(void)
 {
@@ -22,6 +21,11 @@ void HAL_LSSHA_MSP_DeInit(void)
 {
     SYSC_SEC_CPU->PD_CPU_CLKG[1] = SYSC_SEC_CPU_CLKG_CLR_CALC_SHA_MASK;
     csi_vic_disable_irq(CALC_SHA_IRQN);
+}
+
+uint8_t HAL_SHA_DMA_Handshake_Get(void)
+{
+    return DMA_SHA256;
 }
 
 void HAL_LSSHA_MSP_Busy_Set(void)
