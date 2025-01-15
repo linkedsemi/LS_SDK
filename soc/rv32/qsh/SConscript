@@ -28,7 +28,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'rv32/qsh/ls_msp_comp.c',
         'rv32/qsh/ls_msp_crc.c',
         'rv32/qsh/ls_msp_sha.c',
-        'rv32/qsh/ls_msp_sha512.c',
+        # 'rv32/qsh/ls_msp_sha512.c',
         'rv32/qsh/ls_msp_sm4.c',
         'rv32/qsh/ls_msp_crypt.c',
         'rv32/qsh/ls_msp_dmacv3.c',
