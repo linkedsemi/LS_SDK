@@ -59,10 +59,6 @@ extern "C" {
 #define SPI4_IRQN            68
 #define SPIS1_IRQN           69
 #define SPIS2_IRQN           70
-#define SPI_FLT1_IRQN        71
-#define SPI_FLT2_IRQN        72
-#define SPI_FLT3_IRQN        73
-#define SPI_FLT4_IRQN        74
 #define IOPMP1_IRQN          75
 #define IOPMP2_IRQN          76
 #define IOPMP3_IRQN          77
