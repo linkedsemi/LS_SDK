@@ -31,6 +31,22 @@ typedef struct
     volatile uint32_t FIFO_WDAT; //0x60
     volatile uint32_t FIFO_RDAT; //0x64
     volatile uint32_t FIFO_FLVL; //0x68
+    volatile uint32_t RESERVED3;
+    volatile uint32_t PART0_ADDR_START;//0x70
+    volatile uint32_t PART0_ADDR_END;
+    volatile uint32_t PART1_ADDR_START;
+    volatile uint32_t PART1_ADDR_END;
+    volatile uint32_t PART0_DECRYPT_CTRL;//x80
+    volatile uint32_t PART1_DECRYPT_CTRL;
+    volatile uint32_t PART0_NONCE[3];
+    volatile uint32_t PART1_NONCE[3];
+    volatile uint32_t RESERVED4;//0xa0
+    volatile uint32_t PART0_KEY[8];
+    volatile uint32_t PART1_KEY[8];
+    volatile uint32_t PART0_LOCK;
+    volatile uint32_t PART1_LOCK;
+    volatile uint32_t AES_CLR;
+    volatile uint32_t BACKUP_OFFSET;
 }reg_lsqspiv2_t;
 
 enum LSQSPIV2_REG_QSPI_CTRL0_FIELD
