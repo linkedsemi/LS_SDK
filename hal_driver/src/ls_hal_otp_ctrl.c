@@ -6,8 +6,6 @@
 #define ONEBIT_BYTES (0x20)
 #define FIFO_DEPTH_BYTES (0x20)
 
-static uint32_t otp_buffer[0x10];
-
 static void otp_check_power_ready()
 {
     while (1)
@@ -91,8 +89,10 @@ HAL_StatusTypeDef HAL_OTP_Write_bit(uint32_t offset, uint8_t bit_field)
 HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
 {
     uint32_t i;
-    uint8_t *p_buffer = (uint8_t *)otp_buffer;
-    if ((length % sizeof(uint32_t)) || (length > 0x40))
+    uint32_t buffer[0x20];
+    uint8_t *p_buffer = (uint8_t *)buffer;
+
+    if ((offset + length) > 0x1000)
         return HAL_INVALIAD_PARAM;
 
     otp_check_power_ready();
@@ -128,8 +128,8 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
     {
         if ((OTP_CTRL->WR_FIFO_CTRL & OTP_CTRL_WR_FIFO_FULL_MASK) == 0)
         {
-            OTP_CTRL->WR_DATA = otp_buffer[i++];
-            length -= 4;
+            OTP_CTRL->WR_DATA = buffer[i++];
+            length -= (length < 4) ? length : 4;
         }
     }
 
@@ -142,6 +142,9 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 {
     uint8_t remain_length = length & 0x3;
     uint32_t len = (length + 0x3) & ~0x3;
+    
+    if ((offset + length) > 0x1000)
+        return HAL_INVALIAD_PARAM;
 
     otp_check_power_ready();
 
