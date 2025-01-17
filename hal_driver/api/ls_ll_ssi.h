@@ -3,6 +3,7 @@
 #include "HAL_def.h"
 #include "ssi_misc.h"
 #include "field_manipulate.h"
+#include "reg_ssi_type.h"
 #include "ls_msp_ssi.h"
 
 #ifdef __cplusplus
