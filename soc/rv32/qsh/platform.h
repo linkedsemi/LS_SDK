@@ -82,12 +82,19 @@ static inline void cpu_intr1_clr(void)
 
 static inline void app_cpu_reset(void)
 {
-    SYSC_SEC_CPU->APP_CPU_SRST = 0;
+    SYSC_SEC_CPU->APP_CPU_SRST = 0x2; /* reset */
 }
 
 static inline void app_cpu_dereset(void)
 {
-    SYSC_SEC_CPU->APP_CPU_SRST = 1;
+    SYSC_SEC_CPU->APP_CPU_ADDR_CFG = 0x10080000; /* set cpu1 pc addr */
+    SYSC_SEC_CPU->APP_CPU_SRST = 0x1; /* release reset */
+}
+
+static inline void app_cpu_dereset_by_addr(uint32_t pc_addr)
+{
+    SYSC_SEC_CPU->APP_CPU_ADDR_CFG = pc_addr; /* set cpu1 pc addr */
+    SYSC_SEC_CPU->APP_CPU_SRST = 0x1; /* release reset */
 }
 
 static inline void app_cpu_reset_pc(uint32_t addr)
