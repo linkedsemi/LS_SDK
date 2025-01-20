@@ -6,6 +6,8 @@
 #define ONEBIT_BYTES (0x20)
 #define FIFO_DEPTH_BYTES (0x20)
 
+#define SINGLE_WRITE_MAX_LENGTH (0x20)
+
 static void otp_check_power_ready()
 {
     while (1)
@@ -25,7 +27,7 @@ void HAL_OTP_CTRL_Init()
 
     REG_FIELD_WR(OTP_CTRL->PIN, OTP_CTRL_PIN_PTRIM, 1);
 
-#ifndef ROM_CODE
+#ifndef BOOT_ROM
     DELAY_US(50);
 #else
     DELAY_US(50);//TODO
@@ -86,13 +88,13 @@ HAL_StatusTypeDef HAL_OTP_Write_bit(uint32_t offset, uint8_t bit_field)
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
+HAL_StatusTypeDef HAL_OTP_Write_256Bit(uint32_t offset, uint8_t *data, uint32_t length)
 {
     uint32_t i;
-    uint32_t buffer[0x20];
+    uint32_t buffer[SINGLE_WRITE_MAX_LENGTH];
     uint8_t *p_buffer = (uint8_t *)buffer;
 
-    if ((offset + length) > 0x1000)
+    if (((offset + length) > 0x1000) || (length > SINGLE_WRITE_MAX_LENGTH))
         return HAL_INVALIAD_PARAM;
 
     otp_check_power_ready();
@@ -136,6 +138,25 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
     while (OTP_CTRL->INTR_RAW == 0x0) ; /* wait program done */
 
     return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
+{
+    uint32_t current_length;
+    HAL_StatusTypeDef return_val = HAL_OK;
+    
+    while (length)
+    {
+        current_length = (length > SINGLE_WRITE_MAX_LENGTH) ? SINGLE_WRITE_MAX_LENGTH : length;
+        return_val = HAL_OTP_Write_256Bit(offset, data, current_length);
+        if (return_val != HAL_OK)
+            return return_val;
+
+        offset += current_length;
+        data += current_length;
+    }
+
+    return return_val;
 }
 
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)

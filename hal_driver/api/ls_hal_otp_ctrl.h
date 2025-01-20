@@ -18,6 +18,8 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length);
 
 HAL_StatusTypeDef HAL_OTP_Write_bit(uint32_t offset, uint8_t bit_field);
 
+HAL_StatusTypeDef HAL_OTP_Write_256Bit(uint32_t offset, uint8_t *data, uint32_t length);
+
 HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length);
 
 

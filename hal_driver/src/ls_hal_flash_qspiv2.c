@@ -10,7 +10,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flash_init)
     lsqspiv2_init();
 }
 
-static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_enter,)
+void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_enter,)
 {
     uint8_t dummy;
     struct lsqspiv2_stg_cfg cfg;
@@ -76,7 +76,7 @@ static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_exit,)
 static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,){}
 static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_exit,){}
 #else
-static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
+void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
 {
     uint8_t dummy;
     struct lsqspiv2_stg_cfg cfg;

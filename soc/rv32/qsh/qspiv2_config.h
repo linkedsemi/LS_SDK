@@ -14,7 +14,7 @@ extern "C" {
 #define QSPI_CS_SETUP 2
 
 //(neg,delay) = (0,0),(1,1),(0,1),(1,2)
-#ifdef ROM_CODE
+#ifdef BOOT_ROM
 #define QSPI_CAPTURE_DELAY 0
 #define QSPI_CAPTURE_NEG 0
 #else

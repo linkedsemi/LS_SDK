@@ -116,6 +116,7 @@ static void block_data_out(uint8_t *out)
     }
 }
 
+#ifndef BOOT_ROM
 static void crypt_data_in_Padding_PKCS7(const uint8_t *in_src, uint8_t *in_res,uint8_t read_length)
 {
     for (int i = 0; i < BLOCK_SIZE; i++)
@@ -179,6 +180,7 @@ static void crypt_data_in_Padding_ISO10126(const uint8_t *in_src, uint8_t *in_re
         }
     }
 }
+#endif
 
 static void crypt_data_in()
 {
@@ -186,6 +188,7 @@ static void crypt_data_in()
     if (read_length != BLOCK_SIZE)
     {
         uint8_t data_buffer[BLOCK_SIZE];
+#ifndef BOOT_ROM
         switch (crypt_padding_mode)
         {
         case Padding_PKCS7:
@@ -203,6 +206,7 @@ static void crypt_data_in()
         default:
             break;
         }
+#endif
         block_data_in(data_buffer);
     }
     else

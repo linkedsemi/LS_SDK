@@ -49,6 +49,10 @@ struct lsqspiv2_stg_cfg
 
 void lsqspiv2_init(void);
 
+void hal_flash_dual_xip_mode_enter();
+
+void hal_flash_quad_xip_mode_enter();
+
 void lsqspiv2_direct_quad_read_config(void);
 
 void lsqspiv2_direct_dual_read_config(void);
