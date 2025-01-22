@@ -118,7 +118,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_pwm.c',
         # 'src/ls_hal_pdm.c',
         # 'src/ls_hal_pdm_dma.c',
-        # 'src/ls_hal_dmacv3.c',
+        'src/ls_hal_dmacv3.c',
         # 'src/ls_hal_cec.c',
         # 'src/ls_hal_owm.c',
         # 'src/ls_hal_cap.c',
