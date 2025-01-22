@@ -154,6 +154,7 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
 
         offset += current_length;
         data += current_length;
+        length -= current_length;
     }
 
     return return_val;
