@@ -27,10 +27,10 @@ void HAL_OTP_CTRL_Init()
 
     REG_FIELD_WR(OTP_CTRL->PIN, OTP_CTRL_PIN_PTRIM, 1);
 
-#ifndef BOOT_ROM
-    DELAY_US(50);
+#ifdef BOOT_ROM
+    ROM_DELAY_US(50);
 #else
-    DELAY_US(50);//TODO
+    DELAY_US(50);
 #endif
 }
 

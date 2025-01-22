@@ -34,10 +34,16 @@ void flash_swint_init();
 #define FLASH_SWINT_HANDLER SWINT_Handler_ASM
 #endif
 
+#ifdef BOOT_ROM
+void rom_delay(uint32_t us);
+#define ROM_DELAY_US(a) rom_delay(a)
+#define ROM_DELAY_MS(a) rom_delay((a) * 1000)
+#endif
+
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
-#define FLASH_SWINT_NUM RV_SOFT_IRQN
+#define FLASH_SWINT_NUM QSPI1_IRQN
 #define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
 
 static inline void cpu_intr0_unmask(void)
