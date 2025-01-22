@@ -25,6 +25,11 @@ extern "C" {
 #define LTPI_SCM_SLV_ADDR       0x80000000
 #define SEC_QSPI1_ADDR          0x40000000
 #define SEC_IOPMP_ADDR          0x40001000
+#define SEC_IOPMP1_ADDR         0x40001000
+#define SEC_IOPMP2_ADDR         0x40001400
+#define SEC_IOPMP3_ADDR         0x40001800
+#define SEC_IOPMP4_ADDR         0x40001C00
+#define SEC_IOPMP5_ADDR         0x40002000
 #define SEC_CALC_SHA_ADDR       0x40002800
 #define SEC_OTP_CTRL_ADDR       0x40003000
 #define SEC_NIST_TRNG_ADDR      0x40004000
