@@ -57,7 +57,7 @@ static ALWAYS_INLINE void sys_write32(uint32_t data, mem_addr_t addr)
 }
 #endif
 
-inline static uint32_t addr2napot(uint32_t addr, uint32_t size)
+inline static uint32_t addr2napot(uint32_t addr, uint64_t size)
 {
     return ((addr >> 2) |(size - 1) >> 3);
 }
@@ -96,17 +96,21 @@ inline static void iopmp_config_region(uint32_t dev, uint8_t idx, uint32_t addr,
 }
 
 inline static void iopmp_config_region_napot4(uint32_t dev, uint8_t idx,
-                                    uint32_t addr, uint32_t size,
+                                    uint32_t addr, uint64_t size,
                                     bool read, bool write, bool exe, bool lock)
 {
-    iopmp_cfg_attr_t iopmp_cfg_attr = {
-        .COMP_READ = read,
-        .COMP_WRITE = write,
-        .COMP_EXCUT = exe,
-        .COMP_ADDR_MODE = IOPMP_MODE_NAPOT,
-        .COMP_LOCK = lock,
-    };
-    iopmp_config_region(dev, idx, addr2napot(addr, size), iopmp_cfg_attr);
+    if (addr % size != 0) {
+        return;
+    } else {
+        iopmp_cfg_attr_t iopmp_cfg_attr = {
+            .COMP_READ = read,
+            .COMP_WRITE = write,
+            .COMP_EXCUT = exe,
+            .COMP_ADDR_MODE = IOPMP_MODE_NAPOT,
+            .COMP_LOCK = lock,
+        };
+        iopmp_config_region(dev, idx, addr2napot(addr, size), iopmp_cfg_attr);
+    }
 }
 
 inline static void iopmp_config_region_tor(uint32_t dev, uint8_t idx, uint32_t addr,
