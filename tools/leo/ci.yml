@@ -203,6 +203,11 @@ leo_ssi_it_build:
   script:
     - cd examples/peripheral/ssi/ssi_it && scons flags=-Werror ic=leo
 
+leo_ssi_exflash:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ssi_exflash && scons flags=-Werror ic=leo
+
 leo_Basic_PWM_build:
   stage: build
   script:
