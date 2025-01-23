@@ -122,6 +122,7 @@ SDK详细介绍，请参考[凌思文档中心](http://ls-doc.rtfd.io/)
 | peripheral/ssi/ll_ssi_it                                                  |  √     |  √     |  √     |
 | peripheral/ssi/ssi_dma                                                    |  √     |  √     |  √     |
 | peripheral/ssi/ssi_it                                                     |  √     |  √     |  √     |
+| peripheral/ssi/ssi_exflash                                                |        |        |  √     |
 | peripheral/timer/Basic_PWM                                                |  √     |  √     |  √     |
 | peripheral/timer/Basic_TIM                                                |  √     |  √     |  √     |
 | peripheral/timer/DTC_PWM                                                  |  √     |  √     |  √     |
