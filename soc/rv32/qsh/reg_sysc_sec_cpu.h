@@ -66,6 +66,14 @@ typedef struct
     volatile uint32_t KEYMGR_KEY1_11; //0xf4
 } reg_sysc_sec_cpu_t;
 
+#define RESET_SOURCE_BOR09 (0x01)
+#define RESET_SOURCE_BOR33 (0x02)
+#define RESET_SOURCE_PAD   (0x04)
+#define RESET_SOURCE_IWDT  (0x08)
+#define RESET_SOURCE_SFT   (0x10)
+#define RESET_SOURCE_CPU   (0x20)
+#define RESET_SOURCE_IKY   (0x40)
+
 enum SYSC_SEC_CPU_REG_CPU_SYSC_FIELD {
     SYSC_SEC_CPU_PMU_IWDT_DBG_MASK = (int)0x1,
     SYSC_SEC_CPU_PMU_IWDT_DBG_POS = 0,

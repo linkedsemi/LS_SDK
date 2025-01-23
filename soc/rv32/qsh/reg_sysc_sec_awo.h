@@ -17,7 +17,7 @@ typedef struct
     volatile uint32_t DPLL2_CTRL2; //0x1c
     volatile uint32_t RESERVED1[1];
     volatile uint32_t DBG_RST_CTRL; //0x24
-    volatile uint32_t PD_AWO_CLKG_SRST; //0x28
+    volatile uint32_t CLKG_DIV_DPLL; //0x28
     volatile uint32_t PD_AWO_CLK_CTRL0; //0x2c
     volatile uint32_t PD_AWO_CLK_CTRL1; //0x30
     volatile uint32_t RESERVED2[1];
@@ -47,6 +47,12 @@ typedef struct
     volatile uint32_t FUNC_IOT_LOCK; //0x88
 #endif
 } reg_sysc_sec_awo_t;
+
+#define SEC_AWO_REG_CLK_SEL_HSI              (0x01)
+#define SEC_AWO_REG_CLK_SEL_HSE              (0x02)
+#define SEC_AWO_REG_CLK_SEL_CLIKIN           (0x04)
+#define SEC_AWO_REG_CLK_SEL_DPLL_DIV         (0x08)
+#define SEC_AWO_REG_CLK_SEL_DPLL_600M        (0x10)
 
 enum SYSC_SEC_AWO_REG_SLP_HLD_CTRL_FIELD {
     SYSC_SEC_AWO_SLP_HLD_DLY_MASK = (int)0x3f,
@@ -90,11 +96,11 @@ enum SYSC_SEC_AWO_REG_DBG_RST_CTRL_FIELD {
     SYSC_SEC_AWO_DBG_RST_STP_DLY_POS = 4,
 };
 
-enum SYSC_SEC_AWO_REG_PD_AWO_CLKG_SRST_FIELD {
-    SYSC_SEC_AWO_CLKG_SET_DIV_HBUS_MASK = (int)0x1,
-    SYSC_SEC_AWO_CLKG_SET_DIV_HBUS_POS = 0,
-    SYSC_SEC_AWO_CLKG_CLR_DIV_HBUS_MASK = (int)0x2,
-    SYSC_SEC_AWO_CLKG_CLR_DIV_HBUS_POS = 1,
+enum SYSC_SEC_AWO_REG_CLKG_DIV_DPLL_FIELD {
+    SYSC_SEC_AWO_CLKG_DIV_DPLL_SET_MASK = (int)0x1,
+    SYSC_SEC_AWO_CLKG_DIV_DPLL_SET_POS = 0,
+    SYSC_SEC_AWO_CLKG_DIV_DPLL_CLR_MASK = (int)0x2,
+    SYSC_SEC_AWO_CLKG_DIV_DPLL_CLR_POS = 1,
 };
 
 enum SYSC_SEC_AWO_REG_PD_AWO_CLK_CTRL0_FIELD {
