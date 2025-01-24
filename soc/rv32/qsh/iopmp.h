@@ -1,20 +1,20 @@
 #ifndef _IOPMP_H
 #define _IOPMP_H
 
-#define MD_CFG      0x00
-#define IOPMP_CFG0  0x04
-#define IOPMP_CFG1  0x08
-#define IOPMP_CFG2  0x0C
-#define IOPMP_CFG3  0x10
-#define IOPMP_ADDR0 0x14
-#define IOPMP_ADDR1 0x18
-#define IOPMP_ADDR2 0x1C
-#define IOPMP_ADDR3 0x20
-#define IOPMP_ADDR4 0x24
-#define IOPMP_ADDR5 0x28
-#define IOPMP_ADDR6 0x2C
-#define IOPMP_ADDR7 0x30
-#define INTR_CLR    0x34
+#define IOPMP_MD_CFG      0x00
+#define IOPMP_CFG0        0x04
+#define IOPMP_CFG1        0x08
+#define IOPMP_CFG2        0x0C
+#define IOPMP_CFG3        0x10
+#define IOPMP_ADDR0       0x14
+#define IOPMP_ADDR1       0x18
+#define IOPMP_ADDR2       0x1C
+#define IOPMP_ADDR3       0x20
+#define IOPMP_ADDR4       0x24
+#define IOPMP_ADDR5       0x28
+#define IOPMP_ADDR6       0x2C
+#define IOPMP_ADDR7       0x30
+#define IOPMP_INTR_CLR    0x34
 
 #define IOPMP_MODE_NONE   0x0
 #define IOPMP_MODE_TOR    0x1
@@ -67,7 +67,7 @@ inline static void iopmp_config_enable(uint32_t dev, bool enable)
     md_cfg_t md_cfg;
     md_cfg.IOPMP_EN = 1;
     md_cfg.MD_EN = 1;
-    sys_write32(md_cfg.value, dev + MD_CFG);
+    sys_write32(md_cfg.value, dev + IOPMP_MD_CFG);
 }
 
 inline static void iopmp_set_pmpaddrx(uint32_t dev, uint8_t idx, uint32_t addr)
