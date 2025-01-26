@@ -5,6 +5,7 @@
 #include "core_rv32.h"
 #include "platform.h"
 #include "sys_stat.h"
+#include "dmac_config.h"
 
 __attribute__((__unused__))
 static SSI_HandleTypeDef *ssi_inst_env[1];
@@ -34,16 +35,28 @@ void HAL_SSI_MSP_Idle_Set(struct __SSI_HandleTypeDef *hssi)
 {
 }
 
-__attribute__((__unused__))
 uint8_t HAL_SSI_TX_DMA_Handshake_Get(struct __SSI_HandleTypeDef *hssi)
 {
-    return 0;
+    uint8_t ret = 0;
+    switch((uint32_t)hssi->REG) {
+        case APP_DWSPI3_ADDR: ret = DMA_SPI3_TX; break;
+        case APP_DWSPI4_ADDR: ret = DMA_SPI4_TX; break;
+        default: break;
+    }
+
+    return ret;
 }
 
-__attribute__((__unused__))
 uint8_t HAL_SSI_RX_DMA_Handshake_Get(struct __SSI_HandleTypeDef *hssi)
 {
-    return 0;
+    uint8_t ret = 0;
+    switch((uint32_t)hssi->REG) {
+        case APP_DWSPI3_ADDR: ret = DMA_SPI3_RX; break;
+        case APP_DWSPI4_ADDR: ret = DMA_SPI4_RX; break;
+        default: break;
+    }
+
+    return ret;
 }
 
 __attribute__((weak))
