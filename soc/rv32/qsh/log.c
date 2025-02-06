@@ -19,7 +19,7 @@
 #define RAM_LOG_BUF_SIZE 10000
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
 char ram_array[RAM_LOG_BUF_SIZE];
-bool log_uart_en = true;
+bool log_uart_en;
 int count = 0;
 __attribute((weak)) void (*log_output_fn)(bool linefeed, const char *format, ...);
 __attribute((weak)) void (*log_hex_output_fn)(const void *data_pointer, uint16_t data_length);
