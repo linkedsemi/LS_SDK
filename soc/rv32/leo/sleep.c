@@ -31,7 +31,8 @@ void cpu_sleep_recover_init()
 {
     V33_RG->SFT_CTRL03 =(((uint32_t)cpu_recover_asm)>>1)<<24; 
 }
-
+#pragma GCC push_options
+#pragma GCC optimize("Os")
 void XIP_BANNED_FUNC(store_sp,)   
 {
     CPU_SP = __get_SP();
@@ -47,7 +48,7 @@ void XIP_BANNED_FUNC(restore_sp,)
     __set_MTVT((uint32_t)interrupt_vector);
     __set_SP(CPU_SP);
 }
-
+#pragma GCC pop_options
 void XIP_BANNED_FUNC(before_wfi,)
 {
 
