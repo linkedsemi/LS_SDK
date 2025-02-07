@@ -57,6 +57,8 @@ enum padding_mode
     Padding_ISO10126,
 };
 
+void HAL_LSCRYPT_SetRandFunc(void *func);
+
 /** \brief LSCRYPT Initialize 
  *  \return status 
  */

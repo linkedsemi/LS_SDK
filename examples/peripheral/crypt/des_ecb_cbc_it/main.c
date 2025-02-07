@@ -83,6 +83,7 @@ uint32_t expected_length = sizeof(cbc_ecb_plaintext);
 void des_init(void)
 {
     HAL_LSCRYPT_Init();
+    HAL_LSCRYPT_SetRandFunc(rand);
 }
 
 // des

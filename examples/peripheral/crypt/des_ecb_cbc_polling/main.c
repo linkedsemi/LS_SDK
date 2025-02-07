@@ -64,6 +64,7 @@ uint32_t length;
 void des_init(void)
 {
     HAL_LSCRYPT_Init();
+    HAL_LSCRYPT_SetRandFunc(rand);
 }
 
 // des

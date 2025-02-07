@@ -188,6 +188,7 @@ int main()
 {
     sys_init_none();
     HAL_LSCRYPT_Init();
+    HAL_LSCRYPT_SetRandFunc(rand);
     crypt_cbc_ecb_test();
 }
 

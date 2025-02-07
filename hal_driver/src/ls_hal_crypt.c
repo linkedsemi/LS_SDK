@@ -2,7 +2,6 @@
 #include "ls_msp_crypt.h"
 #include "field_manipulate.h"
 #include "ls_dbg.h"
-#include <stdlib.h>
 #include <string.h>
 #define AES_BLOCK_SIZE 16
 #define DES_BLOCK_SIZE 8
@@ -13,6 +12,12 @@ static uint32_t length_in;
 static uint32_t length_out;
 static uint32_t length_residue;
 static enum padding_mode crypt_padding_mode = Padding_None;
+static int (* crypt_rand_func)(void);
+
+void HAL_LSCRYPT_SetRandFunc(void *func)
+{
+    crypt_rand_func = func;
+}
 
 HAL_StatusTypeDef HAL_LSCRYPT_Init(void)
 {
@@ -116,7 +121,6 @@ static void block_data_out(uint8_t *out)
     }
 }
 
-#ifndef BOOT_ROM
 static void crypt_data_in_Padding_PKCS7(const uint8_t *in_src, uint8_t *in_res,uint8_t read_length)
 {
     for (int i = 0; i < BLOCK_SIZE; i++)
@@ -176,11 +180,10 @@ static void crypt_data_in_Padding_ISO10126(const uint8_t *in_src, uint8_t *in_re
         else
         {
             length_out += 1;
-            in_res[i] = i == BLOCK_SIZE - 1 ? BLOCK_SIZE - read_length : rand() % 256;
+            in_res[i] = i == BLOCK_SIZE - 1 ? BLOCK_SIZE - read_length : crypt_rand_func() % 256;
         }
     }
 }
-#endif
 
 static void crypt_data_in()
 {
@@ -188,7 +191,6 @@ static void crypt_data_in()
     if (read_length != BLOCK_SIZE)
     {
         uint8_t data_buffer[BLOCK_SIZE];
-#ifndef BOOT_ROM
         switch (crypt_padding_mode)
         {
         case Padding_PKCS7:
@@ -206,7 +208,6 @@ static void crypt_data_in()
         default:
             break;
         }
-#endif
         block_data_in(data_buffer);
     }
     else

@@ -83,6 +83,7 @@ enum padding_mode mode;
 void des_init(void)
 {
     HAL_LSCRYPT_Init();
+    HAL_LSCRYPT_SetRandFunc(rand);
 }
 
 void crypt_ecb_test_128_None(void)

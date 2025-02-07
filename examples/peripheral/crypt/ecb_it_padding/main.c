@@ -218,6 +218,7 @@ int main()
     sys_init_none();
     HAL_LSCRYPT_Init();
     mode = Padding_None;
+    HAL_LSCRYPT_SetRandFunc(rand);
     encrypt_expected_length = sizeof(cbc_ecb_plaintext_aligned);
     crypt_cbc_ecb_test_128_None();
     mode = Padding_PKCS7;
