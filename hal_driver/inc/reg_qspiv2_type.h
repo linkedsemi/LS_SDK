@@ -163,6 +163,12 @@ enum LSQSPIV2_REG_INT_FIELD
     LSQSPIV2_INT_FSM_END_POS = 3,
 };
 
+enum LSQSPIV2_REG_PART0_LOCK
+{
+    LSQSPIV2_PART0_LOCK_MASK = (int)0x1,
+    LSQSPIV2_PART0_LOCK_POS = 0,
+};
+
 #ifdef __cplusplus
 }
 #endif
