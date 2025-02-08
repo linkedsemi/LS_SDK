@@ -124,6 +124,8 @@ typedef struct
     volatile uint32_t MODE_PAD_PU_PD; //0x3e4
     volatile uint32_t MODE_PAD_REN_DS0; //0x3e8
     volatile uint32_t MODE_PAD_DS1_FIR; //0x3ec
+    volatile uint32_t MODE_PAD_OE_DIN; //0x3f0
+    volatile uint32_t MODE_PAD_DOT; //0x3f4
 }reg_sec_pmu_rg_t;
 
 enum SEC_PMU_RG_REG_SFT_CTRL00_FIELD
@@ -746,35 +748,48 @@ enum SEC_PMU_RG_REG_IOK_DOT_FIELD
 
 enum SEC_PMU_RG_REG_MODE_PAD_LOCK_ST_FIELD
 {
-    SEC_PMU_RG_MODE_PAD_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_LOCK_MASK = (int)0xf,
     SEC_PMU_RG_MODE_PAD_LOCK_POS = 0,
-    SEC_PMU_RG_MODE_PAD_ST_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_ST_MASK = (int)0xf0000,
     SEC_PMU_RG_MODE_PAD_ST_POS = 16,
 };
 
 enum SEC_PMU_RG_REG_MODE_PAD_PU_PD_FIELD
 {
-    SEC_PMU_RG_MODE_PAD_PU_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_PU_MASK = (int)0xf,
     SEC_PMU_RG_MODE_PAD_PU_POS = 0,
-    SEC_PMU_RG_MODE_PAD_PD_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_PD_MASK = (int)0xf0000,
     SEC_PMU_RG_MODE_PAD_PD_POS = 16,
 };
 
 enum SEC_PMU_RG_REG_MODE_PAD_REN_DS0_FIELD
 {
-    SEC_PMU_RG_MODE_PAD_REN_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_REN_MASK = (int)0xf,
     SEC_PMU_RG_MODE_PAD_REN_POS = 0,
-    SEC_PMU_RG_MODE_PAD_DS0_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_DS0_MASK = (int)0xf0000,
     SEC_PMU_RG_MODE_PAD_DS0_POS = 16,
 };
 
 enum SEC_PMU_RG_REG_MODE_PAD_DS1_FIR_FIELD
 {
-    SEC_PMU_RG_MODE_PAD_DS1_MASK = (int)0xffff,
+    SEC_PMU_RG_MODE_PAD_DS1_MASK = (int)0xf,
     SEC_PMU_RG_MODE_PAD_DS1_POS = 0,
-    SEC_PMU_RG_MODE_PAD_FIR_MASK = (int)0xffff0000,
+    SEC_PMU_RG_MODE_PAD_FIR_MASK = (int)0xf0000,
     SEC_PMU_RG_MODE_PAD_FIR_POS = 16,
 };
 
+enum SEC_PMU_RG_REG_MODE_PAD_OE_DIN_FIELD
+{
+    SEC_PMU_RG_MODE_PAD_DIN_MASK = (int)0xf,
+    SEC_PMU_RG_MODE_PAD_DIN_POS = 0,
+    SEC_PMU_RG_MODE_PAD_OE_MASK = (int)0xf0000,
+    SEC_PMU_RG_MODE_PAD_OE_POS = 16,
+};
+
+enum SEC_PMU_RG_REG_MODE_PAD_DOT_FIELD
+{
+    SEC_PMU_RG_MODE_PAD_DOT_MASK = (int)0xf,
+    SEC_PMU_RG_MODE_PAD_DOT_POS = 0,
+};
 #endif
 
