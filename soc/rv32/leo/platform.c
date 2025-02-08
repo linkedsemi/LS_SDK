@@ -41,7 +41,7 @@ __attribute__((weak)) void SystemInit(){
     enable_global_irq();
 }
 
-static inline void shut_down_hsi()
+__attribute__((always_inline)) static inline void shut_down_hsi()
 {
     V33_RG->PMU_SET_VAL = 1 << V33_RG_CLK_SET_HSE_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS;
     V33_RG->PMU_SET_VAL = V33_RG_PMU_SET_TGGL_MASK | 1 << V33_RG_CLK_SET_HSE_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS;
