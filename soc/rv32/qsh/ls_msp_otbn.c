@@ -10,19 +10,13 @@
 
 void HAL_LSOTBN_MSP_Init(void)
 {
+    REG_FIELD_WR(SYSC_SEC_CPU->INTR_CTRL_INTR_MSK, SYSC_SEC_CPU_I_EDN_URND_REQ, 0);
     SYSC_SEC_CPU->PD_CPU_CLKG[1] = SYSC_SEC_CPU_CLKG_CLR_OTBN_MASK;
     SYSC_SEC_CPU->PD_CPU_SRST[1] = SYSC_SEC_CPU_SRST_CLR_OTBN_MASK;
     SYSC_SEC_CPU->PD_CPU_SRST[1] = SYSC_SEC_CPU_SRST_SET_OTBN_MASK;
     SYSC_SEC_CPU->PD_CPU_CLKG[1] = SYSC_SEC_CPU_CLKG_SET_OTBN_MASK;
-    rv_set_int_isr(OBTN_IRQN, HAL_OTBN_IRQHandler);
-    csi_vic_clear_pending_irq(OBTN_IRQN);
-    csi_vic_enable_irq(OBTN_IRQN);
-    rv_set_int_isr(OTBN_SYSC_IRQN, HAL_OTBN_SYSC_IRQHandler);
-    csi_vic_clear_pending_irq(OTBN_SYSC_IRQN);
-    csi_vic_enable_irq(OTBN_SYSC_IRQN);
 
     REG_FIELD_WR(SYSC_SEC_CPU->OTBN_CTRL2, SYSC_SEC_CPU_EDN_URND_FIPS, 1);
-    REG_FIELD_WR(SYSC_SEC_CPU->INTR_CTRL_INTR_MSK, SYSC_SEC_CPU_I_EDN_URND_REQ, 0);
 
     for (uint8_t i = 0; i < 16; i++)
     {
@@ -39,6 +33,13 @@ void HAL_LSOTBN_MSP_Init(void)
     SYSC_SEC_CPU->INTR_CTRL_INTR_MSK = FIELD_BUILD(SYSC_SEC_CPU_I_EDN_RND_REQ, 1) |
                               FIELD_BUILD(SYSC_SEC_CPU_I_EDN_URND_REQ, 1) |
                               FIELD_BUILD(SYSC_SEC_CPU_I_OTBN_OTP_REQ, 1);
+                              
+    rv_set_int_isr(OBTN_IRQN, HAL_OTBN_IRQHandler);
+    csi_vic_clear_pending_irq(OBTN_IRQN);
+    csi_vic_enable_irq(OBTN_IRQN);
+    rv_set_int_isr(OTBN_SYSC_IRQN, HAL_OTBN_SYSC_IRQHandler);
+    csi_vic_clear_pending_irq(OTBN_SYSC_IRQN);
+    csi_vic_enable_irq(OTBN_SYSC_IRQN);
 }
 
 void HAL_LSOTBN_MSP_DeInit(void)
