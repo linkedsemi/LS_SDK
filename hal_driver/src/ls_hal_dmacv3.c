@@ -77,7 +77,7 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
         }
         if(status_int & DMAC_DSTT_MASK)
         {
-
+            int_process(hdma,&hdma->Instance->STATUSDSTTRAN,&hdma->Instance->CLEARDSTTRAN,false);
         }
         if(status_int & DMAC_SRCT_MASK)
         {
