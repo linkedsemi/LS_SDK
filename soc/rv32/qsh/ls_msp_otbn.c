@@ -21,10 +21,10 @@ void HAL_LSOTBN_MSP_Init(void)
     for (uint8_t i = 0; i < 16; i++)
     {
         while (!REG_FIELD_RD(SYSC_SEC_CPU->OTBN_INTR_RAW, SYSC_SEC_CPU_I_EDN_URND_REQ)) ;
-        SYSC_SEC_CPU->INTR_CLR_MSK = SYSC_SEC_CPU_I_EDN_URND_REQ_MASK;
         SYSC_SEC_CPU->EDN_URND_BUS = i + 1;
         REG_FIELD_WR(SYSC_SEC_CPU->OTBN_CTRL2, SYSC_SEC_CPU_EDN_URND_ACK, 1);
         REG_FIELD_WR(SYSC_SEC_CPU->OTBN_CTRL2, SYSC_SEC_CPU_EDN_URND_ACK, 0);
+        SYSC_SEC_CPU->INTR_CLR_MSK = SYSC_SEC_CPU_I_EDN_URND_REQ_MASK;
     }
 
     SYSC_SEC_CPU->INTR_CLR_MSK = FIELD_BUILD(SYSC_SEC_CPU_I_EDN_RND_REQ, 1) |
@@ -73,15 +73,15 @@ void HAL_OTBN_SYSC_IRQHandler()
     }
     if (intr & CO_BIT(8))
     {
-        SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(8);
         SYSC_SEC_CPU->EDN_RND_BUS = 0x3c3c5a5a;  // TODO
         SYSC_SEC_CPU->OTBN_CTRL2 |= CO_BIT(8);
+        SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(8);
     }
     if (intr & CO_BIT(9))
     {
-        SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(9);
         SYSC_SEC_CPU->EDN_URND_BUS = 0x3c3c5a5a;  // TODO
         SYSC_SEC_CPU->OTBN_CTRL2 |= CO_BIT(10);
+        SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(9);
     }
     if (intr & CO_BIT(10))
     {
