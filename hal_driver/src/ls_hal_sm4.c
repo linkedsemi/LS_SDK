@@ -66,7 +66,7 @@ static void sm4_data_length_inout_config(const uint8_t *data, uint32_t length, u
     writeflag = true;
     crypt_in = data;
     crypt_out = result;
-    LSSM4->SM4_CTRL |= (uint8_t)(length / 16 - 1) << SM4_CALC_LEN_POS;
+    REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_LEN, (uint8_t)(length / 16 - 1));
 }
 
 static void sm4_start()
@@ -364,10 +364,10 @@ bool HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
     if ((nonce == NULL) || (tag == NULL) || (tag_size > SM4_BLOCK_SIZE) || (tag_size < SM4_MIN_AUTH_TAG_SIZE) ||
         ((aad == NULL) && (aad_size > 0)) || (nonce_size == 0) || (((in_size != 0) && ((in == NULL) || (out == NULL)))))
     {
-        return HAL_INVALIAD_PARAM;
+        return false;
     }
     
-    REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,1);
+    REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,0);
 
     uint8_t gcm_h[SM4_BLOCK_SIZE] = {0};
     uint8_t c_j0[SM4_BLOCK_SIZE] = {0};
@@ -417,6 +417,7 @@ void HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_s
 {
     memset((uint8_t *)gcm, 0x0, sizeof(sm4_gcm_env));
     gcm->counter_size = nonce_size;
+    REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,0);
 
     if (nonce_size == SM4_MIN_AUTH_TAG_SIZE)
     {
