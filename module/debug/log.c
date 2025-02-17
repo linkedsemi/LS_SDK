@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "log.h"
 #include "mini-printf.h"
 #include "SEGGER_RTT.h"
@@ -27,6 +26,7 @@
 #endif
 #endif
 #define RAM_LOG_BUF_SIZE 10000
+static const uint8_t linefeed_value = 0xA;
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
 char ram_array[RAM_LOG_BUF_SIZE];
 bool log_en;
@@ -175,16 +175,41 @@ int __write (int fd, char *ptr, int len)
 }
 #endif
 
+int mini_puts(char* ptr, int len, void* buf)
+{
+    #if(LOG_BACKEND&JLINK_RTT)
+    {
+        SEGGER_RTT_Write(0, ptr, len);
+    }
+    #endif
+    #if(LOG_BACKEND&UART_LOG)
+    {
+        uart_log_tx(ptr,len);
+    }
+    #endif
+    #if(LOG_BACKEND&RAM_LOG)
+    {
+        ram_log_print(ptr,len);
+    }
+    #endif
+    #if(LOG_BACKEND&SEMIHOSTING)
+    {
+        if (get_semihosting_state()){
+            semihosting_puts(ptr, len);
+        }
+    }
+    #endif
+    return len;
+}
+
 void log_output(bool linefeed,const char *format,...)
 {
     va_list args;
     va_start(args,format);
-    vprintf(format,args);
+    mini_vpprintf(mini_puts, NULL, format, args);
     va_end(args);
     if(linefeed)
-    {
-        putchar('\n');
-    }
+        mini_puts((void *)&linefeed_value, 1, NULL);
 }
 
 void ls_log_init()
@@ -242,7 +267,7 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     }
     *bufptr = '\n'; bufptr ++;
     *bufptr = '\0';
-    printf("%s",log_format_buff);
+    mini_vpprintf(mini_puts, NULL, log_format_buff, "%s");
 }
 
 void ram_log_print(char *ptr, int len)
