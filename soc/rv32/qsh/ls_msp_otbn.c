@@ -4,9 +4,10 @@
 #include "reg_sysc_sec_cpu.h"
 #include "core_rv32.h"
 #include "platform.h"
+#include "co_math.h"
 #include "qsh.h"
 
-#define CO_BIT(pos) (1UL<<(pos))
+static uint32_t EDN_URND_BUS_IN;
 
 void HAL_LSOTBN_MSP_Init(void)
 {
@@ -16,12 +17,10 @@ void HAL_LSOTBN_MSP_Init(void)
     SYSC_SEC_CPU->PD_CPU_SRST[1] = SYSC_SEC_CPU_SRST_SET_OTBN_MASK;
     SYSC_SEC_CPU->PD_CPU_CLKG[1] = SYSC_SEC_CPU_CLKG_SET_OTBN_MASK;
 
-    REG_FIELD_WR(SYSC_SEC_CPU->OTBN_CTRL2, SYSC_SEC_CPU_EDN_URND_FIPS, 1);
-
     for (uint8_t i = 0; i < 16; i++)
     {
         while (!REG_FIELD_RD(SYSC_SEC_CPU->OTBN_INTR_RAW, SYSC_SEC_CPU_I_EDN_URND_REQ)) ;
-        SYSC_SEC_CPU->EDN_URND_BUS = i + 1;
+        SYSC_SEC_CPU->EDN_URND_BUS = ++EDN_URND_BUS_IN;
         REG_FIELD_WR(SYSC_SEC_CPU->OTBN_CTRL2, SYSC_SEC_CPU_EDN_URND_ACK, 1);
         REG_FIELD_WR(SYSC_SEC_CPU->OTBN_CTRL2, SYSC_SEC_CPU_EDN_URND_ACK, 0);
         SYSC_SEC_CPU->INTR_CLR_MSK = SYSC_SEC_CPU_I_EDN_URND_REQ_MASK;
@@ -73,22 +72,22 @@ void HAL_OTBN_SYSC_IRQHandler()
     }
     if (intr & CO_BIT(8))
     {
-        SYSC_SEC_CPU->EDN_RND_BUS = 0x3c3c5a5a;  // TODO
+        SYSC_SEC_CPU->EDN_RND_BUS = ++EDN_URND_BUS_IN;  // TODO
         SYSC_SEC_CPU->OTBN_CTRL2 |= CO_BIT(8);
         SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(8);
     }
     if (intr & CO_BIT(9))
     {
-        SYSC_SEC_CPU->EDN_URND_BUS = 0x3c3c5a5a;  // TODO
+        SYSC_SEC_CPU->EDN_URND_BUS = ++EDN_URND_BUS_IN;  // TODO
         SYSC_SEC_CPU->OTBN_CTRL2 |= CO_BIT(10);
         SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(9);
     }
     if (intr & CO_BIT(10))
     {
-        SYSC_SEC_CPU->OTBN_OTP_KEY_0 = 0x3c3c5a5a;  // TODO
-        SYSC_SEC_CPU->OTBN_OTP_KEY_1 = 0x3c3c5a5a;
-        SYSC_SEC_CPU->OTBN_OTP_KEY_2 = 0x3c3c5a5a;
-        SYSC_SEC_CPU->OTBN_OTP_KEY_3 = 0x3c3c5a5a;
+        SYSC_SEC_CPU->OTBN_OTP_KEY_0 = ++EDN_URND_BUS_IN;  // TODO
+        SYSC_SEC_CPU->OTBN_OTP_KEY_1 = ++EDN_URND_BUS_IN;
+        SYSC_SEC_CPU->OTBN_OTP_KEY_2 = ++EDN_URND_BUS_IN;
+        SYSC_SEC_CPU->OTBN_OTP_KEY_3 = ++EDN_URND_BUS_IN;
         SYSC_SEC_CPU->OTBN_CTRL2 |= CO_BIT(12);
         SYSC_SEC_CPU->INTR_CLR_MSK = CO_BIT(10);
     }
