@@ -327,6 +327,7 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32/qsh/exception_entry.S
     ../soc/rv32/qsh/delay_asm.S
     ../soc/rv32/qsh/ls_msp_uart.c
+    ../soc/rv32/qsh/ls_msp_dmacv3.c
     ../soc/rv32/qsh/ls_soc_gpio.c
     ../soc/rv32/qsh/sys_stat.c
     ../soc/rv32/qsh/platform.c
@@ -337,6 +338,7 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/ls_hal_flash_swint.c
     ../hal_driver/src/ls_hal_cache.c
     ../hal_driver/src/ls_hal_ssi.c
+    ../hal_driver/src/ls_hal_dmacv3.c
     ../soc/rv32/qsh/ls_msp_qspiv2.c
     ../soc/rv32/qsh/ls_msp_cache.c
     ../soc/rv32/qsh/ls_msp_ssi.c
