@@ -2,10 +2,11 @@
 #include "ls_msp_otp_ctrl.h"
 #include "field_manipulate.h"
 #include "platform.h"
+#include <string.h>
 
-#define ONEBIT_BYTES (0x20)
-#define FIFO_DEPTH_BYTES (0x20)
-
+#define ONEBIT_BYTES            (0x20)
+#define FIFO_DEPTH_BYTES        (0x20)
+#define OTP_BYTE_DEFAULT_VALUE  (0xFF)
 #define SINGLE_WRITE_MAX_LENGTH (0x20)
 
 static void otp_check_power_ready()
@@ -160,13 +161,34 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
     return return_val;
 }
 
+static uint32_t otp_read_en_check(uint32_t offset, uint32_t length)
+{
+    uint32_t bit_start = offset / ONEBIT_BYTES;
+    uint32_t bit_end = (offset + length - 1) / ONEBIT_BYTES;
+
+    for (uint32_t i = bit_start; i <= bit_end; i++)
+    {
+        if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20)) & 0x1)
+            return i * 0x20;
+    }
+
+    return 0xFFFFFFFF;
+}
+
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 {
-    uint8_t remain_length = length & 0x3;
-    uint32_t len = (length + 0x3) & ~0x3;
-    
     if ((offset + length) > 0x1000)
         return HAL_INVALIAD_PARAM;
+
+    uint32_t error_len = otp_read_en_check(offset, length);
+    if (error_len != 0xFFFFFFFF)
+    {
+        memset(data + error_len, OTP_BYTE_DEFAULT_VALUE, length - error_len);
+        length = error_len;
+    }
+
+    uint32_t remain_length = length & 0x3;
+    uint32_t len = (length + 0x3) & ~0x3;
 
     otp_check_power_ready();
 
