@@ -22,13 +22,32 @@ typedef struct
     volatile uint32_t TX_DAT3;
     volatile uint32_t TX_DAT4;
     volatile uint32_t TX_DAT5;
-    volatile uint32_t RESERVED1[2];
+    volatile uint32_t TX_DAT6;
+    volatile uint32_t TX_DAT7;
     volatile uint32_t RX_DAT0;
     volatile uint32_t RX_DAT1;
     volatile uint32_t RX_DAT2;
     volatile uint32_t RX_DAT3;
     volatile uint32_t RX_DAT4;
     volatile uint32_t RX_DAT5;
+    volatile uint32_t RX_DAT6;
+    volatile uint32_t RX_DAT7;
+    volatile uint32_t TX_H_DAT0;
+    volatile uint32_t TX_H_DAT1;
+    volatile uint32_t TX_H_DAT2;
+    volatile uint32_t TX_H_DAT3;
+    volatile uint32_t TX_H_DAT4;
+    volatile uint32_t TX_H_DAT5;
+    volatile uint32_t TX_H_DAT6;
+    volatile uint32_t TX_H_DAT7;
+    volatile uint32_t RX_H_DAT0;
+    volatile uint32_t RX_H_DAT1;
+    volatile uint32_t RX_H_DAT2;
+    volatile uint32_t RX_H_DAT3;
+    volatile uint32_t RX_H_DAT4;
+    volatile uint32_t RX_H_DAT5;
+    volatile uint32_t RX_H_DAT6;
+    volatile uint32_t RX_H_DAT7;
 } reg_peci_t;
 
 enum PECI_REG_INTR_MSK_FIELD
@@ -49,8 +68,12 @@ enum PECI_REG_PECI_CTRL_FIELD
     PECI_PRE_DIV_POS = 0,
     PECI_FLT_NUM_MASK = (int)0xf00,
     PECI_FLT_NUM_POS = 8,
-    PECI_DAT_LEN_MASK = (int)0x1f000,
+    PECI_DAT_LEN_MASK = (int)0x3ff000,
     PECI_DAT_LEN_POS = 12,
+    PECI_DAT_WLEN_MASK = (int)0x7fc00000,
+    PECI_DAT_WLEN_POS = 22,
+    PECI_WT_MODE_MASK = (int)0x1,
+    PECI_WT_MODE_POS = 31,
 };
 
 enum PECI_REG_TXRX_REQ_FIELD
