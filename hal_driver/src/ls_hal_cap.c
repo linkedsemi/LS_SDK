@@ -45,7 +45,7 @@ HAL_StatusTypeDef HAL_CAP_Start(uint8_t channel, uint8_t cap_mode, bool enable_i
     }
     else
     {
-        CAP->INTR_MSK = CO_BIT(channel) | CO_BIT(channel+8) | CO_BIT(channel+16);
+        CAP->INTR_MSK |= CO_BIT(channel) | CO_BIT(channel+8) | CO_BIT(channel+16);
     }
     return HAL_OK;
 }
