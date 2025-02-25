@@ -3032,6 +3032,8 @@ void pinmux_cjtag_init(void)
 {
     per_func_enable(DEBUG_CJTAG_TCK, 3); // TCK
     per_func_enable(DEBUG_CJTAG_TMS, 3); // TMS
+    io_cfg_input(DEBUG_CJTAG_TCK);
+    io_cfg_input(DEBUG_CJTAG_TMS);
 }
 
 void pinmux_cjtag_deinit(void)

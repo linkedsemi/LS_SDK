@@ -1169,15 +1169,15 @@ extern "C" {
 #define SGPIO2_MST_DO_FUNC4_PK10_FUNC   PINMUX_FUNC4
 #define SGPIO2_MST_DI_FUNC4_PK11_FUNC   PINMUX_FUNC4
 
-#define QSPI1_CLK_PIN      (PA00)
-#define QSPI1_CSN_PIN      (PA01)
-#define QSPI1_IO0_SI_PIN   (PA02)
-#define QSPI1_IO1_SO_PIN   (PA03)
-#define QSPI1_IO2_WP_PIN   (PA04)
-#define QSPI1_IO3_HOLD_PIN (PA05)
+#define QSPI1_CLK_PIN      (PD10)
+#define QSPI1_CSN_PIN      (PD11)
+#define QSPI1_IO0_SI_PIN   (PD12)
+#define QSPI1_IO1_SO_PIN   (PD13)
+#define QSPI1_IO2_WP_PIN   (PD14)
+#define QSPI1_IO3_HOLD_PIN (PD15)
 
-#define DEBUG_CJTAG_TCK (PN06)
-#define DEBUG_CJTAG_TMS (PN07)
+#define DEBUG_CJTAG_TCK (PE05)
+#define DEBUG_CJTAG_TMS (PE04)
 
 #ifdef __cplusplus
 }
