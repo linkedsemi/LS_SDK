@@ -256,5 +256,13 @@
 #define PT13 (0xed)   /*!< GPIOT13 selected */
 #define PT14 (0xee)   /*!< GPIOT14 selected */
 #define PT15 (0xef)   /*!< GPIOT15 selected */
+//GPIOV
+#define PV00 (0xf0)   /*!< GPIOT00 selected */
+#define PV01 (0xf1)   /*!< GPIOT01 selected */
+#define PV02 (0xf2)   /*!< GPIOT02 selected */
+#define PV03 (0xf3)   /*!< GPIOT03 selected */
+#define PV04 (0xf4)   /*!< GPIOT04 selected */
+#define PV05 (0xf5)   /*!< GPIOT05 selected */
+
 
 #endif /* LS_SOC_GPIO_DEF_H_ */
