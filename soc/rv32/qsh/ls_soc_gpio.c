@@ -975,16 +975,28 @@ ROM_SYMBOL void pinmux_hal_flash_deinit(void)
 
 ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
 {
+    per_func_enable(QSPI1_CLK_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_CSN_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_IO0_SI_PIN, PINMUX_FUNC3);
+    per_func_enable(QSPI1_IO1_SO_PIN, PINMUX_FUNC3);
     per_func_enable(QSPI1_IO2_WP_PIN, PINMUX_FUNC3);
     per_func_enable(QSPI1_IO3_HOLD_PIN, PINMUX_FUNC3);
     io_pull_write(QSPI1_IO2_WP_PIN, IO_PULL_UP);
     io_pull_write(QSPI1_IO3_HOLD_PIN, IO_PULL_UP);
+    io_cfg_input(QSPI1_CLK_PIN);
+    io_cfg_input(QSPI1_CSN_PIN);
+    io_cfg_input(QSPI1_IO0_SI_PIN);
+    io_cfg_input(QSPI1_IO1_SO_PIN);
     io_cfg_input(QSPI1_IO2_WP_PIN);
     io_cfg_input(QSPI1_IO3_HOLD_PIN);
 }
 
 ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
 {
+    per_func_disable(QSPI1_CLK_PIN, PINMUX_FUNC3);
+    per_func_disable(QSPI1_CSN_PIN, PINMUX_FUNC3);
+    per_func_disable(QSPI1_IO0_SI_PIN, PINMUX_FUNC3);
+    per_func_disable(QSPI1_IO1_SO_PIN, PINMUX_FUNC3);
     per_func_disable(QSPI1_IO2_WP_PIN, 2);
     per_func_disable(QSPI1_IO3_HOLD_PIN, 2);
 }
