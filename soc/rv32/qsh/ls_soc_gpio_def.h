@@ -256,5 +256,12 @@
 #define PT13 (0xed)   /*!< GPIOT13 selected */
 #define PT14 (0xee)   /*!< GPIOT14 selected */
 #define PT15 (0xef)   /*!< GPIOT15 selected */
+#define QSPI1_CSN_PIN      (0xf0)
+#define QSPI1_CLK_PIN      (0xf1)
+#define QSPI1_IO0_SI_PIN   (0xf2)
+#define QSPI1_IO1_SO_PIN   (0xf3)
+#define QSPI1_IO2_WP_PIN   (0xf4)
+#define QSPI1_IO3_HOLD_PIN (0xf5)
+
 
 #endif /* LS_SOC_GPIO_DEF_H_ */
