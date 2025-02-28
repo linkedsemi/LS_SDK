@@ -5,6 +5,22 @@
 
 #define APP_PMU ((reg_app_pmu_rg_t *)APP_PMU_RG_APP_ADDR)
 
+typedef struct {
+    volatile uint32_t RESERVED;
+    volatile uint32_t PU1_PU0;
+    volatile uint32_t PD_PU2;
+    volatile uint32_t IEN1_IEN0;
+    volatile uint32_t DS1_DS0;
+    volatile uint32_t AE_DS2;
+    volatile uint32_t OD_FIR;
+    volatile uint32_t SL_ST;
+} reg_io_cfg_t;
+
+typedef struct {
+    volatile uint32_t OE_DIN;
+    volatile uint32_t DOC_DOS;
+} reg_io_val_t;
+
 typedef struct
 {
     volatile uint32_t RESERVED0[11];
@@ -15,227 +31,17 @@ typedef struct
     volatile uint32_t RESERVED2[1];
     volatile uint32_t PASSTHROUGH_INTR_MSK_CLR; //0x50
     volatile uint32_t PASSTHROUGH_INTR_RAW_STT; //0x54
-    volatile uint32_t RESERVED3[10];
-    volatile uint32_t GPIOA_INTR_MSK; //0x80
-    volatile uint32_t GPIOB_INTR_MSK; //0x84
-    volatile uint32_t GPIOC_INTR_MSK; //0x88
-    volatile uint32_t GPIOD_INTR_MSK; //0x8c
-    volatile uint32_t GPIOE_INTR_MSK; //0x90
-    volatile uint32_t GPIOF_INTR_MSK; //0x94
-    volatile uint32_t GPIOG_INTR_MSK; //0x98
-    volatile uint32_t GPIOH_INTR_MSK; //0x9c
-    volatile uint32_t GPIOI_INTR_MSK; //0xa0
-    volatile uint32_t GPIOJ_INTR_MSK; //0xa4
-    volatile uint32_t GPIOK_INTR_MSK; //0xa8
-    volatile uint32_t GPIOM_INTR_MSK; //0xac
-    volatile uint32_t GPION_INTR_MSK; //0xb0
-    volatile uint32_t GPIOQ_INTR_MSK; //0xb4
-    volatile uint32_t GPIOT_INTR_MSK; //0xb8
-    volatile uint32_t RESERVED4[1];
-    volatile uint32_t GPIOA_INTR_CLR; //0xc0
-    volatile uint32_t GPIOB_INTR_CLR; //0xc4
-    volatile uint32_t GPIOC_INTR_CLR; //0xc8
-    volatile uint32_t GPIOD_INTR_CLR; //0xcc
-    volatile uint32_t GPIOE_INTR_CLR; //0xd0
-    volatile uint32_t GPIOF_INTR_CLR; //0xd4
-    volatile uint32_t GPIOG_INTR_CLR; //0xd8
-    volatile uint32_t GPIOH_INTR_CLR; //0xdc
-    volatile uint32_t GPIOI_INTR_CLR; //0xe0
-    volatile uint32_t GPIOJ_INTR_CLR; //0xe4
-    volatile uint32_t GPIOK_INTR_CLR; //0xe8
-    volatile uint32_t GPIOM_INTR_CLR; //0xec
-    volatile uint32_t GPION_INTR_CLR; //0xf0
-    volatile uint32_t GPIOQ_INTR_CLR; //0xf4
-    volatile uint32_t GPIOT_INTR_CLR; //0xf8
-    volatile uint32_t RESERVED5[1];
-    volatile uint32_t GPIOA_INTR_STT; //0x100
-    volatile uint32_t GPIOB_INTR_STT; //0x104
-    volatile uint32_t GPIOC_INTR_STT; //0x108
-    volatile uint32_t GPIOD_INTR_STT; //0x10c
-    volatile uint32_t GPIOE_INTR_STT; //0x110
-    volatile uint32_t GPIOF_INTR_STT; //0x114
-    volatile uint32_t GPIOG_INTR_STT; //0x118
-    volatile uint32_t GPIOH_INTR_STT; //0x11c
-    volatile uint32_t GPIOI_INTR_STT; //0x120
-    volatile uint32_t GPIOJ_INTR_STT; //0x124
-    volatile uint32_t GPIOK_INTR_STT; //0x128
-    volatile uint32_t GPIOM_INTR_STT; //0x12c
-    volatile uint32_t GPION_INTR_STT; //0x130
-    volatile uint32_t GPIOQ_INTR_STT; //0x134
-    volatile uint32_t GPIOT_INTR_STT; //0x138
-    volatile uint32_t RESERVED6[1];
-    volatile uint32_t GPIOA_INTR_RAW; //0x140
-    volatile uint32_t GPIOB_INTR_RAW; //0x144
-    volatile uint32_t GPIOC_INTR_RAW; //0x148
-    volatile uint32_t GPIOD_INTR_RAW; //0x14c
-    volatile uint32_t GPIOE_INTR_RAW; //0x150
-    volatile uint32_t GPIOF_INTR_RAW; //0x154
-    volatile uint32_t GPIOG_INTR_RAW; //0x158
-    volatile uint32_t GPIOH_INTR_RAW; //0x15c
-    volatile uint32_t GPIOI_INTR_RAW; //0x160
-    volatile uint32_t GPIOJ_INTR_RAW; //0x164
-    volatile uint32_t GPIOK_INTR_RAW; //0x168
-    volatile uint32_t GPIOM_INTR_RAW; //0x16c
-    volatile uint32_t GPION_INTR_RAW; //0x170
-    volatile uint32_t GPIOQ_INTR_RAW; //0x174
-    volatile uint32_t GPIOT_INTR_RAW; //0x178
-    volatile uint32_t RESERVED7[1];
-    volatile uint32_t IOA_LOCK; //0x180
-    volatile uint32_t IOA_PU0_PU1; //0x184
-    volatile uint32_t IOA_PU2_PD; //0x188
-    volatile uint32_t IOA_REN; //0x18c
-    volatile uint32_t IOA_DS0_DS1; //0x190
-    volatile uint32_t IOA_DS2_AE; //0x194
-    volatile uint32_t IOA_FIR_ODE; //0x198
-    volatile uint32_t IOA_ST_SL; //0x19c
-    volatile uint32_t IOB_LOCK; //0x1a0
-    volatile uint32_t IOB_PU0_PU1; //0x1a4
-    volatile uint32_t IOB_PU2_PD; //0x1a8
-    volatile uint32_t IOB_REN; //0x1ac
-    volatile uint32_t IOB_DS0_DS1; //0x1b0
-    volatile uint32_t IOB_DS2_AE; //0x1b4
-    volatile uint32_t IOB_FIR_ODE; //0x1b8
-    volatile uint32_t IOB_ST_SL; //0x1bc
-    volatile uint32_t IOC_LOCK; //0x1c0
-    volatile uint32_t IOC_PU0_PU1; //0x1c4
-    volatile uint32_t IOC_PU2_PD; //0x1c8
-    volatile uint32_t IOC_REN; //0x1cc
-    volatile uint32_t IOC_DS0_DS1; //0x1d0
-    volatile uint32_t IOC_DS2_AE; //0x1d4
-    volatile uint32_t IOC_FIR_ODE; //0x1d8
-    volatile uint32_t IOC_ST_SL; //0x1dc
-    volatile uint32_t IOD_LOCK; //0x1e0
-    volatile uint32_t IOD_PU0_PU1; //0x1e4
-    volatile uint32_t IOD_PU2_PD; //0x1e8
-    volatile uint32_t IOD_REN; //0x1ec
-    volatile uint32_t IOD_DS0_DS1; //0x1f0
-    volatile uint32_t IOD_DS2_AE; //0x1f4
-    volatile uint32_t IOD_FIR_ODE; //0x1f8
-    volatile uint32_t IOD_ST_SL; //0x1fc
-    volatile uint32_t IOE_LOCK; //0x200
-    volatile uint32_t IOE_PU0_PU1; //0x204
-    volatile uint32_t IOE_PU2_PD; //0x208
-    volatile uint32_t IOE_REN; //0x20c
-    volatile uint32_t IOE_DS0_DS1; //0x210
-    volatile uint32_t IOE_DS2_AE; //0x214
-    volatile uint32_t IOE_FIR_ODE; //0x218
-    volatile uint32_t IOE_ST_SL; //0x21c
-    volatile uint32_t IOF_LOCK; //0x220
-    volatile uint32_t IOF_PU0_PU1; //0x224
-    volatile uint32_t IOF_PU2_PD; //0x228
-    volatile uint32_t IOF_REN; //0x22c
-    volatile uint32_t IOF_DS0_DS1; //0x230
-    volatile uint32_t IOF_DS2_AE; //0x234
-    volatile uint32_t IOF_FIR_ODE; //0x238
-    volatile uint32_t IOF_ST_SL; //0x23c
-    volatile uint32_t IOG_LOCK; //0x240
-    volatile uint32_t IOG_PU0_PU1; //0x244
-    volatile uint32_t IOG_PU2_PD; //0x248
-    volatile uint32_t IOG_REN; //0x24c
-    volatile uint32_t IOG_DS0_DS1; //0x250
-    volatile uint32_t IOG_DS2_AE; //0x254
-    volatile uint32_t IOG_FIR_ODE; //0x258
-    volatile uint32_t IOG_ST_SL; //0x25c
-    volatile uint32_t IOH_LOCK; //0x260
-    volatile uint32_t IOH_PU0_PU1; //0x264
-    volatile uint32_t IOH_PU2_PD; //0x268
-    volatile uint32_t IOH_REN; //0x26c
-    volatile uint32_t IOH_DS0_DS1; //0x270
-    volatile uint32_t IOH_DS2_AE; //0x274
-    volatile uint32_t IOH_FIR_ODE; //0x278
-    volatile uint32_t IOH_ST_SL; //0x27c
-    volatile uint32_t IOI_LOCK; //0x280
-    volatile uint32_t IOI_PU0_PU1; //0x284
-    volatile uint32_t IOI_PU2_PD; //0x288
-    volatile uint32_t IOI_REN; //0x28c
-    volatile uint32_t IOI_DS0_DS1; //0x290
-    volatile uint32_t IOI_DS2_AE; //0x294
-    volatile uint32_t IOI_FIR_ODE; //0x298
-    volatile uint32_t IOI_ST_SL; //0x29c
-    volatile uint32_t IOJ_LOCK; //0x2a0
-    volatile uint32_t IOJ_PU0_PU1; //0x2a4
-    volatile uint32_t IOJ_PU2_PD; //0x2a8
-    volatile uint32_t IOJ_REN; //0x2ac
-    volatile uint32_t IOJ_DS0_DS1; //0x2b0
-    volatile uint32_t IOJ_DS2_AE; //0x2b4
-    volatile uint32_t IOJ_FIR_ODE; //0x2b8
-    volatile uint32_t IOJ_ST_SL; //0x2bc
-    volatile uint32_t IOK_LOCK; //0x2c0
-    volatile uint32_t IOK_PU0_PU1; //0x2c4
-    volatile uint32_t IOK_PU2_PD; //0x2c8
-    volatile uint32_t IOK_REN; //0x2cc
-    volatile uint32_t IOK_DS0_DS1; //0x2d0
-    volatile uint32_t IOK_DS2_AE; //0x2d4
-    volatile uint32_t IOK_FIR_ODE; //0x2d8
-    volatile uint32_t IOK_ST_SL; //0x2dc
-    volatile uint32_t IOM_LOCK; //0x2e0
-    volatile uint32_t IOM_PU0_PU1; //0x2e4
-    volatile uint32_t IOM_PU2_PD; //0x2e8
-    volatile uint32_t IOM_REN; //0x2ec
-    volatile uint32_t IOM_DS0_DS1; //0x2f0
-    volatile uint32_t IOM_DS2_AE; //0x2f4
-    volatile uint32_t IOM_FIR_ODE; //0x2f8
-    volatile uint32_t IOM_ST_SL; //0x2fc
-    volatile uint32_t ION_LOCK; //0x300
-    volatile uint32_t ION_PU0_PU1; //0x304
-    volatile uint32_t ION_PU2_PD; //0x308
-    volatile uint32_t ION_REN; //0x30c
-    volatile uint32_t ION_DS0_DS1; //0x310
-    volatile uint32_t ION_DS2_AE; //0x314
-    volatile uint32_t ION_FIR_ODE; //0x318
-    volatile uint32_t ION_ST_SL; //0x31c
-    volatile uint32_t IOQ_LOCK; //0x320
-    volatile uint32_t IOQ_PU0_PU1; //0x324
-    volatile uint32_t IOQ_PU2_PD; //0x328
-    volatile uint32_t IOQ_REN; //0x32c
-    volatile uint32_t IOQ_DS0_DS1; //0x330
-    volatile uint32_t IOQ_DS2_AE; //0x334
-    volatile uint32_t IOQ_FIR_ODE; //0x338
-    volatile uint32_t IOQ_ST_SL; //0x33c
-    volatile uint32_t IOT_LOCK; //0x340
-    volatile uint32_t IOT_PU0_PU1; //0x344
-    volatile uint32_t IOT_PU2_PD; //0x348
-    volatile uint32_t IOT_REN; //0x34c
-    volatile uint32_t IOT_DS0_DS1; //0x350
-    volatile uint32_t IOT_DS2_AE; //0x354
-    volatile uint32_t IOT_FIR_ODE; //0x358
-    volatile uint32_t IOT_ST_SL; //0x35c
-    volatile uint32_t IOA_DIN_OE; //0x360
-    volatile uint32_t IOA_DOT; //0x364
-    volatile uint32_t IOB_DIN_OE; //0x368
-    volatile uint32_t IOB_DOT; //0x36c
-    volatile uint32_t IOC_DIN_OE; //0x370
-    volatile uint32_t IOC_DOT; //0x374
-    volatile uint32_t IOD_DIN_OE; //0x378
-    volatile uint32_t IOD_DOT; //0x37c
-    volatile uint32_t IOE_DIN_OE; //0x380
-    volatile uint32_t IOE_DOT; //0x384
-    volatile uint32_t IOF_DIN_OE; //0x388
-    volatile uint32_t IOF_DOT; //0x38c
-    volatile uint32_t IOG_DIN_OE; //0x390
-    volatile uint32_t IOG_DOT; //0x394
-    volatile uint32_t IOH_DIN_OE; //0x398
-    volatile uint32_t IOH_DOT; //0x39c
-    volatile uint32_t IOI_DIN_OE; //0x3a0
-    volatile uint32_t IOI_DOT; //0x3a4
-    volatile uint32_t IOJ_DIN_OE; //0x3a8
-    volatile uint32_t IOJ_DOT; //0x3ac
-    volatile uint32_t IOK_DIN_OE; //0x3b0
-    volatile uint32_t IOK_DOT; //0x3b4
-    volatile uint32_t IOM_DIN_OE; //0x3b8
-    volatile uint32_t IOM_DOT; //0x3bc
-    volatile uint32_t ION_DIN_OE; //0x3c0
-    volatile uint32_t ION_DOT; //0x3c4
-    volatile uint32_t IOQ_DIN_OE; //0x3c8
-    volatile uint32_t IOQ_DOT; //0x3cc
-    volatile uint32_t IOT_DIN_OE; //0x3d0
-    volatile uint32_t IOT_DOT; //0x3d4
-    volatile uint32_t RESERVED8[2];
-    volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
-    volatile uint32_t MODE_PAD_PU_PD; //0x3e4
-    volatile uint32_t MODE_PAD_REN_DS0; //0x3e8
-    volatile uint32_t MODE_PAD_DS1_FIR; //0x3ec
+    volatile uint32_t RESERVED3[2];
+    reg_io_cfg_t QSPI1_PAD_CFG;//0x60
+    volatile uint32_t GPIO_INTR_MSK[16]; //0x80
+    volatile uint32_t GPIO_INTR_CLR[16]; //0xc0
+    volatile uint32_t GPIO_INTR_STT[16]; //0x100
+    volatile uint32_t GPIO_INTR_RAW[16]; //0x140
+    reg_io_cfg_t IO_CFG[15];//0x180
+    reg_io_val_t IO_VAL[16];//0x360
+    reg_io_cfg_t PECI_PAD_CFG;//0x3e0
 } reg_app_pmu_rg_t;
+_Static_assert(sizeof(reg_app_pmu_rg_t) == 0x400, "reg_app_pmu_rg_t size error.");
 
 enum APP_PMU_RG_REG_CLKG_SRST_FIELD {
     APP_PMU_RG_CLKG_SET_TIM_MASK = (int)0x1,
