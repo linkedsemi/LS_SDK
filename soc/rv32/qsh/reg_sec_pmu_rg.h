@@ -9,7 +9,13 @@
 
 typedef struct {
     volatile uint32_t LOCK;
-    volatile uint32_t RESERVED[7];
+    volatile uint32_t PU1_PU0;
+    volatile uint32_t PD_PU2;
+    volatile uint32_t IEN1_IEN0;
+    volatile uint32_t DS1_DS0;
+    volatile uint32_t AE_DS2;
+    volatile uint32_t OD_FIR;
+    volatile uint32_t SL_ST;
 } reg_io_cfg_t;
 
 typedef struct {
@@ -39,9 +45,14 @@ typedef struct
     volatile uint32_t GPIO_INTR_RAW[16]; //0x140
     reg_io_cfg_t IO_CFG[15];//0x180 GPIO[A-T]
     reg_io_val_t IO_VAL[16];//0x360
-    reg_io_cfg_t MODE_PAD_CFG;//0x3e0
+    volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
+    volatile uint32_t MODE_PAD_PU_PD; //0x3e4
+    volatile uint32_t MODE_PAD_REN_DS0; //0x3e8
+    volatile uint32_t MODE_PAD_DS1_FIR; //0x3ec
+    volatile uint32_t MODE_PAD_OE_DIN; //0x3f0
+    volatile uint32_t MODE_PAD_DOT; //0x3f4
 }reg_sec_pmu_rg_t;
-_Static_assert(sizeof(reg_sec_pmu_rg_t) == 0x400, "reg_sec_pmu_rg_t size error.");
+_Static_assert(sizeof(reg_sec_pmu_rg_t) == 0x3f8, "reg_sec_pmu_rg_t size error.");
 
 enum SEC_PMU_RG_REG_SFT_CTRL00_FIELD
 {
