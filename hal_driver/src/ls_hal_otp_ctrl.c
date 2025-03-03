@@ -74,6 +74,9 @@ HAL_StatusTypeDef HAL_OTP_Write_bit(uint32_t offset, uint8_t bit_field)
     OTP_CTRL->READY = OTP_CTRL_READY_WRITE_EN_MASK;
     OTP_CTRL->WR_FIFO_CTRL = OTP_CTRL_WR_FIFO_RCLR_MASK | OTP_CTRL_WR_FIFO_WCLR_MASK;
     OTP_CTRL->WR_FIFO_CTRL = 0x0;
+#ifdef ROM_CODE
+    rom_delay(1);
+#endif
 
     OTP_CTRL->PIN = FIELD_BUILD(OTP_CTRL_PIN_PTRIM, 1) | FIELD_BUILD(OTP_CTRL_PIN_PA, offset) |
                     FIELD_BUILD(OTP_CTRL_PIN_PCE, 1) | FIELD_BUILD(OTP_CTRL_PIN_PPROG, 1) |
@@ -118,6 +121,9 @@ HAL_StatusTypeDef HAL_OTP_Write_256Bit(uint32_t offset, uint8_t *data, uint32_t 
     OTP_CTRL->READY = OTP_CTRL_READY_WRITE_EN_MASK;
     OTP_CTRL->WR_FIFO_CTRL = OTP_CTRL_WR_FIFO_RCLR_MASK | OTP_CTRL_WR_FIFO_WCLR_MASK;
     OTP_CTRL->WR_FIFO_CTRL = 0x0;
+#ifdef ROM_CODE
+        rom_delay(1);
+#endif
 
     OTP_CTRL->PIN = FIELD_BUILD(OTP_CTRL_PIN_PTRIM, 1) | FIELD_BUILD(OTP_CTRL_PIN_PA, offset) |
                     FIELD_BUILD(OTP_CTRL_PIN_PCE, 1) | FIELD_BUILD(OTP_CTRL_PIN_PPROG, 1) |
@@ -201,6 +207,9 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
     OTP_CTRL->READY = OTP_CTRL_READY_READ_EN_MASK;
     OTP_CTRL->RD_FIFO_CTRL = OTP_CTRL_RD_FIFO_RCLR_MASK | OTP_CTRL_RD_FIFO_WCLR_MASK;
     OTP_CTRL->RD_FIFO_CTRL = 0x0;
+#ifdef ROM_CODE
+        rom_delay(1);
+#endif
 
     OTP_CTRL->PIN = FIELD_BUILD(OTP_CTRL_PIN_PTRIM, 1) | FIELD_BUILD(OTP_CTRL_PIN_PA, offset) |
                     FIELD_BUILD(OTP_CTRL_PIN_PCE, 1) | FIELD_BUILD(OTP_CTRL_PIN_PPROG, 0) |
