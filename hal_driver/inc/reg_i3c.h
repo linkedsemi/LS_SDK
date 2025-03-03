@@ -1,0 +1,776 @@
+#ifndef REG_I3C_TYPE_H_
+#define REG_I3C_TYPE_H_
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
+
+typedef struct
+{
+    volatile uint32_t CFGR;                              //0x80
+    volatile uint32_t SCONFIG;                           /**< offset: 0x4 Target Configuration Register,  */
+    volatile uint32_t SSTATUS;                           /**< offset: 0x8 Target Status Register,  */
+    volatile uint32_t SCTRL;                             /**< offset: 0xC Target Control Register,  */
+    volatile uint32_t SINTSET;                           /**< offset: 0x10 Target Interrupt Set Register,  */
+    volatile uint32_t SINTCLR;                           /**< offset: 0x14 Target Interrupt Clear Register,  */
+    volatile uint32_t SINTMASKED;                        /**< offset: 0x18 Target Interrupt Mask Register,  */
+    volatile uint32_t SERRWARN;                          /**< offset: 0x1C Target Errors and Warnings Register,  */
+    volatile uint32_t SDMACTRL;                          /**< offset: 0x20 Target DMA Control Register,  */
+    volatile uint32_t RESERVED_1[2];
+    volatile uint32_t SDATACTRL;                         /**< offset: 0x2C Target Data Control Register,  */
+    volatile uint32_t SWDATAB;                           /**< offset: 0x30 Target Write Data Byte Register,  */
+    volatile uint32_t SWDATABE;                          /**< offset: 0x34 Target Write Data Byte End,  */
+    volatile uint32_t SWDATAH;                           /**< offset: 0x38 Target Write Data Half-word Register,  */
+    volatile uint32_t SWDATAHE;                          /**< offset: 0x3C Target Write Data Half-word End Register,  */
+    volatile uint32_t SRDATAB;                           /**< offset: 0x40 Target Read Data Byte Register,  */
+    volatile uint32_t RESERVED_2[1];
+    volatile uint32_t SRDATAH;                           /**< offset: 0x48 Target Read Data Half-word Register,  */
+    volatile uint32_t RESERVED_3[1];
+    volatile uint32_t IBIEXTIDATA;                       /**< offset: 0x50 Extended IBI Data fifo */
+    volatile uint32_t WDATAB1;                           /**< offset: 0x54 Target write Date Byte with DMA Register */
+    volatile uint32_t RESERVED_4[2];
+    volatile uint32_t SCAPABILITIES;                     /**< offset: 0x60 Target Capabilities Register,  */
+    volatile uint32_t SDYNADDR;                          /**< offset: 0x64 Target Dynamic Address Register,  */
+    volatile uint32_t SMAXLIMITS;                        /**< offset: 0x68 Target Maximum Limits Register,  */
+    volatile uint32_t SIDPARTNO;                         /**< offset: 0x6C Target ID Part Number Register,  */
+    volatile uint32_t SIDEXT;                            /**< offset: 0x70 Target ID Extension Register,  */
+    volatile uint32_t SVENDORID;                         /**< offset: 0x74 Target Vendor ID Register,  */
+    volatile uint32_t STCCLOCK;                          /**< offset: 0x78 Target Time Control Clock Register,  */
+    volatile uint32_t SMSGMAPADDR;                       /**< offset: 0x7CTarget Message-Mapped Address Register,  */
+    volatile uint32_t TIMINGR0;                          //0x80
+    volatile uint32_t TIMINGR1;                          //0x84
+    volatile uint32_t TIMINGR2;                          //0x88
+    volatile uint32_t CR;                                //0x8c
+    volatile uint32_t SR;                                //0x90
+    volatile uint32_t TDR;                               //0x94
+    volatile uint32_t RDR;                               //0x98
+    volatile uint32_t RESERVED1[41];
+    volatile uint32_t DEVRX[4];                          //0x140
+    volatile uint32_t IER;                               //0x150
+    volatile uint32_t CEVR;                              //0x154  
+    volatile uint32_t EVR;                               //0x158
+    volatile uint32_t IBIDR;                             //0x15c
+    volatile uint32_t SER;                               //0x160
+    volatile uint32_t RMR;                               //0x164
+    volatile uint32_t RESERVED_5[1];
+    volatile uint32_t SCONFIG2;                          //0x16c
+}I3C_TypeDef;
+
+enum I3C_REG_SCONFIG_FIELD
+{
+
+    I3C_SCONFIG_SADDR_MASK = (int)0xfe000000,
+    I3C_SCONFIG_SADDR_POS = 25,
+    I3C_SCONFIG_BAMATCH_MASK = (int)0xff0000,
+    I3C_SCONFIG_BAMATCH_POS = 16,
+    I3C_SCONFIG_HDR_CMD_MASK = (int)0xc00,
+    I3C_SCONFIG_HDR_CMD_POS = 10,
+    I3C_SCONFIG_OFFLINE_MASK = (int)0x200,
+    I3C_SCONFIG_OFFLINE_POS = 9,
+    I3C_SCONFIG_IDRAND_MASK = (int)0x100,
+    I3C_SCONFIG_IDRAND_POS = 8,
+    I3C_SCONFIG_BTOK_MASK = (int)0x20,
+    I3C_SCONFIG_BTOK_POS = 5,
+    I3C_SCONFIG_DDROK_MASK = (int)0x10,
+    I3C_SCONFIG_DDROK_POS = 4,
+    I3C_SCONFIG_S0IGNORE_MASK = (int)0x8,
+    I3C_SCONFIG_S0IGNORE_POS = 3,
+    I3C_SCONFIG_MATCHSS_MASK = (int)0x4,
+    I3C_SCONFIG_MATCHSS_POS = 2,
+    I3C_SCONFIG_SLVNACK_MASK = (int)0x2,
+    I3C_SCONFIG_SLVNACK_POS = 1,
+    I3C_SCONFIG_SLVENA_MASK = (int)0x1,
+    I3C_SCONFIG_SLVENA_POS = 0,
+};
+
+enum I3C_REG_SCONFIG2_FIELD
+{
+    I3C_SCONFIG2_CONTROLLER_RESET_PATTERN_DELAY_MASK = (int)0x10,
+    I3C_SCONFIG2_CONTROLLER_RESET_PATTERN_DELAY_POS = 4,
+    I3C_SCONFIG2_SDA_SCL_DELAY_MASK = (int)0xc,
+    I3C_SCONFIG2_SDA_SCL_DELAY_POS = 2,
+    I3C_SCONFIG2_CCCRCCC_DISABLE_MASK = (int)0x2,
+    I3C_SCONFIG2_CCCRCCC_DISABLE_POS = 1,
+    I3C_SCONFIG2_TARGET_CLOCK_EN_MASK = (int)0x1,
+    I3C_SCONFIG2_TARGET_CLOCK_EN_POS = 0,
+};
+
+enum I3C_REG_SSTATUS_FIELD
+{
+    I3C_SSTATUS_TIMECTRL_MASK = (int)0xc0000000,
+    I3C_SSTATUS_TIMECTRL_POS = 30,
+    I3C_SSTATUS_ACTSTATE_MASK = (int)0x30000000,
+    I3C_SSTATUS_ACTSTATE_POS = 28,
+    I3C_SSTATUS_HJDIS_MASK = (int)0x8000000,
+    I3C_SSTATUS_HJDIS_POS = 27,
+    I3C_SSTATUS_MRDIS_MASK = (int)0x2000000,
+    I3C_SSTATUS_MRDIS_POS = 25,
+    I3C_SSTATUS_IBIDIS_MASK = (int)0x1000000,
+    I3C_SSTATUS_IBIDIS_POS = 24,
+    I3C_SSTATUS_CRRQUSET_MASK = (int)0x400000,
+    I3C_SSTATUS_CRRQUSET_POS = 22,
+    I3C_SSTATUS_EVDET_MASK = (int)0x300000,
+    I3C_SSTATUS_EVDET_POS = 20,
+    I3C_SSTATUS_SLVRST_MASK = (int)0x80000,
+    I3C_SSTATUS_SLVRST_POS = 19,
+    I3C_SSTATUS_EVENT_MASK = (int)0x40000,
+    I3C_SSTATUS_EVENT_POS = 18,
+    I3C_SSTATUS_CHANDLED_MASK = (int)0x20000,
+    I3C_SSTATUS_CHANDLED_POS = 17,
+    I3C_SSTATUS_HDRMATCH_MASK = (int)0x10000,
+    I3C_SSTATUS_HDRMATCH_POS = 16,
+    I3C_SSTATUS_ERRWARN_MASK = (int)0x8000,
+    I3C_SSTATUS_ERRWARN_POS = 15,
+    I3C_SSTATUS_CCC_MASK = (int)0x4000,
+    I3C_SSTATUS_CCC_POS = 14,
+    I3C_SSTATUS_DACHG_MASK = (int)0x2000,
+    I3C_SSTATUS_DACHG_POS = 13,
+    I3C_SSTATUS_TXNOTFULL_MASK = (int)0x1000,
+    I3C_SSTATUS_TXNOTFULL_POS = 12,
+    I3C_SSTATUS_RXPEND_MASK = (int)0x800,
+    I3C_SSTATUS_RXPEND_POS = 11,
+    I3C_SSTATUS_STOP_MASK = (int)0x400,
+    I3C_SSTATUS_STOP_POS = 10,
+    I3C_SSTATUS_MATCHED_MASK = (int)0x200,
+    I3C_SSTATUS_MATCHED_POS = 9,
+    I3C_SSTATUS_START_MASK = (int)0x100,
+    I3C_SSTATUS_START_POS = 8,
+    I3C_SSTATUS_STHDR_MASK = (int)0x40,
+    I3C_SSTATUS_STHDR_POS = 6,
+    I3C_SSTATUS_STDAA_MASK = (int)0x20,
+    I3C_SSTATUS_STDAA_POS = 5,
+    I3C_SSTATUS_STREQWR_MASK = (int)0x10,
+    I3C_SSTATUS_STREQWR_POS = 4,
+    I3C_SSTATUS_STREQRD_MASK = (int)0x8,
+    I3C_SSTATUS_STREQRD_POS = 3,
+    I3C_SSTATUS_STCCCH_MASK = (int)0x4,
+    I3C_SSTATUS_STCCCH_POS = 2,
+    I3C_SSTATUS_STMSG_MASK = (int)0x2,
+    I3C_SSTATUS_STMSG_POS = 1,
+    I3C_SSTATUS_STNOTSTOP_MASK = (int)0x1,
+    I3C_SSTATUS_STNOTSTOP_POS = 0,
+};
+
+enum I3C_REG_SCTRL_FIELD
+{
+    I3C_SCTRL_VENDINFO_MASK = (int)0xff000000,
+    I3C_SCTRL_VENDINFO_POS = 24,
+    I3C_SCTRL_ACTSTATE_MASK = (int)0x300000,
+    I3C_SCTRL_ACTSTATE_POS = 20,
+    I3C_SCTRL_PENDINT_MASK = (int)0xf0000,
+    I3C_SCTRL_PENDINT_POS = 16,
+    I3C_SCTRL_IBIDATA_MASK = (int)0xff00,
+    I3C_SCTRL_IBIDATA_POS = 8,
+    I3C_SCTRL_MAPIDX_MASK = (int)0xf0,
+    I3C_SCTRL_MAPIDX_POS = 4,
+    I3C_SCTRL_EXTDATA_MASK = (int)0x8,
+    I3C_SCTRL_EXTDATA_POS = 3,
+    I3C_SCTRL_EVENT_MASK = (int)0x3,
+    I3C_SCTRL_EVENT_POS = 0,
+};
+
+enum I3C_REG_SINTSET_FIELD
+{
+    I3C_SINTSET_CE3_CHECK_END_MASK = (int)0x800000,
+    I3C_SINTSET_CE3_CHECK_END_POS = 23,
+    I3C_SINTSET_CRRQUSET_MASK = (int)0x400000,
+    I3C_SINTSET_CRRQUSET_POS = 22,
+    I3C_SINTSET_SLVRST_MASK = (int)0x80000,
+    I3C_SINTSET_SLVRST_POS = 19,
+    I3C_SINTSET_EVENT_MASK = (int)0x40000,
+    I3C_SINTSET_EVENT_POS = 18,
+    I3C_SINTSET_CHANDLED_MASK = (int)0x20000,
+    I3C_SINTSET_CHANDLED_POS = 17,
+    I3C_SINTSET_DDRMATCHED_MASK = (int)0x10000,
+    I3C_SINTSET_DDRMATCHED_POS = 16,
+    I3C_SINTSET_ERRWARN_MASK = (int)0x8000,
+    I3C_SINTSET_ERRWARN_POS = 15,
+    I3C_SINTSET_CCC_MASK = (int)0x4000,
+    I3C_SINTSET_CCC_POS = 14,
+    I3C_SINTSET_DACHG_MASK = (int)0x2000,
+    I3C_SINTSET_DACHG_POS = 13,
+    I3C_SINTSET_TXSEND_MASK = (int)0x1000,
+    I3C_SINTSET_TXSEND_POS = 12,
+    I3C_SINTSET_RXPEND_MASK = (int)0x800,
+    I3C_SINTSET_RXPEND_POS = 11,
+    I3C_SINTSET_STOP_MASK = (int)0x400,
+    I3C_SINTSET_STOP_POS = 10,
+    I3C_SINTSET_MATCHED_MASK = (int)0x200,
+    I3C_SINTSET_MATCHED_POS = 9,
+    I3C_SINTSET_START_MASK = (int)0x100,
+    I3C_SINTSET_START_POS = 8,
+};
+
+enum I3C_REG_SINTCLR_FIELD
+{
+    I3C_SINTCLR_CE3_CHECK_END_MASK = (int)0x800000,
+    I3C_SINTCLR_CE3_CHECK_END_POS = 23,
+    I3C_SINTCLR_CRRQUSET_MASK = (int)0x400000,
+    I3C_SINTCLR_CRRQUSET_POS = 22,
+    I3C_SINTCLR_SLVRST_MASK = (int)0x80000,
+    I3C_SINTCLR_SLVRST_POS = 19,
+    I3C_SINTCLR_EVENT_MASK = (int)0x40000,
+    I3C_SINTCLR_EVENT_POS = 18,
+    I3C_SINTCLR_CHANDLED_MASK = (int)0x20000,
+    I3C_SINTCLR_CHANDLED_POS = 17,
+    I3C_SINTCLR_DDRMATCHED_MASK = (int)0x10000,
+    I3C_SINTCLR_DDRMATCHED_POS = 16,
+    I3C_SINTCLR_ERRWARN_MASK = (int)0x8000,
+    I3C_SINTCLR_ERRWARN_POS = 15,
+    I3C_SINTCLR_CCC_MASK = (int)0x4000,
+    I3C_SINTCLR_CCC_POS = 14,
+    I3C_SINTCLR_DACHG_MASK = (int)0x2000,
+    I3C_SINTCLR_DACHG_POS = 13,
+    I3C_SINTCLR_TXSEND_MASK = (int)0x1000,
+    I3C_SINTCLR_TXSEND_POS = 12,
+    I3C_SINTCLR_RXPEND_MASK = (int)0x800,
+    I3C_SINTCLR_RXPEND_POS = 11,
+    I3C_SINTCLR_STOP_MASK = (int)0x400,
+    I3C_SINTCLR_STOP_POS = 10,
+    I3C_SINTCLR_MATCHED_MASK = (int)0x200,
+    I3C_SINTCLR_MATCHED_POS = 9,
+    I3C_SINTCLR_START_MASK = (int)0x100,
+    I3C_SINTCLR_START_POS = 8,
+    I3C_SINTCLR_IBI_VLD_MASK = (int)0x10,
+    I3C_SINTCLR_IBI_VLD_POS = 4,
+    I3C_SINTCLR_CRR_VLD_MASK = (int)0x8,
+    I3C_SINTCLR_CRR_VLD_POS = 3,
+    I3C_SINTCLR_HJ_VLD_MASK = (int)0x4,
+    I3C_SINTCLR_HJ_VLD_POS = 2,
+    I3C_SINTCLR_CRNFF_MASK = (int)0x2,
+    I3C_SINTCLR_CRNFF_POS = 1,
+    I3C_SINTCLR_FRAME_COMPLETE_MASK = (int)0x1,
+    I3C_SINTCLR_FRAME_COMPLETE_POS = 0,
+};
+
+enum I3C_REG_SINTMASKED_FIELD
+{
+    I3C_SINTMASK_CE3_CHECK_END_MASK = (int)0x800000,
+    I3C_SINTMASK_CE3_CHECK_END_POS = 23,
+    I3C_SINTMASK_CRRQUSET_MASK = (int)0x400000,
+    I3C_SINTMASK_CRRQUSET_POS = 22,
+    I3C_SINTMASK_SLVRST_MASK = (int)0x80000,
+    I3C_SINTMASK_SLVRST_POS = 19,
+    I3C_SINTMASK_EVENT_MASK = (int)0x40000,
+    I3C_SINTMASK_EVENT_POS = 18,
+    I3C_SINTMASK_CHANDLED_MASK = (int)0x20000,
+    I3C_SINTMASK_CHANDLED_POS = 17,
+    I3C_SINTMASK_DDRMATCHED_MASK = (int)0x10000,
+    I3C_SINTMASK_DDRMATCHED_POS = 16,
+    I3C_SINTMASK_ERRWARN_MASK = (int)0x8000,
+    I3C_SINTMASK_ERRWARN_POS = 15,
+    I3C_SINTMASK_CCC_MASK = (int)0x4000,
+    I3C_SINTMASK_CCC_POS = 14,
+    I3C_SINTMASK_DACHG_MASK = (int)0x2000,
+    I3C_SINTMASK_DACHG_POS = 13,
+    I3C_SINTMASK_TXSEND_MASK = (int)0x1000,
+    I3C_SINTMASK_TXSEND_POS = 12,
+    I3C_SINTMASK_RXPEND_MASK = (int)0x800,
+    I3C_SINTMASK_RXPEND_POS = 11,
+    I3C_SINTMASK_STOP_MASK = (int)0x400,
+    I3C_SINTMASK_STOP_POS = 10,
+    I3C_SINTMASK_MATCHED_MASK = (int)0x200,
+    I3C_SINTMASK_MATCHED_POS = 9,
+    I3C_SINTMASK_START_MASK = (int)0x100,
+    I3C_SINTMASK_START_POS = 8,
+    I3C_SINTMASK_IBI_VLD_MASK = (int)0x10,
+    I3C_SINTMASK_IBI_VLD_POS = 4,
+    I3C_SINTMASK_CRR_VLD_MASK = (int)0x8,
+    I3C_SINTMASK_CRR_VLD_POS = 3,
+    I3C_SINTMASK_HJ_VLD_MASK = (int)0x4,
+    I3C_SINTMASK_HJ_VLD_POS = 2,
+    I3C_SINTMASK_CRNFF_MASK = (int)0x2,
+    I3C_SINTMASK_CRNFF_POS = 1,
+    I3C_SINTMASK_FRAME_COMPLETE_MASK = (int)0x1,
+    I3C_SINTMASK_FRAME_COMPLETE_POS = 0,
+};
+
+enum I3C_REG_SERRWARN_FIELD
+{
+    I3C_SERRWARN_OWRITE_MASK = (int)0x20000,
+    I3C_SERRWARN_OWRITE_POS = 17,
+    I3C_SERRWARN_OREAD_MASK = (int)0x10000,
+    I3C_SERRWARN_OREAD_POS = 16,
+    I3C_SERRWARN_S0S1_MASK = (int)0x800,
+    I3C_SERRWARN_S0S1_POS = 11,
+    I3C_SERRWARN_HCRC_MASK = (int)0x400,
+    I3C_SERRWARN_HCRC_POS = 10,
+    I3C_SERRWARN_HPAR_MASK = (int)0x200,
+    I3C_SERRWARN_HPAR_POS = 9,
+    I3C_SERRWARN_SPAR_MASK = (int)0x100,
+    I3C_SERRWARN_SPAR_POS = 8,
+    I3C_SERRWARN_IBIURUN_MASK = (int)0x20,
+    I3C_SERRWARN_IBIURUN_POS = 5,
+    I3C_SERRWARN_INVSTART_MASK = (int)0x10,
+    I3C_SERRWARN_INVSTART_POS = 4,
+    I3C_SERRWARN_TERM_MASK = (int)0x8,
+    I3C_SERRWARN_TERM_POS = 3,
+    I3C_SERRWARN_URUNNACK_MASK = (int)0x4,
+    I3C_SERRWARN_URUNNACK_POS = 2,
+    I3C_SERRWARN_URUN_MASK = (int)0x2,
+    I3C_SERRWARN_URUN_POS = 1,
+    I3C_SERRWARN_ORUN_MASK = (int)0x1,
+    I3C_SERRWARN_ORUN_POS = 0,
+};
+
+enum I3C_REG_SDMACTRL_FIELD
+{
+    I3C_SDMAC_DMAWIDTH_MASK = (int)0x30,
+    I3C_SDMAC_DMAWIDTH_POS = 4,
+    I3C_SDMAC_DMATB_MASK = (int)0xc,
+    I3C_SDMAC_DMATB_POS = 2,
+    I3C_SDMAC_DMAFB_MASK = (int)0x3,
+    I3C_SDMAC_DMAFB_POS = 0,
+};
+
+enum I3C_REG_SDATACTRL_FIELD
+{
+    I3C_SDATACTRL_RXEMPTY_MASK = (int)0x80000000,
+    I3C_SDATACTRL_RXEMPTY_POS = 31,
+    I3C_SDATACTRL_TXFULL_MASK = (int)0x40000000,
+    I3C_SDATACTRL_TXFULL_POS = 30,
+    I3C_SDATACTRL_RXCOUNT_MASK = (int)0x1f000000,
+    I3C_SDATACTRL_RXCOUNT_POS = 24,
+    I3C_SDATACTRL_TXCOUNT_MASK = (int)0x1f0000,
+    I3C_SDATACTRL_TXCOUNT_POS = 16,
+    I3C_SDATACTRL_RXTRIG_MASK = (int)0xc0,
+    I3C_SDATACTRL_RXTRIG_POS = 6,
+    I3C_SDATACTRL_TXTRIG_MASK = (int)0x30,
+    I3C_SDATACTRL_TXTRIG_POS = 4,
+    I3C_SDATACTRL_UNLOCK_MASK = (int)0x8,
+    I3C_SDATACTRL_UNLOCK_POS = 3,
+    I3C_SDATACTRL_FLUSHFB_MASK = (int)0x2,
+    I3C_SDATACTRL_FLUSHFB_POS = 1,
+    I3C_SDATACTRL_FLUSHTB_MASK = (int)0x1,
+    I3C_SDATACTRL_FLUSHTB_POS = 0,
+};
+
+enum I3C_REG_SWDATAB_FIELD
+{
+    I3C_SWDATAB_END1_MASK = (int)0x10000,
+    I3C_SWDATAB_END1_POS = 16,
+    I3C_SWDATAB_END0_MASK = (int)0x100,
+    I3C_SWDATAB_END0_POS = 8,
+    I3C_SWDATAB_DATA_MASK = (int)0xff,
+    I3C_SWDATAB_DATA_POS = 0,
+};
+
+enum I3C_REG_SWDATABE_FIELD
+{
+    I3C_WDATABE_DATA_MASK = (int)0xff,
+    I3C_WDATABE_DATA_POS = 0,
+};
+
+enum I3C_REG_SWDATAH_FIELD
+{
+    I3C_SWDATAH_END_MASK = (int)0x10000,
+    I3C_SWDATAH_END_POS = 16,
+    I3C_SWDATAH_DATA1_MASK = (int)0xff00,
+    I3C_SWDATAH_DATA1_POS = 8,
+    I3C_SWDATAH_DATA0_MASK = (int)0xff,
+    I3C_SWDATAH_DATA0_POS = 0,
+};
+
+enum I3C_REG_SWDATAHE_FIELD
+{
+    I3C_SWDATAHE_DATA1_MASK = (int)0xff00,
+    I3C_SWDATAHE_DATA1_POS = 8,
+    I3C_SWDATAHE_DATA0_MASK = (int)0xff,
+    I3C_SWDATAHE_DATA0_POS = 0,
+};
+
+enum I3C_REG_SRDATAB_FIELD
+{
+    I3C_SRDATAB_DATA0_MASK = (int)0xff,
+    I3C_SRDATAB_DATA0_POS = 0,
+};
+
+enum I3C_REG_SRDATAH_FIELD
+{
+    I3C_SRDATAH_MSB_MASK = (int)0xff00,
+    I3C_SRDATAH_MSB_POS = 8,
+    I3C_SRDATAH_LSB_MASK = (int)0xff,
+    I3C_SRDATAH_LSB_POS = 0,
+};
+
+enum I3C_REG_SIBIEXTIDATA_FIELD
+{
+    I3C_SIBIEXTIDATA_CLR_MASK = (int)0x80000000,
+    I3C_SIBIEXTIDATA_CLR_POS = 31,
+    I3C_SIBIEXTIDATA_END2_MASK = (int)0x10000,
+    I3C_SIBIEXTIDATA_END2_POS = 16,
+    I3C_SIBIEXTIDATA_END1_MASK = (int)0x100,
+    I3C_SIBIEXTIDATA_END1_POS = 8,
+    I3C_SIBIEXTIDATA_DATA_MASK = (int)0xff,
+    I3C_SIBIEXTIDATA_DATA_POS = 0,
+    I3C_SIBIEXTIDATA_FREE_MASK = (int)0x1,
+    I3C_SIBIEXTIDATA_FREE_POS = 0,
+};
+
+enum I3C_REG_WDATAB1_FIELD
+{
+    I3C_WDATAB1_MASK = (int)0xff,
+    I3C_WDATAB1_POS = 0,
+};
+
+enum I3C_REG_SCAPABILITIES_FIELD
+{
+    I3C_SCAPABILITIES_DMA_MASK = (int)0x80000000,
+    I3C_SCAPABILITIES_DMA_POS = 31,
+    I3C_SCAPABILITIES_INT_MASK = (int)0x40000000,
+    I3C_SCAPABILITIES_INT_POS = 30,
+    I3C_SCAPABILITIES_FIFORX_MASK = (int)0x30000000,
+    I3C_SCAPABILITIES_FIFORX_POS = 28,
+    I3C_SCAPABILITIES_FIFOTX_MASK = (int)0xc000000,
+    I3C_SCAPABILITIES_FIFOTX_POS = 26,
+    I3C_SCAPABILITIES_EXTFIFO_MASK = (int)0x3800000,
+    I3C_SCAPABILITIES_EXTFIFO_POS = 23,
+    I3C_SCAPABILITIES_TIMECTRL_MASK = (int)0x200000,
+    I3C_SCAPABILITIES_TIMECTRL_POS = 21,
+    I3C_SCAPABILITIES_IBI_MR_HJ_MASK = (int)0x1f0000,
+    I3C_SCAPABILITIES_IBI_MR_HJ_POS = 16,
+    I3C_SCAPABILITIES_CCCHANDLE_MASK = (int)0xf000,
+    I3C_SCAPABILITIES_CCCHANDLE_POS = 12,
+    I3C_SCAPABILITIES_SADDR_MASK = (int)0xc00,
+    I3C_SCAPABILITIES_SADDR_POS = 10,
+    I3C_SCAPABILITIES_MASTER_MASK = (int)0x200,
+    I3C_SCAPABILITIES_MASTER_POS = 9,
+    I3C_SCAPABILITIES_HDRSUPP_MASK = (int)0x1c0,
+    I3C_SCAPABILITIES_HDRSUPP_POS = 6,
+    I3C_SCAPABILITIES_IDREG_MASK = (int)0x3c,
+    I3C_SCAPABILITIES_IDREG_POS = 2,
+    I3C_SCAPABILITIES_IDENA_MASK = (int)0x3,
+    I3C_SCAPABILITIES_IDENA_POS = 0,
+};
+
+enum I3C_REG_SDYNADDR_FIELD
+{
+    I3C_SDYNADDR_KEY_MASK = (int)0xffff0000,
+    I3C_SDYNADDR_KEY_POS = 16,
+    I3C_SDYNADDR_SA10B_MASK = (int)0xe000,
+    I3C_SDYNADDR_SA10B_POS = 13,
+    I3C_SDYNADDR_MAPSA_MASK = (int)0x1000,
+    I3C_SDYNADDR_MAPSA_POS = 12,
+    I3C_SDYNADDR_MAPIDX_MASK = (int)0xf00,
+    I3C_SDYNADDR_MAPIDX_POS = 8,
+    I3C_SDYNADDR_DCAUSE_MASK = (int)0x700,
+    I3C_SDYNADDR_DCAUSE_POS = 8,    
+    I3C_SDYNADDR_DADDR_MASK = (int)0xfe,
+    I3C_SDYNADDR_DADDR_POS = 1,
+    I3C_SDYNADDR_DAVALID_MASK = (int)0x1,
+    I3C_SDYNADDR_DAVALID_POS = 0,
+};
+
+enum I3C_REG_SMAXLIMITS_FIELD
+{
+    I3C_SMAXLIMITS_MAXRD_MASK = (int)0xfff0000,
+    I3C_SMAXLIMITS_MAXRD_POS = 16,
+    I3C_SMAXLIMITS_MAXWR_MASK = (int)0xfff,
+    I3C_SMAXLIMITS_MAXWR_POS = 0,
+};
+
+enum I3C_REG_SIDPARTNO_FIELD
+{
+    I3C_SIDPARTNO_PARTNO_MASK = (int)0xffffffff,
+    I3C_SIDPARTNO_PARTNO_POS = 0,
+};
+
+enum I3C_REG_SIDEXT_FIELD
+{
+    I3C_SIDEXT_BCR_MASK = (int)0xff0000,
+    I3C_SIDEXT_BCR_POS = 16,
+    I3C_SIDEXT_DCR_MASK = (int)0xff00,
+    I3C_SIDEXT_DCR_POS = 8,
+    I3C_SIDEXT_I2CREV_MASK = (int)0x70,
+    I3C_SIDEXT_I2CREV_POS = 4,
+    I3C_SIDEXT_INSTANCE_MASK = (int)0xf,
+    I3C_SIDEXT_INSTANCE_POS = 0,
+};
+
+enum I3C_REG_SVENDORID_FIELD
+{
+    I3C_SIDVID_VID_MASK = (int)0x7fff,
+    I3C_SIDVID_VID_POS = 0,
+};
+
+enum I3C_REG_STCCLOCK_FIELD
+{
+    I3C_STCCLK_FREQ_MASK = (int)0xff00,
+    I3C_STCCLK_FREQ_POS = 8,
+    I3C_STCCLK_ACCURACY_MASK = (int)0xff,
+    I3C_STCCLK_ACCURACY_POS = 0,
+};
+
+enum I3C_REG_SMSGMAPADDR_FIELD
+{
+    I3C_SMSGMAP_MAPLASTM2_MASK = (int)0xf0000,
+    I3C_SMSGMAP_MAPLASTM2_POS = 16,
+    I3C_SMSGMAP_MAPLASTM1_MASK = (int)0xf00,
+    I3C_SMSGMAP_MAPLASTM1_POS = 8,
+    I3C_SMSGMAP_LASTSTATIC_MASK = (int)0x10,
+    I3C_SMSGMAP_LASTSTATIC_POS = 4,
+    I3C_SMSGMAP_MAPLAST_MASK = (int)0xf,
+    I3C_SMSGMAP_MAPLAST_POS = 0,
+};
+
+/* controller*/
+
+enum APB_I3C_REG_CFGR_FIELD
+{
+    I3C_CFGR_SCL_OPMODE_ENABNLE_MASK = (int)0x80000000,
+    I3C_CFGR_SCL_OPMODE_ENABNLE_POS = 31, 
+    I3C_CFGR_TSFSET_MASK = (int)0x40000000,
+    I3C_CFGR_TSFSET_POS = 30,
+    I3C_CFGR_FIFO_INTR_MODE_MASK = (int)0x1000000,  //fifo中断
+    I3C_CFGR_FIFO_INTR_MODE_POS = 24,
+    I3C_CFGR_TIME_LOCK_MASK = (int)0x800000,
+    I3C_CFGR_TIME_LOCK_POS = 23,
+    I3C_CFGR_STOP_MODE_MASK = (int)0x400000,
+    I3C_CFGR_STOP_MODE_POS = 22,
+    I3C_CFGR_CFLUSH_MASK = (int)0x200000,
+    I3C_CFGR_CFLUSH_POS = 21,
+    I3C_CFGR_CDMAEN_MASK = (int)0x100000,
+    I3C_CFGR_CDMAEN_POS = 20,
+    I3C_CFGR_SMODE_MASK = (int)0x40000,
+    I3C_CFGR_SMODE_POS = 18,
+    I3C_CFGR_SFLUSH_MASK = (int)0x20000,
+    I3C_CFGR_SFLUSH_POS = 17,
+    I3C_CFGR_TXTHRES_MASK = (int)0x4000,
+    I3C_CFGR_TXTHRES_POS = 14,
+    I3C_CFGR_TXFLUSH_MASK = (int)0x2000,
+    I3C_CFGR_TXFLUSH_POS = 13,
+    I3C_CFGR_TXDMAEN_MASK = (int)0x1000,
+    I3C_CFGR_TXDMAEN_POS = 12,
+    I3C_CFGR_RXTHRES_MASK = (int)0x400,
+    I3C_CFGR_RXTHRES_POS = 10,
+    I3C_CFGR_RXFLUSH_MASK = (int)0x200,
+    I3C_CFGR_RXFLUSH_POS = 9,
+    I3C_CFGR_RXDMAEN_MASK = (int)0x100,
+    I3C_CFGR_RXDMAEN_POS = 8,
+    I3C_CFGR_HJACK_MASK = (int)0x80,
+    I3C_CFGR_HJACK_POS = 7,
+    I3C_CFGR_HKSDAEN_MASK = (int)0x20,
+    I3C_CFGR_HKSDAEN_POS = 5,
+    I3C_CFGR_EXITPTRN_MASK = (int)0x10,
+    I3C_CFGR_EXITPTRN_POS = 4,
+    I3C_CFGR_RSTPTRN_MASK = (int)0x8,
+    I3C_CFGR_RSTPTRN_POS = 3,
+    I3C_CFGR_NOARBH_MASK = (int)0x4,
+    I3C_CFGR_NOARBH_POS = 2,
+    I3C_CFGR_CE3_ENABLE_MASK = (int)0x2,
+    I3C_CFGR_CE3_ENABLE_POS = 1,
+    I3C_CFGR_MASTER_EN_MASK = (int)0x1,
+    I3C_CFGR_MASTER_EN_POS = 0,
+};
+
+enum I3C_REG_TIMINGR0_FIELD
+{
+    I3C_TIMINGR0_SCLH_I2C_MASK = (int)0xff000000,
+    I3C_TIMINGR0_SCLH_I2C_POS = 24,
+    I3C_TIMINGR0_SCLL_OD_MASK = (int)0xff0000,
+    I3C_TIMINGR0_SCLL_OD_POS = 16,
+    I3C_TIMINGR0_SCLH_I3C_MASK = (int)0xff00,
+    I3C_TIMINGR0_SCLH_I3C_POS = 8,
+    I3C_TIMINGR0_SCLL_PP_MASK = (int)0xff,
+    I3C_TIMINGR0_SCLL_PP_POS = 0,
+};
+
+enum I3C_REG_TIMINGR1_FIELD
+{
+    I3C_TIMINGR1_SDA_HD_MASK = (int)0x10000000,
+    I3C_TIMINGR1_SDA_HD_POS = 28,
+    I3C_TIMINGR1_FREE_MASK = (int)0x7f0000,
+    I3C_TIMINGR1_FREE_POS = 16,
+    I3C_TIMINGR1_ASNCR_MASK = (int)0x300,
+    I3C_TIMINGR1_ASNCR_POS = 8,
+    I3C_TIMINGR1_AVAL_MASK = (int)0xff,
+    I3C_TIMINGR1_AVAL_POS = 0,
+};
+
+enum I3C_REG_TIMINGR2_FIELD
+{
+    I3C_TIMINGR2_STALL_MASK = (int)0xff00,
+    I3C_TIMINGR2_STALL_POS = 8,
+    I3C_TIMINGR2_STALLA_MASK = (int)0x8,
+    I3C_TIMINGR2_STALLA_POS = 3,
+    I3C_TIMINGR2_STALLC_MASK = (int)0x4,
+    I3C_TIMINGR2_STALLC_POS = 2,
+    I3C_TIMINGR2_STALLD_MASK = (int)0x2,
+    I3C_TIMINGR2_STALLD_POS = 1,
+    I3C_TIMINGR2_STALLT_MASK = (int)0x1,
+    I3C_TIMINGR2_STALLT_POS = 0,
+};
+
+enum I3C_REG_CR_FIELD
+{
+    I3C_CR_MEND_MASK = (int)0x80000000,
+    I3C_CR_MEND_POS = 31,
+    I3C_CR_MTYPE_MASK = (int)0x78000000,
+    I3C_CR_MTYPE_POS = 27,
+    I3C_CR_CCC_MASK = (int)0xff0000,
+    I3C_CR_CCC_POS = 16,
+    I3C_CR_ADD_MASK = (int)0xfe0000,
+    I3C_CR_ADD_POS = 17,
+    I3C_CR_RNW_MASK = (int)0x10000,
+    I3C_CR_RNW_POS = 16,
+    I3C_CR_DCNT_MASK = (int)0xffff,
+    I3C_CR_DCNT_POS = 0,
+};
+
+enum I3C_REG_SR_FIELD
+{
+    I3C_SR_MID_MASK = (int)0xff000000,
+    I3C_SR_MID_POS = 24,
+    I3C_SR_DIR_MASK = (int)0x40000,
+    I3C_SR_DIR_POS = 18,
+    I3C_SR_ABT_MASK = (int)0x20000,
+    I3C_SR_ABT_POS = 17,
+    I3C_SR_XDCNT_MASK = (int)0xffff,
+    I3C_SR_XDCNT_POS = 0,
+};
+
+enum I3C_REG_TDR_FIELD
+{
+    I3C_TDR_W_DATA_MASK = (int)0xff,
+    I3C_TDR_W_DATA_POS = 0,
+};
+
+enum I3C_REG_RDR_FIELD
+{
+    I3C_RDR_R_DATA_MASK = (int)0xff,
+    I3C_RDR_R_DATA_POS = 0,
+};
+
+enum I3C_REG_DEVRX_FIELD
+{
+    I3C_DEVRX_DIS_MASK = (int)0x80000000,
+    I3C_DEVRX_DIS_POS = 31,
+    I3C_DEVRX_SUSP_MASK = (int)0x80000,
+    I3C_DEVRX_SUSP_POS = 19,
+    I3C_DEVRX_IBIDEN_MASK = (int)0x40000,
+    I3C_DEVRX_IBIDEN_POS = 18,
+    I3C_DEVRX_CRACK_MASK = (int)0x20000,
+    I3C_DEVRX_CRACK_POS = 17,
+    I3C_DEVRX_IBIACK_MASK = (int)0x10000,
+    I3C_DEVRX_IBIACK_POS = 16,
+    I3C_DEVRX_DA_MASK = (int)0xfe,
+    I3C_DEVRX_DA_POS = 1,
+};
+
+enum I3C_REG_IER_FIELD
+{
+    I3C_IER_HJIE_MASK = (int)0x80000,
+    I3C_IER_HJIE_POS = 19,
+    I3C_IER_CRIE_MASK = (int)0x20000,
+    I3C_IER_CRIE_POS = 17,
+    I3C_IER_IBIIE_MASK = (int)0x8000,
+    I3C_IER_IBIIE_POS = 15,
+    I3C_IER_ERRIE_MASK = (int)0x800,
+    I3C_IER_ERRIE_POS = 11,
+    I3C_IER_RXTGTENDIE_MASK = (int)0x400,
+    I3C_IER_RXTGTENDIE_POS = 10,
+    I3C_IER_FCIE_MASK = (int)0x200,
+    I3C_IER_FCIE_POS = 9,
+    I3C_IER_RXFNEIE_MASK = (int)0x20,
+    I3C_IER_RXFNEIE_POS = 5,
+    I3C_IER_TXFNFIE_MASK = (int)0x10,
+    I3C_IER_TXFNFIE_POS = 4,
+    I3C_IER_SFNEIE_MASK = (int)0x8,
+    I3C_IER_SFNEIE_POS = 3,
+    I3C_IER_CFNFIE_MASK = (int)0x4,
+    I3C_IER_CFNFIE_POS = 2,
+};
+
+enum I3C_REG_CEVR_FIELD
+{
+    I3C_CEVR_CHJF_MASK = (int)0x80000,
+    I3C_CEVR_CHJF_POS = 19,
+    I3C_CEVR_CCRF_MASK = (int)0x20000,
+    I3C_CEVR_CCRF_POS = 17,
+    I3C_CEVR_CIBIF_MASK = (int)0x8000,
+    I3C_CEVR_CIBIF_POS = 15,
+    I3C_CEVR_CERRF_MASK = (int)0x800,
+    I3C_CEVR_CERRF_POS = 11,
+    I3C_CEVR_TGTEND_MASK = (int)0x400,
+    I3C_CEVR_TGTEND_POS = 10,
+    I3C_CEVR_CFCF_MASK = (int)0x200,
+    I3C_CEVR_CFCF_POS = 9,
+};
+
+enum I3C_REG_EVR_FIELD
+{
+    I3C_EVR_HJF_MASK = (int)0x80000,
+    I3C_EVR_HJF_POS = 19,
+    I3C_EVR_CRF_MASK = (int)0x20000,
+    I3C_EVR_CRF_POS = 17,
+    I3C_EVR_IBIF_MASK = (int)0x8000,
+    I3C_EVR_IBIF_POS = 15,
+    I3C_EVR_ERRF_MASK = (int)0x800,
+    I3C_EVR_ERRF_POS = 11,
+    I3C_EVR_RXTGTENDF_MASK = (int)0x400,
+    I3C_EVR_RXTGTENDF_POS = 10,
+    I3C_EVR_FCF_MASK = (int)0x200,
+    I3C_EVR_FCF_POS = 9,
+    I3C_EVR_RXFNEF_MASK = (int)0x20,
+    I3C_EVR_RXFNEF_POS = 5,
+    I3C_EVR_TXFNFF_MASK = (int)0x10,
+    I3C_EVR_TXFNFF_POS = 4,
+    I3C_EVR_SFNEF_MASK = (int)0x8,
+    I3C_EVR_SFNEF_POS = 3,
+    I3C_EVR_CFNFF_MASK = (int)0x4,
+    I3C_EVR_CFNFF_POS = 2,
+    I3C_EVR_TXFEF_MASK = (int)0x2,
+    I3C_EVR_TXFEF_POS = 1,
+    I3C_EVR_CFEF_MASK = (int)0x1,
+    I3C_EVR_CFEF_POS = 0,
+};
+
+enum I3C_REG_IBIDR_FIELD
+{
+    I3C_IBIDR_IBIDB3_MASK = (int)0xff000000,
+    I3C_IBIDR_IBIDB3_POS = 24,
+    I3C_IBIDR_IBIDB2_MASK = (int)0xff0000,
+    I3C_IBIDR_IBIDB2_POS = 16,
+    I3C_IBIDR_IBIDB1_MASK = (int)0xff00,
+    I3C_IBIDR_IBIDB1_POS = 8,
+    I3C_IBIDR_IBIDB0_MASK = (int)0xff,
+    I3C_IBIDR_IBIDB0_POS = 0,
+};
+
+enum I3C_REG_SER_FIELD
+{
+    I3C_SER_DERR_MASK = (int)0x400,
+    I3C_SER_DERR_POS = 10,
+    I3C_SER_DNACK_MASK = (int)0x200,
+    I3C_SER_DNACK_POS = 9,
+    I3C_SER_ANACK_MASK = (int)0x100,
+    I3C_SER_ANACK_POS = 8,
+    I3C_SER_COVR_MASK = (int)0x80,
+    I3C_SER_COVR_POS = 7,
+    I3C_SER_DOVR_MASK = (int)0x40,
+    I3C_SER_DOVR_POS = 6,
+    I3C_SER_STALL_MASK = (int)0x20,
+    I3C_SER_STALL_POS = 5,
+    I3C_SER_PERR_MASK = (int)0x10,
+    I3C_SER_PERR_POS = 4,
+    I3C_SER_CODERR_MASK = (int)0xf,
+    I3C_SER_CODERR_POS = 0,
+};
+
+enum I3C_REG_RMR_FIELD
+{
+    I3C_RMR_RADD_MASK = (int)0xfe0000,
+    I3C_RMR_RADD_POS = 17,
+    I3C_RMR_IBIRDCNT_MASK = (int)0x7,
+    I3C_RMR_IBIRDCNT_POS = 0,
+};
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

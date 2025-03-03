@@ -65,6 +65,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'rv32/qsh/ls_msp_pis.c',
         'rv32/qsh/ls_msp_cache.c',
         'rv32/qsh/ls_msp_mjtag.c',
+        'rv32/qsh/ls_msp_i3c.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
         'src/otbn/text_array/ecc256_base_mult_text.c',
@@ -130,6 +131,10 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_otbn.c',
         'src/ls_hal_otp_ctrl.c',
         'src/ls_hal_mjtag.c',
+        'src/ls_hal_i3c_controller_dma.c',
+        'src/ls_hal_i3c_controller.c',
+        'src/ls_hal_i3c_irq.c',
+        'src/ls_hal_i3c_target.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',

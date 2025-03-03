@@ -1,0 +1,34 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "target_ibi_it",
+            "type": "gdb",
+            "request": "attach",
+            // "target": "10.10.20.59:1025",
+            // "target": "192.168.6.107:1025",
+            "target": "192.168.6.91:1025",
+            "executable": "examples/peripheral/i3c/target_ibi_it/build/qsh/target_ibi_it.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "delete",
+                "restore examples/peripheral/i3c/target_ibi_it/build/qsh/target_ibi_it.bin binary 0x1000000",
+                "reset",
+                // "hb sd_init",
+                // "hb sd_command_init",
+                // "hb linkedsemi_sdhci_request",
+                // "hb linkedsemi_sdhci_transfer_blocking",
+                // "hb sdhci_send_command",
+                // "hb linkedsemi_sdhci_isr",
+                // "hb sdhci_set_transfer_config",
+                // "watch *0x4000902f",
+                // "hb _isr_wrapper",
+
+                // "set $pc=0x10000000",
+            ],
+        },
+    ]
+}
