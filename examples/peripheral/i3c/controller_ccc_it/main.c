@@ -13,6 +13,11 @@
 I3C_HandleTypeDef hi3c10;
 I3C_HandleTypeDef hi3c9;
 
+static I3C_XferTypeDef aContextBuffers[2];
+static uint32_t aControlBuffer[0xF];
+static uint8_t aTxBuffer[300];
+
+
 void I3C10_CONTROLLER_INIT(void)
 {
     hi3c10.Instance = I3C10;
@@ -40,7 +45,6 @@ void I3C10_CONTROLLER_INIT(void)
     hi3c10.EnableController = true;
     HAL_I3C_Controller_Init(&hi3c10);
 }
-
 
 void I3C9_TARGET_INIT(void)
 {
@@ -70,9 +74,6 @@ void I3C9_TARGET_INIT(void)
     HAL_I3C_Target_Init(&hi3c9);
 }
 
-/* Private define for CCC command */
-#define I3C_BROADCAST_RSTDAA          (0x00000006U)
-#define I3C_BROADCAST_ENTDAA          (0x00000007U)
 typedef struct {
   char *        TARGET_NAME;          /*!< Marketing Target reference */
   uint32_t      TARGET_ID;            /*!< Target Identifier on the Bus */
@@ -114,42 +115,121 @@ TargetDesc_TypeDef *aTargetDesc[3] = \
                             &TargetDesc3,
                           };
 
+#define Broadcast_DISEC 0x1
+#define Direct_ENEC 0x80
+
+uint8_t aDISEC_data[1]   = {0x08};
+
+/* Descriptor for broadcast CCC */
+static I3C_CCCTypeDef aBroadcast_CCC[] =
+{
+    /*   Target Addr              CCC Value    CCC data + defbyte pointer  CCC size + defbyte         Direction        */
+    //I3C_BROADCAST_WITH_DEFBYTE_STOP
+    {0,                Broadcast_DISEC,           {aDISEC_data,           1},              LL_I3C_DIRECTION_WRITE},
+};
+
+static I3C_CCCTypeDef aDirect_CCC[] =
+{
+    /*   Target Addr              CCC Value    CCC data + defbyte pointer  CCC size + defbyte         Direction        */
+    // I3C_DIRECT_WITHOUT_DEFBYTE_STOP
+    {0x34,         Direct_ENEC,            {aDISEC_data, 1},              LL_I3C_DIRECTION_WRITE},
+};
+
 #define I3C10_SCL PJ00
 #define I3C10_SDA PJ01
-
-#define I3C9_SCL PJ02
-#define I3C9_SDA PJ03
 
 #ifndef PINMUX_FUNC3
 #define PINMUX_FUNC3 2
 #endif
 
+static void Error_Handler(void)
+{
+    LOG_RAW("Error_Handler\r\n");
+    while (1) {};
+}
+
+
 int main()
 {
-    sys_init_none();
+  sys_init_none();
 
-    per_func_enable(I3C10_SCL,PINMUX_FUNC3);
-    per_func_enable(I3C10_SDA,PINMUX_FUNC3);
-    per_func_enable(I3C9_SCL,PINMUX_FUNC3);
-    per_func_enable(I3C9_SDA,PINMUX_FUNC3);
+  per_func_enable(I3C10_SCL,PINMUX_FUNC3);
+  per_func_enable(I3C10_SDA,PINMUX_FUNC3);
 
-    /*时钟使能*/
-    SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C10_MASK;
-    SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C9_MASK;
+  /*时钟使能*/
+  SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C10_MASK;
+  // SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C9_MASK;
 
-    I3C9_TARGET_INIT();
-    I3C10_CONTROLLER_INIT();
+  I3C10_CONTROLLER_INIT();
 
-    if (HAL_I3C_Ctrl_DynAddrAssign_IT(&hi3c10, I3C_ONLY_ENTDAA) != HAL_OK)
-    {
-      LOG_I("entdaa error code = 0x%x",hi3c10.ErrorCode);
-        /* Error_Handler() function is called when error occurs. */
-        // Error_Handler();
-    }
+  if (HAL_I3C_Ctrl_DynAddrAssign_IT(&hi3c10, I3C_ONLY_ENTDAA) != HAL_OK)
+  {
+    LOG_I("entdaa error code = 0x%x",hi3c10.ErrorCode);
+      /* Error_Handler() function is called when error occurs. */
+      // Error_Handler();
+  }
 
-    while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)//HAL_I3C_STATE_READY
-    {
-    }
+  while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)
+  {
+  }
+
+
+  /* broadcast ccc test */
+  aContextBuffers[0].CtrlBuf.pBuffer = aControlBuffer;
+  aContextBuffers[0].CtrlBuf.Size    = sizeof(aControlBuffer);
+  aContextBuffers[0].TxBuf.pBuffer   = aTxBuffer;
+  aContextBuffers[0].TxBuf.Size      = sizeof(aDISEC_data);
+
+  if (HAL_I3C_AddDescToFrame(&hi3c10,
+                             &aBroadcast_CCC[0],
+                             NULL,
+                             &aContextBuffers[0],
+                             1,
+                             I3C_BROADCAST_WITH_DEFBYTE_STOP) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /*##- Start the transmission process ###################################*/
+  /* Transmit private data processus */
+  if (HAL_I3C_Ctrl_Transmit_IT(&hi3c10, &aContextBuffers[0]) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+
+  while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)
+  {
+  }
+
+
+
+  /* direct ccc test */
+  aContextBuffers[0].CtrlBuf.pBuffer = aControlBuffer;
+  aContextBuffers[0].CtrlBuf.Size    = sizeof(aControlBuffer);
+  aContextBuffers[0].TxBuf.pBuffer   = aTxBuffer;
+  aContextBuffers[0].TxBuf.Size      = sizeof(aDISEC_data);
+
+  if (HAL_I3C_AddDescToFrame(&hi3c10,
+                             &aDirect_CCC[0],
+                             NULL,
+                             &aContextBuffers[0],
+                             1,
+                             I3C_DIRECT_WITHOUT_DEFBYTE_STOP) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /*##- Start the transmission process ###################################*/
+  /* Transmit private data processus */
+  if (HAL_I3C_Ctrl_Transmit_IT(&hi3c10, &aContextBuffers[0]) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)
+  {
+  }
 
     while (1);
     return 0;

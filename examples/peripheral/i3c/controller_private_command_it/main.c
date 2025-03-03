@@ -13,6 +13,11 @@
 I3C_HandleTypeDef hi3c10;
 I3C_HandleTypeDef hi3c9;
 
+static I3C_XferTypeDef aContextBuffers[2];
+static uint32_t aControlBuffer[0xF];
+static uint8_t aTxBuffer[300];
+
+
 void I3C10_CONTROLLER_INIT(void)
 {
     hi3c10.Instance = I3C10;
@@ -41,38 +46,6 @@ void I3C10_CONTROLLER_INIT(void)
     HAL_I3C_Controller_Init(&hi3c10);
 }
 
-
-void I3C9_TARGET_INIT(void)
-{
-    hi3c9.Mode = HAL_I3C_MODE_TARGET;
-    hi3c9.Instance = I3C9;
-    hi3c9.EnableTarget = false;
-    LL_I3C_TgtBusConfTypeDef *slaveConfig = &hi3c9.Init.TgtBusCharacteristic;
-    slaveConfig->isHotJoin = false;
-    slaveConfig->staticAddr = 0xcc;
-    slaveConfig->vendorID = 0x11bU;
-    slaveConfig->enableRandomPart = false;
-    slaveConfig->partNumber = 0;
-    slaveConfig->dcr = 0;/* Generic device. */
-    slaveConfig->bcr = 
-        0b1100110; /* BCR[7:6]: device role, I3C slave(2b'00), BCR[5]: SDR Only / SDR and HDR Capable,  SDR and HDR
-              Capable(1b'1), BCR[4]: Bridge Identifier, Not a bridge device(1b'0), BCR[3]: Offline Capable, device is
-              offline capable(1b'1), BCR[2]: IBI Payload(1b'1). No data byte following(1b'0), BCR[1]: IBI Request Capable,
-              capable(1b'1), BCR[0]: Max Data Speed Limitation, has limitation(1b'1). */
-    slaveConfig->nakAllRequest          = false;
-    slaveConfig->ignoreS0S1Error        = true;
-    slaveConfig->offline                = false;
-    slaveConfig->matchTargetStartStop    = false;
-    slaveConfig->maxWriteLength = 255;
-    slaveConfig->maxReadLength = 255;
-    slaveConfig->matchCount = (uint8_t)(SDK_HCLK_MHZ);
-
-    HAL_I3C_Target_Init(&hi3c9);
-}
-
-/* Private define for CCC command */
-#define I3C_BROADCAST_RSTDAA          (0x00000006U)
-#define I3C_BROADCAST_ENTDAA          (0x00000007U)
 typedef struct {
   char *        TARGET_NAME;          /*!< Marketing Target reference */
   uint32_t      TARGET_ID;            /*!< Target Identifier on the Bus */
@@ -114,6 +87,13 @@ TargetDesc_TypeDef *aTargetDesc[3] = \
                             &TargetDesc3,
                           };
 
+/* Descriptor for private data transmit */
+static I3C_PrivateTypeDef aPrivateDescriptor[] = \
+                                          {
+                                            {0x34, {aTxBuffer, 1}, {NULL, 0}, HAL_I3C_DIRECTION_WRITE},
+                                          };
+                                          
+                                          
 #define I3C10_SCL PJ00
 #define I3C10_SDA PJ01
 
@@ -123,6 +103,13 @@ TargetDesc_TypeDef *aTargetDesc[3] = \
 #ifndef PINMUX_FUNC3
 #define PINMUX_FUNC3 2
 #endif
+
+static void Error_Handler(void)
+{
+    LOG_RAW("Error_Handler\r\n");
+    while (1) {};
+}
+
 
 int main()
 {
@@ -135,9 +122,8 @@ int main()
 
     /*时钟使能*/
     SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C10_MASK;
-    SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C9_MASK;
+    // SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C9_MASK;
 
-    I3C9_TARGET_INIT();
     I3C10_CONTROLLER_INIT();
 
     if (HAL_I3C_Ctrl_DynAddrAssign_IT(&hi3c10, I3C_ONLY_ENTDAA) != HAL_OK)
@@ -147,9 +133,37 @@ int main()
         // Error_Handler();
     }
 
-    while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)//HAL_I3C_STATE_READY
+    while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)
     {
     }
+
+  aContextBuffers[0].CtrlBuf.pBuffer = aControlBuffer;
+  aContextBuffers[0].CtrlBuf.Size    = 1;
+  aContextBuffers[0].TxBuf.pBuffer   = aTxBuffer;
+  aContextBuffers[0].TxBuf.Size      = 1;
+  if (HAL_I3C_AddDescToFrame(&hi3c10,
+                             NULL,
+                             &aPrivateDescriptor[0],
+                             &aContextBuffers[0],
+                             1,
+                             I3C_PRIVATE_WITH_ARB_RESTART) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /*##- Start the transmission process ###################################*/
+  /* Transmit private data processus */
+  if (HAL_I3C_Ctrl_Transmit_IT(&hi3c10, &aContextBuffers[0]) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  //target_recived_data_check(&hi3c9,1);
+
+  while (HAL_I3C_GetState(&hi3c10) != HAL_I3C_STATE_READY)
+  {
+  }
+
 
     while (1);
     return 0;

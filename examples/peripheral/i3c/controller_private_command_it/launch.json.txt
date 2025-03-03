@@ -2,20 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "controller_entdaa_it",
+            "name": "controller_private_command_it",
             "type": "gdb",
             "request": "attach",
             // "target": "10.10.20.59:1025",
             // "target": "192.168.6.107:1025",
             "target": "192.168.6.91:1025",
-            "executable": "examples/peripheral/i3c/controller_entdaa_it/build/qsh/controller_entdaa_it.elf",
+            "executable": "examples/peripheral/i3c/controller_private_command_it/build/qsh/controller_private_command_it.elf",
             "cwd": "${workspaceFolder}",
             "remote": true,
             "gdbpath": "riscv64-unknown-elf-gdb",
             "autorun": [
                 "set output-radix 16",
                 "delete",
-                "restore examples/peripheral/i3c/controller_entdaa_it/build/qsh/controller_entdaa_it.bin binary 0x1000000",
+                "restore examples/peripheral/i3c/controller_private_command_it/build/qsh/controller_private_command_it.bin binary 0x1000000",
                 "reset",
                 // "hb sd_init",
                 // "hb sd_command_init",

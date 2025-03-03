@@ -13,6 +13,12 @@
 I3C_HandleTypeDef hi3c10;
 I3C_HandleTypeDef hi3c9;
 
+/* Variable to catch IBI event */
+volatile uint32_t uwIBIRequested = 0;
+
+I3C_DeviceConfTypeDef DeviceConf[2] = {0};
+I3C_CCCInfoTypeDef CCCInfo;
+
 void I3C10_CONTROLLER_INIT(void)
 {
     hi3c10.Instance = I3C10;
@@ -40,7 +46,6 @@ void I3C10_CONTROLLER_INIT(void)
     hi3c10.EnableController = true;
     HAL_I3C_Controller_Init(&hi3c10);
 }
-
 
 void I3C9_TARGET_INIT(void)
 {
@@ -117,12 +122,16 @@ TargetDesc_TypeDef *aTargetDesc[3] = \
 #define I3C10_SCL PJ00
 #define I3C10_SDA PJ01
 
-#define I3C9_SCL PJ02
-#define I3C9_SDA PJ03
-
 #ifndef PINMUX_FUNC3
 #define PINMUX_FUNC3 2
 #endif
+
+static void Error_Handler(void)
+{
+    LOG_RAW("Error_Handler\r\n");
+    while (1) {};
+}
+
 
 int main()
 {
@@ -130,14 +139,10 @@ int main()
 
     per_func_enable(I3C10_SCL,PINMUX_FUNC3);
     per_func_enable(I3C10_SDA,PINMUX_FUNC3);
-    per_func_enable(I3C9_SCL,PINMUX_FUNC3);
-    per_func_enable(I3C9_SDA,PINMUX_FUNC3);
 
     /*时钟使能*/
     SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C10_MASK;
-    SYSC_APP_PER->PD_PER_CLKG3 |=SYSC_APP_PER_CLKG_SET_I3C9_MASK;
 
-    I3C9_TARGET_INIT();
     I3C10_CONTROLLER_INIT();
 
     if (HAL_I3C_Ctrl_DynAddrAssign_IT(&hi3c10, I3C_ONLY_ENTDAA) != HAL_OK)
@@ -173,5 +178,72 @@ void HAL_I3C_TgtReqDynamicAddrCallback(I3C_HandleTypeDef *hi3c10, uint64_t targe
   if(target_dix == 2)
   {
     target_dix = 0;
+  }
+}
+
+void i3c_ibi_test(I3C_HandleTypeDef *controller,I3C_HandleTypeDef *target1)
+{
+  DeviceConf[0].DeviceIndex        = 1;
+  DeviceConf[0].TargetDynamicAddr  = aTargetDesc[0]->DYNAMIC_ADDR; //0x32
+  DeviceConf[0].IBIAck             =
+    __HAL_I3C_GET_IBI_CAPABLE(__HAL_I3C_GET_BCR(aTargetDesc[0]->TARGET_BCR_DCR_PID));
+  DeviceConf[0].IBIPayload         =
+  __HAL_I3C_GET_IBI_PAYLOAD(__HAL_I3C_GET_BCR(aTargetDesc[0]->TARGET_BCR_DCR_PID));
+  DeviceConf[0].CtrlRoleReqAck     =
+    __HAL_I3C_GET_CR_CAPABLE(__HAL_I3C_GET_BCR(aTargetDesc[0]->TARGET_BCR_DCR_PID));
+  DeviceConf[0].CtrlStopTransfer   = DISABLE;
+
+  DeviceConf[1].DeviceIndex        = 2;
+  DeviceConf[1].TargetDynamicAddr  = aTargetDesc[2]->DYNAMIC_ADDR; //0x34
+  DeviceConf[1].IBIAck             =
+    __HAL_I3C_GET_IBI_CAPABLE(__HAL_I3C_GET_BCR(aTargetDesc[1]->TARGET_BCR_DCR_PID));
+  DeviceConf[1].IBIPayload         = 
+  __HAL_I3C_GET_IBI_PAYLOAD(__HAL_I3C_GET_BCR(aTargetDesc[1]->TARGET_BCR_DCR_PID));
+  DeviceConf[1].CtrlRoleReqAck     =
+    __HAL_I3C_GET_CR_CAPABLE(__HAL_I3C_GET_BCR(aTargetDesc[1]->TARGET_BCR_DCR_PID));
+  DeviceConf[1].CtrlStopTransfer   = DISABLE;
+  if (HAL_I3C_Ctrl_ConfigBusDevices(controller, &DeviceConf[0], 2U) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /*##- Start the listen mode process ####################################*/
+  /* Activate notifications for specially for this example
+     - In Band Interrupt requested by a Target. */
+  if( HAL_I3C_Controller_ActivateNotification(&hi3c10, NULL, HAL_I3C_IT_IBIIE) != HAL_OK)
+  {
+      /* Error_Handler() function is called when error occurs. */
+      Error_Handler();
+  }
+
+  while(uwIBIRequested == 0U)
+  {
+  }
+  uwIBIRequested = 0;
+
+  if (HAL_I3C_GetCCCInfo(&hi3c10, EVENT_ID_IBI, &CCCInfo) != HAL_OK)
+  {
+    /* Error_Handler() function is called when error occurs. */
+    Error_Handler();
+  }
+}
+
+
+/**
+  * @brief I3C notify callback after receiving a notification.
+  *        The main objective of this user function is to check on the notification ID and assign 1 to the global
+  *        variable used to indicate that the event is well finished.
+  * @par Called functions
+  * - HAL_I3C_NotifyCallback()
+  * @retval None
+  */
+void HAL_I3C_NotifyCallback(I3C_HandleTypeDef *hi3c, uint32_t eventId)
+{
+  if(hi3c->Instance == I3C10)
+  {
+    if ((eventId & EVENT_ID_IBI) == EVENT_ID_IBI)
+    {
+      uwIBIRequested = 1;
+    }
   }
 }
