@@ -11,11 +11,11 @@ extern "C" {
 #define PMU_RTC_IRQN         16
 #define PMU_WDT_IRQN         17
 #define PMU_TIM_IRQN         18
-#define PMU_EXT_IRQN         19
+#define PMU_EXT_SEC_IRQN     19
 #define PMU_LVD_IRQN         20
 #define PMU_CASEOPEN_IRQN    21
 #define PMU_PASSTHROUGH_IRQN 22
-
+#define PMU_EXT_APP_IRQN     23
 #define SYSC_SEC_CPU_IRQN    26
 #define SYSC_APP_CPU_IRQN    27
 #define USB1_IRQN            28
