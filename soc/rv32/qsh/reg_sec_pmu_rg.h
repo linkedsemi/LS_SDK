@@ -2,26 +2,11 @@
 #define REG_SEC_PMU_RG_TYPE_H_
 #include <stdint.h>
 #include "reg_base_addr.h"
+#include "reg_io_type.h"
 
 #define SEC_PMU ((reg_sec_pmu_rg_t *)SEC_PMU_RG_SEC_ADDR)
 #define SEC_PMU_QSPI_PAD_LOCK ((uint32_t *)SEC_PMU_RG_SEC_ADDR + 0x344)
 #define SEC_PMU_PECI_PAD_LOCK ((uint32_t *)SEC_PMU_RG_SEC_ADDR + 0x348)
-
-typedef struct {
-    volatile uint32_t LOCK;
-    volatile uint32_t PU1_PU0;
-    volatile uint32_t PD_PU2;
-    volatile uint32_t IEN1_IEN0;
-    volatile uint32_t DS1_DS0;
-    volatile uint32_t AE_DS2;
-    volatile uint32_t OD_FIR;
-    volatile uint32_t SL_ST;
-} reg_io_cfg_t;
-
-typedef struct {
-    volatile uint32_t OE_DIN;
-    volatile uint32_t RESERVED;
-} reg_io_val_t;
 
 typedef struct
 {

@@ -478,7 +478,7 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 //     return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
 // }
 
-static inline void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
+void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
 {
     switch(edge)
     {
@@ -507,11 +507,11 @@ static inline void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,
 //     ext_intr_mask(&V33_RG->GPIO_INTR_MSK[x->port],&V33_RG->GPIO_INTR_CLR[x->port],x->num,edge);
 // }
 
-void io_vcore_exti_config(uint8_t pin,exti_edge_t edge)
-{
-    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    ext_intr_mask(&APP_PMU->GPIO_INTR_MSK[x->port],&APP_PMU->GPIO_INTR_CLR[x->port],x->num,edge);
-}
+// void io_vcore_exti_config(uint8_t pin,exti_edge_t edge)
+// {
+//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+//     ext_intr_mask(&APP_PMU->GPIO_INTR_MSK[x->port],&APP_PMU->GPIO_INTR_CLR[x->port],x->num,edge);
+// }
 
 // void io_exti_config(uint8_t pin,exti_edge_t edge)
 // {

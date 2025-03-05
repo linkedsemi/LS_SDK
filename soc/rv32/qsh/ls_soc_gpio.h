@@ -209,7 +209,7 @@ void io_v33_exti_config(uint8_t pin,exti_edge_t edge);
   * @param  edge edges for IO interrupts 
   */
 void io_exti_config(uint8_t pin,exti_edge_t edge);
-
+void ext_intr_mask(volatile uint32_t *mask, volatile uint32_t *clr, uint8_t num, exti_edge_t edge);
 void per_func_disable_all(uint8_t pin);
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt);
 
