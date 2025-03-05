@@ -36,11 +36,10 @@ void flash_swint_init();
 
 #ifdef BOOT_ROM
 void rom_delay(uint32_t us);
-#define ROM_DELAY_US(a) rom_delay(a)
-#define ROM_DELAY_MS(a) rom_delay((a) * 1000)
-#endif
-
+#define DELAY_US(a) rom_delay(a)
+#else
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
+#endif
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
 #define FLASH_SWINT_NUM QSPI1_IRQN
