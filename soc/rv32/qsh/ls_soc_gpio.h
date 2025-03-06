@@ -212,6 +212,9 @@ void io_exti_config(uint8_t pin,exti_edge_t edge);
 void ext_intr_mask(volatile uint32_t *mask, volatile uint32_t *clr, uint8_t num, exti_edge_t edge);
 void per_func_disable_all(uint8_t pin);
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt);
+void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t edge, bool lock);
+void io_cfg_lock(uint8_t pin, bool lock);
+void io_cfg_input_lock(uint8_t pin, bool lock);
 
 #ifdef __cplusplus
 }

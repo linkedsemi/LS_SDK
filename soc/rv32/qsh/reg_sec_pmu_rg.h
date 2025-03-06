@@ -2,11 +2,20 @@
 #define REG_SEC_PMU_RG_TYPE_H_
 #include <stdint.h>
 #include "reg_base_addr.h"
-#include "reg_io_type.h"
 
 #define SEC_PMU ((reg_sec_pmu_rg_t *)SEC_PMU_RG_SEC_ADDR)
 #define SEC_PMU_QSPI_PAD_LOCK ((uint32_t *)SEC_PMU_RG_SEC_ADDR + 0x344)
 #define SEC_PMU_PECI_PAD_LOCK ((uint32_t *)SEC_PMU_RG_SEC_ADDR + 0x348)
+
+typedef struct {
+    volatile uint32_t LOCK;
+    volatile uint32_t RESERVED[7];
+} reg_sec_io_cfg_t;
+
+typedef struct {
+    volatile uint32_t DIN;       //0x0
+    volatile uint32_t RESERVED0; //0x4
+} reg_sec_io_val_t;
 
 typedef struct
 {
@@ -28,8 +37,8 @@ typedef struct
     volatile uint32_t GPIO_INTR_LOCK[16]; //0xc0
     volatile uint32_t GPIO_INTR_STT[16]; //0x100
     volatile uint32_t GPIO_INTR_RAW[16]; //0x140
-    reg_io_cfg_t IO_CFG[15];//0x180 GPIO[A-T]
-    reg_io_val_t IO_VAL[16];//0x360
+    reg_sec_io_cfg_t IO_CFG[15];//0x180 GPIO[A-T]
+    reg_sec_io_val_t IO_VAL[16];//0x360
     volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
     volatile uint32_t MODE_PAD_PU_PD; //0x3e4
     volatile uint32_t MODE_PAD_REN_DS0; //0x3e8
@@ -143,6 +152,7 @@ typedef struct
 #endif
 }reg_sec_pmu_rg_t;
 _Static_assert(sizeof(reg_sec_pmu_rg_t) == 0x3f8, "reg_sec_pmu_rg_t size error.");
+_Static_assert((uint32_t)(((reg_sec_pmu_rg_t *)0)->IO_VAL) == 0x360, "reg_sec_pmu_rg_t size error.");
 
 enum SEC_PMU_RG_REG_SFT_CTRL00_FIELD
 {
@@ -390,376 +400,18 @@ enum SEC_PMU_RG_REG_PMU_STATUS_FIELD
     SEC_PMU_RG_RST_SRC_POS = 24,
 };
 
-enum SEC_PMU_RG_REG_IOA_LOCK_FIELD
+enum SEC_PMU_RG_REG_IO_LOCK_FIELD
 {
-    SEC_PMU_RG_GPIOA_LOCK_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_LOCK_POS = 0,
+    SEC_PMU_RG_GPIO_LOCK_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIO_LOCK_POS = 0,
+    SEC_PMU_RG_GPIO_DIN_LOCK_MASK = (int)0xffff0000,
+    SEC_PMU_RG_GPIO_DIN_LOCK_POS = 16,
 };
 
-enum SEC_PMU_RG_REG_IOA_PU0_PU1_FIELD
+enum SEC_PMU_RG_REG_IO_DIN_OE_FIELD
 {
-    SEC_PMU_RG_GPIOA_PU0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_PU0_POS = 0,
-    SEC_PMU_RG_GPIOA_PU1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_PU1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_PU2_PD_FIELD
-{
-    SEC_PMU_RG_GPIOA_PU2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_PU2_POS = 0,
-    SEC_PMU_RG_GPIOA_PD_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_PD_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_REN_FIELD
-{
-    SEC_PMU_RG_GPIOA_REN0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_REN0_POS = 0,
-    SEC_PMU_RG_GPIOA_REN1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_REN1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_DS0_DS1_FIELD
-{
-    SEC_PMU_RG_GPIOA_DS0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_DS0_POS = 0,
-    SEC_PMU_RG_GPIOA_DS1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_DS1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_DS2_AE_FIELD
-{
-    SEC_PMU_RG_GPIOA_DS2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_DS2_POS = 0,
-    SEC_PMU_RG_GPIOA_AE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_AE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_FIR_ODE_FIELD
-{
-    SEC_PMU_RG_GPIOA_FIR_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_FIR_POS = 0,
-    SEC_PMU_RG_GPIOA_ODE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_ODE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_LOCK_FIELD
-{
-    SEC_PMU_RG_GPIOC_LOCK_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_LOCK_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOC_PU0_PU1_FIELD
-{
-    SEC_PMU_RG_GPIOC_PU0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_PU0_POS = 0,
-    SEC_PMU_RG_GPIOC_PU1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_PU1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_PU2_PD_FIELD
-{
-    SEC_PMU_RG_GPIOC_PU2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_PU2_POS = 0,
-    SEC_PMU_RG_GPIOC_PD_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_PD_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_REN_FIELD
-{
-    SEC_PMU_RG_GPIOC_REN0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_REN0_POS = 0,
-    SEC_PMU_RG_GPIOC_REN1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_REN1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_DS0_DS1_FIELD
-{
-    SEC_PMU_RG_GPIOC_DS0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_DS0_POS = 0,
-    SEC_PMU_RG_GPIOC_DS1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_DS1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_DS2_AE_FIELD
-{
-    SEC_PMU_RG_GPIOC_DS2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_DS2_POS = 0,
-    SEC_PMU_RG_GPIOC_AE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_AE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_FIR_ODE_FIELD
-{
-    SEC_PMU_RG_GPIOC_FIR_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_FIR_POS = 0,
-    SEC_PMU_RG_GPIOC_ODE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_ODE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_ST_SL_FIELD
-{
-    SEC_PMU_RG_GPIOC_ST_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_ST_POS = 0,
-    SEC_PMU_RG_GPIOC_SL_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_SL_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_LOCK_FIELD
-{
-    SEC_PMU_RG_GPIOE_LOCK_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_LOCK_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOE_PU0_PU1_FIELD
-{
-    SEC_PMU_RG_GPIOE_PU0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_PU0_POS = 0,
-    SEC_PMU_RG_GPIOE_PU1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_PU1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_PU2_PD_FIELD
-{
-    SEC_PMU_RG_GPIOE_PU2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_PU2_POS = 0,
-    SEC_PMU_RG_GPIOE_PD_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_PD_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_REN_FIELD
-{
-    SEC_PMU_RG_GPIOE_REN0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_REN0_POS = 0,
-    SEC_PMU_RG_GPIOE_REN1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_REN1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_DS0_DS1_FIELD
-{
-    SEC_PMU_RG_GPIOE_DS0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_DS0_POS = 0,
-    SEC_PMU_RG_GPIOE_DS1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_DS1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_DS2_AE_FIELD
-{
-    SEC_PMU_RG_GPIOE_DS2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_DS2_POS = 0,
-    SEC_PMU_RG_GPIOE_AE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_AE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_FIR_ODE_FIELD
-{
-    SEC_PMU_RG_GPIOE_FIR_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_FIR_POS = 0,
-    SEC_PMU_RG_GPIOE_ODE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_ODE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_ST_SL_FIELD
-{
-    SEC_PMU_RG_GPIOE_ST_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_ST_POS = 0,
-    SEC_PMU_RG_GPIOE_SL_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_SL_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_LOCK_FIELD
-{
-    SEC_PMU_RG_GPIOI_LOCK_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_LOCK_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOI_PU0_PU1_FIELD
-{
-    SEC_PMU_RG_GPIOI_PU0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_PU0_POS = 0,
-    SEC_PMU_RG_GPIOI_PU1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_PU1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_PU2_PD_FIELD
-{
-    SEC_PMU_RG_GPIOI_PU2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_PU2_POS = 0,
-    SEC_PMU_RG_GPIOI_PD_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_PD_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_REN_FIELD
-{
-    SEC_PMU_RG_GPIOI_REN0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_REN0_POS = 0,
-    SEC_PMU_RG_GPIOI_REN1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_REN1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_DS0_DS1_FIELD
-{
-    SEC_PMU_RG_GPIOI_DS0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_DS0_POS = 0,
-    SEC_PMU_RG_GPIOI_DS1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_DS1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_DS2_AE_FIELD
-{
-    SEC_PMU_RG_GPIOI_DS2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_DS2_POS = 0,
-    SEC_PMU_RG_GPIOI_AE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_AE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_FIR_ODE_FIELD
-{
-    SEC_PMU_RG_GPIOI_FIR_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_FIR_POS = 0,
-    SEC_PMU_RG_GPIOI_ODE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_ODE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_ST_SL_FIELD
-{
-    SEC_PMU_RG_GPIOI_ST_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_ST_POS = 0,
-    SEC_PMU_RG_GPIOI_SL_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_SL_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_LOCK_FIELD
-{
-    SEC_PMU_RG_GPIOK_LOCK_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_LOCK_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOK_PU0_PU1_FIELD
-{
-    SEC_PMU_RG_GPIOK_PU0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_PU0_POS = 0,
-    SEC_PMU_RG_GPIOK_PU1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_PU1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_PU2_PD_FIELD
-{
-    SEC_PMU_RG_GPIOK_PU2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_PU2_POS = 0,
-    SEC_PMU_RG_GPIOK_PD_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_PD_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_REN_FIELD
-{
-    SEC_PMU_RG_GPIOK_REN0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_REN0_POS = 0,
-    SEC_PMU_RG_GPIOK_REN1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_REN1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_DS0_DS1_FIELD
-{
-    SEC_PMU_RG_GPIOK_DS0_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_DS0_POS = 0,
-    SEC_PMU_RG_GPIOK_DS1_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_DS1_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_DS2_AE_FIELD
-{
-    SEC_PMU_RG_GPIOK_DS2_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_DS2_POS = 0,
-    SEC_PMU_RG_GPIOK_AE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_AE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_FIR_ODE_FIELD
-{
-    SEC_PMU_RG_GPIOK_FIR_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_FIR_POS = 0,
-    SEC_PMU_RG_GPIOK_ODE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_ODE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_ST_SL_FIELD
-{
-    SEC_PMU_RG_GPIOK_ST_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_ST_POS = 0,
-    SEC_PMU_RG_GPIOK_SL_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_SL_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_DIN_OE_FIELD
-{
-    SEC_PMU_RG_GPIOA_DIN_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_DIN_POS = 0,
-    SEC_PMU_RG_GPIOA_OE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOA_OE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOA_DOT_FIELD
-{
-    SEC_PMU_RG_GPIOA_DOT_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOA_DOT_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOC_DIN_OE_FIELD
-{
-    SEC_PMU_RG_GPIOC_DIN_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_DIN_POS = 0,
-    SEC_PMU_RG_GPIOC_OE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOC_OE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOC_DOT_FIELD
-{
-    SEC_PMU_RG_GPIOC_DOT_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOC_DOT_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOE_DIN_OE_FIELD
-{
-    SEC_PMU_RG_GPIOE_DIN_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_DIN_POS = 0,
-    SEC_PMU_RG_GPIOE_OE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOE_OE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOE_DOT_FIELD
-{
-    SEC_PMU_RG_GPIOE_DOT_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOE_DOT_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOI_DIN_OE_FIELD
-{
-    SEC_PMU_RG_GPIOI_DIN_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_DIN_POS = 0,
-    SEC_PMU_RG_GPIOI_OE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOI_OE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOI_DOT_FIELD
-{
-    SEC_PMU_RG_GPIOI_DOT_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOI_DOT_POS = 0,
-};
-
-enum SEC_PMU_RG_REG_IOK_DIN_OE_FIELD
-{
-    SEC_PMU_RG_GPIOK_DIN_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_DIN_POS = 0,
-    SEC_PMU_RG_GPIOK_OE_MASK = (int)0xffff0000,
-    SEC_PMU_RG_GPIOK_OE_POS = 16,
-};
-
-enum SEC_PMU_RG_REG_IOK_DOT_FIELD
-{
-    SEC_PMU_RG_GPIOK_DOT_MASK = (int)0xffff,
-    SEC_PMU_RG_GPIOK_DOT_POS = 0,
+    SEC_PMU_RG_GPIO_DIN_MASK = (int)0xffff,
+    SEC_PMU_RG_GPIO_DIN_POS = 0,
 };
 
 enum SEC_PMU_RG_REG_MODE_PAD_LOCK_ST_FIELD

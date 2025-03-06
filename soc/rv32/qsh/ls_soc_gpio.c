@@ -7,6 +7,7 @@
 #include "platform.h"
 #include "reg_sysc_app_per.h"
 #include "reg_sysc_app_awo.h"
+#include "reg_sec_pmu_rg.h"
 #include "reg_app_pmu_rg.h"
 #include "compile_flag.h"
 
@@ -499,6 +500,56 @@ void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,ex
     break;
     }
     *clr = 0;
+}
+
+void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t edge, bool lock)
+{
+    switch(edge)
+    {
+    case INT_EDGE_NONE:
+    break;
+    case INT_EDGE_RISING:
+        if (lock) {
+            SET_BIT(*clr_lock, 1<<num);
+        } else {
+            CLEAR_BIT(*clr_lock, 1<<num);
+        }
+    break;
+    case INT_EDGE_FALLING:
+        if (lock) {
+            SET_BIT(*clr_lock, 1<<16<<num);
+        } else {
+            CLEAR_BIT(*clr_lock, 1<<16<<num);
+        }
+    break;
+    case INT_EDGE_BOTH:
+        if (lock) {
+            SET_BIT(*clr_lock, 1<<num|1<<16<<num);
+        } else {
+            CLEAR_BIT(*clr_lock, 1<<num|1<<16<<num);
+        }
+    break;
+    }
+}
+
+void io_cfg_lock(uint8_t pin, bool lock)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (lock) {
+        SET_BIT(SEC_PMU->IO_CFG[x->port].LOCK, 1<<x->num);
+    } else {
+        CLEAR_BIT(SEC_PMU->IO_CFG[x->port].LOCK, 1<<x->num);
+    }
+}
+
+void io_cfg_input_lock(uint8_t pin, bool lock)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (lock) {
+        SET_BIT(SEC_PMU->IO_CFG[x->port].LOCK, 1<<x->num<<16);
+    } else {
+        CLEAR_BIT(SEC_PMU->IO_CFG[x->port].LOCK, 1<<x->num<<16);
+    }
 }
 
 // void io_v33_exti_config(uint8_t pin,exti_edge_t edge)

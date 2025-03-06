@@ -2,9 +2,24 @@
 #define REG_APP_PMU_RG_TYPE_H_
 #include <stdint.h>
 #include "reg_base_addr.h"
-#include "reg_io_type.h"
 
 #define APP_PMU ((reg_app_pmu_rg_t *)APP_PMU_RG_APP_ADDR)
+
+typedef struct {
+    volatile uint32_t RESERVED0;
+    volatile uint32_t PU1_PU0;
+    volatile uint32_t PD_PU2;
+    volatile uint32_t IEN1_IEN0;
+    volatile uint32_t DS1_DS0;
+    volatile uint32_t AE_DS2;
+    volatile uint32_t OD_FIR;
+    volatile uint32_t SL_ST;
+} reg_io_cfg_t;
+
+typedef struct {
+    volatile uint32_t OE_DIN;
+    volatile uint32_t DOC_DOS;
+} reg_io_val_t;
 
 typedef struct
 {
