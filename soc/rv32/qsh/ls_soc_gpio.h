@@ -148,6 +148,42 @@ uint8_t io_get_input_val(uint8_t pin);
 uint8_t io_read_pin(uint8_t pin);
 
 /**
+  * @brief sec cpu get GPIO input level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO input level
+  *              0 means low level
+  *              1 means high level
+  */
+uint8_t io_sec_get_input_val(uint8_t pin);
+
+/**
+  * @brief sec cpu get GPIO level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO level
+  *              0 means low level
+  *              1 means high level
+  */
+uint8_t io_sec_read_pin(uint8_t pin);
+
+/**
+  * @brief app cpu get GPIO input level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO input level
+  *              0 means low level
+  *              1 means high level
+  */
+uint8_t io_app_get_input_val(uint8_t pin);
+
+/**
+  * @brief app cpu get GPIO level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO level
+  *              0 means low level
+  *              1 means high level
+  */
+uint8_t io_app_read_pin(uint8_t pin);
+
+/**
   * @brief set GPIO drive capability
   * @param  pin  Specific GPIO pin
   * @param drive Configure the GPIO drive capability, This parameter can be a value of @ref io_drive_type_t

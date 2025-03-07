@@ -385,23 +385,52 @@ uint8_t io_get_output_val(uint8_t pin)
     return APP_PMU->IO_VAL[x->port].DOC_DOS >> x->num & 0x1;
 }
 
-uint8_t io_get_input_val(uint8_t pin)
+uint8_t io_sec_get_input_val(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    return APP_PMU->IO_VAL[x->port].OE_DIN >> x->num & 0x1;
+    return SEC_PMU->IO_VAL[x->port].DIN >> x->num & 0x1;
 }
 
-uint8_t io_read_pin(uint8_t pin)
+uint8_t io_sec_read_pin(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    if (APP_PMU->IO_VAL[x->port].OE_DIN & (1<<x->num))
+    if (APP_PMU->IO_VAL[x->port].OE_DIN & (1<<x->num<<16))
     {
-        return io_get_input_val(pin);
+        return io_sec_get_input_val(pin);
     }
     else
     {
         return io_get_output_val(pin);
     }
+}
+
+uint8_t io_app_get_input_val(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return APP_PMU->IO_VAL[x->port].OE_DIN >> x->num & 0x1;
+}
+
+uint8_t io_app_read_pin(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (APP_PMU->IO_VAL[x->port].OE_DIN & (1<<x->num<<16))
+    {
+        return io_app_get_input_val(pin);
+    }
+    else
+    {
+        return io_get_output_val(pin);
+    }
+}
+
+uint8_t io_get_input_val(uint8_t pin)
+{
+    return io_sec_get_input_val(pin);
+}
+
+uint8_t io_read_pin(uint8_t pin)
+{
+    return io_sec_read_pin(pin);
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)
