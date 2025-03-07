@@ -213,7 +213,7 @@ void io_sec_exti_config(uint8_t pin, exti_edge_t edge);
 void io_app_exti_config(uint8_t pin, exti_edge_t edge);
 void per_func_disable_all(uint8_t pin);
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt);
-void io_func_cfg_lock(uint8_t pin, uint8_t func_num, bool lock);
+void io_func_cfg_lock(uint8_t pin, bool lock);
 void io_exti_clr_cfg_lock(uint8_t pin, exti_edge_t edge, bool lock);
 void io_cfg_lock(uint8_t pin, bool lock);
 void io_cfg_app_input_lock(uint8_t pin, bool lock);

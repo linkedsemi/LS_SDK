@@ -595,15 +595,15 @@ void io_cfg_app_input_lock(uint8_t pin, bool lock)
     }
 }
 
-void io_func_cfg_lock(uint8_t pin, uint8_t func_num, bool lock)
+void io_func_cfg_lock(uint8_t pin, bool lock)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     if (lock) {
         SET_BIT(SYSC_SEC_AWO->FUNC_IO_LOCK[pin>>4], 1<<x->num);
-        SET_BIT(SYSC_APP_AWO->IO_FUNC[func_num][x->port>>1], 1<<(((x->port%2)<<4)+x->num));
+        SET_BIT(SYSC_SEC_PER->IO_FUNC_LOCK[pin>>4], 1<<x->num);
     } else {
         CLEAR_BIT(SYSC_SEC_AWO->FUNC_IO_LOCK[pin>>4], 1<<x->num);
-        CLEAR_BIT(SYSC_APP_AWO->IO_FUNC[func_num][x->port>>1], 1<<(((x->port%2)<<4)+x->num));
+        CLEAR_BIT(SYSC_SEC_PER->IO_FUNC_LOCK[pin>>4], 1<<x->num);
     }
 }
 
