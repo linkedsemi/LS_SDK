@@ -10,7 +10,7 @@ extern "C" {
 #ifdef APP_LTPI_HPM_CFG_ADDR
 #define LTPI_HPM ((reg_ltpi_t *)APP_LTPI_HPM_CFG_ADDR)
 #endif
-#ifdef LTPI_SCM_SLV_ADDR
+#ifdef APP_LTPI_SCM_CFG_ADDR
 #define LTPI_SCM ((reg_ltpi_t *)APP_LTPI_SCM_CFG_ADDR)
 #endif
 #ifdef APP_LTPI_PHY_CTL_ADDR
