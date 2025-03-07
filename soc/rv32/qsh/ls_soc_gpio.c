@@ -5,6 +5,8 @@
 #include "field_manipulate.h"
 #include "per_func_mux.h"
 #include "platform.h"
+#include "reg_sysc_sec_per.h"
+#include "reg_sysc_sec_awo.h"
 #include "reg_sysc_app_per.h"
 #include "reg_sysc_app_awo.h"
 #include "reg_sec_pmu_rg.h"
@@ -292,6 +294,12 @@ void io_cfg_output(uint8_t pin)
     APP_PMU->IO_VAL[x->port].OE_DIN |= 1<<x->num<<16;
 }
 
+bool io_is_output_enabled(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return READ_BIT(APP_PMU->IO_VAL[x->port].OE_DIN, 1<<x->num<<16) != 0;
+}
+
 void io_cfg_opendrain(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -317,6 +325,23 @@ void io_cfg_input_pure(uint8_t pin)
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     APP_PMU->IO_CFG[x->port].IEN1_IEN0 &= ~(1<<x->num);
     APP_PMU->IO_CFG[x->port].IEN1_IEN0 |= 1<<x->num<<16;
+}
+
+bool io_is_input_enabled(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return READ_BIT(APP_PMU->IO_CFG[x->port].IEN1_IEN0, 1<<x->num<<16) == 0;
+}
+
+bool io_is_output(uint8_t pin)
+{
+    // return io_is_output_enabled(pin) && (!io_is_input_enabled(pin));
+    return io_is_output_enabled(pin);
+}
+
+bool io_is_input(uint8_t pin)
+{
+    return (!io_is_output_enabled(pin)) && io_is_input_enabled(pin);
 }
 
 void io_write_pin(uint8_t pin,uint8_t val)
@@ -479,7 +504,7 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 //     return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
 // }
 
-void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
+static void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
 {
     switch(edge)
     {
@@ -502,7 +527,19 @@ void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,ex
     *clr = 0;
 }
 
-void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t edge, bool lock)
+void io_sec_exti_config(uint8_t pin, exti_edge_t edge)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    ext_intr_mask(&SEC_PMU->GPIO_INTR_MSK[x->port], &APP_PMU->GPIO_INTR_CLR[x->port], x->num, edge);
+}
+
+void io_app_exti_config(uint8_t pin, exti_edge_t edge)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    ext_intr_mask(&APP_PMU->GPIO_INTR_MSK[x->port], &APP_PMU->GPIO_INTR_CLR[x->port], x->num, edge);
+}
+
+static void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t edge, bool lock)
 {
     switch(edge)
     {
@@ -532,6 +569,12 @@ void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t
     }
 }
 
+void io_exti_clr_cfg_lock(uint8_t pin, exti_edge_t edge, bool lock)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    ext_intr_clr_cfg_lock(&SEC_PMU->GPIO_INTR_LOCK[x->port], x->num, edge, lock);
+}
+
 void io_cfg_lock(uint8_t pin, bool lock)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -542,13 +585,25 @@ void io_cfg_lock(uint8_t pin, bool lock)
     }
 }
 
-void io_cfg_input_lock(uint8_t pin, bool lock)
+void io_cfg_app_input_lock(uint8_t pin, bool lock)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     if (lock) {
         SET_BIT(SEC_PMU->IO_CFG[x->port].LOCK, 1<<x->num<<16);
     } else {
         CLEAR_BIT(SEC_PMU->IO_CFG[x->port].LOCK, 1<<x->num<<16);
+    }
+}
+
+void io_func_cfg_lock(uint8_t pin, uint8_t func_num, bool lock)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (lock) {
+        SET_BIT(SYSC_SEC_AWO->FUNC_IO_LOCK[pin>>4], 1<<x->num);
+        SET_BIT(SYSC_APP_AWO->IO_FUNC[func_num][x->port>>1], 1<<(((x->port%2)<<4)+x->num));
+    } else {
+        CLEAR_BIT(SYSC_SEC_AWO->FUNC_IO_LOCK[pin>>4], 1<<x->num);
+        CLEAR_BIT(SYSC_APP_AWO->IO_FUNC[func_num][x->port>>1], 1<<(((x->port%2)<<4)+x->num));
     }
 }
 

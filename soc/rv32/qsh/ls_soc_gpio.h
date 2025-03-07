@@ -208,13 +208,19 @@ void io_v33_exti_config(uint8_t pin,exti_edge_t edge);
   * @param  pin  Specific GPIO pin 
   * @param  edge edges for IO interrupts 
   */
-void io_exti_config(uint8_t pin,exti_edge_t edge);
-void ext_intr_mask(volatile uint32_t *mask, volatile uint32_t *clr, uint8_t num, exti_edge_t edge);
+
+void io_sec_exti_config(uint8_t pin, exti_edge_t edge);
+void io_app_exti_config(uint8_t pin, exti_edge_t edge);
 void per_func_disable_all(uint8_t pin);
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt);
-void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t edge, bool lock);
+void io_func_cfg_lock(uint8_t pin, uint8_t func_num, bool lock);
+void io_exti_clr_cfg_lock(uint8_t pin, exti_edge_t edge, bool lock);
 void io_cfg_lock(uint8_t pin, bool lock);
-void io_cfg_input_lock(uint8_t pin, bool lock);
+void io_cfg_app_input_lock(uint8_t pin, bool lock);
+bool io_is_output_enabled(uint8_t pin);
+bool io_is_input_enabled(uint8_t pin);
+bool io_is_output(uint8_t pin);
+bool io_is_input(uint8_t pin);
 
 #ifdef __cplusplus
 }
