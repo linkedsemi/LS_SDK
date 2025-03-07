@@ -1,13 +1,17 @@
 #ifndef LS_MSP_LTPI_H_
 #define LS_MSP_LTPI_H_
 #include "reg_ltpi_phy_type.h"
+#include "reg_ltpi_typy.h"
 #include "reg_base_addr.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifdef APP_LTPI_HPM_CFG_ADDR
-#define LTPI_HPM ((reg_ltpi_phy_t *)APP_LTPI_HPM_CFG_ADDR)
+#define LTPI_HPM ((reg_ltpi_t *)APP_LTPI_HPM_CFG_ADDR)
+#endif
+#ifdef LTPI_SCM_SLV_ADDR
+#define LTPI_SCM ((reg_ltpi_t *)APP_LTPI_SCM_CFG_ADDR)
 #endif
 #ifdef APP_LTPI_PHY_CTL_ADDR
 #define LTPI_PHY ((reg_ltpi_phy_t *)APP_LTPI_PHY_CTL_ADDR)
@@ -16,6 +20,14 @@ extern "C" {
 void HAL_MSP_LTPI_PHY_Init();
 
 void HAL_MSP_LTPI_PHY_DeInit();
+
+void HAL_MSP_LTPI_HPM_Init();
+
+void HAL_MSP_LTPI_HPM_DeInit();
+
+void HAL_MSP_LTPI_SCM_Init();
+
+void HAL_MSP_LTPI_SCM_DeInit();
 
 #ifdef __cplusplus
 }
