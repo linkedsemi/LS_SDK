@@ -34,6 +34,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'rv32/qsh/ls_msp_dmacv3.c',
         # 'rv32/qsh/ls_msp_dwtrng.c',
         'rv32/qsh/ls_msp_iwdg.c',
+        'rv32/qsh/ls_msp_ltpi.c',
         'rv32/qsh/ls_msp_otbn.c',
         'rv32/qsh/ls_msp_otp_ctrl.c',
         # 'rv32/qsh/ls_msp_touchkey.c',

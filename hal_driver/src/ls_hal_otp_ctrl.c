@@ -28,11 +28,7 @@ void HAL_OTP_CTRL_Init()
 
     REG_FIELD_WR(OTP_CTRL->PIN, OTP_CTRL_PIN_PTRIM, 1);
 
-#ifdef BOOT_ROM
-    ROM_DELAY_US(50);
-#else
     DELAY_US(50);
-#endif
 }
 
 void HAL_OTP_SET_WR_Addr(uint32_t addr[0x4])
@@ -73,10 +69,9 @@ HAL_StatusTypeDef HAL_OTP_Write_bit(uint32_t offset, uint8_t bit_field)
     REG_FIELD_WR(OTP_CTRL->CTRL, OTP_CTRL_CTRL_1LEN_MODE, 1);
     OTP_CTRL->READY = OTP_CTRL_READY_WRITE_EN_MASK;
     OTP_CTRL->WR_FIFO_CTRL = OTP_CTRL_WR_FIFO_RCLR_MASK | OTP_CTRL_WR_FIFO_WCLR_MASK;
+    DELAY_US(1);
     OTP_CTRL->WR_FIFO_CTRL = 0x0;
-#ifdef ROM_CODE
-    rom_delay(1);
-#endif
+    DELAY_US(1);
 
     OTP_CTRL->PIN = FIELD_BUILD(OTP_CTRL_PIN_PTRIM, 1) | FIELD_BUILD(OTP_CTRL_PIN_PA, offset) |
                     FIELD_BUILD(OTP_CTRL_PIN_PCE, 1) | FIELD_BUILD(OTP_CTRL_PIN_PPROG, 1) |
@@ -120,10 +115,9 @@ HAL_StatusTypeDef HAL_OTP_Write_256Bit(uint32_t offset, uint8_t *data, uint32_t 
                        FIELD_BUILD(OTP_CTRL_WFIFO_FULL_EN, 1);
     OTP_CTRL->READY = OTP_CTRL_READY_WRITE_EN_MASK;
     OTP_CTRL->WR_FIFO_CTRL = OTP_CTRL_WR_FIFO_RCLR_MASK | OTP_CTRL_WR_FIFO_WCLR_MASK;
+    DELAY_US(1);
     OTP_CTRL->WR_FIFO_CTRL = 0x0;
-#ifdef ROM_CODE
-        rom_delay(1);
-#endif
+    DELAY_US(1);
 
     OTP_CTRL->PIN = FIELD_BUILD(OTP_CTRL_PIN_PTRIM, 1) | FIELD_BUILD(OTP_CTRL_PIN_PA, offset) |
                     FIELD_BUILD(OTP_CTRL_PIN_PCE, 1) | FIELD_BUILD(OTP_CTRL_PIN_PPROG, 1) |
@@ -206,10 +200,9 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
                        FIELD_BUILD(OTP_CTRL_RFIFO_FULL_EN, 1);
     OTP_CTRL->READY = OTP_CTRL_READY_READ_EN_MASK;
     OTP_CTRL->RD_FIFO_CTRL = OTP_CTRL_RD_FIFO_RCLR_MASK | OTP_CTRL_RD_FIFO_WCLR_MASK;
+    DELAY_US(1);
     OTP_CTRL->RD_FIFO_CTRL = 0x0;
-#ifdef ROM_CODE
-        rom_delay(1);
-#endif
+    DELAY_US(1);
 
     OTP_CTRL->PIN = FIELD_BUILD(OTP_CTRL_PIN_PTRIM, 1) | FIELD_BUILD(OTP_CTRL_PIN_PA, offset) |
                     FIELD_BUILD(OTP_CTRL_PIN_PCE, 1) | FIELD_BUILD(OTP_CTRL_PIN_PPROG, 0) |
