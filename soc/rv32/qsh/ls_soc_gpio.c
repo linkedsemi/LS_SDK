@@ -330,7 +330,7 @@ void io_cfg_input_pure(uint8_t pin)
 bool io_is_input_enabled(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    return READ_BIT(APP_PMU->IO_CFG[x->port].IEN1_IEN0, 1<<x->num<<16) == 0;
+    return READ_BIT(APP_PMU->IO_CFG[x->port].IEN1_IEN0, 1<<x->num) == 0;
 }
 
 bool io_is_output(uint8_t pin)
