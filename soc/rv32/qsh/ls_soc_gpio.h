@@ -247,6 +247,9 @@ void io_v33_exti_config(uint8_t pin,exti_edge_t edge);
 
 void io_sec_exti_config(uint8_t pin, exti_edge_t edge);
 void io_app_exti_config(uint8_t pin, exti_edge_t edge);
+bool io_sec_get_exti_status(uint8_t pin, exti_edge_t edge);
+bool io_app_get_exti_status(uint8_t pin, exti_edge_t edge);
+void io_clr_exti(uint8_t pin, exti_edge_t edge);
 void per_func_disable_all(uint8_t pin);
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt);
 void io_func_cfg_lock(uint8_t pin, bool lock);

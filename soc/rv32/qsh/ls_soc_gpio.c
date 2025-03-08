@@ -568,6 +568,76 @@ void io_app_exti_config(uint8_t pin, exti_edge_t edge)
     ext_intr_mask(&APP_PMU->GPIO_INTR_MSK[x->port], &APP_PMU->GPIO_INTR_CLR[x->port], x->num, edge);
 }
 
+bool io_sec_get_exti_status(uint8_t pin, exti_edge_t edge)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    bool ret = 0;
+
+    switch(edge)
+    {
+    case INT_EDGE_NONE:
+    break;
+    case INT_EDGE_RISING:
+        ret = ((READ_REG(SEC_PMU->GPIO_INTR_STT[x->port]) >> x->num) & 0x1) == 0x1;
+    break;
+    case INT_EDGE_FALLING:
+        ret = ((READ_REG(SEC_PMU->GPIO_INTR_STT[x->port]) >> x->num >> 16) & 0x1) == 0x1;
+    break;
+    case INT_EDGE_BOTH:
+        ret = (((READ_REG(SEC_PMU->GPIO_INTR_STT[x->port]) >> x->num) & 0x1) == 0x1)
+                && (((READ_REG(SEC_PMU->GPIO_INTR_STT[x->port]) >> x->num >> 16) & 0x1) == 0x1);
+    break;
+    }
+
+    return ret;
+}
+
+bool io_app_get_exti_status(uint8_t pin, exti_edge_t edge)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    bool ret = 0;
+
+    switch(edge)
+    {
+    case INT_EDGE_NONE:
+    break;
+    case INT_EDGE_RISING:
+        ret = ((READ_REG(APP_PMU->GPIO_INTR_STT[x->port]) >> x->num) & 0x1) == 0x1;
+    break;
+    case INT_EDGE_FALLING:
+        ret = ((READ_REG(APP_PMU->GPIO_INTR_STT[x->port]) >> x->num >> 16) & 0x1) == 0x1;
+    break;
+    case INT_EDGE_BOTH:
+        ret = (((READ_REG(APP_PMU->GPIO_INTR_STT[x->port]) >> x->num) & 0x1) == 0x1)
+                && (((READ_REG(APP_PMU->GPIO_INTR_STT[x->port]) >> x->num >> 16) & 0x1) == 0x1);
+    break;
+    }
+
+    return ret;
+}
+
+void io_clr_exti(uint8_t pin, exti_edge_t edge)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    switch(edge)
+    {
+    case INT_EDGE_NONE:
+    break;
+    case INT_EDGE_RISING:
+        SET_BIT(APP_PMU->GPIO_INTR_CLR[x->port], 1<<x->num);
+    break;
+    case INT_EDGE_FALLING:
+        SET_BIT(APP_PMU->GPIO_INTR_CLR[x->port], 1<<16<<x->num);
+    break;
+    case INT_EDGE_BOTH:
+        SET_BIT(APP_PMU->GPIO_INTR_CLR[x->port], (1<<x->num)|(1<<16<<x->num));
+    break;
+    }
+    if (edge) {
+        WRITE_REG(APP_PMU->GPIO_INTR_CLR[x->port], 0);
+    }
+}
+
 static void ext_intr_clr_cfg_lock(volatile uint32_t *clr_lock, uint8_t num, exti_edge_t edge, bool lock)
 {
     switch(edge)
