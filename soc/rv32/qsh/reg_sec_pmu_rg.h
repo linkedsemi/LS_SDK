@@ -4,8 +4,6 @@
 #include "reg_base_addr.h"
 
 #define SEC_PMU ((reg_sec_pmu_rg_t *)SEC_PMU_RG_SEC_ADDR)
-#define SEC_PMU_QSPI_PAD_LOCK ((uint32_t *)SEC_PMU_RG_SEC_ADDR + 0x344)
-#define SEC_PMU_PECI_PAD_LOCK ((uint32_t *)SEC_PMU_RG_SEC_ADDR + 0x348)
 
 typedef struct {
     volatile uint32_t LOCK;
@@ -37,7 +35,15 @@ typedef struct
     volatile uint32_t GPIO_INTR_LOCK[16]; //0xc0
     volatile uint32_t GPIO_INTR_STT[16]; //0x100
     volatile uint32_t GPIO_INTR_RAW[16]; //0x140
-    reg_sec_io_cfg_t IO_CFG[15];//0x180 GPIO[A-T]
+    union {
+        reg_sec_io_cfg_t IO_CFG[15];//0x180 GPIO[A-T]
+        struct {
+            volatile uint32_t RESERVED1[113];
+            volatile uint32_t QSPI_PAD_LOCK; //0x344
+            volatile uint32_t PECI_PAD_LOCK; //0x348
+            volatile uint32_t RESERVED2[5];
+        };
+    };
     reg_sec_io_val_t IO_VAL[16];//0x360
     volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
     volatile uint32_t MODE_PAD_PU_PD; //0x3e4
@@ -152,7 +158,8 @@ typedef struct
 #endif
 }reg_sec_pmu_rg_t;
 _Static_assert(sizeof(reg_sec_pmu_rg_t) == 0x3f8, "reg_sec_pmu_rg_t size error.");
-_Static_assert((uint32_t)(((reg_sec_pmu_rg_t *)0)->IO_VAL) == 0x360, "reg_sec_pmu_rg_t size error.");
+_Static_assert((uint32_t)(&((reg_sec_pmu_rg_t *)0)->QSPI_PAD_LOCK) == 0x344, "reg_sec_pmu_rg_t QSPI_PAD_LOCK offset error.");
+_Static_assert((uint32_t)(((reg_sec_pmu_rg_t *)0)->IO_VAL) == 0x360, "reg_sec_pmu_rg_t IO_VAL offset error.");
 
 enum SEC_PMU_RG_REG_SFT_CTRL00_FIELD
 {
