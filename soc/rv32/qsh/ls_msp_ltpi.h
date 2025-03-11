@@ -1,7 +1,7 @@
 #ifndef LS_MSP_LTPI_H_
 #define LS_MSP_LTPI_H_
 #include "reg_ltpi_phy_type.h"
-#include "reg_ltpi_typy.h"
+#include "reg_ltpi_type.h"
 #include "reg_base_addr.h"
 #ifdef __cplusplus
 extern "C" {
