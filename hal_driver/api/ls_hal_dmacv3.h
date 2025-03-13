@@ -126,7 +126,7 @@ struct ch_reg
 typedef struct __DMA_Controller_HandleTypeDef
 {
     reg_dmac_t *Instance;
-    void (*channel_callback[DMAC_CHANNEL_NUM])(struct __DMA_Controller_HandleTypeDef*,uint32_t,uint8_t,uint32_t *,bool);
+    void (*channel_callback[DMAC_CHANNEL_NUM])(struct __DMA_Controller_HandleTypeDef*,uint32_t,uint8_t,uint32_t *,bool,uint32_t);
     uint32_t param[DMAC_CHANNEL_NUM];
 }DMA_Controller_HandleTypeDef;
 
@@ -208,7 +208,7 @@ void HAL_DMA_Controller_Init(DMA_Controller_HandleTypeDef *hdma);
 
 void HAL_DMA_Controller_DeInit(DMA_Controller_HandleTypeDef *hdma);
 
-void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,struct ch_reg *reg_cfg,void (*callback)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,uint32_t *,bool),uint32_t param);
+void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,struct ch_reg *reg_cfg,void (*callback)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,uint32_t *,bool,uint32_t),uint32_t param);
 
 uint32_t HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx);
 

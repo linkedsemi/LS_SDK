@@ -15,7 +15,7 @@ void HAL_DMA_Controller_DeInit(DMA_Controller_HandleTypeDef *hdma)
     HAL_DMA_Controller_MSP_DeInit(hdma);
 }
 
-void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,struct ch_reg *reg_cfg,void (*callback)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,uint32_t *,bool),uint32_t param)
+void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,struct ch_reg *reg_cfg,void (*callback)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,uint32_t *,bool,uint32_t),uint32_t param)
 {
     uint8_t ch_idx = reg_cfg->ch_idx;
     hdma->channel_callback[ch_idx] = callback;
@@ -49,7 +49,7 @@ uint32_t HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx
     return hdma->Instance->CH[ch_idx].CTL[1] & 0xfff;
 }
 
-static void int_process(DMA_Controller_HandleTypeDef *hdma,volatile uint32_t *REG_STATUS,volatile uint32_t *REG_CLR,bool tfr_end)
+static void int_process(DMA_Controller_HandleTypeDef *hdma,volatile uint32_t *REG_STATUS,volatile uint32_t *REG_CLR,bool tfr_end,uint32_t status_int)
 {
     uint8_t status = *REG_STATUS;
     uint8_t i;
@@ -58,7 +58,7 @@ static void int_process(DMA_Controller_HandleTypeDef *hdma,volatile uint32_t *RE
         if(status&1<<i)
         {
             *REG_CLR = 1<<i;
-            hdma->channel_callback[i](hdma,hdma->param[i],i,(uint32_t *)(hdma->Instance->CH[i].LLP&~0x3),tfr_end);
+            hdma->channel_callback[i](hdma,hdma->param[i],i,(uint32_t *)(hdma->Instance->CH[i].LLP&~0x3),tfr_end,status_int);
         }
     }
 }
@@ -77,7 +77,7 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
         }
         if(status_int & DMAC_DSTT_MASK)
         {
-            int_process(hdma,&hdma->Instance->STATUSDSTTRAN,&hdma->Instance->CLEARDSTTRAN,false);
+            int_process(hdma,&hdma->Instance->STATUSDSTTRAN,&hdma->Instance->CLEARDSTTRAN,false,DMAC_DSTT_MASK);
         }
         if(status_int & DMAC_SRCT_MASK)
         {
@@ -85,11 +85,11 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
         }
         if(status_int & DMAC_BLOCK_MASK)
         {
-            int_process(hdma,&hdma->Instance->STATUSBLOCK,&hdma->Instance->CLEARBLOCK,false);
+            int_process(hdma,&hdma->Instance->STATUSBLOCK,&hdma->Instance->CLEARBLOCK,false,DMAC_SRCT_MASK);
         }
         if(status_int & DMAC_TFR_MASK)
         {
-            int_process(hdma,&hdma->Instance->STATUSTFR,&hdma->Instance->CLEARTFR,true);
+            int_process(hdma,&hdma->Instance->STATUSTFR,&hdma->Instance->CLEARTFR,true,DMAC_TFR_MASK);
         }
     }
     
