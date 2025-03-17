@@ -90,11 +90,13 @@ static inline void app_cpu_reset(void)
     SYSC_SEC_CPU->APP_CPU_SRST = 0x2; /* reset */
 }
 
+#if defined(CONFIG_CPU2_BOOT_ADDR)
 static inline void app_cpu_dereset(void)
 {
-    SYSC_SEC_CPU->APP_CPU_ADDR_CFG = 0x10080000; /* set cpu1 pc addr */
+    SYSC_SEC_CPU->APP_CPU_ADDR_CFG = CONFIG_CPU2_BOOT_ADDR; /* set cpu1 pc addr */
     SYSC_SEC_CPU->APP_CPU_SRST = 0x1; /* release reset */
 }
+#endif
 
 static inline void app_cpu_dereset_by_addr(uint32_t pc_addr)
 {
