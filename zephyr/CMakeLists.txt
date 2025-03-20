@@ -276,6 +276,7 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/api/otbn
     ../module/common
     ../module/debug
+    ../module/debug/semihosting/riscv
     ../module/debug/RTT
     ../module/static_buffer
   )
@@ -284,7 +285,7 @@ if(CONFIG_SOC_LSQSH)
         ../module/common
         ../module/crc
         ../module/debug
-        ../module/debug/semihosting/riscv/
+        ../module/debug/semihosting/riscv
         ../module/debug/RTT
         ../module/static_buffer
   )
