@@ -34,6 +34,15 @@ typedef struct
     volatile uint32_t DATA_CHANNEL_TAG; //0x104
     volatile uint32_t LTPI_LINK_ST; //0x108
     volatile uint32_t DC_PADDR_CFG; //0x10c
+#if 1
+    volatile uint32_t SYS_INTR_MSK[5]; //0x110
+    volatile uint32_t SYS_INTR_STT[5]; //0x124
+    volatile uint32_t TX_OFFSET_CNT_FREQ[6]; //0x138
+    volatile uint32_t CONTROLLER_CNT_200M[2]; //0x150
+    volatile uint32_t TARGET_CNT_200M[2]; //0x158
+    volatile uint32_t CONTROLLER_CNT_120M[2]; //0x160
+    volatile uint32_t TARGET_CNT_120M[2]; //0x168
+#else
     volatile uint32_t SYS_INTR_MSK_31_0; //0x110
     volatile uint32_t SYS_INTR_MSK_63_32; //0x114
     volatile uint32_t SYS_INTR_MSK_95_64; //0x118
@@ -58,6 +67,7 @@ typedef struct
     volatile uint32_t CONTROLLER_CNT1_120M; //0x164
     volatile uint32_t TARGET_CNT0_120M; //0x168
     volatile uint32_t TARGET_CNT1_120M; //0x16c
+#endif
 }reg_ltpi_t;
 
 enum LTPI_REG_LINK_ST_FIELD
