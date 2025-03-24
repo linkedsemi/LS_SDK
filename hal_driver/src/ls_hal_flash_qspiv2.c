@@ -73,8 +73,8 @@ static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_exit,)
 }
 
 #if DUAL_CONTINUOUS_MODE_OFF
-static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,){}
-static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_exit,){}
+void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,){}
+void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_exit,){}
 #else
 void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
 {

@@ -30,7 +30,7 @@ extern "C" {
 #endif
 #endif
 
-#if defined(LM3050)
+#if defined(LM3050) || defined(QSH)
 #define DUAL_CONTINUOUS_MODE_OFF 1
 #else
 #define DUAL_CONTINUOUS_MODE_OFF 0
