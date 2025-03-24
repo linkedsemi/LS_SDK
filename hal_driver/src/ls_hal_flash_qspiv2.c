@@ -36,7 +36,7 @@ void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_enter,)
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = &dummy;
     lsqspiv2_stg_read_write(&cfg);
-    #if !defined FLASH_PROG_ALGO && !defined BOOT_ROM
+    #if !defined(FLASH_PROG_ALGO) && !defined(BOOT_ROM) && !defined(QSH)
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
     #endif
 }
@@ -67,7 +67,7 @@ static void XIP_BANNED_FUNC(hal_flash_quad_xip_mode_exit,)
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = &dummy;
     lsqspiv2_stg_read_write(&cfg);
-    #if !defined FLASH_PROG_ALGO && !defined BOOT_ROM
+    #if !defined(FLASH_PROG_ALGO) && !defined(BOOT_ROM) && !defined(QSH)
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
     #endif
 }
@@ -102,7 +102,7 @@ void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_enter,)
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = &dummy;
     lsqspiv2_stg_read_write(&cfg);
-    #if !defined FLASH_PROG_ALGO && !defined BOOT_ROM
+    #if !defined(FLASH_PROG_ALGO) && !defined(BOOT_ROM) && !defined(QSH)
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
     #endif
 }
@@ -133,7 +133,7 @@ static void XIP_BANNED_FUNC(hal_flash_dual_xip_mode_exit,)
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = &dummy;
     lsqspiv2_stg_read_write(&cfg);
-    #if !defined FLASH_PROG_ALGO && !defined BOOT_ROM
+    #if !defined(FLASH_PROG_ALGO) && !defined(BOOT_ROM) && !defined(QSH)
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
     #endif
 }
