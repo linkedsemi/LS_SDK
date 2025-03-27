@@ -44,7 +44,14 @@ typedef struct
             volatile uint32_t RESERVED2[5];
         };
     };
-    reg_sec_io_val_t IO_VAL[16];//0x360
+    union {
+        reg_sec_io_val_t IO_VAL[15];//0x360 GPIO[A-T]
+        struct {
+            volatile uint32_t RESERVED3[29];
+            volatile uint32_t QSPI_PAD_DIN; //0x344
+            volatile uint32_t RESERVED4[2];
+        };
+    };
     volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
     volatile uint32_t MODE_PAD_PU_PD; //0x3e4
     volatile uint32_t MODE_PAD_REN_DS0; //0x3e8
@@ -148,7 +155,7 @@ typedef struct
     volatile uint32_t GPIO_N_DIN; //0x3c0
     volatile uint32_t GPIO_Q_DIN; //0x3c8
     volatile uint32_t GPIO_T_DIN; //0x3d0
-    volatile uint32_t GPIO_V_DIN; //0x3d8
+    volatile uint32_t GPIO_V_DIN; //0x3d4
     volatile uint32_t MODE_PAD_LOCK_ST; //0x3e0
     volatile uint32_t MODE_PAD_PU_PD; //0x3e4
     volatile uint32_t MODE_PAD_REN_DS0; //0x3e8

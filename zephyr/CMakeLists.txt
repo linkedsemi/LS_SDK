@@ -169,7 +169,7 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_iwdgv2.c
     ../hal_driver/src/ls_hal_ps2h.c
     ../soc/rv32/systick.c
-    ../soc/rv32/int_call_asm.S
+    # ../soc/rv32/int_call_asm.S
     ../soc/rv32/leo/cpu.c
     ../soc/rv32/leo/sleep_asm.S
     ../soc/rv32/leo/exception_entry.S
@@ -322,7 +322,7 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/otbn/text_array/sm2_text.c
     ../soc/rv32/qsh/ls_msp_otbn.c
     ../soc/rv32/systick.c
-    ../soc/rv32/int_call_asm.S
+    # ../soc/rv32/int_call_asm.S
     ../soc/rv32/qsh/cpu.c
     ../soc/rv32/qsh/sleep_asm.S
     ../soc/rv32/qsh/exception_entry.S
