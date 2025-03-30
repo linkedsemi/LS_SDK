@@ -13,6 +13,10 @@
 #include "reg_app_pmu_rg.h"
 #include "compile_flag.h"
 
+#if (!defined(CONFIG_SOC_LSQSH_CPU1)) && (!defined(CONFIG_SOC_LSQSH_CPU2))
+#define CONFIG_SOC_LSQSH_CPU1
+#endif
+
 static gpio_port_pin_t uart1_txd;
 static gpio_port_pin_t uart1_rxd;
 static gpio_port_pin_t uart2_txd;
@@ -425,12 +429,20 @@ uint8_t io_app_read_pin(uint8_t pin)
 
 uint8_t io_get_input_val(uint8_t pin)
 {
+#if defined(CONFIG_SOC_LSQSH_CPU1)
     return io_sec_get_input_val(pin);
+#elif defined(CONFIG_SOC_LSQSH_CPU2)
+    return io_app_get_input_val(pin);
+#endif
 }
 
 uint8_t io_read_pin(uint8_t pin)
 {
+#if defined(CONFIG_SOC_LSQSH_CPU1)
     return io_sec_read_pin(pin);
+#elif defined(CONFIG_SOC_LSQSH_CPU2)
+    return io_app_read_pin(pin);
+#endif
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)
