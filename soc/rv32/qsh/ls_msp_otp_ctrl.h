@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+#define OTP_MEM_TOTAL_BYTES   (0x1000)
 
 #define OTP_CTRL ((reg_otp_ctrl_t *)SEC_OTP_CTRL_ADDR)
 
