@@ -1,5 +1,7 @@
 if(CONFIG_SOC_LE5010)
 
+  option(LS_USE_SOURCE_COMPILE "Use source code compile" OFF)
+
   zephyr_include_directories(
     .
     ../soc
@@ -58,10 +60,83 @@ if(CONFIG_SOC_LE5010)
     ../soc/arm_cm/le501x/integration/modem_rf_le501x.c
   )
 
-  zephyr_link_libraries(
-    ls_ble_controller
-    -L${CMAKE_CURRENT_SOURCE_DIR}/../soc/arm_cm/le501x/bin
-  )
+  if(LS_USE_SOURCE_COMPILE)
+    zephyr_library_include_directories(
+      ../stack/modules/rwip/api
+      ../stack/modules/ke/api
+      ../stack/modules/common/api
+      ../stack/modules/aes/api
+      ../stack/modules/nvds/api
+      ../stack/modules/rf/api
+      ../stack/modules/ecc_p256/api
+      ../stack/modules/h4tl/api
+      ../stack/modules/dbg/api
+      ../stack/ip/ble/ll/api
+      ../stack/ip/ble/hl/inc
+      ../stack/ip/ble/hl/api
+      ../stack/ip/sch/api
+      ../stack/ip/ahi/api
+      ../stack/inc
+      ../link_layer
+      ../link_layer/le501x
+    )
+
+    zephyr_library_sources(
+      ../stack/link_layer/evt_ctrl.c
+      ../stack/link_layer/ll_conn.c
+      ../stack/link_layer/ll_env.c
+      ../stack/link_layer/ll_evt.c
+      ../stack/link_layer/ll_hci.c
+      ../stack/link_layer/ll_sched.c
+      ../stack/link_layer/ll_test.c
+      ../stack/link_layer/timer_wrapper.c
+      ../stack/link_layer/white_list.c
+      ../stack/link_layer/sw_cache.c
+      ../stack/link_layer/adv_report_cache.c
+      ../stack/link_layer/dev_addr_cache.c
+      ../stack/link_layer/ll_ext_adv.c
+      ../stack/link_layer/ll_ext_scan.c
+      ../stack/link_layer/ll_external.c
+      ../stack/link_layer/ll_sync.c
+      ../stack/link_layer/per_adv_list.c
+      ../stack/link_layer/rwhost_if.c
+      ../stack/link_layer/le501x/ll_port.c
+      ../stack/link_layer/le501x/sw_timer_port.c
+      # ../stack/modules/rwip/src/rwip.c
+      # ../stack/modules/rwip/src/rwip_driver.c
+      ../stack/modules/ke/src/ke_timer.c
+      ../stack/modules/ke/src/ke_msg.c
+      ../stack/modules/ke/src/ke_queue.c
+      ../stack/modules/ke/src/ke_mem.c
+      ../stack/modules/ke/src/ke_task.c
+      ../stack/modules/ke/src/ke_event.c
+      ../stack/modules/ke/src/ke.c
+      ../stack/modules/common/src/co_utils.c
+      ../stack/modules/common/src/co_list.c
+      ../stack/modules/aes/src/aes.c
+      # ../stack/modules/aes/src/aes_cmac.c
+      # ../stack/modules/aes/src/aes_rpa.c
+      # ../stack/modules/aes/src/aes_c1.c
+      # ../stack/modules/aes/src/aes_f4.c
+      # ../stack/modules/aes/src/aes_f5.c
+      # ../stack/modules/aes/src/aes_f6.c
+      # ../stack/modules/aes/src/aes_g2.c
+      # ../stack/modules/aes/src/aes_ccm.c
+      # ../stack/modules/aes/src/aes_s1.c
+      # ../stack/modules/aes/src/aes_k1.c
+      # ../stack/modules/aes/src/aes_k2.c
+      # ../stack/modules/aes/src/aes_k3.c
+      # ../stack/modules/aes/src/aes_k4.c
+      ../stack/modules/ecc_p256/src/ecc_p256.c
+      # ../stack/modules/h4tl/src/h4tl.c
+      ../stack/export_lib/le501x/ls_ble_controller.c
+    )
+  else()
+    zephyr_link_libraries(
+      ls_ble_controller
+      -L${CMAKE_CURRENT_SOURCE_DIR}/../soc/arm_cm/le501x/bin
+    )
+  endif()
 
   zephyr_linker_sources(
     RAMFUNC_SECTION
