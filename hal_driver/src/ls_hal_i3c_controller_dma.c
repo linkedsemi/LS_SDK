@@ -28,20 +28,20 @@ void I3C_StateUpdate(I3C_HandleTypeDef *hi3c);
 void I3C_Enable_IRQ(I3C_HandleTypeDef *hi3c, uint32_t InterruptRequest);
 void I3C_Disable_IRQ(I3C_HandleTypeDef *hi3c, uint32_t InterruptRequest);
 
-void i3c_dma_tx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void i3c_dma_tx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
 
     I3C_HandleTypeDef *hi3cx = (I3C_HandleTypeDef *)param;
     LL_I3C_DisableDMAReq_TX(hi3cx->Instance);
 }
 
-void i3c_dma_ctrl_rx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void i3c_dma_ctrl_rx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
   I3C_HandleTypeDef *hi3cx = (I3C_HandleTypeDef *)param;
   LL_I3C_DisableDMAReq_RX(hi3cx->Instance);
 }
 
-void i3c_dma_ctrl_tx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void i3c_dma_ctrl_tx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
   I3C_HandleTypeDef *hi3cx = (I3C_HandleTypeDef *)param;
   /* Disable Rx DMA Request */

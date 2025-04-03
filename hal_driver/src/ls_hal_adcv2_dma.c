@@ -80,9 +80,9 @@ HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc)
 #elif DMACV3
 #include "ls_hal_dmacv3.h"
 
-void ADC_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void ADC_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         ADC_HandleTypeDef *hadc = (ADC_HandleTypeDef *)param;
         CLEAR_BIT(hadc->Instance->MISC_CTRL, ADC_DMA_EN_MASK);

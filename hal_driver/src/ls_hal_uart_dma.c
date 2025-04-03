@@ -96,18 +96,18 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
 }
 #elif DMACV3
 #include "ls_hal_dmacv3.h"
-static void UART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+static void UART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, uint32_t status_int)
 {
-    if (tfr_end == false)
+    if (!(status_int & DMAC_TFR_MASK))
     {
         UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
         HAL_UART_DMA_TxCpltCallback(huart);
     }
 }
 
-static void UART_Recevie_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+static void UART_Recevie_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, uint32_t status_int)
 {
-    if (tfr_end == false)
+    if (!(status_int & DMAC_TFR_MASK))
     {
         UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
         HAL_UART_DMA_RxCpltCallback(huart);

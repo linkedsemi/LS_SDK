@@ -122,18 +122,18 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
 }
 #elif DMACV3
 #include "ls_hal_dmacv3.h"
-static void SSI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void SSI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
         ssi_tx_dma_cb(hssi);
     }
 }
 
-static void SSI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void SSI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         SSI_HandleTypeDef *hssi = (SSI_HandleTypeDef *)param;
         ssi_rx_dma_cb(hssi);
