@@ -100,7 +100,7 @@ static bool otp_block_write(uint32_t offset, uint8_t *data, uint32_t length)
     otp_single_wirte(buffer, offset, length, 0);// pas low
     otp_single_wirte(buffer, offset, length, 1);// pas high
 
-    return HAL_OK;
+    return true;
 }
 
 HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
@@ -140,15 +140,8 @@ static uint32_t otp_read_en_check(uint32_t offset, uint32_t length)
 
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 {
-    if ((offset + length) > OTP_MEM_TOTAL_BYTES)
+    if (((offset + length) > OTP_MEM_TOTAL_BYTES) || (length == 0))
         return HAL_INVALIAD_PARAM;
-
-    uint32_t error_len = otp_read_en_check(offset, length);
-    if (error_len != 0xFFFFFFFF)
-    {
-        memset(data + error_len, OTP_BYTE_DEFAULT_VALUE, length - error_len);
-        length = error_len;
-    }
 
     uint32_t remain_length = length & 0x3;
     uint32_t len = (length + 0x3) & ~0x3;
