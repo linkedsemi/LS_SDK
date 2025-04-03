@@ -597,19 +597,19 @@ HAL_StatusTypeDef HAL_I3C_Tgt_CRReq_IT(I3C_HandleTypeDef *hi3c)
     return status;
 }
 
-void i3c_dma_tgt_rx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void i3c_dma_tgt_rx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
     I3C_HandleTypeDef *hi3cx = (I3C_HandleTypeDef *)param;
-    if(tfr_end)
+    if(status_int & DMAC_TFR_MASK)
     {
         I3C_TargetEnableDMA(hi3cx->Instance,false,false);
     }
 }
 
-void i3c_dma_tgt_tx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void i3c_dma_tgt_tx_callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
   I3C_HandleTypeDef *hi3cx = (I3C_HandleTypeDef *)param;
-  if(tfr_end)
+  if(status_int & DMAC_TFR_MASK)
   {
     I3C_TargetEnableDMA(hi3cx->Instance,false,false);
     hi3cx->Instance->SWDATAB = hi3cx->pXferData->TxBuf.pBuffer[hi3cx->TxXferCount-1]|I3C_SWDATAB_END1_MASK;   

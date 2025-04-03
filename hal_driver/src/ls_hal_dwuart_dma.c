@@ -6,9 +6,9 @@
 __attribute__((weak)) void HAL_DWUART_DMA_TxCpltCallback(DWUART_HandleTypeDef *huart) {}
 __attribute__((weak)) void HAL_DWUART_DMA_RxCpltCallback(DWUART_HandleTypeDef *huart) {}
 
-static void DWUART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+static void DWUART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, uint32_t status_int)
 {
-    if (tfr_end == false)
+    if (!(status_int & DMAC_TFR_MASK))
     {
         DWUART_HandleTypeDef *hdwuart = (DWUART_HandleTypeDef *)param;
         hdwuart->Tx_Env.DMA.Channel_Done = true;
@@ -16,9 +16,9 @@ static void DWUART_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uin
     }
 }
 
-static void DWUART_Recevie_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+static void DWUART_Recevie_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, uint32_t status_int)
 {
-    if (tfr_end == false)
+    if (!(status_int & DMAC_TFR_MASK))
     {
         DWUART_HandleTypeDef *hdwuart = (DWUART_HandleTypeDef *)param;
         hdwuart->Rx_Env.DMA.Channel_Done = true;
