@@ -5,15 +5,15 @@ from gmssl import sm2
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT
 from binascii import unhexlify, hexlify
 
-do_sign = False
-do_crypt = False
-do_kek = False
-if 'sign' in sys.argv:
-    do_sign = True
-if 'crypt' in sys.argv:
-    do_crypt = True
-if 'kek' in sys.argv:
-    do_kek = True
+do_sign = True
+do_crypt = True
+do_kek = True
+# if 'sign' in sys.argv:
+#     do_sign = True
+# if 'crypt' in sys.argv:
+#     do_crypt = True
+# if 'kek' in sys.argv:
+#     do_kek = True
 
 CRYPT_PRI_KEY = 'B9AB0B828FF68872F21A837FC303668428DEA11DCD1B24429D0C99E24EED83D5'
 CRYPT_PUB_KEY = 'B9C9A6E04E9C91F7BA880429273747D7EF5DDEB0BB2FF6317EB00BEF331A83081A6994B8993F3F5D6EADDDB81872266C87C018FB4162F5AF347B483E24620207'
@@ -52,44 +52,42 @@ crypt_pri_key = CRYPT_PRI_KEY
 crypt_pub_key = CRYPT_PUB_KEY
 sm4_key = SM4_KEY.to_bytes(16,'big')
 iv = IV.to_bytes(12,'big')
-
 image_data = open(sys.argv[1],'rb').read()
-test_word0 = 0xa5a53c3c
-test_word1 = 0x5a5ac3c3
-offset = 0x100
-length = len(image_data)
-version = 0x1
-decrypt_key_id = 0
-public_key_id = 0
-kek_enable = 0 
-exe_addr = 0x0
-count = iv + struct.pack('>I', offset >> 4)
-realtime_decrypt_lock = 0
-sign = [0xFF]*64
-encrypt_key = [0xFF]*144
 
-if do_crypt:#SM4 CTR CRYPT
+test_word0              = 0xa5a53c3c
+test_word1              = 0x5a5ac3c3
+offset                  = 0x100
+length                  = len(image_data)
+version                 = 0x1
+decrypt_key_id          = 0
+public_key_id           = 0
+kek_enable              = 0 
+exe_addr                = 0x0
+count                   = [0xFF] * 16
+realtime_decrypt_lock   = 0
+sign                    = [0xFF] * 64
+encrypt_key             = [0xFF] * 144
+
+if do_crypt:
     decrypt_key_id = 1
+    count = iv + struct.pack('>I', offset >> 4)
     image_data = sm4_ctr_encrypt(image_data, sm4_key, count)
-    if do_kek:#SM2 ENCRYPT
+    if do_kek:
         kek_enable = 1
         decrypt_key_id = 2
-        sm4_key = 0x67f1aec5ba0d615be0c7074923de30ba.to_bytes(16,'big')
-        encrypt_key = sm2_kek(sm4_key, crypt_pri_key, crypt_pub_key) + b'\xff' * 32
-
-if do_sign:#SM2 SIGN
+        encrypt_key = sm2_kek(sm4_key, crypt_pri_key, crypt_pub_key) + b'\xFF' * 32
+if do_sign:
     public_key_id = 3
     sign = unhexlify(image_sign(image_data, sign_pri_key, sign_pub_key))
-    print(f'sign: 0x{sign.hex()}')
+    print(f'firmware_sign: 0x{sign.hex()}')
 
-image_header = struct.pack('5I', test_word0, test_word1, offset, length, version)
+image_header  = struct.pack('5I', test_word0, test_word1, offset, length, version)
 image_header += struct.pack('4B', decrypt_key_id, public_key_id, kek_enable, realtime_decrypt_lock)
 image_header += struct.pack('16B', *count)
 image_header += struct.pack('144B', *encrypt_key)
 image_header += struct.pack('64B', *sign)
 image_header += struct.pack('I', exe_addr)
-crc = zlib.crc32(image_header)
-image_header += struct.pack('I', crc)
+image_header += struct.pack('I', zlib.crc32(image_header))
 with open(sys.argv[2],'wb') as out:
     out.write(image_header)
     out.write(image_data)
