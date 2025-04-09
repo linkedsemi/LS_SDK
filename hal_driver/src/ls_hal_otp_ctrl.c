@@ -124,7 +124,7 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
     return HAL_OK;
 }
 
-static uint32_t otp_read_en_check(uint32_t offset, uint32_t length)
+static void otp_read_en_check(uint32_t offset, uint8_t *data, uint32_t length)
 {
     uint32_t bit_start = offset / ONEBIT_BYTES;
     uint32_t bit_end = (offset + length - 1) / ONEBIT_BYTES;
@@ -132,10 +132,10 @@ static uint32_t otp_read_en_check(uint32_t offset, uint32_t length)
     for (uint32_t i = bit_start; i <= bit_end; i++)
     {
         if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20)) & 0x1)
-            return i * 0x20;
+        {
+            memset(&data[i * ONEBIT_BYTES], OTP_BYTE_DEFAULT_VALUE, ONEBIT_BYTES);
+        }
     }
-
-    return 0xFFFFFFFF;
 }
 
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
@@ -145,6 +145,8 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 
     uint32_t remain_length = length & 0x3;
     uint32_t len = (length + 0x3) & ~0x3;
+    uint32_t count = length;
+    uint8_t *out = data;
 
     otp_check_power_ready();
 
@@ -167,16 +169,16 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
                     FIELD_BUILD(OTP_CTRL_PIN_PTM, 0);
     OTP_CTRL->SOFT_REQ = OTP_CTRL_SOFT_REQ_MASK;
 
-    while (length - remain_length)
+    while (count - remain_length)
     {
         if ((OTP_CTRL->RD_FIFO_CTRL & OTP_CTRL_RD_FIFO_EMPTY_MASK) == 0)
         {
             uint32_t temp_data = OTP_CTRL->RD_DATA;
-            *data++ = temp_data & 0xff;
-            *data++ = (temp_data >> 8) & 0xff;
-            *data++ = (temp_data >> 16) & 0xff;
-            *data++ = (temp_data >> 24) & 0xff;
-            length -= 4;
+            *out++ = temp_data & 0xff;
+            *out++ = (temp_data >> 8) & 0xff;
+            *out++ = (temp_data >> 16) & 0xff;
+            *out++ = (temp_data >> 24) & 0xff;
+            count -= 4;
         }
     }
 
@@ -187,9 +189,11 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 
         for (uint8_t i = 0; i < remain_length; i++)
         {
-            data[i] = (temp_data >> (8 * i)) & 0xff;
+            out[i] = (temp_data >> (8 * i)) & 0xff;
         }
     }
+
+    otp_read_en_check(offset, data, length);
 
     return HAL_OK;
 }
