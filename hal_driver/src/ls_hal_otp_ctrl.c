@@ -133,7 +133,7 @@ static void otp_read_en_check(uint32_t offset, uint8_t *data, uint32_t length)
     {
         if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20)) & 0x1)
         {
-            memset(&data[i * ONEBIT_BYTES], OTP_BYTE_DEFAULT_VALUE, ONEBIT_BYTES);
+            memset(data + (i - bit_start) * ONEBIT_BYTES, OTP_BYTE_DEFAULT_VALUE, ONEBIT_BYTES);
         }
     }
 }
