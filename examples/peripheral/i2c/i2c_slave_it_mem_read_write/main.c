@@ -123,18 +123,11 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c, uint8_t error)
 {
     LOG_RAW("HAL_I2C_ErrorCallback %x\r\r", error);
-    // HAL_I2C_EnableListen_IT(&g_i2cHandle);
-}
-
-void HAL_I2C_StopCallback(I2C_HandleTypeDef *hi2c)
-{
-    if (g_slaveStatus == I2C_RX_START) {
-        uint8_t rxLen = I2C_RX_DATA_LEN_BYTE - hi2c->Rx_Env.XferCount;
-        LOG_RAW("rx len %x, data: ", rxLen);
-        for (uint8_t i = 0; i < rxLen; i++) {
-            LOG_RAW("%x, ", g_slaveRxData[i]);
-        }
-        LOG_RAW("\r\n");
+    /* 如果长度错误，打印还有剩余多少长度没有接收或者发送 */
+    if (error == HAL_I2C_ERROR_SIZE) {
+        /* 如果长度错误是rx的话，是正常的情况，因为设置的rx len是200字节，主机在mem寻址的时候，发送的是2个字节的寄存器地址 */
+        LOG_RAW("rx remain %x, tx remain %x \r\r", hi2c->Rx_Env.XferCount,  hi2c->Tx_Env.XferCount);
+        /* 长度错误，这个时候已经收到停止信号，重新清空状态 */
+        g_slaveStatus = I2C_IDLE;
     }
-    g_slaveStatus = I2C_IDLE;
 }

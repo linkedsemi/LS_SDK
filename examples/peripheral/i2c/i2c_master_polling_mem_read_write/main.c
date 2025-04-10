@@ -55,7 +55,7 @@ int main()
             }
             LOG_RAW("\r\n");
         }
-
+        DELAY_US(1000);
         /* 往寄存器地址0x1234，写入两个字节的数据0x55和0xAA */
         regData[0] = 0x55;
         regData[1] = 0xAA;

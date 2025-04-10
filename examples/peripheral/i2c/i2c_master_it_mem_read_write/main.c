@@ -57,7 +57,7 @@ int main()
             LOG_RAW("%lx, ", regData[i]);
         }
         LOG_RAW("\r\n");
-
+        DELAY_US(1000);
         /* 往寄存器地址0x1234，写入两个字节的数据0x55和0xAA */
         regData[0] = 0x55;
         regData[1] = 0xAA;
@@ -79,6 +79,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
     LOG_I("HAL_I2C_MasterTxCpltCallback\r\n");
     if (g_memWriteOverFlag == 0) {
         g_memWriteOverFlag = 1;
+        hi2c->State = 0; /* 主机发送完成，清除状态 */
     }
 }
 
@@ -88,6 +89,7 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
     LOG_RAW("HAL_I2C_MasterRxCpltCallback\r\n");
     if (g_memReadOverFlag == 0) {
         g_memReadOverFlag = 1;
+        hi2c->State = 0; /* 主机接收完成，清除状态 */
     }
 
 }
@@ -95,6 +97,13 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 /* i2c错误回调 */
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c, uint8_t error)
 {
+    /* 主机写状态，收到了ncak的标志，判断当前是否还存在没有接收的字节 */
+    /* 如果所有字节都接收完了，则该nack表示的是，从机所有数据已经收到,返回的nack，并非错误，直接返回 */
+    if (error == HAL_I2C_ERROR_NACKF) {
+        if ((g_memWriteOverFlag == 0) && (hi2c->Rx_Env.XferCount == 0)) {
+            return;
+        }
+    }
     LOG_RAW("HAL_I2C_ErrorCallback %x\r\r", error);
 }
 
