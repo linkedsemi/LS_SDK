@@ -260,6 +260,13 @@ static HAL_StatusTypeDef wait_for_tc_stop(I2C_HandleTypeDef *hi2c)
         }
     };
     hi2c->Instance->ICR = I2C_INT_TC_MASK|I2C_INT_TCR_MASK;
+
+    /* 如果是作为主机，发送完了数据，但是对方返回的是nack，那么会作为主机，我们会自动的发送stop，清nack标志，并直接返回 */
+    if (hi2c->Instance->RIF&I2C_INT_NACK_MASK) {
+        LS_ASSERT(hi2c->Tx_Env.XferCount == 0); /* 执行到这里，主机计划发送的字节数必须全部发送完 */
+        hi2c->Instance->ICR = I2C_INT_NACK_MASK;
+        return HAL_OK;
+    }
     hi2c->Instance->CR2_0_1 |= I2C_CR2_STOP_MASK;
     endTick += SYSTICK_MS2TICKS(HAL_I2C_POLL_TIMEOUT_MS);
     while ((hi2c->Instance->RIF & I2C_INT_STOP_MASK) == 0) {
@@ -308,7 +315,7 @@ static HAL_StatusTypeDef i2c_rx_polling(I2C_HandleTypeDef *hi2c)
             return HAL_ERROR;
         } else {
             hi2c->Instance->ICR = I2C_INT_RXNE_MASK;
-            while((hi2c->Instance->RIF&I2C_INT_RXNE_MASK)==0) {
+            while((hi2c->Instance->SR&I2C_SR_RXNE_MASK)==0) {
                 if (i2c_isTime0Big(systick_get_value(), endTick, isRewind) == true) {
                     return HAL_TIMEOUT;
                 }
