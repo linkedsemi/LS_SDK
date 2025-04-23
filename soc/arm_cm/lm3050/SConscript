@@ -106,7 +106,8 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',
         'common/circular_doubly_linked_list.c',
-        #'common/linked_async_framework.c',
+        'common/linked_async_framework.c',
+        'common/co_list.c',
         #'common/async_call.c',
         'common/sw_timer.c',
         #'calendar/calendar.c',

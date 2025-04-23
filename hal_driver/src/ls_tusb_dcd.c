@@ -35,16 +35,24 @@ _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
 #endif
 
 #include "usbd.h"
+#include "usbd_pvt.h"
 #include "platform.h"
 #include "cpu.h"
 #include "dcd.h"
 #include "musb_type.h"
 #include "ls_msp_usb.h"
 #include "field_manipulate.h"
+#include "linked_async_framework.h"
+#include "ls_dbg.h"
 #include "log.h"
 
 #include "ls_soc_gpio.h"
 #include "compile_flag.h"
+
+#define USB_TX_BUF_ADDR         (8)
+#define USB_TX_FIFO_SZ          (1)
+#define USB_TX_BUF_SIZE         (1<<(3+USB_TX_FIFO_SZ))
+#define USB_RX_BUF_ADDR         (USB_TX_BUF_ADDR + USB_TX_BUF_SIZE / 8)
 
 /*------------------------------------------------------------------
  * MACRO TYPEDEF CONSTANT ENUM DECLARATION
@@ -73,8 +81,9 @@ typedef union {
     uint32_t  u32;
 } hw_fifo_t;
 
-typedef struct TU_ATTR_PACKED
+typedef struct 
 {
+    struct co_list_hdr list_hdr;
     void      *buf;      /* the start address of a transfer data buffer */
     uint16_t  length;    /* the number of bytes in the buffer */
     uint16_t  remaining; /* the number of bytes remaining in the buffer */
@@ -85,6 +94,7 @@ typedef struct
     tusb_control_request_t setup_packet;
     uint16_t     remaining_ctrl; /* The number of bytes remaining in data stage of control transfer. */
     int8_t       status_out;
+    uint8_t      rx_buf_addr;
     pipe_state_t pipe0;
     pipe_state_t pipe[2][7];   /* pipe[direction][endpoint number - 1] */
     uint16_t     pipe_buf_is_fifo[2]; /* Bitmap. Each bit means whether 1:TU_FIFO or 0:POD. */
@@ -95,7 +105,26 @@ typedef struct
  *------------------------------------------------------------------*/
 static dcd_data_t _dcd;
 
-static bool rx_data_delay; 
+static linked_async_inst_t dcd_async_inst;
+
+static void handle_xfer_in(uint_fast8_t ep_addr);
+
+static void dcd_linked_async_end(void *param)
+{
+    linked_async_end(&dcd_async_inst, NULL, 0);
+}
+
+static void dcd_linked_async_pre_process(struct linked_async_inst_s *inst, struct co_list_hdr *hdr)
+{
+    pipe_state_t *pipe = (void *)hdr;
+    uint8_t ep_addr = TUSB_DIR_IN_MASK | (pipe - _dcd.pipe[TUSB_DIR_IN] + 1);
+    handle_xfer_in(ep_addr);
+}
+
+static bool dcd_linked_async_callback(struct linked_async_inst_s *inst, struct co_list_hdr *hdr, void *dummy, uint8_t status)
+{
+    return false;
+}
 
 #if 0
 static inline free_block_t *find_containing_block(free_block_t *beg, free_block_t *end, uint_fast16_t addr)
@@ -333,26 +362,22 @@ static void handle_xfer_in(uint_fast8_t ep_addr)
     // TU_LOG1(" TXCSRL%d = %x %d\n", epnum_minus1 + 1, regs->TXCSRL, rem - len);
 }
 
-static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
+static void handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
 {
     unsigned epnum_minus1 = tu_edpt_number(ep_addr) - 1;
     pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epnum_minus1];
     volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
     // TU_LOG1(" RXCSRL%d = %x\n", epnum_minus1 + 1, regs->RXCSRL);
-    TU_ASSERT(regs->RXCSRL & USB_RXCSRL1_RXRDY);
 
     const unsigned mps = regs->RXMAXP;
     const unsigned rem = pipe->remaining;
     const unsigned vld = regs->RXCOUNT;
     const unsigned len = TU_MIN(TU_MIN(rem, mps), vld);
     uint8_t       *buf = pipe->buf;
-
-    /* Delay handling out data in FIFO if stack has't configured the buffer. By mzhou. */
-    if (NULL == buf)
+    
+    if(!buf)
     {
-        TU_ASSERT(!rx_data_delay);
-        rx_data_delay = true;
-        return true;
+        return;
     }
 
     if (len) {
@@ -367,15 +392,11 @@ static bool handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
 
     if ((len < mps) || (rem == len)) {
         pipe->buf = NULL;
-        //   return NULL != buf;
-        /* Send completed event if it's the last packet. By mzhou. */
         dcd_event_xfer_complete(rhport, ep_addr,
                                 pipe->length - pipe->remaining,
                                 XFER_RESULT_SUCCESS, isr);
     }
-    CLEAR_BIT(regs->RXCSRL, USB_RXCSRL1_RXRDY);
-    // regs->RXCSRL = 0; /* Clear RXRDY bit */
-    return false;
+    CLEAR_BIT(regs->RXCSRL, USB_RXCSRL1_RXRDY); /* Clear RXRDY bit */
 }
 
 static bool edpt_n_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t total_bytes)
@@ -393,16 +414,13 @@ static bool edpt_n_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16
     pipe->buf          = buffer;
 
     if (dir_in) {
-        handle_xfer_in(ep_addr);
+        linked_async_start(&dcd_async_inst, (void *)&pipe->list_hdr);
     } else {
-        if (rx_data_delay)
+        volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
+        if(regs->RXCOUNT)
         {
-            rx_data_delay = false;
             handle_xfer_out(rhport, ep_addr, false);
         }
-        /* It's not reasonable to clear rxrdy here especially at the moment of receiving out data. By mzhou. */
-        // volatile hw_endpoint_t *regs = edpt_regs(epnum_minus1);
-        // if (regs->RXCSRL & USB_RXCSRL1_RXRDY) regs->RXCSRL = 0;
     }
     return true;
 }
@@ -560,7 +578,6 @@ static void process_ep0(uint8_t rhport)
 
 static void process_edpt_n(uint8_t rhport, uint_fast8_t ep_addr)
 {
-    bool completed;
     const unsigned dir_in     = tu_edpt_dir(ep_addr);
     const unsigned epn_minus1 = tu_edpt_number(ep_addr) - 1;
 
@@ -572,10 +589,16 @@ static void process_edpt_n(uint8_t rhport, uint_fast8_t ep_addr)
             return;
         }
         pipe_state_t  *pipe = &_dcd.pipe[tu_edpt_dir(ep_addr)][epn_minus1];
-        completed = pipe->remaining ? false : true;
-        if (!completed)
+        if (pipe->remaining)
         {
             handle_xfer_in(ep_addr);
+        }
+        else
+        {
+            usbd_defer_func(dcd_linked_async_end, NULL, true);
+            dcd_event_xfer_complete(rhport, ep_addr,
+                                    pipe->length - pipe->remaining,
+                                    XFER_RESULT_SUCCESS, true);
         }
     } else {
         // TU_LOG1(" RXCSRL%d = %x\n", epn_minus1 + 1, regs->RXCSRL);
@@ -583,18 +606,7 @@ static void process_edpt_n(uint8_t rhport, uint_fast8_t ep_addr)
             regs->RXCSRL &= ~(USB_RXCSRL1_STALLED | USB_RXCSRL1_OVER);
             return;
         }
-        /* The return value of handle_xfer_out is unnecessary, because a completed event 
-        will be sent inside if needed. By mzhou. */
-        // completed = handle_xfer_out(ep_addr);
         handle_xfer_out(rhport, ep_addr, true);
-        completed = false;
-    }
-
-    if (completed) {
-        pipe_state_t *pipe = &_dcd.pipe[dir_in][tu_edpt_number(ep_addr) - 1];
-        dcd_event_xfer_complete(rhport, ep_addr,
-                                pipe->length - pipe->remaining,
-                                XFER_RESULT_SUCCESS, true);
     }
 }
 
@@ -633,10 +645,11 @@ static void USB_IRQHandler(void)
 void dcd_init(uint8_t rhport)
 {
     (void)rhport;
+    linked_async_init(&dcd_async_inst, dcd_linked_async_pre_process, dcd_linked_async_callback);
     HAL_USB_MSP_Init(USB_IRQHandler);
     HAL_USB_MSP_Busy_Set();
     USB0->IE |= USB_IE_SUSPND;
-
+    _dcd.rx_buf_addr = USB_RX_BUF_ADDR;
     dcd_connect(rhport);
 }
 
@@ -744,24 +757,34 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * ep_desc)
     /* Setup FIFO */
     if (dir_in) 
     {
-        USB0->TXFIFO_SIZE[0] = 8;
-        if(mps <= 32)
-        {
-            USB0->TXFIFO_SIZE[1] = (2 << USB_TX_FIFO_SIZE_POS) | USB_TX_FIFO_DPB_MASK;
-        }else
-        {
-            USB0->TXFIFO_SIZE[1] = 3 << USB_TX_FIFO_SIZE_POS;
-        }
+        USB0->TXFIFO_SIZE[0] = USB_TX_BUF_ADDR;
+        USB0->TXFIFO_SIZE[1] = USB_TX_FIFO_SZ << USB_TX_FIFO_SIZE_POS;
     }
     else
     {
-        USB0->RXFIFO_SIZE[0] = 8;
-        if(mps <= 32)
+        TU_ASSERT(_dcd.rx_buf_addr < 16);
+        USB0->RXFIFO_SIZE[0] = _dcd.rx_buf_addr;
+        switch(mps)
         {
-            USB0->RXFIFO_SIZE[1] = 2 << USB_RX_FIFO_SIZE_POS | USB_RX_FIFO_DPB_MASK;
-        }else
-        {
+        case 8:
+            USB0->RXFIFO_SIZE[1] = 0 << USB_RX_FIFO_SIZE_POS;
+            _dcd.rx_buf_addr += 1;
+        break;
+        case 16:
+            USB0->RXFIFO_SIZE[1] = 1 << USB_RX_FIFO_SIZE_POS;
+            _dcd.rx_buf_addr += 2;
+        break;
+        case 32:
+            USB0->RXFIFO_SIZE[1] = 2 << USB_RX_FIFO_SIZE_POS;
+            _dcd.rx_buf_addr += 4;
+        break;
+        case 64:
             USB0->RXFIFO_SIZE[1] = 3 << USB_RX_FIFO_SIZE_POS;
+            _dcd.rx_buf_addr += 8;
+        break;
+        default:
+            TU_ASSERT(0,0);
+        break;
         }
     }
     return true;
