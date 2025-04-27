@@ -139,7 +139,7 @@ static uint32_t flash_data_storage_base_offset()
 
 void lvd33_irq_enable()
 {
-    REG_FIELD_WR(SYSCFG->RSTST,SYSCFG_LVD33_FLAG,1);
+    SYSCFG->RSTST = SYSCFG_LVD33_FLAG_MASK;
     __NVIC_ClearPendingIRQ(LVD33_IRQn);
     __NVIC_EnableIRQ(LVD33_IRQn);
 }
@@ -391,7 +391,7 @@ void XIP_BANNED_FUNC(LVD33_Handler,)
 {
     while(REG_FIELD_RD(SYSCFG->RSTST,SYSCFG_LVD33_FLAG))
     {
-        REG_FIELD_WR(SYSCFG->RSTST,SYSCFG_LVD33_FLAG,1);
+        SYSCFG->RSTST = SYSCFG_LVD33_FLAG_MASK;
     }
 }
 

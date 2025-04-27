@@ -203,6 +203,11 @@ leo_ssi_it_build:
   script:
     - cd examples/peripheral/ssi/ssi_it && scons flags=-Werror ic=leo
 
+leo_ssi_exflash:
+  stage: build
+  script:
+    - cd examples/peripheral/ssi/ssi_exflash && scons flags=-Werror ic=leo
+
 leo_Basic_PWM_build:
   stage: build
   script:
@@ -322,6 +327,16 @@ leo_adc_multi_channel_dma_build:
   stage: build
   script:
     - cd examples/peripheral/adcv2/adc_multi_channel_dma && scons flags=-Werror ic=leo
+
+leo_adc_pingpong_dma_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_pingpong_dma && scons flags=-Werror ic=leo
+
+leo_adc_timer_trigger_build:
+  stage: build
+  script:
+    - cd examples/peripheral/adcv2/adc_timer_trigger && scons flags=-Werror ic=leo
 
 leo_dual_dac_channel_dma_voltage_build:
   stage: build

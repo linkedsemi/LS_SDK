@@ -130,4 +130,57 @@ HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc)
     __HAL_ADC_DISABLE(hadc);
     return status;
 }
+
+__attribute__((weak)) void HAL_ADC_DMA_CpltCallback(ADC_HandleTypeDef *hadc,uint8_t ch_idx,uint8_t buf_idx){}
+
+static void ADC_DMA_PingPong_Callback(DMA_Controller_HandleTypeDef *hadc,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+{
+    if(tfr_end == false)
+    {
+        ADC_HandleTypeDef *adc = (ADC_HandleTypeDef *)param;
+        HAL_ADC_DMA_CpltCallback(adc,ch_idx,lli==(void *)&adc->Env.DMA.LLI[1]);
+    }
+}
+
+HAL_StatusTypeDef HAL_ADC_PingPong_Transfer_Config_DMA(ADC_HandleTypeDef *hadc,struct ADC_PingPong_Bufptr *Buf,uint16_t Num)
+{
+    ADC_Enable(hadc);
+    SET_BIT(hadc->Instance->MISC_CTRL,ADC_DMA_EN_MASK);
+    struct dma_lli *lli = hadc->Env.DMA.LLI;
+    DMA_LLI_CFG(lli[1],        
+        hadc->Env.DMA.DMA_Channel,
+        &hadc->Instance->FIF_DAT,
+        Buf->Bufptr[1],
+        TRANSFER_WIDTH_16BITS,
+        Num,
+        P2M,
+        &lli[0]);
+    DMA_LLI_CFG(lli[0],
+        hadc->Env.DMA.DMA_Channel,
+        &hadc->Instance->FIF_DAT,
+        Buf->Bufptr[0],
+        TRANSFER_WIDTH_16BITS,
+        Num,
+        P2M,
+        &lli[1]);
+
+    struct ch_reg cfg;
+    DMA_CHANNEL_CFG(cfg,
+        hadc->Env.DMA.DMA_Channel,
+        &hadc->Instance->FIF_DAT,
+        Buf->Bufptr[0],
+        TRANSFER_WIDTH_16BITS,
+        Num,
+        P2M,
+        &lli[1],
+        HAL_ADC_DMA_Handshake_Get(hadc),
+        0,0,0,0);
+    HAL_DMA_Channel_Start_IT(hadc->DMAC_Instance,&cfg,ADC_DMA_PingPong_Callback,(uint32_t)hadc);
+    if(hadc->Init.TrigType == ADC_SOFTWARE_TRIGT)
+    {
+        REG_FIELD_WR(hadc->Instance->TRIG,ADC_FIF_TRIG,1);
+    }
+    return HAL_OK;
+}
+
 #endif
