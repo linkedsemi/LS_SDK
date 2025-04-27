@@ -38,7 +38,7 @@
 //--------------------------------------------------------------------+
 enum
 {
-  BULK_PACKET_SIZE = (TUD_OPT_HIGH_SPEED ? 512 : 64)
+  BULK_PACKET_SIZE = CFG_TUD_CDC_TX_BUFSIZE,
 };
 
 typedef struct
