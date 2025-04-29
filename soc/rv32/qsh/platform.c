@@ -62,6 +62,7 @@ void sys_init_none()
     // clk_flash_init();
     // set_all_irq_priority_to_lowest_level();
     io_init();
+    log_en = true;
     LOG_INIT();
 
     // pinmux_hal_flash_init();

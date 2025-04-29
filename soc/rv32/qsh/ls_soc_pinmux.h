@@ -1606,7 +1606,7 @@ void pinmux_kscan_deinit(void);
 /**
  * @brief             Init IO FOR USB 
  */
-void pinmux_usb_init(bool host);
+void pinmux_usb_init(bool host, uint8_t dp, uint8_t dm);
 
 /**
  * @brief            DeInit IO FOR USB

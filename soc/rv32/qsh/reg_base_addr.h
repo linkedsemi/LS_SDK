@@ -47,7 +47,7 @@ extern "C" {
 #define APP_DWDMAC1_ADDR        0x40041000
 #define APP_DWDMAC2_ADDR        0x40042000
 #define APP_USB1_ADDR           0x40043000
-#define APP_USB2_ADDR           0x40044000
+#define APP_USB2_ADDR           0x40050000
 #define APP_ESPI1_ADDR          0x40045000
 #define APP_ESPI2_ADDR          0x40046000
 #define APP_LPC1_ADDR           0x40047000

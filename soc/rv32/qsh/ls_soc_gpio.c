@@ -160,7 +160,9 @@ static gpio_port_pin_t dwuart4_rxd;
 
 // static gpio_port_pin_t owm_pin;
 
-// static uint8_t otg_id = 0xff;
+static uint8_t usb_dp = 0xff;
+static uint8_t usb_dm = 0xff;
+static uint8_t otg_id = 0xff;
 
 // __attribute__((weak)) void io_exti_callback(uint8_t pin,exti_edge_t edge){}
 
@@ -3081,61 +3083,50 @@ void io_cfg_disable(uint8_t pin)
 //     set_gpio_mode((gpio_port_pin_t *)&gptimc1_bk);
 // }
 
-// static void usb_io_cfg(uint8_t dp,uint8_t dm, bool host)
-// {
-//     if(host)
-//     {
-//         io_pull_write(dp,IO_PULL_DOWN);
-//     }else
-//     {
-//         io_pull_write(dp,IO_PULL_UP);
-//     }
-//     io_pull_write(dm,IO_PULL_DOWN);
-//     io_cfg_input(dm);
-//     io_cfg_input(dp);
-// }
+static void usb_io_cfg(uint8_t dp,uint8_t dm, bool host)
+{
+    if(host)
+    {
+        io_pull_write(dp,IO_PULL_DOWN);
+    }else
+    {
+        io_pull_write(dp,IO_PULL_UP);
+    }
+    io_pull_write(dm,IO_PULL_DOWN);
+    io_cfg_input(dm);
+    io_cfg_input(dp);
+}
 
-// void PD00_PD01_PowerOn(void)
-// {
-//     SYSC_APP_AWO->IO[3].DS |= 1 << 16 << 1;
-// }
-
-// void pinmux_usb_init(bool host)
-// {
-//     uint8_t dp = USB_DP_PAD;
-//     uint8_t dm = USB_DM_PAD;
-//     usb_io_cfg(dp,dm,host);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&dp),USB_DP);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&dm),USB_DM);
+void pinmux_usb_init(bool host, uint8_t dp, uint8_t dm)
+{
+    usb_dp = dp;
+    usb_dm = dm;
+    usb_io_cfg(dp,dm,host);
+    per_func0_enable(dp,FIOI_USB1_DP);
+    per_func0_enable(dm,FIOI_USB1_DM);
     
-//     PD00_PD01_PowerOn();
+    if (otg_id == 0xff)
+    {
+        REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_USB1_CID, 0x2 + !host);
+    }
+}
 
-//     REG_FIELD_WR(SYSC_CPU->GATE_SYS,SYSC_CPU_USB_RX_DIFF_SEL,1);
-//     REG_FIELD_WR(SYSC_APP_AWO->PIN_SEL0, SYSC_AWO_USB_PUPD, 1);
-//     if (otg_id == 0xff)
-//     {
-//         REG_FIELD_WR(SYSC_APP_AWO->PIN_SEL0, SYSC_AWO_USB_CID, 0x2 + !host);
-//     }
-// }
+void pinmux_usb_otg_id_init(uint8_t pin)
+{
+    otg_id = pin;
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_USB1_CID, 0);
+    per_func0_enable(pin,FIOI_USB1_CID);
+}
 
-// void pinmux_usb_otg_id_init(uint8_t pin)
-// {
-//     otg_id = pin;
-//     REG_FIELD_WR(SYSC_APP_AWO->PIN_SEL0, SYSC_AWO_USB_CID, 0);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&pin), USB_CID);
-// }
-
-// void pinmux_usb_deinit(void)
-// {
-//     uint8_t dp = USB_DP_PAD;
-//     uint8_t dm = USB_DM_PAD;
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&dp));
-//     per_func_disable(pin2func_io((gpio_port_pin_t *)&dm));
-//     if (otg_id != 0xff)
-//     {
-//         per_func_disable(pin2func_io((gpio_port_pin_t *)&otg_id));
-//     }
-// }
+void pinmux_usb_deinit(void)
+{
+    if (usb_dp != 0xff)
+        per_func0_disable(usb_dp);
+    if (usb_dm != 0xff)
+        per_func0_disable(usb_dm);
+    if (otg_id != 0xff)
+        per_func0_disable(otg_id);
+}
 
 // static void ps2h_io_cfg(uint8_t clk, uint8_t dat)
 // {
