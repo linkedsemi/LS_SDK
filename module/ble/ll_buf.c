@@ -13,20 +13,20 @@
 #include "evt_ctrl.h"
 #define ADV_SETS_NUM 1
 #define LL_CONNECTION_MAX 1
-#define SCAN_RX_BUF_NUM (5)
+#define SCAN_RX_BUF_NUM (20)
 #define SECOND_SCAN_BUF_NUM (0)
 #define LL_CONN_TX_BUFFER_NUM (2*LL_CONNECTION_MAX)  //tx_data_buf_num
 #define LL_CONN_RX_BUFFER_NUM 10//(2*LL_CONNECTION_MAX)
 #define LL_SYNC_ENV_NUM 0
 #define SYNC_RX_BUF_NUM 0
-#define HCI_TX_ELEMENT_MAX_NUM 10
+#define HCI_TX_ELEMENT_MAX_NUM 20
 #define AES_128_CALC_ENV_BUF_SIZE 2
-#define LL_SCHED_BUF_NUM (10)
+#define LL_SCHED_BUF_NUM (20)
 #define SWINT_POST_BUF_NUM (10)
 #define WHITE_LIST_SIZE 1
 #define PER_ADV_LIST_SIZE 1
 #define ADV_REPORT_CACHE_SIZE 2
-#define SW_TIMER_BUF_NUM 5
+#define SW_TIMER_BUF_NUM 10
 
 #define TX_RAMPUP_TIME (110)
 #define TX_RAMPDOWN_TIME (1)
