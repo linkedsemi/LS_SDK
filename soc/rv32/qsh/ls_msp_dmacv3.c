@@ -18,9 +18,6 @@ void DMAC2_Handler()
     HAL_DMA_Controller_IRQHandler(dma_inst[1]);
 }
 
-#if defined(__ZEPHYR__)
-#include <zephyr/kernel.h>
-#endif
 void HAL_DMA_Controller_MSP_Init(struct __DMA_Controller_HandleTypeDef *hdma)
 {
     switch((uint32_t)hdma->Instance)
@@ -30,30 +27,20 @@ void HAL_DMA_Controller_MSP_Init(struct __DMA_Controller_HandleTypeDef *hdma)
         SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_CLR_DMAC1_MASK;
         SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_SET_DMAC1_MASK;
         SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_SET_DMAC1_MASK;
-        dma_inst[0] = hdma;
-#if defined(__ZEPHYR__)
-        IRQ_CONNECT(DMAC1_IRQN, 0, DMAC1_Handler, NULL, 0);
-        irq_enable(DMAC1_IRQN);
-#else
         rv_set_int_isr(DMAC1_IRQN, DMAC1_Handler);
+        dma_inst[0] = hdma;
         csi_vic_clear_pending_irq(DMAC1_IRQN);
         csi_vic_enable_irq(DMAC1_IRQN);
-#endif
         break;
     case (uint32_t)DMAC2:
         SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_CLR_DMAC2_MASK;
         SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_CLR_DMAC2_MASK;
         SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_SET_DMAC2_MASK;
         SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_SET_DMAC2_MASK;
-        dma_inst[1] = hdma;
-#if defined(__ZEPHYR__)
-        IRQ_CONNECT(DMAC2_IRQN, 0, DMAC2_Handler, NULL, 0);
-        irq_enable(DMAC2_IRQN);
-#else
         rv_set_int_isr(DMAC2_IRQN, DMAC2_Handler);
+        dma_inst[1] = hdma;
         csi_vic_clear_pending_irq(DMAC2_IRQN);
         csi_vic_enable_irq(DMAC2_IRQN);
-#endif
         break;
     }
 }
