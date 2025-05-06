@@ -180,6 +180,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'soc',
         'soc/rv32',
         'soc/rv32/qsh',
+        'soc/rv32/qsh/include',
     ]))
     
     if usb:

@@ -271,6 +271,7 @@ if(CONFIG_SOC_LSQSH)
     ../soc
     ../soc/rv32
     ../soc/rv32/qsh
+    ../soc/rv32/qsh/include
     ../hal_driver/inc
     ../hal_driver/api
     ../hal_driver/api/otbn
