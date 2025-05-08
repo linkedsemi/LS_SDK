@@ -126,7 +126,7 @@ ROM_SYMBOL bool dword_fifo_get(struct fifo_env *ptr,void *data)
 }
 
 
-bool byte_fifo_put(struct fifo_env *ptr,uint8_t *data)
+ROM_SYMBOL bool byte_fifo_put(struct fifo_env *ptr,uint8_t *data)
 {
     if(sw_fifo_full(ptr))
     {
@@ -146,7 +146,7 @@ bool byte_fifo_put(struct fifo_env *ptr,uint8_t *data)
     }
 }
 
-bool byte_fifo_get(struct fifo_env *ptr,uint8_t *data)
+ROM_SYMBOL bool byte_fifo_get(struct fifo_env *ptr,uint8_t *data)
 {
     if(sw_fifo_empty(ptr))
     {
