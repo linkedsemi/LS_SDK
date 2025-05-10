@@ -798,13 +798,40 @@ void per_func_disable_all(uint8_t pin)
 int per_func_get(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    int func = -1;
+
     for (uint8_t i = PINMUX_FUNC_START; i <= PINMUX_FUNC_END; i++) {
         if (SYSC_APP_AWO->IO_FUNC[i][x->port >> 1] & (1 << (((x->port % 2) * 16)+ x->num))) {
-            return i;
+            func = i;
+            break;
         }
     }
 
-    return -1;
+    for (uint8_t i = func + 1; i <= PINMUX_FUNC_END; i++) {
+        if (SYSC_APP_AWO->IO_FUNC[i][x->port >> 1] & (1 << (((x->port % 2) * 16)+ x->num))) {
+            func = -2;
+            break;
+        }
+    }
+
+    return func;
+}
+
+int per_func0_alt_get(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+
+    return (SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] >> ((x->num % 4) * 8)) & 0x1f;
+}
+
+bool per_func_check(uint8_t pin, uint8_t func)
+{
+    return (per_func_get(pin) == PINMUX_FUNC1);
+}
+
+bool per_func0_alt_check(uint8_t pin, uint8_t alt)
+{
+    return ((per_func_get(pin) == PINMUX_FUNC1) && (per_func0_alt_get(pin) == alt));
 }
 
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt)
