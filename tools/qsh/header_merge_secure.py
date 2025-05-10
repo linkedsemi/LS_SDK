@@ -5,6 +5,14 @@ from gmssl import sm2
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT
 from binascii import unhexlify, hexlify
 
+def usage():
+    print("usage: ")
+    print("    python ./program.py img.bin img_with_header.bin")
+
+if len(sys.argv) != 3:
+    usage()
+    sys.exit()
+
 do_sign = True
 do_crypt = True
 do_kek = True
