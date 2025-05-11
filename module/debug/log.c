@@ -26,7 +26,7 @@
 #endif
 #endif
 #define RAM_LOG_BUF_SIZE 10000
-static const uint8_t linefeed_value = 0xA;
+static const uint8_t *linefeed_value = "\r\n";
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
 char ram_array[RAM_LOG_BUF_SIZE];
 bool log_en;
@@ -209,7 +209,7 @@ void log_output(bool linefeed,const char *format,...)
     mini_vpprintf(mini_puts, NULL, format, args);
     va_end(args);
     if(linefeed)
-        mini_puts((void *)&linefeed_value, 1, NULL);
+        mini_puts((void *)linefeed_value, 2, NULL);
 }
 
 void ls_log_init()
