@@ -361,4 +361,12 @@ if(CONFIG_SOC_LSQSH)
   zephyr_compile_definitions(QSH)
   zephyr_compile_definitions(CONFIG_FSTACK_PROTECTOR)
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
+
+  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+    ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+    ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_FLASH_BASE_ADDRESS}.bin
+    ${CONFIG_SRAM_BASE_ADDRESS}
+  )
+
 endif()
