@@ -8,7 +8,7 @@
 #include "reg_sysc_sec_cpu.h"
 #include "reg_sysc_app_cpu.h"
 
-__attribute__((always_inline)) static inline void e906_init()
+static ALWAYS_INLINE void e906_init()
 {
     uint32_t value = __get_MSTATUS();
     MODIFY_REG(value,0x6000,0x2000); 
@@ -45,66 +45,66 @@ void rom_delay(uint32_t us);
 #define FLASH_SWINT_NUM QSPI1_IRQN
 #define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
 
-static inline void cpu_intr0_unmask(void)
+static ALWAYS_INLINE void cpu_intr0_unmask(void)
 {
     SYSC_APP_CPU->APP_CPU_IMSK = 1;
 }
 
-static inline void cpu_intr0_mask(void)
+static ALWAYS_INLINE void cpu_intr0_mask(void)
 {
     SYSC_APP_CPU->APP_CPU_IMSK = 0;
 }
 
-static inline void cpu_intr0_activate(void)
+static ALWAYS_INLINE void cpu_intr0_activate(void)
 {
     SYSC_APP_CPU->APP_CPU_INTR = 1;
 }
 
-static inline void cpu_intr0_clr(void)
+static ALWAYS_INLINE void cpu_intr0_clr(void)
 {
     SYSC_APP_CPU->APP_CPU_INTR = 0;
 }
 
-static inline void cpu_intr1_unmask(void)
+static ALWAYS_INLINE void cpu_intr1_unmask(void)
 {
     SYSC_SEC_CPU->SEC_CPU_IMSK = 1;
 }
 
-static inline void cpu_intr1_mask(void)
+static ALWAYS_INLINE void cpu_intr1_mask(void)
 {
     SYSC_SEC_CPU->SEC_CPU_IMSK = 0;
 }
 
-static inline void cpu_intr1_activate(void)
+static ALWAYS_INLINE void cpu_intr1_activate(void)
 {
     SYSC_SEC_CPU->SEC_CPU_INTR = 1;
 }
 
-static inline void cpu_intr1_clr(void)
+static ALWAYS_INLINE void cpu_intr1_clr(void)
 {
     SYSC_SEC_CPU->SEC_CPU_INTR = 0;
 }
 
-static inline void app_cpu_reset(void)
+static ALWAYS_INLINE void app_cpu_reset(void)
 {
     SYSC_SEC_CPU->APP_CPU_SRST = 0x2; /* reset */
 }
 
 #if defined(CONFIG_CPU2_BOOT_ADDR)
-static inline void app_cpu_dereset(void)
+static ALWAYS_INLINE void app_cpu_dereset(void)
 {
     SYSC_SEC_CPU->APP_CPU_ADDR_CFG = CONFIG_CPU2_BOOT_ADDR; /* set cpu1 pc addr */
     SYSC_SEC_CPU->APP_CPU_SRST = 0x1; /* release reset */
 }
 #endif
 
-static inline void app_cpu_dereset_by_addr(uint32_t pc_addr)
+static ALWAYS_INLINE void app_cpu_dereset_by_addr(uint32_t pc_addr)
 {
     SYSC_SEC_CPU->APP_CPU_ADDR_CFG = pc_addr; /* set cpu1 pc addr */
     SYSC_SEC_CPU->APP_CPU_SRST = 0x1; /* release reset */
 }
 
-static inline void app_cpu_reset_pc(uint32_t addr)
+static ALWAYS_INLINE void app_cpu_reset_pc(uint32_t addr)
 {
     SYSC_SEC_CPU->APP_CPU_ADDR_CFG = addr;
 }
