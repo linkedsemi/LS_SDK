@@ -52,7 +52,7 @@ static uint8_t sha256_hmac_kx[SHA256_BLOCK_SIZE];
 static uint8_t sha256_hmac_kh[SHA256_RESULT_SIZE];
 static uint8_t *sha256_hmac_key;
 static uint32_t sha256_hmac_key_size;
-static uint32_t index;
+static uint32_t sha_idx;
 static uint32_t totasha256_hmac_cnt;
 static uint32_t remain_len;
 static uint8_t remain_data[SHA256_BLOCK_SIZE];
@@ -60,7 +60,7 @@ void HAL_OTBN_SHA256_Init()
 {
     totasha256_hmac_cnt = 0;
     remain_len = 0;
-    index = SHA256_DMEM_MSG_OFFSET;
+    sha_idx = SHA256_DMEM_MSG_OFFSET;
     HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sha256_text, SHA256_TEXT_LENTH);
     HAL_OTBN_DMEM_Write(SHA256_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA256_DMEM_STATE_SIZE);
@@ -71,12 +71,12 @@ void HAL_OTBN_SHA256_Init()
 
 static void sha256_msg_write(uint8_t *msg)
 {
-    HAL_OTBN_DMEM_Write(index, (uint32_t *)msg, SHA256_BLOCK_SIZE);
-    index += SHA256_BLOCK_SIZE;
-    if (index == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
+    HAL_OTBN_DMEM_Write(sha_idx, (uint32_t *)msg, SHA256_BLOCK_SIZE);
+    sha_idx += SHA256_BLOCK_SIZE;
+    if (sha_idx == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
     {
         HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-        index = SHA256_DMEM_MSG_OFFSET;
+        sha_idx = SHA256_DMEM_MSG_OFFSET;
     }
 }
 
@@ -137,9 +137,9 @@ void HAL_OTBN_SHA256_Final(uint8_t result[0x20])
     {
         remain_data[0x3f - i] = (uint8_t)(bit_cnt >> (8 * i));
     }
-    HAL_OTBN_DMEM_Write(index, (uint32_t *)remain_data, SHA256_BLOCK_SIZE);
-    index += SHA256_BLOCK_SIZE;
-    Sha256_BlockNumber_Update((index - SHA256_DMEM_MSG_OFFSET) / SHA256_BLOCK_SIZE);
+    HAL_OTBN_DMEM_Write(sha_idx, (uint32_t *)remain_data, SHA256_BLOCK_SIZE);
+    sha_idx += SHA256_BLOCK_SIZE;
+    Sha256_BlockNumber_Update((sha_idx - SHA256_DMEM_MSG_OFFSET) / SHA256_BLOCK_SIZE);
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
 
     uint32_t rs[8];
