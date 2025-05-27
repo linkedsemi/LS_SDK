@@ -104,6 +104,19 @@ void hal_flash_page_erase(uint32_t offset);
  */
 void hal_flash_sector_erase(uint32_t offset);
 
+
+/** \brief 32K block Erase 
+ *  \note 擦除需要按照32k的块对齐。
+ *  \param[in] offset Offset to FLASH_BASE_ADDR
+ */
+void hal_flash_block_32K_erase(uint32_t offset);
+
+/** \brief 64K block Erase
+ *  \note 擦除需要按照64k的块对齐。
+ *  \param[in] offset Offset to FLASH_BASE_ADDR
+ */
+void hal_flash_block_64K_erase(uint32_t offset);
+
 /** \brief Chip Erase */
 void hal_flash_chip_erase(void);
 

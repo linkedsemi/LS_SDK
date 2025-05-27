@@ -256,6 +256,28 @@ ROM_SYMBOL void hal_flash_sector_erase(uint32_t offset)
     hal_flash_write_reg_operation(&param);
 }
 
+ROM_SYMBOL void hal_flash_block_32K_erase(uint32_t offset)
+{
+    uint8_t addr[3] = {offset>>16&0xff,offset>>8&0xff,offset&0xff};
+    struct flash_wr_rd_reg_param param = {
+         .buf = addr,
+         .length = sizeof(addr),
+         .opcode = BLOCK_32K_ERASE_OPCODE,
+    };
+    hal_flash_write_reg_operation(&param);
+}
+
+ROM_SYMBOL void hal_flash_block_64K_erase(uint32_t offset)
+{
+    uint8_t addr[3] = {offset>>16&0xff,offset>>8&0xff,offset&0xff};
+    struct flash_wr_rd_reg_param param = {
+        .buf = addr,
+        .length = sizeof(addr),
+        .opcode = BLOCK_64K_ERASE_OPCODE,
+    };
+    hal_flash_write_reg_operation(&param);
+}
+
 ROM_SYMBOL void do_hal_flash_read(void *param)
 {
     flash_reading_critical(do_hal_flash_read_func,param);
