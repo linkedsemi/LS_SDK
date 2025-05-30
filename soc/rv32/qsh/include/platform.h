@@ -61,42 +61,22 @@ void rom_delay(uint32_t us);
 #define FLASH_SWINT_NUM QSPI1_IRQN
 #define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
 
-__ALWAYS_STATIC_INLINE void cpu_intr0_unmask(void)
-{
-    SYSC_APP_CPU->APP_CPU_IMSK = 1;
-}
-
-__ALWAYS_STATIC_INLINE void cpu_intr0_mask(void)
-{
-    SYSC_APP_CPU->APP_CPU_IMSK = 0;
-}
-
-__ALWAYS_STATIC_INLINE void cpu_intr0_activate(void)
-{
-    SYSC_APP_CPU->APP_CPU_INTR = 1;
-}
-
-__ALWAYS_STATIC_INLINE void cpu_intr0_clr(void)
-{
-    SYSC_APP_CPU->APP_CPU_INTR = 0;
-}
-
-__ALWAYS_STATIC_INLINE void cpu_intr1_unmask(void)
+__ALWAYS_STATIC_INLINE void cpu_intr_sec_unmask(void)
 {
     SYSC_SEC_CPU->SEC_CPU_IMSK = 1;
 }
 
-__ALWAYS_STATIC_INLINE void cpu_intr1_mask(void)
+__ALWAYS_STATIC_INLINE void cpu_intr_sec_mask(void)
 {
     SYSC_SEC_CPU->SEC_CPU_IMSK = 0;
 }
 
-__ALWAYS_STATIC_INLINE void cpu_intr1_activate(void)
+__ALWAYS_STATIC_INLINE void cpu_intr_sec_activate(void)
 {
     SYSC_SEC_CPU->SEC_CPU_INTR = 1;
 }
 
-__ALWAYS_STATIC_INLINE void cpu_intr1_clr(void)
+__ALWAYS_STATIC_INLINE void cpu_intr_sec_clr(void)
 {
     SYSC_SEC_CPU->SEC_CPU_INTR = 0;
 }
@@ -104,6 +84,26 @@ __ALWAYS_STATIC_INLINE void cpu_intr1_clr(void)
 __ALWAYS_STATIC_INLINE void app_cpu_reset(void)
 {
     SYSC_SEC_CPU->APP_CPU_SRST = 0x2; /* reset */
+}
+
+__ALWAYS_STATIC_INLINE void cpu_intr_app_unmask(void)
+{
+    SYSC_APP_CPU->APP_CPU_IMSK = 1;
+}
+
+__ALWAYS_STATIC_INLINE void cpu_intr_app_mask(void)
+{
+    SYSC_APP_CPU->APP_CPU_IMSK = 0;
+}
+
+__ALWAYS_STATIC_INLINE void cpu_intr_app_activate(void)
+{
+    SYSC_APP_CPU->APP_CPU_INTR = 1;
+}
+
+__ALWAYS_STATIC_INLINE void cpu_intr_app_clr(void)
+{
+    SYSC_APP_CPU->APP_CPU_INTR = 0;
 }
 
 #if defined(CONFIG_CPU2_BOOT_ADDR)
