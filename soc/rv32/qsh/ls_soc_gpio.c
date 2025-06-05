@@ -836,19 +836,13 @@ bool per_func0_alt_check(uint8_t pin, uint8_t alt)
 
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt)
 {
-    per_func_disable_all(pin);
-    switch (func) {
-    case PINMUX_FUNC1:
-        per_func0_set(pin, func0_alt);
-        __fallthrough;
-    case PINMUX_FUNC2:
-        __fallthrough;
-    case PINMUX_FUNC3:
-        __fallthrough;
-    case PINMUX_FUNC4:
+    if ((func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END)) {
+        per_func0_set(pin, 0);
+        per_func_disable_all(pin);
         per_func_enable(pin, func);
-    default:
-        break;
+        if (PINMUX_FUNC1 == func) {
+            per_func0_set(pin, func0_alt);
+        }
     }
 
     return;
