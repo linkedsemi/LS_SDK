@@ -771,7 +771,8 @@ void per_func_disable(uint8_t pin, uint8_t func_num)
 void per_func0_set(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
+    uint8_t pos = (x->num % 4) * 8;
+    MODIFY_REG(SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4], 0xff << pos, per_func << pos);
 }
 
 void per_func0_enable(uint8_t pin,uint8_t per_func)
