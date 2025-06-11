@@ -184,9 +184,13 @@ static void *lsi_counting_timer;
 static volatile uint16_t lsi_cnt_val;
 static bool lsi_counting_valid;
 
+static uint32_t g_lsiRecountPeriodMs = LSI_DEFAULT_RECOUNT_PERIOD_MS;
+
 __attribute__((weak)) void builtin_timer_start(void *timer,uint32_t timeout,void *param){}
 __attribute__((weak)) void *builtin_timer_create(void (*cb)(void *)){return NULL;}
 __attribute__((weak)) void func_post(void (*func)(void *),void *param){}
+
+
 
 void rco_freq_counting_start()
 {
@@ -215,6 +219,25 @@ void rco_freq_counting_start()
     __NVIC_EnableIRQ(GPTIMB1_IRQn);
 }
 
+/**
+ * @brief   修改lsi校准周期
+ * @param   period_ms: 新的lsi校准周期
+ * @param   caliImmediate: 是否需要立即执行一次校准
+ * @return  void
+ * @note    这个校准，主要是保证在lp0时，电源供电不那么稳定，温度变化明显，
+ *          或者其他因素，对lsi有较大影响的时候进行修改的。
+ *          校准周期过小，会导致功耗偏高。
+ * */
+void platform_set_lsi_recount_period_ms(uint32_t period_ms, uint8_t caliImmediate)
+{
+    g_lsiRecountPeriodMs = period_ms;
+
+    /* 如果需要立即校准，且此时没有正在进行lsi校准，则执行一次lsi校准 */
+    if ((caliImmediate == true) && (__NVIC_GetEnableIRQ(GPTIMB1_IRQn) == 0)) {
+        rco_freq_counting_start();
+    }
+}
+
 static void lsi_counting_timer_callback(void *param)
 {
     rco_freq_counting_start();
@@ -227,7 +250,7 @@ void lsi_counting_timer_create()
 
 static void lsi_counting_timer_start(void *param)
 {
-    builtin_timer_start(lsi_counting_timer,LSI_RECOUNT_PERIOD_MS,lsi_counting_timer);
+    builtin_timer_start(lsi_counting_timer, g_lsiRecountPeriodMs, lsi_counting_timer);
 }
 
 static void GPTIM_IRQ_Handler_For_LSI_Counting()
@@ -293,6 +316,9 @@ void lse_init(){}
 #else
 void rco_freq_counting_init(){}
 void rco_freq_counting_start(){}
+
+void platform_set_lsi_recount_period_ms(uint32_t period_ms, uint8_t caliImmediate){}
+
 uint64_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
 uint32_t us_to_lpcycles(uint32_t us){return 0;}
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt){return 0;}

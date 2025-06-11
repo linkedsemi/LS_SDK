@@ -21,6 +21,8 @@ struct reset_retain_struct
     uint32_t reset_reason;
 };
 
+void platform_set_lsi_recount_period_ms(uint32_t period_ms, uint8_t caliImmediate);
+
 void switch_to_rc32k(void);
 
 void switch_to_xo16m(void);

@@ -53,8 +53,8 @@ extern "C" {
 #define SDK_LSI_USED 1
 #endif
 
-#ifndef LSI_RECOUNT_PERIOD_MS
-#define LSI_RECOUNT_PERIOD_MS (60*1000)
+#ifndef LSI_DEFAULT_RECOUNT_PERIOD_MS
+#define LSI_DEFAULT_RECOUNT_PERIOD_MS (60*1000)
 #endif
 
 #ifndef FPGA
