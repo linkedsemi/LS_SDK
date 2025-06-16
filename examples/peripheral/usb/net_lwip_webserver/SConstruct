@@ -1,0 +1,31 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+
+lwip_src, lwip_inc = env.SConscript(
+    env['SDK_ROOT'].File('module/lwip-2.2.1/SConscript'),
+    exports='env'
+)
+
+src = [
+    '../bsp.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/net_lwip_webserver/src/main.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/net_lwip_webserver/src/usb_descriptors.c',
+    '$SDK_ROOT/module/tinyusb/lib/networking/dhserver.c',
+    '$SDK_ROOT/module/tinyusb/lib/networking/dnserver.c',
+    '$SDK_ROOT/module/tinyusb/lib/networking/rndis_reports.c'
+
+] + lwip_src
+
+inc = [
+    '.',
+    '$SDK_ROOT/module/tinyusb/examples/device/net_lwip_webserver/src/',
+    '$SDK_ROOT/module/tinyusb/lib/networking'
+] + lwip_inc
+
+env.Tool('compilation_db')
+cdb = env.CompilationDatabase(os.path.join(os.getcwd(), './compile_commands.json'))
+Alias('cdb', cdb)
+
+env.app_build('net_lwip_webserver',src,inc, ble = False,usb=True)
