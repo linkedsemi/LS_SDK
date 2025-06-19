@@ -21,6 +21,7 @@
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((aligned(64))) void (*interrupt_vector[IRQn_MAX])();
+struct hal_flash_env flash1;
 
 void rv_set_int_isr(uint8_t type,void (*isr)())
 {
@@ -114,16 +115,22 @@ static void flash_swint_init()
 {
     rv_set_int_isr(FLASH_SWINT_NUM,FLASH_SWINT_HANDLER);
     CLIC->CLICINT[FLASH_SWINT_NUM].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
-    csi_vic_set_prio(FLASH_SWINT_NUM,0xf);
+    csi_vic_set_prio(FLASH_SWINT_NUM,0x1);
     csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
     csi_vic_enable_irq(FLASH_SWINT_NUM);
 }
 void sys_init_none()
 {
     clk_flash_init();
+    flash1.reg = LSQSPIV2;
+    flash1.dual_mode_only = false;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = true;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     set_all_irq_priority_to_lowest_level();
     flash_swint_init();
-    hal_flash_xip_func_ptr_init();
     io_init();
     LOG_INIT();
     low_power_init();
@@ -152,7 +159,7 @@ void key_reset(uint32_t seconds, uint8_t pin, bool voltage_level)
     REG_FIELD_WR(V33_RG->MISC_CTRL0, V33_RG_LKRST_EN, 1);
 }
 
-void XIP_BANNED_FUNC(sync_for_xip_stop,)
+void XIP_BANNED_FUNC(sync_for_xip_stop,struct hal_flash_env *env)
 {
     while((SYSC_AWO->IO[3].DIN&1<<8)==0);
 }

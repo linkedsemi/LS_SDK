@@ -20,6 +20,7 @@
 #include "reg_base_addr.h"
 #include "ota_settings.h"
 #include "sleep.h"
+#include "ls_msp_qspi.h"
 #define TRIM_4202_BUF_SIZE (12)
 
 static void swd_pull_down()
@@ -297,10 +298,15 @@ void boot_ram_start(uint32_t exec_addr)
         NORMAL_SLEEP<<SYSCFG_SLP_LVL_POS|SYSCFG_LP_WKUP_CLR_MASK);
     DELAY_US(200);
     SYSCFG->PMU_PWR = 0;
-    hal_flash_drv_var_init(false,false);
+    flash1.reg = LSQSPI;
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = false;
+    flash1.writing = false;
+    flash1.dual_mode_only = false;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     hal_flash_init();
-    hal_flash_dual_mode_set(false);
-    hal_flash_xip_start();
+    hal_flash_continuous_mode_start();
     lscache_cache_enable(0);
     io_init();
     swd_pull_down();

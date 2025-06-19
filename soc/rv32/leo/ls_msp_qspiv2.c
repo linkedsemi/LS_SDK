@@ -11,7 +11,7 @@ ROM_SYMBOL void (*qspiv2_global_int_restore_fn)(uint32_t);
 
 #if defined(BOOT_ROM)
 void qspiv2_global_int_dummy(){}
-void XIP_BANNED_FUNC(lsqspiv2_msp_init)
+void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 {
     SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_QSPI_MASK;
     __NOP(); __NOP();
@@ -37,7 +37,7 @@ void qspiv2_global_int_ctrl_fn_init()
 }
 #endif
 
-void XIP_BANNED_FUNC(lsqspiv2_msp_init)
+void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 {
     SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_QSPI_MASK;
     __NOP(); __NOP();

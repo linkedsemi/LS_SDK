@@ -1,7 +1,7 @@
 
     .option rvc
-    .section .text.exception_entry
-    .align 6
+    .section .xip_banned.exception_entry,"ax"
+    .balign 64
     .global exception_entry
     .type   exception_entry, %function
 exception_entry:
@@ -33,6 +33,7 @@ exception_entry:
     sw      t2, 0x40(sp)
     .cfi_offset ra,-0x4c
     bgtz    t1, trap_handler
+    jal     ra, hal_flash_prog_erase_suspend_isr
 int_call:
     csrrsi  t0, mnxti, 8
     beqz    t0, exception_exit
@@ -41,6 +42,7 @@ int_call:
     csrc    mstatus, 8  # disable global irq to fetch mnxti correctly
     j       int_call
 exception_exit:
+    jal     ra, hal_flash_prog_erase_resume_isr
     lw      ra, 0x00(sp)
     .cfi_restore ra
     lw      t6, 0x04(sp)

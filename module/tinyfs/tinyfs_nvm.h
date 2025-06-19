@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 extern void (*const nvm_program)(uint32_t,uint8_t *,uint16_t);
-extern void (*const nvm_read)(uint32_t, uint8_t *, uint16_t);
+extern void (*const nvm_read)(uint32_t, uint8_t *, uint32_t);
 extern void (*const nvm_sector_ease)(uint32_t);
 
 #ifdef __cplusplus

@@ -6,9 +6,13 @@
 #include "cpu.h"
 
 #if defined(LE501X)
+#define DUAL_MODE false
+#define FLASH_CTRL_REG LSQSPI_BASE_ADDR
 static void io_pull_up_cfg() {}
 static void clk_flash_init() {}
 #elif defined(LM3050) 
+#define FLASH_CTRL_REG LSQSPIV2_BASE_ADDR
+#define DUAL_MODE true
 static void io_pull_up_cfg()
 {
     io_pull_write(PD14, IO_PULL_UP);
@@ -16,6 +20,8 @@ static void io_pull_up_cfg()
 }
 __attribute__((long_call)) void pinmux_hal_flash_quad_init(void);
 #elif defined(LEO)
+#define FLASH_CTRL_REG LSQSPIV2_BASE_ADDR
+#define DUAL_MODE false
 static void io_pull_up_cfg()
 {
     io_pull_write(PD04, IO_PULL_UP);
@@ -29,11 +35,16 @@ static void flash_init(void)
     io_pull_up_cfg();
     lscache_cache_disable();
     pinmux_hal_flash_quad_init();
-    hal_flash_drv_var_init(false, false);
-    hal_flash_dual_mode_set(false);
+    flash1.reg = (void *)FLASH_CTRL_REG;
+    flash1.dual_mode_only = DUAL_MODE;
+    flash1.continuous_mode_enable = false;
+    flash1.writing = false;
+    flash1.suspend_count = 0;
+    flash1.continuous_mode_on = false;
+    flash1.addr4b = false;
     hal_flash_init();
     clk_flash_init();
-    hal_flash_xip_mode_reset();
+    hal_flash_continuous_mode_reset();
     hal_flash_software_reset();
     DELAY_US(500);
     hal_flash_release_from_deep_power_down();
@@ -50,14 +61,12 @@ void FlashInit(void)
 void XipStart(void)
 {
     flash_init();
-    hal_flash_xip_start();
     __BKPT();
 }
 
 void XipStop(void)
 {
     disable_global_irq();
-    hal_flash_xip_stop();
     __BKPT();
 }
 

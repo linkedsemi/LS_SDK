@@ -143,7 +143,7 @@ static void XIP_BANNED_FUNC(gpio_pd_latch_state_exit,)
 
 NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
 {
-    hal_flash_xip_stop();
+    hal_flash_continuous_mode_stop();
     hal_flash_deep_power_down();
     uint8_t i;
     uint32_t GPIO_DOT[8];
@@ -169,7 +169,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
         SYSC_AWO->IO[i].PUPD = GPIO_PUPD[i];
     }
     SYSC_AWO->PD_AWO_ANA1 = HSI_CAL;
-    if(hal_flash_dual_mode_get())
+    if(flash1.dual_mode_only)
     {
         pinmux_hal_flash_init();
     }else
@@ -181,7 +181,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     clk_flash_init();
     hal_flash_release_from_deep_power_down();
     DELAY_US(8);
-    hal_flash_xip_start();
+    hal_flash_continuous_mode_start();
     lscache_cache_enable(1);
 }
 
@@ -275,14 +275,14 @@ void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,bool lp2_mode)
     while(1)
     {
         uint32_t cpu_stat = enter_critical();
-        hal_flash_xip_stop();
+        hal_flash_continuous_mode_stop();
         hal_flash_deep_power_down();
         // V33_RG->EXTI_CTRL2 = 0x10;   //clear swd wakeup
         // V33_RG->EXTI_CTRL2 = 0x0;
         __WFI();
         hal_flash_release_from_deep_power_down();
         DELAY_US(8);
-        hal_flash_xip_start();
+        hal_flash_continuous_mode_start();
         exit_critical(cpu_stat);
     }
 }

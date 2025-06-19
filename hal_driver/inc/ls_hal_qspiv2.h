@@ -1,5 +1,6 @@
 #ifndef LS_HAL_QSPIV2_H_
 #define LS_HAL_QSPIV2_H_
+#include <stdbool.h>
 #include "ls_msp_qspiv2.h"
 
 #ifdef __cplusplus
@@ -47,23 +48,23 @@ struct lsqspiv2_stg_cfg
     uint8_t *data;
 };
 
-void lsqspiv2_init(void);
+void lsqspiv2_init(reg_lsqspiv2_t *reg);
 
-void lsqspiv2_direct_quad_read_config(void);
+void lsqspiv2_direct_quad_read_config(reg_lsqspiv2_t *reg,bool continuous_mode);
 
-void lsqspiv2_direct_dual_read_config(void);
+void lsqspiv2_direct_dual_read_config(reg_lsqspiv2_t *reg,bool continuous_mode);
 
-void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *cfg);
+void lsqspiv2_stg_read_write(reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *cfg);
 
-void lsqspiv2_stg_send_command(uint8_t opcode);
+void lsqspiv2_stg_send_command(reg_lsqspiv2_t *reg,uint8_t opcode);
 
-void lsqspiv2_stg_read_register(uint8_t opcode,uint8_t *data,uint8_t length);
+void lsqspiv2_stg_read_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
 
-void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
+void lsqspiv2_stg_write_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
 
 #if defined(LM3050) && defined(FLASH_PROG_ALGO)
-__attribute__((long_call)) void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *);
-__attribute__((long_call)) void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
+__attribute__((long_call)) void lsqspiv2_stg_read_write(reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *);
+__attribute__((long_call)) void lsqspiv2_stg_write_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
 #endif
 
 #ifdef __cplusplus

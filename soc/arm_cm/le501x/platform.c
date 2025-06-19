@@ -41,6 +41,7 @@
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 DEF_BUILTIN_TIMER_ENV(SDK_BUILTIN_TIMER_MAX);
+struct hal_flash_env flash1;
 
 void stack_var_ptr_init(void);
 
@@ -474,7 +475,13 @@ static void var_init()
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
-    hal_flash_drv_var_init(true,false);
+    flash1.reg = LSQSPI;
+    flash1.dual_mode_only = false;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = true;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     flash_swint_init();
 }
 
@@ -498,7 +505,13 @@ void sys_init_none()
 {
     analog_init();
     HAL_PIS_Init();
-    hal_flash_drv_var_init(true,false);
+    flash1.reg = LSQSPI;
+    flash1.dual_mode_only = false;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = true;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     flash_swint_init();
     cpu_sleep_recover_init();
     calc_acc_init();
@@ -527,7 +540,6 @@ static void ll_var_init()
     stack_data_bss_init();
     bb_mem_clr();
     ll_stack_var_ptr_init();
-    hal_flash_drv_var_init(true,false);
     flash_swint_init();
 }
 
@@ -591,31 +603,9 @@ __attribute__((weak)) void ble_stack_isr(){ble_isr();}
 
 void XIP_BANNED_FUNC(BLE_Handler,)
 {
-    bool flash_writing_status = hal_flash_writing_busy();
-    bool xip = hal_flash_xip_status_get();
-    if(flash_writing_status)
-    {
-        LS_RAM_ASSERT(xip == false);
-        hal_flash_prog_erase_suspend();
-        uint8_t status_reg1;
-        do{
-            hal_flash_read_status_register_1_ram(&status_reg1);
-        }while(hal_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
-    }
-    if(xip == false)
-    {
-        hal_flash_xip_start();
-    }
+    hal_flash_prog_erase_suspend_isr();
     ble_stack_isr();
-    if(xip == false)
-    {
-        hal_flash_xip_stop();
-    }
-    if(flash_writing_status)
-    {
-        hal_flash_prog_erase_resume();
-        DELAY_US(20);
-    }
+    hal_flash_prog_erase_resume_isr();
 }
 
 void XIP_BANNED_FUNC(switch_to_rc32k,)
@@ -745,3 +735,5 @@ void SWINT_Handler_C(uint32_t *args,uint32_t (*func)(uint32_t,uint32_t,uint32_t,
 {
     args[0] = func(args[0],args[1],args[2],args[3]);
 }
+
+void XIP_BANNED_FUNC(sync_for_xip_stop,struct hal_flash_env *env){}

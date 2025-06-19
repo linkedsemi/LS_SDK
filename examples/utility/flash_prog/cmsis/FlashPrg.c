@@ -64,6 +64,8 @@ uint32_t PRGDATA_StartMarker;
  *    Return Value:   0 - OK,  1 - Failed
  */
 #ifdef LM3050
+#define FLASH_CTRL_REG LSQSPIV2_BASE_ADDR
+#define DUAL_MODE true
 static void io_pull_up_cfg()
 {
     io_pull_write(PD14,IO_PULL_UP);
@@ -71,12 +73,16 @@ static void io_pull_up_cfg()
 }
 __attribute__((long_call)) void pinmux_hal_flash_quad_init(void);
 #elif LEO
+#define FLASH_CTRL_REG LSQSPIV2_BASE_ADDR
+#define DUAL_MODE false
 static void io_pull_up_cfg()
 {
     io_pull_write(PC13,IO_PULL_UP);
     io_pull_write(PD04,IO_PULL_UP);
 }
 #else
+#define DUAL_MODE false
+#define FLASH_CTRL_REG LSQSPI_BASE_ADDR
 static void io_pull_up_cfg(){}
 static void clk_flash_init(){}
 #endif
@@ -87,17 +93,21 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     io_pull_up_cfg();
     lscache_cache_disable();
     pinmux_hal_flash_quad_init();
-    hal_flash_drv_var_init(false,false);
-    hal_flash_dual_mode_set(false);
+    flash1.reg = (void *)FLASH_CTRL_REG;
+    flash1.dual_mode_only = DUAL_MODE;
+    flash1.continuous_mode_enable = false;
+    flash1.writing = false;
+    flash1.suspend_count = 0;
+    flash1.continuous_mode_on = false;
+    flash1.addr4b = false;
     hal_flash_init();
     clk_flash_init();
-    hal_flash_xip_mode_reset();
+    hal_flash_continuous_mode_reset();
     hal_flash_software_reset();
     DELAY_US(500);
     hal_flash_release_from_deep_power_down();
     DELAY_US(100);
     hal_flash_qe_status_read_and_set();
-    hal_flash_xip_start();
     return (0);                                  // Finished without Errors
 }
 
@@ -110,7 +120,6 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
 
 int UnInit (unsigned long fnc) {
     disable_global_irq();
-    hal_flash_xip_stop();
     return (0);                                  // Finished without Errors
 }
 

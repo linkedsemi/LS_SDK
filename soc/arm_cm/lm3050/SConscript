@@ -59,7 +59,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'arm_cm/lm3050/ls_msp_uart.c',
         'arm_cm/lm3050/sys_stat.c',
         'arm_cm/lm3050/sw_timer_port.c',
-        'arm_cm/lm3050/rom_flash_api_wrapper.c',
         'arm_cm/lm3050/compiler/$COMPILER/swint_asm.S',
         'arm_cm/lm3050/compiler/$COMPILER/delay_asm.S',
         'arm_cm/lm3050/compiler/$COMPILER/sleep_asm.S',
