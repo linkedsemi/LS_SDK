@@ -13,65 +13,49 @@
 
 #define LSQSPIV2_FIFO_DEPTH 8
 
-ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_init)
+ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_init,reg_lsqspiv2_t *reg)
 {
-    lsqspiv2_msp_init();
-    LSQSPIV2->QSPI_CTRL0 = FIELD_BUILD(LSQSPIV2_CLK_CYC,QSPI_CLK_CYCLE) | FIELD_BUILD(LSQSPIV2_CS_INTV,QSPI_CS_INTERVAL) 
+    lsqspiv2_msp_init(reg);
+    reg->QSPI_CTRL0 = FIELD_BUILD(LSQSPIV2_CLK_CYC,QSPI_CLK_CYCLE) | FIELD_BUILD(LSQSPIV2_CS_INTV,QSPI_CS_INTERVAL) 
         | FIELD_BUILD(LSQSPIV2_CS_HOLD, QSPI_CS_HOLD) | FIELD_BUILD(LSQSPIV2_CS_SETUP, QSPI_CS_SETUP);
-    MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+    MODIFY_REG(reg->QSPI_CTRL1,LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,LSQSPIV2_MODE_DAC_MASK|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
 }
 
-static void XIP_BANNED_FUNC(lsqspiv2_xip_mode_start)
+void XIP_BANNED_FUNC(lsqspiv2_direct_quad_read_config,reg_lsqspiv2_t *reg,bool continuous_mode)
 {
-    LSQSPIV2->DAC_CMD = FIELD_BUILD(LSQSPIV2_DAC_CMD_EN,0);
-    LSQSPIV2->DAC_CA_LOW = XIP_MODE_BITS<<24;
-    REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,1);
+    reg->DAC_CTRL = FIELD_BUILD(LSQSPIV2_DAC_HZ_CYC,4)|FIELD_BUILD(LSQSPIV2_DAC_MW_WID,QUAD_WIRE)|FIELD_BUILD(LSQSPIV2_DAC_MW_CYC,11)
+        | FIELD_BUILD(LSQSPIV2_DAC_MW_EN,1)|FIELD_BUILD(LSQSPIV2_DAC_SW_CYC,7)|FIELD_BUILD(LSQSPIV2_DAC_SW_EN,!continuous_mode);
+    reg->DAC_CMD = FIELD_BUILD(LSQSPIV2_DAC_CMD,QUAD_IO_READ_OPCODE)|FIELD_BUILD(LSQSPIV2_DAC_CMD_EN,!continuous_mode);
+    reg->DAC_CA_LOW = continuous_mode?XIP_MODE_BITS<<24:0;
 }
 
-void XIP_BANNED_FUNC(lsqspiv2_direct_quad_read_config)
+void XIP_BANNED_FUNC(lsqspiv2_direct_dual_read_config,reg_lsqspiv2_t *reg,bool continuous_mode)
 {
-    LSQSPIV2->DAC_CTRL = FIELD_BUILD(LSQSPIV2_DAC_HZ_CYC,4)|FIELD_BUILD(LSQSPIV2_DAC_MW_WID,QUAD_WIRE)|FIELD_BUILD(LSQSPIV2_DAC_MW_CYC,11)
-        | FIELD_BUILD(LSQSPIV2_DAC_MW_EN,1)|FIELD_BUILD(LSQSPIV2_DAC_SW_EN,0);
-    lsqspiv2_xip_mode_start();
+    reg->DAC_CTRL = FIELD_BUILD(LSQSPIV2_DAC_HZ_CYC,1)|FIELD_BUILD(LSQSPIV2_DAC_MW_WID,DUAL_WIRE)|FIELD_BUILD(LSQSPIV2_DAC_MW_CYC,15)
+        | FIELD_BUILD(LSQSPIV2_DAC_MW_EN,1)|FIELD_BUILD(LSQSPIV2_DAC_SW_CYC,7)|FIELD_BUILD(LSQSPIV2_DAC_SW_EN,!continuous_mode);
+    reg->DAC_CMD = FIELD_BUILD(LSQSPIV2_DAC_CMD,DUAL_IO_READ_OPCODE)|FIELD_BUILD(LSQSPIV2_DAC_CMD_EN,!continuous_mode);
+    reg->DAC_CA_LOW = continuous_mode?XIP_MODE_BITS<<24:0;
 }
 
-#if DUAL_CONTINUOUS_MODE_OFF
-void XIP_BANNED_FUNC(lsqspiv2_direct_dual_read_config)
-{
-    LSQSPIV2->DAC_CTRL = FIELD_BUILD(LSQSPIV2_DAC_HZ_CYC,1)|FIELD_BUILD(LSQSPIV2_DAC_MW_WID,DUAL_WIRE)|FIELD_BUILD(LSQSPIV2_DAC_MW_CYC,15)
-        | FIELD_BUILD(LSQSPIV2_DAC_MW_EN,1)|FIELD_BUILD(LSQSPIV2_DAC_SW_CYC,7)|FIELD_BUILD(LSQSPIV2_DAC_SW_EN,1);
-    LSQSPIV2->DAC_CMD = FIELD_BUILD(LSQSPIV2_DAC_CMD,DUAL_IO_READ_OPCODE)|FIELD_BUILD(LSQSPIV2_DAC_CMD_EN,1);
-    LSQSPIV2->DAC_CA_LOW = 0;
-    REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,1);
-}
-#else
-void XIP_BANNED_FUNC(lsqspiv2_direct_dual_read_config)
-{
-    LSQSPIV2->DAC_CTRL = FIELD_BUILD(LSQSPIV2_DAC_HZ_CYC,1)|FIELD_BUILD(LSQSPIV2_DAC_MW_WID,DUAL_WIRE)|FIELD_BUILD(LSQSPIV2_DAC_MW_CYC,15)
-        | FIELD_BUILD(LSQSPIV2_DAC_MW_EN,1)|FIELD_BUILD(LSQSPIV2_DAC_SW_EN,0);
-    lsqspiv2_xip_mode_start();
-}
-#endif
-
-static void XIP_BANNED_FUNC(write_data_to_fifo,struct lsqspiv2_stg_cfg *cfg)
+static void XIP_BANNED_FUNC(write_data_to_fifo,reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *cfg)
 {
     int16_t tx_remain = cfg->dat_ctrl.dat_bytes + 1 + cfg->dat_ctrl.dat_offset;
     uint32_t *tx_ptr = (uint32_t *)(cfg->data - cfg->dat_ctrl.dat_offset);
     while(tx_remain>0)
     {
-        if(LSQSPIV2->FIFO_FLVL!=LSQSPIV2_FIFO_DEPTH)
+        if(reg->FIFO_FLVL!=LSQSPIV2_FIFO_DEPTH)
         {
-            LSQSPIV2->FIFO_WDAT = *tx_ptr++;
+            reg->FIFO_WDAT = *tx_ptr++;
             tx_remain -= 4;
         }
     }
-    while((LSQSPIV2->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
+    while((reg->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
 }
 
-static void XIP_BANNED_FUNC(read_data_from_fifo,struct lsqspiv2_stg_cfg *cfg)
+static void XIP_BANNED_FUNC(read_data_from_fifo,reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *cfg)
 {
-    while(LSQSPIV2->FIFO_FLVL==0);
-    uint32_t rx = LSQSPIV2->FIFO_RDAT;
+    while(reg->FIFO_FLVL==0);
+    uint32_t rx = reg->FIFO_RDAT;
     uint8_t *end = (uint8_t *)cfg->data + cfg->dat_ctrl.dat_bytes + 1;
     uint8_t *head = (uint8_t *)cfg->data;
     switch(cfg->dat_ctrl.dat_offset)
@@ -98,15 +82,15 @@ static void XIP_BANNED_FUNC(read_data_from_fifo,struct lsqspiv2_stg_cfg *cfg)
     uint32_t *rx_ptr = (uint32_t *)head;
     while(end - (uint8_t *)rx_ptr>=4)
     {
-        if(LSQSPIV2->FIFO_FLVL)
+        if(reg->FIFO_FLVL)
         {
-            *rx_ptr++ = LSQSPIV2->FIFO_RDAT;
+            *rx_ptr++ = reg->FIFO_RDAT;
         }
     }
     if(end - (uint8_t *)rx_ptr)
     {
-        while(LSQSPIV2->FIFO_FLVL==0);
-        rx = LSQSPIV2->FIFO_RDAT;
+        while(reg->FIFO_FLVL==0);
+        rx = reg->FIFO_RDAT;
         uint8_t *tail = (uint8_t *)rx_ptr;
         switch(end - (uint8_t *)rx_ptr)
         {
@@ -125,35 +109,36 @@ static void XIP_BANNED_FUNC(read_data_from_fifo,struct lsqspiv2_stg_cfg *cfg)
     }
 }
 
-ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,struct lsqspiv2_stg_cfg *cfg)
+ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *cfg)
 {
     uint32_t cpu_stat = QSPIV2_ENTER_CRITICAL();
-    LSQSPIV2->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
-    REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
+    reg->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
+    REG_FIELD_WR(reg->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
     uint32_t *ctrl = (uint32_t *)&cfg->ctrl;
-    LSQSPIV2->STG_CTRL = *ctrl;
-    LSQSPIV2->STG_CA_HIGH = cfg->ca_high;
-    LSQSPIV2->STG_CA_LOW = cfg->ca_low;
+    reg->STG_CTRL = *ctrl;
+    reg->STG_CA_HIGH = cfg->ca_high;
+    reg->STG_CA_LOW = cfg->ca_low;
     uint32_t *dat_ctrl = (uint32_t *)&cfg->dat_ctrl;
-    LSQSPIV2->STG_DAT_CTRL = *dat_ctrl;
-    LSQSPIV2->STG_REQ_T = 1;
+    reg->STG_DAT_CTRL = *dat_ctrl;
+    reg->STG_REQ_T = 1;
     if(cfg->dat_ctrl.dat_en == 0)
     {
-        while((LSQSPIV2->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
+        while((reg->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
     }else
     {
         if(cfg->dat_ctrl.dat_dir == WRITE_TO_FLASH)
         {
-            write_data_to_fifo(cfg);
+            write_data_to_fifo(reg,cfg);
         }else
         {
-            read_data_from_fifo(cfg);
+            read_data_from_fifo(reg,cfg);
         }
     }
+    REG_FIELD_WR(reg->QSPI_CTRL1,LSQSPIV2_MODE_DAC,1);
     QSPIV2_EXIT_CRITICAL(cpu_stat);
 }
 
-ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_send_command,uint8_t opcode)
+ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_send_command,reg_lsqspiv2_t *reg,uint8_t opcode)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -175,10 +160,10 @@ ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_send_command,uint8_t opcode)
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
-    lsqspiv2_stg_read_write(&cfg);
+    lsqspiv2_stg_read_write(reg,&cfg);
 }
 
-ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_register,uint8_t opcode,uint8_t *data,uint8_t length)
+ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_register,reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -201,10 +186,10 @@ ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_register,uint8_t opcode,uint8_
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = data;
-    lsqspiv2_stg_read_write(&cfg);
+    lsqspiv2_stg_read_write(reg,&cfg);
 }
 
-ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_write_register,uint8_t opcode,uint8_t *data,uint8_t length)
+ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_write_register,reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -227,5 +212,5 @@ ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_write_register,uint8_t opcode,uint8
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.reserved2 = 0;
     cfg.data = data;
-    lsqspiv2_stg_read_write(&cfg);
+    lsqspiv2_stg_read_write(reg,&cfg);
 }

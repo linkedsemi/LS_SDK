@@ -17,24 +17,6 @@ extern "C" {
 #if defined(FLASH_PROG_ALGO) && __arm__
 #define HAL_FLASH_C_MERGED
 #endif
-#define PUYA_FLASH_WORKAROUND 1
-#define TSINGTENG_FLASH_WORKAROUND 2
-
-#ifndef SUSPEND_WORKAROUND 
-#if (defined(FLASH_PROG_ALGO) || BOOT_RAM==1)
-#define SUSPEND_WORKAROUND 0
-#elif defined(LE501X)
-#define SUSPEND_WORKAROUND PUYA_FLASH_WORKAROUND
-#else
-#define SUSPEND_WORKAROUND 0
-#endif
-#endif
-
-#if defined(LM3050)
-#define DUAL_CONTINUOUS_MODE_OFF 1
-#else
-#define DUAL_CONTINUOUS_MODE_OFF 0
-#endif
 
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
 #define WRTIE_STATUS_REGISTER_0_OPCODE 0x01
@@ -48,11 +30,17 @@ extern "C" {
 #define BLOCK_32K_ERASE_OPCODE 0x52
 #define BLOCK_64K_ERASE_OPCODE 0xd8
 #define PAGE_PROGRAM_OPCODE 0x02
+#define PAGE_PROGRAM4B_OPCODE 0x12
 #define DUAL_PAGE_PROGRAM_OPCODE 0xa2
+#define DUAL_PAGE_PROGRAM4B_OPCODE 0xa4
 #define QUAD_PAGE_PROGRAM_OPCODE 0x32
+#define QUAD_PAGE_PROGRAM4B_OPCODE 0x34
 #define DUAL_IO_READ_OPCODE 0xbb
+#define DUAL_IO_READ4B_OPCODE 0xbc
 #define QUAD_IO_READ_OPCODE 0xeb
+#define QUAD_IO_READ4B_OPCODE 0xec
 #define FAST_READ_OPCODE 0x0b
+#define FAST_READ4B_OPCODE 0x0c
 #define READ_SFDP_OPCODE 0x5a
 #define DEEP_POWER_DOWN_OPCODE 0xb9
 #define RELEASE_FROM_DEEP_POWER_DOWN_OPCODE 0xab
@@ -85,55 +73,55 @@ struct flash_wr_rd_reg_param
     uint8_t length;
 };
 
-void hal_flash_program_operation(void *param);
+void hal_flashx_program_operation(struct hal_flash_env *env,void *param);
 
-void hal_flash_write_reg_operation(void *param);
+void hal_flashx_write_reg_operation(struct hal_flash_env *env,void *param);
 
-void hal_flash_read_operation(void *param);
+void hal_flashx_read_operation(struct hal_flash_env *env,void *param);
 
-void hal_flash_read_reg_operation(void *param);
+void hal_flashx_read_reg_operation(struct hal_flash_env *env,void *param);
 
-void hal_flash_chip_erase_operation(void *param);
+void hal_flashx_chip_erase_operation(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_program_swint(void *param);
+void do_hal_flashx_program_swint(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_write_reg_swint(void *param);
+void do_hal_flashx_write_reg_swint(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_read_swint(void *param);
+void do_hal_flashx_read_swint(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_read_reg_swint(void *param);
+void do_hal_flashx_read_reg_swint(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_chip_erase_swint(void *param);
+void do_hal_flashx_chip_erase_swint(struct hal_flash_env *env,void *param);
 
-void hal_flash_write_enable(void);
+void hal_flashx_write_enable(struct hal_flash_env *env);
 
-void do_hal_flash_write_reg_func(void * param);
+void do_hal_flashx_write_reg_func(struct hal_flash_env *env,void * param);
 
-void do_hal_flash_read_func(void *param);
+void do_hal_flashx_read_func(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_read_reg_func(void *param);
+void do_hal_flashx_read_reg_func(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_prog_func(void *param);
+void do_hal_flashx_prog_func(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_chip_erase_func(void *param);
+void do_hal_flashx_chip_erase_func(struct hal_flash_env *env,void *param);
 
-void flash_reading_critical(void (*func)(void *),void *param);
+void flashx_reading_critical(void (*func)(struct hal_flash_env *,void *),struct hal_flash_env *env,void *param);
 
-void flash_writing_critical(void (*func)(void *),void *param);
+void flashx_writing_critical(void (*func)(struct hal_flash_env *,void *),struct hal_flash_env *env,void *param);
 
-void do_hal_flash_read(void *param);
+void do_hal_flashx_read(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_program(void *param);
+void do_hal_flashx_program(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_write_reg(void *param);
+void do_hal_flashx_write_reg(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_read_reg(void *param);
+void do_hal_flashx_read_reg(struct hal_flash_env *env,void *param);
 
-void do_hal_flash_chip_erase(void *param);
+void do_hal_flashx_chip_erase(struct hal_flash_env *env,void *param);
 
-void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode);
+void hal_flashx_read_addr_8bit_dummy(struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length,uint8_t opcode,bool addr4b);
 
-void sync_for_xip_stop(void);
+void sync_for_xip_stop(struct hal_flash_env *env);
 
 #ifdef __cplusplus
 }

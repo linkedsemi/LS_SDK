@@ -20,18 +20,18 @@ SWINT_C_Routine
     ALIGN
     ENDP
     
-#define FLASH_SWINT_FUNC do_hal_flash_program
+#define FLASH_SWINT_FUNC do_hal_flashx_program
 #include "flash_swint_asm.inc"
 	
-#define FLASH_SWINT_FUNC do_hal_flash_write_reg
+#define FLASH_SWINT_FUNC do_hal_flashx_write_reg
 #include "flash_swint_asm.inc"
 
-#define FLASH_SWINT_FUNC do_hal_flash_read
+#define FLASH_SWINT_FUNC do_hal_flashx_read
 #include "flash_swint_asm.inc"
 
-#define FLASH_SWINT_FUNC do_hal_flash_read_reg
+#define FLASH_SWINT_FUNC do_hal_flashx_read_reg
 #include "flash_swint_asm.inc"
 
-#define FLASH_SWINT_FUNC do_hal_flash_chip_erase
+#define FLASH_SWINT_FUNC do_hal_flashx_chip_erase
 #include "flash_swint_asm.inc"
 	END

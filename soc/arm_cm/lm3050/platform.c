@@ -15,6 +15,7 @@
 #include "ls_msp_qspiv2.h"
 #include "log.h"
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
+struct hal_flash_env flash1;
 
 __attribute__((weak)) void SystemInit(){
     SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
@@ -106,7 +107,14 @@ static void flash_swint_init()
 void sys_init_none()
 {
     clk_flash_init();
-    clk_switch();
+    flash1.reg = LSQSPIV2;
+    flash1.dual_mode_only = true;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = false;
+    flash1.continuous_mode_on = false;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
+
     flash_swint_init();
     LOG_INIT();
     io_init();
@@ -122,7 +130,7 @@ void platform_reset(uint32_t error)
     REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_RST_FROM_SFT, 1);
 }
 
-void XIP_BANNED_FUNC(sync_for_xip_stop,)
+void XIP_BANNED_FUNC(sync_for_xip_stop,struct hal_flash_env *env)
 {
     while((SYSC_AWO->IO[3].DIN&1<<10)==0);
 }

@@ -32,9 +32,13 @@ int  flashInit(){
     io_pull_write(PD04, IO_PULL_UP);
     io_pull_write(PC13, IO_PULL_UP);
     pinmux_hal_flash_init();
-    hal_flash_dual_mode_set(true);
-    hal_flash_drv_var_init(false,false);
-    hal_flash_xip_func_ptr_dummy();
+    flash1.reg = (void *)LSQSPIV2_BASE_ADDR;
+    flash1.dual_mode_only = false;
+    flash1.continuous_mode_enable = false;
+    flash1.writing = false;
+    flash1.suspend_count = 0;
+    flash1.continuous_mode_on = false;
+    flash1.addr4b = false;
     hal_flash_init();
     clk_flash_init();
     hal_flash_software_reset();
@@ -186,11 +190,9 @@ int flashChipErase( ){
  */
 int flashChecksum(char*dst, int length, int checksum) {
     int i, sum = 0;
-    hal_flash_xip_start();
     for (i = 0; i < length; i++) {
         sum += dst[i];
     }
-    hal_flash_xip_stop();
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
 

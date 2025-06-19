@@ -189,7 +189,7 @@ static void XIP_BANNED_FUNC(power_down_hardware_modules,)
 
 NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
 {
-    hal_flash_xip_stop();
+    hal_flash_continuous_mode_stop();
     hal_flash_deep_power_down();
     power_down_hardware_modules();
     cpu_sleep_asm();
@@ -198,7 +198,7 @@ NOINLINE static void XIP_BANNED_FUNC(cpu_flash_deep_sleep_and_recover,)
     hal_flash_init();
     hal_flash_release_from_deep_power_down();
     DELAY_US(8);
-    hal_flash_xip_start();
+    hal_flash_continuous_mode_start();
 }
 
 uint32_t XIP_BANNED_FUNC(io_retention_pull,uint32_t idx,uint16_t oe,uint16_t ie,uint16_t dout,uint32_t pupd)
@@ -292,7 +292,7 @@ static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
 void XIP_BANNED_FUNC(enter_deep_sleep_mode_lvl2_lvl3,struct deep_sleep_wakeup *wakeup)
 {
     lvl2_lvl3_mode_prepare(wakeup);
-    hal_flash_xip_stop();
+    hal_flash_continuous_mode_stop();
     hal_flash_deep_power_down();
     uint16_t c_oe = LSGPIOC->OE;
     uint16_t c_ie = LSGPIOC->IE;
