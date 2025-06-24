@@ -48,17 +48,16 @@ int  flashInit(){
     lscache_cache_disable();
     io_pull_up_cfg();
     pinmux_hal_flash_init();
-    flash1.reg = (void *)LSQSPIV2_BASE_ADDR;
-    flash1.dual_mode_only = false;
-    flash1.continuous_mode_enable = false;
-    flash1.writing = false;
-    flash1.suspend_count = 0;
-    flash1.continuous_mode_on = false;
-    flash1.addr4b = false;
+    hal_flash_dual_mode_set(true);
+    hal_flash_drv_var_init(false,false);
+    hal_flash_xip_func_ptr_dummy();
     hal_flash_init();
 #if defined(LEO)
     clk_flash_init();
 #endif
+
+    // to programm flash after xip
+    hal_flash_xip_mode_reset();
 
     hal_flash_software_reset();
     DELAY_US(500);
@@ -67,19 +66,10 @@ int  flashInit(){
 
 #if !defined(QSH)
     hal_flash_qe_status_read_and_set();
+#else
+    hal_flash_read_ear();
 #endif
 
-#if defined(QSH)
-    uint8_t jedec_id[3] = {};
-    hal_flashx_read_id(&flash1, jedec_id);
-    if ((jedec_id[0] != 0) && (jedec_id[1] != 0) && (jedec_id[2] != 0)) {
-        if ((2 << (jedec_id[2] - 1)) > (16 << 20)) {
-            flash1.addr4b = true;
-        }
-    } else {
-        return ERROR_INIT;
-    }
-#endif
 
     return 0;
 }
@@ -133,7 +123,7 @@ int flashProgram(char* dst, char *src, int size){
     }
     if(length)
     {
-        hal_flash_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
+        hal_flash_page_program_32bit(current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -141,7 +131,7 @@ int flashProgram(char* dst, char *src, int size){
     while(size)
     {
         length = size > 256 ? 256 : size;
-        hal_flash_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
+        hal_flash_page_program_32bit(current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -161,7 +151,7 @@ int flashProgram(char* dst, char *src, int size){
  * Otherwise return 0.
  */
 int flashRead(char* dst, char *src, int length){
-    hal_flash_dual_io_read((uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
+    hal_flash_dual_io_read_32bit((uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
     return 0;
 }
 
@@ -180,7 +170,7 @@ int flashErase(char *dst, int size){
     uint32_t offset = (uint32_t)dst;
     while(size)
     {
-        hal_flash_sector_erase(offset);
+        hal_flash_sector_erase_32bit(offset);
         if(size > FLASH_SECTOR_SIZE)
         {
             size -= FLASH_SECTOR_SIZE;

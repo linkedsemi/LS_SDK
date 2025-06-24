@@ -10,10 +10,10 @@ struct FlashDevice const FlashDevices  INDEVSECTION =  {
     .CPU = "e906",              // CPU name, must in low case
     .FlashID = 0x123456,               // Flash ID
     .FlashType = "NorFlash",             // type
-    .TotalSize = 16*1024*1024,               // Reserved
+    .TotalSize = 1*1024*1024*1024,               // Reserved
     .IsAccDirect = 0,                      // Access directly
     .rangeNumbers = 1,                      // RangeNumbers
 	// {start address, the flash size, sector size}
-    .Devs = {{FLASH_BASE_ADDR, 16*1024*1024, FLASH_SECTOR_SIZE}},
+    .Devs = {{FLASH_BASE_ADDR, 1*1024*1024*1024, FLASH_SECTOR_SIZE}},
     .VendorName = "LinkedSemi"
 };
