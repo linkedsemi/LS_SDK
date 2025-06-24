@@ -16,6 +16,7 @@
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((aligned(64))) void (*interrupt_vector[IRQN_MAX])();
+struct hal_flash_env flash1;
 
 __attribute__((weak)) void SystemInit(){
     e906_init();

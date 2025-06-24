@@ -29,7 +29,7 @@ void qspiv2_global_int_ctrl_fn_init()
 }
 #endif
 
-void XIP_BANNED_FUNC(lsqspiv2_msp_init)
+void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 {
     SYSC_SEC_CPU->PD_CPU_CLKG[0] = SYSC_SEC_CPU_CLKG_SET_QSPI1_MASK;
     __NOP(); __NOP();

@@ -18,7 +18,7 @@ extern "C" {
 extern uint32_t (*qspiv2_global_int_disable_fn)();
 extern void (*qspiv2_global_int_restore_fn)(uint32_t);
 
-void lsqspiv2_msp_init(void);
+void lsqspiv2_msp_init(reg_lsqspiv2_t *reg);
 
 /* qspiv2_global_int_ctrl_fn_init for FPGA*/
 void qspiv2_global_int_ctrl_fn_init();

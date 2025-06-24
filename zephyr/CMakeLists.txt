@@ -293,6 +293,7 @@ if(CONFIG_SOC_LSQSH)
 
   zephyr_library_sources(
     ../soc/rv32/startup.c
+    ../module/debug/ls_dbg.c
     ../module/common/common.c
     ../module/common/circular_doubly_linked_list.c
     ../module/common/linked_async_framework.c
