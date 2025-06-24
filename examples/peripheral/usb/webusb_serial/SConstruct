@@ -1,0 +1,14 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    '../bsp.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/webusb_serial/src/main.c',
+    '$SDK_ROOT/module/tinyusb/examples/device/webusb_serial/src/usb_descriptors.c',
+]
+inc = [
+    '.',
+    '$SDK_ROOT/module/tinyusb/examples/device/webusb_serial/src/',
+]
+env.app_build('webusb_serial',src,inc, ble = False,usb=True)

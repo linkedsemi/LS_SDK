@@ -41,6 +41,7 @@
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 DEF_BUILTIN_TIMER_ENV(SDK_BUILTIN_TIMER_MAX);
+struct hal_flash_env flash1;
 
 void stack_var_ptr_init(void);
 
@@ -184,9 +185,13 @@ static void *lsi_counting_timer;
 static volatile uint16_t lsi_cnt_val;
 static bool lsi_counting_valid;
 
+static uint32_t g_lsiRecountPeriodMs = LSI_DEFAULT_RECOUNT_PERIOD_MS;
+
 __attribute__((weak)) void builtin_timer_start(void *timer,uint32_t timeout,void *param){}
 __attribute__((weak)) void *builtin_timer_create(void (*cb)(void *)){return NULL;}
 __attribute__((weak)) void func_post(void (*func)(void *),void *param){}
+
+
 
 void rco_freq_counting_start()
 {
@@ -215,6 +220,25 @@ void rco_freq_counting_start()
     __NVIC_EnableIRQ(GPTIMB1_IRQn);
 }
 
+/**
+ * @brief   修改lsi校准周期
+ * @param   period_ms: 新的lsi校准周期
+ * @param   caliImmediate: 是否需要立即执行一次校准
+ * @return  void
+ * @note    这个校准，主要是保证在lp0时，电源供电不那么稳定，温度变化明显，
+ *          或者其他因素，对lsi有较大影响的时候进行修改的。
+ *          校准周期过小，会导致功耗偏高。
+ * */
+void platform_set_lsi_recount_period_ms(uint32_t period_ms, uint8_t caliImmediate)
+{
+    g_lsiRecountPeriodMs = period_ms;
+
+    /* 如果需要立即校准，且此时没有正在进行lsi校准，则执行一次lsi校准 */
+    if ((caliImmediate == true) && (__NVIC_GetEnableIRQ(GPTIMB1_IRQn) == 0)) {
+        rco_freq_counting_start();
+    }
+}
+
 static void lsi_counting_timer_callback(void *param)
 {
     rco_freq_counting_start();
@@ -227,7 +251,7 @@ void lsi_counting_timer_create()
 
 static void lsi_counting_timer_start(void *param)
 {
-    builtin_timer_start(lsi_counting_timer,LSI_RECOUNT_PERIOD_MS,lsi_counting_timer);
+    builtin_timer_start(lsi_counting_timer, g_lsiRecountPeriodMs, lsi_counting_timer);
 }
 
 static void GPTIM_IRQ_Handler_For_LSI_Counting()
@@ -293,6 +317,9 @@ void lse_init(){}
 #else
 void rco_freq_counting_init(){}
 void rco_freq_counting_start(){}
+
+void platform_set_lsi_recount_period_ms(uint32_t period_ms, uint8_t caliImmediate){}
+
 uint64_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
 uint32_t us_to_lpcycles(uint32_t us){return 0;}
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt){return 0;}
@@ -448,7 +475,13 @@ static void var_init()
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
-    hal_flash_drv_var_init(true,false);
+    flash1.reg = LSQSPI;
+    flash1.dual_mode_only = false;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = true;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     flash_swint_init();
 }
 
@@ -472,7 +505,13 @@ void sys_init_none()
 {
     analog_init();
     HAL_PIS_Init();
-    hal_flash_drv_var_init(true,false);
+    flash1.reg = LSQSPI;
+    flash1.dual_mode_only = false;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = true;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     flash_swint_init();
     cpu_sleep_recover_init();
     calc_acc_init();
@@ -501,7 +540,6 @@ static void ll_var_init()
     stack_data_bss_init();
     bb_mem_clr();
     ll_stack_var_ptr_init();
-    hal_flash_drv_var_init(true,false);
     flash_swint_init();
 }
 
@@ -565,31 +603,9 @@ __attribute__((weak)) void ble_stack_isr(){ble_isr();}
 
 void XIP_BANNED_FUNC(BLE_Handler,)
 {
-    bool flash_writing_status = hal_flash_writing_busy();
-    bool xip = hal_flash_xip_status_get();
-    if(flash_writing_status)
-    {
-        LS_RAM_ASSERT(xip == false);
-        hal_flash_prog_erase_suspend();
-        uint8_t status_reg1;
-        do{
-            hal_flash_read_status_register_1_ram(&status_reg1);
-        }while(hal_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
-    }
-    if(xip == false)
-    {
-        hal_flash_xip_start();
-    }
+    hal_flash_prog_erase_suspend_isr();
     ble_stack_isr();
-    if(xip == false)
-    {
-        hal_flash_xip_stop();
-    }
-    if(flash_writing_status)
-    {
-        hal_flash_prog_erase_resume();
-        DELAY_US(20);
-    }
+    hal_flash_prog_erase_resume_isr();
 }
 
 void XIP_BANNED_FUNC(switch_to_rc32k,)
@@ -719,3 +735,5 @@ void SWINT_Handler_C(uint32_t *args,uint32_t (*func)(uint32_t,uint32_t,uint32_t,
 {
     args[0] = func(args[0],args[1],args[2],args[3]);
 }
+
+void XIP_BANNED_FUNC(sync_for_xip_stop,struct hal_flash_env *env){}

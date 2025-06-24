@@ -5,9 +5,17 @@
 #include "ls_hal_flash.c"
 #endif
 
-void XIP_BANNED_FUNC(hal_flash_init,)
+void XIP_BANNED_FUNC(hal_flashx_init,struct hal_flash_env *env)
 {
     lsqspi_init();
+    struct lsqspi_direct_read_config_param direct_read_param; //do not initialize this variable with a const struct
+    direct_read_param.opcode = QUAD_IO_READ_OPCODE;
+    direct_read_param.dummy_bytes = 2;
+    direct_read_param.quad_addr = 1;
+    direct_read_param.quad_data = 1;
+    direct_read_param.mode_bits_en = 1;
+    direct_read_param.mode_bits = env->continuous_mode_enable?XIP_MODE_BITS:0;
+    lsqspi_direct_read_config(&direct_read_param);
 }
 
 static void XIP_BANNED_FUNC(quad_io_read_dummy,uint8_t opcode_en,uint8_t mode_bits)
@@ -27,50 +35,43 @@ static void XIP_BANNED_FUNC(quad_io_read_dummy,uint8_t opcode_en,uint8_t mode_bi
     param.mode_bits = mode_bits;
     param.quad_data = true;
     lsqspi_stig_read_data(&param);
-    #ifndef FLASH_PROG_ALGO
-    LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
-    #endif
 }
 
-void XIP_BANNED_FUNC(hal_flash_xip_start,)
+
+
+void XIP_BANNED_FUNC(hal_flashx_continuous_mode_start,struct hal_flash_env *env)
 {
-    if(hal_flash_xip_status_get())
+    if(env->continuous_mode_enable == false)
     {
         return;
     }
+    LS_RAM_ASSERT(env->continuous_mode_on == false);
     uint32_t cpu_stat = enter_critical();
     quad_io_read_dummy(1,XIP_MODE_BITS);
-    struct lsqspi_direct_read_config_param direct_read_param; //do not initialize this variable with a const struct
-    direct_read_param.opcode = QUAD_IO_READ_OPCODE;
-    direct_read_param.dummy_bytes = 2;
-    direct_read_param.quad_addr = 1;
-    direct_read_param.quad_data = 1;
-    direct_read_param.mode_bits_en = 1;
-    direct_read_param.mode_bits = XIP_MODE_BITS;
-    lsqspi_direct_read_config(&direct_read_param);
-    hal_flash_xip_status_set(true);
+    env->continuous_mode_on = true;
     exit_critical(cpu_stat);
 }
 
 
-void XIP_BANNED_FUNC(hal_flash_xip_stop,)
+void XIP_BANNED_FUNC(hal_flashx_continuous_mode_stop,struct hal_flash_env *env)
 {
-    if(hal_flash_xip_status_get() == false)
+    if(env->continuous_mode_enable == false)
     {
         return;
     }
+    LS_RAM_ASSERT(env->continuous_mode_on);
     uint32_t cpu_stat = enter_critical();
     quad_io_read_dummy(0,0);
-    hal_flash_xip_status_set(false);
+    env->continuous_mode_on = false;
     exit_critical(cpu_stat);
 }
 
-void XIP_BANNED_FUNC(hal_flash_write_enable,)
+void XIP_BANNED_FUNC(hal_flashx_write_enable,struct hal_flash_env *env)
 {
     lsqspi_stig_send_command(WRITE_ENABLE_OPCODE);
 }
 
-void XIP_BANNED_FUNC(do_hal_flash_prog_func,void *param)
+void XIP_BANNED_FUNC(do_hal_flashx_prog_func,struct hal_flash_env *env,void *param)
 {
     lsqspi_stig_write_data( param);
 }
@@ -89,39 +90,39 @@ static void flash_program_param_set(uint32_t offset,uint8_t *data,uint16_t lengt
     param->quad_data = multi_type == QUAD_WIRE;
 }
 
-void hal_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+void hal_flashx_quad_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     flash_program_param_set(offset,data,length,QUAD_WIRE,&param);
-    hal_flash_program_operation(&param);
+    hal_flashx_program_operation(env,&param);
 }
 
-void hal_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length){}
+void hal_flashx_dual_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length){}
 
-void hal_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length)
+void hal_flashx_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     flash_program_param_set(offset,data,length,SINGLE_WIRE,&param);
-    hal_flash_program_operation(&param);
+    hal_flashx_program_operation(env,&param);
 }
 
-void XIP_BANNED_FUNC(do_hal_flash_write_reg_func,void *param)
+void XIP_BANNED_FUNC(do_hal_flashx_write_reg_func,struct hal_flash_env *env,void *param)
 {
     struct flash_wr_rd_reg_param *ptr = param;
     lsqspi_stig_write_register(ptr->opcode,ptr->buf,ptr->length);
 }
 
-void XIP_BANNED_FUNC(do_hal_flash_chip_erase_func,void *param)
+void XIP_BANNED_FUNC(do_hal_flashx_chip_erase_func,struct hal_flash_env *env,void *param)
 {
     lsqspi_stig_send_command(CHIP_ERASE_OPCODE);
 }
 
-void XIP_BANNED_FUNC(do_hal_flash_read_func,void *param)
+void XIP_BANNED_FUNC(do_hal_flashx_read_func,struct hal_flash_env *env,void *param)
 {
     lsqspi_stig_read_data(param);
 }
 
-void hal_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
+void hal_flashx_quad_io_read(struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
@@ -136,10 +137,10 @@ void hal_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
     param.size = length;
     param.mode_bits = 0;
     param.quad_data = 1;
-    hal_flash_read_operation(&param);
+    hal_flashx_read_operation(env,&param);
 }
 
-void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint16_t length,uint8_t opcode)
+void hal_flashx_read_addr_8bit_dummy(struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length,uint8_t opcode,bool addr4b)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
@@ -153,27 +154,27 @@ void hal_flash_read_24bit_addr_8bit_dummy(uint32_t offset, uint8_t * data, uint1
     param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = 0;
-    hal_flash_read_operation(&param);
+    hal_flashx_read_operation(env,&param);
 }
 
 
-void XIP_BANNED_FUNC(hal_flash_deep_power_down,)
+void XIP_BANNED_FUNC(hal_flashx_deep_power_down,struct hal_flash_env *env)
 {
     lsqspi_stig_send_command( DEEP_POWER_DOWN_OPCODE);
 }
 
-void XIP_BANNED_FUNC(hal_flash_release_from_deep_power_down,)
+void XIP_BANNED_FUNC(hal_flashx_release_from_deep_power_down,struct hal_flash_env *env)
 {
     lsqspi_stig_send_command(RELEASE_FROM_DEEP_POWER_DOWN_OPCODE);
 }
 
-void XIP_BANNED_FUNC(do_hal_flash_read_reg_func,void *param)
+void XIP_BANNED_FUNC(do_hal_flashx_read_reg_func,struct hal_flash_env *env,void *param)
 {
     struct flash_wr_rd_reg_param *ptr = param;
     lsqspi_stig_read_register(ptr->opcode,ptr->buf,ptr->length);
 }
 
-void hal_flash_read_unique_id(uint8_t unique_serial_id[16])
+void hal_flashx_read_unique_id(struct hal_flash_env *env,uint8_t unique_serial_id[16])
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = unique_serial_id;
@@ -187,10 +188,10 @@ void hal_flash_read_unique_id(uint8_t unique_serial_id[16])
     param.start.opcode_en = 1;
     param.size = 16;
     param.quad_data = false;
-    hal_flash_read_operation(&param);
+    hal_flashx_read_operation(env,&param);
 }
 
-void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+void hal_flashx_program_security_area(struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
@@ -203,10 +204,10 @@ void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
     param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = false;
-    hal_flash_program_operation(&param);
+    hal_flashx_program_operation(env,&param);
 }
 
-void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+void hal_flashx_read_security_area(struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
@@ -220,29 +221,28 @@ void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16
     param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = false;
-    hal_flash_read_operation(&param);
+    hal_flashx_read_operation(env,&param);
 }
 
-void XIP_BANNED_FUNC(hal_flash_software_reset,)
+void XIP_BANNED_FUNC(hal_flashx_software_reset,struct hal_flash_env *env)
 {
     lsqspi_stig_send_command(RESET_EN_OPCODE);
     lsqspi_stig_send_command(RESET_OPCODE);
 }
 
-void XIP_BANNED_FUNC(hal_flash_prog_erase_suspend,)
+void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend,struct hal_flash_env *env)
 {
     lsqspi_stig_send_command(PROG_ERASE_SUSPEND);
 }
 
-
-void XIP_BANNED_FUNC(hal_flash_prog_erase_resume,)
+void XIP_BANNED_FUNC(hal_flashx_prog_erase_resume,struct hal_flash_env *env)
 {
     lsqspi_stig_send_command(PROG_ERASE_RESUME);
 }
 
-__attribute__((weak)) void hal_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length){}
+__attribute__((weak)) void hal_flashx_dual_io_read(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint32_t length){}
 
-void XIP_BANNED_FUNC(hal_flash_xip_mode_reset,)
+void XIP_BANNED_FUNC(hal_flashx_continuous_mode_reset,struct hal_flash_env *env)
 {
     uint8_t data = CONTINUOUS_READ_MODE_RESET;
     lsqspi_stig_write_register(CONTINUOUS_READ_MODE_RESET,&data,sizeof(data));

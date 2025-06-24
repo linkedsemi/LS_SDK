@@ -618,6 +618,7 @@ static void process_bus_reset(uint8_t rhport)
     _dcd.status_out = 0;
     /* When pipe0.buf has not NULL, DATA stage works in progress. */
     _dcd.pipe0.buf = NULL;
+    _dcd.rx_buf_addr = USB_RX_BUF_ADDR;
 
     USB0->TXIE = 1; /* Enable only EP0 */
     USB0->RXIE = 0; 

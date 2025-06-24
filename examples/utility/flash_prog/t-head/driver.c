@@ -48,9 +48,13 @@ int  flashInit(){
     lscache_cache_disable();
     io_pull_up_cfg();
     pinmux_hal_flash_init();
-    hal_flash_dual_mode_set(true);
-    hal_flash_drv_var_init(false,false);
-    hal_flash_xip_func_ptr_dummy();
+    flash1.reg = (void *)LSQSPIV2_BASE_ADDR;
+    flash1.dual_mode_only = false;
+    flash1.continuous_mode_enable = false;
+    flash1.writing = false;
+    flash1.suspend_count = 0;
+    flash1.continuous_mode_on = false;
+    flash1.addr4b = false;
     hal_flash_init();
 #if defined(LEO)
     clk_flash_init();

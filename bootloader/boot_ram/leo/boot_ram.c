@@ -10,10 +10,11 @@
 #include "reg_v33_rg.h"
 #include "field_manipulate.h"
 #include "ls_hal_sha.h"
+#include "ls_msp_qspiv2.h"
 #include "../../module/micro-ecc/uECC.h"
 
 #define FLASH_ADDR 0x8000000
-#define APP_OFFSET 0x1800
+#define APP_OFFSET 0x2000
 #define APP_SIGN_OFFSET APP_OFFSET - 0x40
 #define APP_SIZE_INFO APP_OFFSET - 0x44
 
@@ -150,14 +151,18 @@ void boot_ram_start()
         MODIFY_REG(SYSC_AWO->IO[7].PUPD,3<<16<<2,3<<2);
     }
     __disable_irq();
-    hal_flash_drv_var_init(false,false);
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = false;
+    flash1.reg = LSQSPIV2;
+    flash1.writing = false;
+    flash1.dual_mode_only = false;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
     hal_flash_init();
-    hal_flash_dual_mode_set(false);
+    hal_flash_continuous_mode_start();
     pinmux_hal_flash_quad_init();
     trim_val_load();
-    hal_flash_xip_start();
     lscache_cache_enable(1);
-    hal_flash_xip_func_ptr_init();
     ecc_verify();
     boot_app(FLASH_ADDR+APP_OFFSET);
 }

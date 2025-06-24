@@ -1,0 +1,46 @@
+# module/lwip-2.2.1/SConscript
+Import('env')
+
+lwip_src = [
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/altcp_alloc.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/altcp_tcp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/altcp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/def.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/dns.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/inet_chksum.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/init.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ip.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/mem.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/memp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/netif.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/pbuf.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/raw.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/stats.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/sys.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/tcp_in.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/tcp_out.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/tcp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/timeouts.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/udp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/acd.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/autoip.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/dhcp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/etharp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/icmp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/igmp.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/ip4_addr.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/ip4_frag.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/core/ipv4/ip4.c',
+    #netif
+    '$SDK_ROOT/module/lwip-2.2.1/src/netif/ethernet.c',
+    #app
+    '$SDK_ROOT/module/lwip-2.2.1/src/apps/http/httpd.c',
+    '$SDK_ROOT/module/lwip-2.2.1/src/apps/http/fs.c',
+]
+
+lwip_inc = [
+    '$SDK_ROOT/module/lwip-2.2.1/src/include',
+    '$SDK_ROOT/module/lwip-2.2.1/src/include/lwip/apps',
+]
+
+Return('lwip_src', 'lwip_inc')

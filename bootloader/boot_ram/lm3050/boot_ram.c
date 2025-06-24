@@ -9,7 +9,7 @@
 #include "reg_v33_rg_type.h"
 #include "ls_hal_sha.h"
 #include "../../module/micro-ecc/uECC.h"
-
+#include "ls_msp_qspiv2.h"
 #define APP_ADDR 0x800500
 #define APP_OFFSET 0x500
 #define APP_SIGN_OFFSET APP_OFFSET - 0x40
@@ -78,9 +78,15 @@ __NO_RETURN void boot_ram_start()
 {
     __disable_irq();
     SYSC_AWO->IO[3].PUPD = 0xf000;
-    hal_flash_dual_mode_set(true);
+    flash1.reg = LSQSPIV2;
+    flash1.dual_mode_only = true;
+    flash1.writing = false;
+    flash1.continuous_mode_enable = false;
+    flash1.continuous_mode_on = false;
+    flash1.suspend_count = 0;
+    flash1.addr4b = false;
+    hal_flash_init();
     pinmux_hal_flash_quad_init();
-    hal_flash_xip_start();
     lscache_cache_enable(1);
     trim_val_load();
     ecc_verify();
