@@ -17,7 +17,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_init,struct hal_flash_env *env)
     }
 }
 
-static void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_enter,reg_lsqspiv2_t *reg,bool addr4b)
+void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_enter,reg_lsqspiv2_t *reg,bool addr4b)
 {
     uint8_t dummy;
     struct lsqspiv2_stg_cfg cfg;
@@ -45,7 +45,7 @@ static void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_enter,reg_lsqspiv2_t
     lsqspiv2_stg_read_write(reg,&cfg);
 }
 
-static void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_exit,reg_lsqspiv2_t *reg,bool addr4b)
+void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_exit,reg_lsqspiv2_t *reg,bool addr4b)
 {
     uint8_t dummy;
     struct lsqspiv2_stg_cfg cfg;
@@ -73,7 +73,7 @@ static void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_exit,reg_lsqspiv2_t 
     lsqspiv2_stg_read_write(reg,&cfg);
 }
 
-static void XIP_BANNED_FUNC(hal_flashx_dual_continuous_mode_enter,reg_lsqspiv2_t *reg,bool addr4b)
+void XIP_BANNED_FUNC(hal_flashx_dual_continuous_mode_enter,reg_lsqspiv2_t *reg,bool addr4b)
 {
     uint8_t dummy;
     struct lsqspiv2_stg_cfg cfg;
@@ -101,7 +101,7 @@ static void XIP_BANNED_FUNC(hal_flashx_dual_continuous_mode_enter,reg_lsqspiv2_t
     lsqspiv2_stg_read_write(reg,&cfg);
 }
 
-static void XIP_BANNED_FUNC(hal_flashx_dual_continuous_mode_exit,reg_lsqspiv2_t *reg,bool addr4b)
+void XIP_BANNED_FUNC(hal_flashx_dual_continuous_mode_exit,reg_lsqspiv2_t *reg,bool addr4b)
 {
     uint8_t dummy;
     struct lsqspiv2_stg_cfg cfg;

@@ -265,6 +265,29 @@ void XIP_BANNED_FUNC(hal_flashx_prog_erase_resume_isr,struct hal_flash_env *env)
     }
 }
 
+uint8_t hal_flashx_read_ear(struct hal_flash_env *env)
+{
+    uint8_t ear = 0;
+
+    struct flash_wr_rd_reg_param param;
+    param.buf = &ear;
+    param.opcode = RDEAR_OPCODE;
+    param.length = 1;
+    hal_flashx_read_reg_operation(env, &param);
+
+    return ear;
+}
+
+void hal_flashx_write_ear(struct hal_flash_env *env, uint8_t ear)
+{
+    struct flash_wr_rd_reg_param param = {
+        .buf = &ear,
+        .length = 1,
+        .opcode = WREAR_OPCODE,
+    };
+    hal_flashx_write_reg_operation(env, &param);
+}
+
 void XIP_BANNED_FUNC(hal_flash_init){hal_flashx_init(&flash1);}
 
 void XIP_BANNED_FUNC(hal_flash_continuous_mode_start){hal_flashx_continuous_mode_start(&flash1);}

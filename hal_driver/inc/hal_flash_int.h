@@ -54,6 +54,8 @@ extern "C" {
 #define PROG_ERASE_SUSPEND 0x75
 #define PROG_ERASE_RESUME 0x7a
 #define CONTINUOUS_READ_MODE_RESET 0xff
+#define RDEAR_OPCODE 0xc8 /* Read Extended Address Register  */
+#define WREAR_OPCODE 0xc5 /* Write Extended Address Register */
 
 #define XIP_MODE_BITS 0xa0
 

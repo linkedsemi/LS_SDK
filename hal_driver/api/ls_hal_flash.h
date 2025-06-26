@@ -227,6 +227,9 @@ void hal_flashx_prog_erase_suspend_isr(struct hal_flash_env *env);
 
 void hal_flashx_prog_erase_resume_isr(struct hal_flash_env *env);
 
+uint8_t hal_flashx_read_ear(struct hal_flash_env *env);
+
+void hal_flashx_write_ear(struct hal_flash_env *env, uint8_t ear);
 
 void hal_flash_init();
 
