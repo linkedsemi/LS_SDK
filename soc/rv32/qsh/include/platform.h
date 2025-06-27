@@ -1,6 +1,7 @@
 #ifndef PLATFORM_H_
 #define PLATFORM_H_
 #include <stdint.h>
+#include <stdbool.h>
 #include "field_manipulate.h"
 #include "sdk_config.h"
 #include "core_rv32.h"
