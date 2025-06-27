@@ -135,4 +135,9 @@ __ALWAYS_STATIC_INLINE void app_cpu_reset_hold_set(void)
     SYSC_SEC_CPU->CPU_SYSC |= (1UL << 16);
 }
 
+__ALWAYS_STATIC_INLINE bool is_app_cpu_running(void)
+{
+    return (SYSC_SEC_CPU->APP_CPU_SRST > 0);
+}
+
 #endif
