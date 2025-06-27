@@ -9,7 +9,9 @@
 #include "cpu.h"
 #include "ls_hal_cache.h"
 #include "FlashOS.h"
-
+#if defined(QSH)
+#include "ls_msp_qspiv2.h"
+#endif
 /**
  * ERROR TYPE. MUST NOT BE MODIFIED
  */
@@ -45,10 +47,13 @@ static void io_pull_up_cfg()
  */
 int  flashInit(){
     disable_global_irq();
+#if defined(QSH)
+    app_cpu_reset();
+#endif
     lscache_cache_disable();
     io_pull_up_cfg();
     pinmux_hal_flash_init();
-    flash1.reg = (void *)LSQSPIV2_BASE_ADDR;
+    flash1.reg = (void *)LSQSPIV2;
     flash1.dual_mode_only = false;
     flash1.continuous_mode_enable = false;
     flash1.writing = false;
@@ -133,7 +138,7 @@ int flashProgram(char* dst, char *src, int size){
     }
     if(length)
     {
-        hal_flash_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
+        hal_flashx_multi_io_page_program(&flash1, current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -141,7 +146,7 @@ int flashProgram(char* dst, char *src, int size){
     while(size)
     {
         length = size > 256 ? 256 : size;
-        hal_flash_page_program(current - FLASH_BASE_ADDR,(void *)data,length);
+        hal_flashx_multi_io_page_program(&flash1, current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -161,7 +166,7 @@ int flashProgram(char* dst, char *src, int size){
  * Otherwise return 0.
  */
 int flashRead(char* dst, char *src, int length){
-    hal_flash_dual_io_read((uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
+    hal_flashx_multi_io_read(&flash1, (uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
     return 0;
 }
 
