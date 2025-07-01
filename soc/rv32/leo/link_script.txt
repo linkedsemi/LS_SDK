@@ -10,13 +10,14 @@ SECTIONS
 	{
 		KEEP(*(.rodata.__info_array))
 		. = ALIGN(0x100);
-		. = 0X2000,
+		. = 0X4000,
 	} >FLASH
 	__image_lma__ = LOADADDR(.info);
 
 	.text :
     {
 		__text_start = .;
+		KEEP(*(.rodata.image_header))
         KEEP(*(.text.Reset_Handler))
         KEEP(*(.init))
         KEEP(*(.fini))

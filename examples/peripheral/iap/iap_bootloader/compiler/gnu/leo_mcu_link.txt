@@ -10,7 +10,7 @@ SECTIONS
 	{
 		KEEP(*(.rodata.__info_array))
 		. = ALIGN(0x100);
-		. = 0X2000,
+		. = 0X4000,
 	} >FLASH
 	__image_lma__ = LOADADDR(.info);
 
