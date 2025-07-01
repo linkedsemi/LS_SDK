@@ -236,3 +236,5 @@ uint32_t GenerateRandom32Bit()
         clk_cnt = 0;
     }
 }
+
+const uint32_t image_header[28]={0};

@@ -4,7 +4,8 @@ env['SDK_ROOT'] = Dir('../../../')
 env['IC'] = 'leo'
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
-    'boot_ram.c'
+    'boot_ram.c',
+    'ext_flash.c',
 ]
 inc = [
     './'
