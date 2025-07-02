@@ -7,10 +7,10 @@ import hashlib
 SBL_LEN_OFFSET = 12
 FEATUERE_MASK_OFFSET = 24
 HEADER_CRC_OFFSET = 0x24 # 内部flash最后的crc
-APP_DESC_OFFSET = 0x4000 # app在bin文件中的偏移
+APP_DESC_OFFSET = 0x2000 # app在bin文件中的偏移
 APP_SIGN_LEN = 64
-IMAGE_OFFSET = 0x4020
-APP_OFFSET = 0x4070
+APP_IMAGE_OFFSET = 0x2020
+APP_OFFSET = 0x2070
 APP_SIGN_OFFSET = APP_OFFSET - 0x40
 APP_SIZE_OFFSET = APP_OFFSET - 0x44
 SBL_IMAGE_OFFSET = 0x100
@@ -20,7 +20,7 @@ INFO_SBL_DATA_CRC32_OFFSET = 28
 PUBLIC_KEY_OFFSET = 0x40
 INFO_SBL_OFFSET = 0x30  #info_sbl在bios文件中的偏移
 app_magic = b'LSEC_APP'
-IMAGE_OFFSET_IN_BIOS_FILE = IMAGE_OFFSET + INFO_SBL_OFFSET
+IMAGE_OFFSET_IN_BIOS_FILE = APP_IMAGE_OFFSET + INFO_SBL_OFFSET
 SECURE_BOOT_ENABLED = 1
 SECP256K1_USED = 0
 
@@ -101,7 +101,7 @@ fw_data[APP_SIGN_OFFSET : APP_SIGN_OFFSET + APP_SIGN_LEN] = app_signature
 app_data_len_bytes = struct.pack('I', app_data_len)
 fw_data[APP_SIZE_OFFSET : APP_SIZE_OFFSET + 4] = app_data_len_bytes
 
-image_data = fw_data[IMAGE_OFFSET:] # 从固件中提取整个image
+image_data = fw_data[APP_IMAGE_OFFSET:] # 从固件中提取整个image
 image_size = len(image_data)
 image_crc32 = zlib.crc32(image_data)
 app_desc_head = struct.pack('8sIIII', app_magic, IMAGE_OFFSET_IN_BIOS_FILE, image_size, app_version, image_crc32)

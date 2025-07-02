@@ -10,7 +10,7 @@ UART_CMD_MASK = 0xffffffff
 
 PUBLIC_KEY_END_OFFSET = 128
 SBL_IMAGE_OFFSET = 0x100
-APP_IMAGE_OFFSET = 0x4000
+APP_DESC_OFFSET = 0x2000
 
 sbl_file = open(sys.argv[1],'rb')
 sbl_data = sbl_file.read()
@@ -33,7 +33,7 @@ dummy_array = struct.pack('24B', *[0xff] * 24)
 key_array = struct.pack('64B', *[0xff] * 64)
 dummy_array2_length = SBL_IMAGE_OFFSET-PUBLIC_KEY_END_OFFSET
 dummy_array2 = struct.pack(f'{dummy_array2_length}B', *[0xff] * dummy_array2_length)
-dummay_array3_length = APP_IMAGE_OFFSET - SBL_IMAGE_OFFSET - sbl_length - 4
+dummay_array3_length = APP_DESC_OFFSET - SBL_IMAGE_OFFSET - sbl_length - 4
 dummay_array3 = struct.pack(f'{dummay_array3_length}B', *[0xff] * dummay_array3_length)
 
 with open(sys.argv[2],'wb') as out:

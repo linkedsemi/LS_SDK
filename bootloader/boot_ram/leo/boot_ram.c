@@ -19,12 +19,12 @@ typedef uint32_t (*crc32_calc_func_t)(uint32_t crc,uint8_t *data,uint32_t length
 #define HAL_LSCRC_CRC32          ((crc32_calc_func_t)0x01000c80)
 #define EC_BOOT_SUPPORT 1
 #define FLASH_ADDR 0x8000000
-#define APP_DESC_OFFSET 0x4000
-#define APP_IMAGE_OFFSET 0x4020
-#define APP_OFFSET 0x4070
+#define APP_DESC_OFFSET 0x2000
+#define APP_IMAGE_OFFSET 0x2020
+#define APP_OFFSET 0x2070
 #define APP_SIGN_OFFSET APP_OFFSET - 0x40
 #define APP_SIZE_INFO APP_OFFSET - 0x44
-#define EXT_SEARCH_START_ADDR 0x4030
+#define EXT_SEARCH_START_ADDR 0x2030
 #define TEMP_BUF_SIZE 1024
 #define MAX_EXT_FLASH_SIZE_BITS 26
 __attribute__((aligned(4))) static const uint8_t ec_app_magic[8] = {'L','S','E','C','_','A','P','P'};
