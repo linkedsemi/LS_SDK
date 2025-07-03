@@ -80,12 +80,7 @@ uint32_t GenerateRandom32Bit();
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/3,1)
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
-#define ROM_FLASH_API
-#ifdef ROM_FLASH_API
-#define FLASH_SWINT_NUM RV_SOFT_IRQn
-#else
 #define FLASH_SWINT_NUM QSPI_IRQn
-#endif
 
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler
