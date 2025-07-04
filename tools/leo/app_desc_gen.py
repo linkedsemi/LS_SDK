@@ -9,10 +9,8 @@ FEATUERE_MASK_OFFSET = 24
 HEADER_CRC_OFFSET = 0x24 # 内部flash最后的crc
 APP_DESC_OFFSET = 0x2000 # app在bin文件中的偏移
 APP_SIGN_LEN = 64
-APP_IMAGE_OFFSET = 0x2020
-APP_OFFSET = 0x2070
+APP_OFFSET = 0x2060
 APP_SIGN_OFFSET = APP_OFFSET - 0x40
-APP_SIZE_OFFSET = APP_OFFSET - 0x44
 SBL_IMAGE_OFFSET = 0x100
 INFO_SBL_DATA_LEN = 0x2000
 INFO_SBL_DATA_LEN_OFFSET = 20
@@ -20,7 +18,6 @@ INFO_SBL_DATA_CRC32_OFFSET = 28
 PUBLIC_KEY_OFFSET = 0x40
 INFO_SBL_OFFSET = 0x30  #info_sbl在bios文件中的偏移
 app_magic = b'LSEC_APP'
-IMAGE_OFFSET_IN_BIOS_FILE = APP_IMAGE_OFFSET + INFO_SBL_OFFSET
 SECURE_BOOT_ENABLED = 1
 SECP256K1_USED = 0
 
@@ -94,17 +91,16 @@ fw_data[SBL_IMAGE_OFFSET+sbl_len : SBL_IMAGE_OFFSET+sbl_len + APP_SIGN_LEN] = sb
 app_data = fw_data[APP_OFFSET:] # 从固件中提取应用部分
 app_data_len = len(app_data)
 app_version = 0x1
+reserved = 0x0
 app_signature = sk.sign_deterministic(app_data,hashfunc = hashlib.sha256) 
 print("app_data_len :",app_data_len)
 # 添加app_data的签名
 fw_data[APP_SIGN_OFFSET : APP_SIGN_OFFSET + APP_SIGN_LEN] = app_signature
-app_data_len_bytes = struct.pack('I', app_data_len)
-fw_data[APP_SIZE_OFFSET : APP_SIZE_OFFSET + 4] = app_data_len_bytes
 
-image_data = fw_data[APP_IMAGE_OFFSET:] # 从固件中提取整个image
-image_size = len(image_data)
-image_crc32 = zlib.crc32(image_data)
-app_desc_head = struct.pack('8sIIII', app_magic, IMAGE_OFFSET_IN_BIOS_FILE, image_size, app_version, image_crc32)
+sign_and_image_data = fw_data[APP_SIGN_OFFSET:]
+sign_and_image_size = len(sign_and_image_data)
+sign_and_image_crc32 = zlib.crc32(sign_and_image_data)
+app_desc_head = struct.pack('8sIIIII', app_magic, sign_and_image_size, app_version, reserved, reserved, sign_and_image_crc32)
 app_desc_crc_val = zlib.crc32(app_desc_head)
 print("app_desc_crc_val",app_desc_crc_val)
 app_desc_crc = struct.pack('I', app_desc_crc_val)
