@@ -20,15 +20,31 @@ typedef uint32_t (*crc32_calc_func_t)(uint32_t crc,uint8_t *data,uint32_t length
 #define EC_BOOT_SUPPORT 1
 #define FLASH_ADDR 0x8000000
 #define APP_DESC_OFFSET 0x2000
-#define APP_IMAGE_OFFSET 0x2020
-#define APP_OFFSET 0x2070
-#define APP_SIGN_OFFSET APP_OFFSET - 0x40
-#define APP_SIZE_INFO APP_OFFSET - 0x44
-#define EXT_SEARCH_START_ADDR 0x2030
+#define APP_OFFSET 0x2060
+#define APP_SIGN_OFFSET (APP_OFFSET - 0x40)
 #define TEMP_BUF_SIZE 1024
 #define MAX_EXT_FLASH_SIZE_BITS 26
+#define SIGN_LEN 64
+#define EXT_FLASH_SEARCH_STEP 0x1000
+#define EXT_SEARCH_START_ADDR 0x1000
+
+__attribute__((aligned(4))) static const uint8_t ec_magic_num[] = {'L','S','E','C'};
 __attribute__((aligned(4))) static const uint8_t ec_app_magic[8] = {'L','S','E','C','_','A','P','P'};
 __attribute__((aligned(4))) uint8_t temp_buf[TEMP_BUF_SIZE];
+__attribute__((aligned(4))) static uint32_t mirror_start_addr = 0x2030;
+struct flash_app_image_desc nvm_head;
+struct boot_search_cfg
+{
+    uint16_t loop;
+    uint16_t delay_10us;
+};
+struct fw_desc_pointer
+{
+    uint32_t magic;
+    uint32_t desc_offset;
+    struct boot_search_cfg search_cfg;
+    uint32_t crc32;
+};
 
 #define EC_MODE_PIN PB06
 #define I2C0_SCL_PIN PA11
@@ -51,16 +67,6 @@ const uint8_t i2c_scl_list[] = {
     I2C5_SCL_PIN,
     I2C6_SCL_PIN,
     I2C7_SCL_PIN,
-};
-
-struct flash_app_image_desc  
-{
-    uint8_t magic[8];
-    uint32_t image_offset;
-    uint32_t size;
-    uint32_t version;
-    uint32_t image_crc32;
-    uint32_t crc32;
 };
 
 void boot_app(uint32_t base)
@@ -138,11 +144,9 @@ extern bool secp256k1;
 extern uint8_t pub_key[64];
 bool sign_verification(uint8_t *signature)
 {
-    uint32_t app_len;
     uint32_t digest[SHA256_WORDS_NUM];
-    hal_flash_quad_io_read(APP_SIZE_INFO, (uint8_t *)&app_len,sizeof(app_len));
     HAL_LSSHA_Init();
-    HAL_LSSHA_SHA256((void *)(FLASH_ADDR+APP_OFFSET),app_len,digest);
+    HAL_LSSHA_SHA256((void *)(FLASH_ADDR+APP_OFFSET),nvm_head.sign_and_image_size-SIGN_LEN,digest);
     HAL_LSSHA_DeInit();
     uECC_Curve curve = secp256k1 ? uECC_secp256k1() : uECC_secp256r1();
     uint8_t result =  uECC_verify(pub_key,(uint8_t *)digest,32,signature,curve);
@@ -176,22 +180,22 @@ static void image_copy(uint32_t src,uint32_t size)
     hal_flash_page_program(dst,temp_buf,size);
 }
 
-static bool int_flash_image_check(uint32_t image_crc32,uint32_t image_size, uint32_t offset)
+static bool int_flash_image_check(uint32_t crc32,uint32_t size, uint32_t offset)
 {
     uint32_t crc = 0;
     uint16_t i;
-    for(i=0;i<image_size/TEMP_BUF_SIZE;++i)
+    for(i=0;i<size/TEMP_BUF_SIZE;++i)
     {
         hal_flash_fast_read(offset,temp_buf,TEMP_BUF_SIZE);
         crc = HAL_LSCRC_CRC32(crc,temp_buf,TEMP_BUF_SIZE);
         offset += TEMP_BUF_SIZE;
     }
-    if(image_size%TEMP_BUF_SIZE)
+    if(size%TEMP_BUF_SIZE)
     {
-        hal_flash_fast_read(offset,temp_buf,image_size%TEMP_BUF_SIZE);
-        crc = HAL_LSCRC_CRC32(crc,temp_buf,image_size%TEMP_BUF_SIZE);
+        hal_flash_fast_read(offset,temp_buf,size%TEMP_BUF_SIZE);
+        crc = HAL_LSCRC_CRC32(crc,temp_buf,size%TEMP_BUF_SIZE);
     }
-    return image_crc32 == crc;
+    return crc32 == crc;
 }
 
 static bool ext_flash_app_desc_ptr_read(uint32_t offset,struct flash_app_image_desc *ptr)
@@ -200,8 +204,8 @@ static bool ext_flash_app_desc_ptr_read(uint32_t offset,struct flash_app_image_d
     if(memcmp(ptr->magic, ec_app_magic, sizeof(ptr->magic)) == 0)
     {
         ext_flash_read(offset+sizeof(ptr->magic),&((uint32_t *)ptr)[sizeof(ptr->magic)/sizeof(uint32_t)],(sizeof(*ptr)- sizeof(ptr->magic))/sizeof(uint32_t));
-        uint32_t crc = HAL_LSCRC_CRC32(0,(uint8_t *)ptr,sizeof(*ptr)-sizeof(ptr->crc32));
-        if(crc==ptr->crc32)
+        uint32_t crc = HAL_LSCRC_CRC32(0,(uint8_t *)ptr,sizeof(*ptr)-sizeof(ptr->desc_crc32));
+        if(crc==ptr->desc_crc32)
         {
             return true;
         }
@@ -209,10 +213,64 @@ static bool ext_flash_app_desc_ptr_read(uint32_t offset,struct flash_app_image_d
     return false;
 }
 
-static bool ext_flash_search(void *param)
+static bool ext_flash_desc_ptr_read(uint32_t offset,struct fw_desc_pointer *ptr)
 {
-    struct flash_app_image_desc *p = param;
-    if(ext_flash_app_desc_ptr_read(EXT_SEARCH_START_ADDR, p))
+    ext_flash_read(offset,(uint32_t *)ptr,sizeof(ptr->magic)/sizeof(uint32_t));
+    if(ptr->magic == *(uint32_t *)ec_magic_num)
+    {
+        ext_flash_read(offset+sizeof(ptr->magic),&((uint32_t *)ptr)[sizeof(ptr->magic)/sizeof(uint32_t)],(sizeof(*ptr)- sizeof(ptr->magic))/sizeof(uint32_t));
+        uint32_t crc = HAL_LSCRC_CRC32(0,(uint8_t *)ptr,sizeof(*ptr)-sizeof(ptr->crc32));
+        if(crc==ptr->crc32)
+        {
+            mirror_start_addr += offset;
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool ext_flash_search_in_ramge(struct flash_app_image_desc *ptr1, struct fw_desc_pointer *ptr2,uint32_t offset,uint32_t total_size)
+{
+    uint8_t i;
+    for(i=0;i<total_size/EXT_FLASH_SEARCH_STEP;++i)
+    {
+        if(ext_flash_desc_ptr_read(offset,ptr2))
+        {
+            if(ext_flash_app_desc_ptr_read(mirror_start_addr, ptr1))
+            {
+                return true;
+            }
+        }
+        offset += EXT_FLASH_SEARCH_STEP;
+        if(offset >= total_size)
+        {
+            offset = EXT_SEARCH_START_ADDR;
+            break;
+        }
+    }
+    return false;
+}
+
+static uint32_t ext_flash_size_get_and_addressing_mode_set()
+{
+    uint8_t jedec_id[3];
+    ext_flash_read_id(jedec_id);
+    uint8_t capacity_id = jedec_id[2];
+    if(capacity_id>MAX_EXT_FLASH_SIZE_BITS)
+    {
+        capacity_id = MAX_EXT_FLASH_SIZE_BITS;
+    }
+    uint32_t size = 1<<capacity_id;
+    ext_flash_addressing_mode_set(size);
+    return size;
+}
+
+static bool ext_flash_search(void *param1, void *param2)
+{
+    struct flash_app_image_desc *p1 = param1;
+    struct fw_desc_pointer *p2 = param2;
+    uint32_t ext_total_size = ext_flash_size_get_and_addressing_mode_set();
+    if(ext_flash_app_desc_ptr_read(mirror_start_addr, p1) || ext_flash_search_in_ramge(p1, p2, EXT_SEARCH_START_ADDR, ext_total_size))
     {
         return true;
     }else
@@ -228,9 +286,9 @@ bool check_firmware_integrity(void *param)
     if(memcmp(buf->magic, ec_app_magic, sizeof(buf->magic)) == 0)
     {
         uint32_t crc32_result = HAL_LSCRC_CRC32(0,(uint8_t *)buf,sizeof(struct flash_app_image_desc)-sizeof(uint32_t));
-        if(crc32_result == buf->crc32)
+        if(crc32_result == buf->desc_crc32)
         {
-            if(int_flash_image_check(buf->image_crc32,buf->size,APP_IMAGE_OFFSET))
+            if(int_flash_image_check(buf->sign_and_image_crc32,buf->sign_and_image_size,APP_SIGN_OFFSET))
             {
                 return true;
             }
@@ -247,18 +305,18 @@ void ec_app_boot_flow()
 {
     bool internal;
     bool external;
-    struct flash_app_image_desc nvm_head; 
     struct flash_app_image_desc desc_ptr;
+    struct fw_desc_pointer fw_desc_ptr;
     ext_flash_driver_init();
     while(1)
     {
         if(check_firmware_integrity(&nvm_head))
         {
             internal = true;
-            external = ext_flash_search(&desc_ptr);
+            external = ext_flash_search(&desc_ptr, &fw_desc_ptr);
             break;
         }
-        if(ext_flash_search(&desc_ptr))
+        if(ext_flash_search(&desc_ptr, &fw_desc_ptr))
         {
             external = true;
             internal = check_firmware_integrity(&nvm_head);
@@ -276,14 +334,18 @@ void ec_app_boot_flow()
         {
             do{
                 uint32_t offset = APP_DESC_OFFSET;
-                while(offset < (desc_ptr.size + sizeof(struct flash_app_image_desc) + 4))
+                while(offset < (desc_ptr.sign_and_image_size + sizeof(struct flash_app_image_desc)))
                 {
                     hal_flash_sector_erase(offset);
                     offset += FLASH_SECTOR_SIZE;
                 }
-                image_copy(EXT_SEARCH_START_ADDR, desc_ptr.size + sizeof(struct flash_app_image_desc) + 4);
-            }while(int_flash_image_check(desc_ptr.crc32, sizeof(struct flash_app_image_desc) - 4, APP_DESC_OFFSET)==false || 
-            int_flash_image_check(desc_ptr.image_crc32,desc_ptr.size, APP_IMAGE_OFFSET)==false);
+                image_copy(mirror_start_addr, desc_ptr.sign_and_image_size + sizeof(struct flash_app_image_desc));
+            }while(int_flash_image_check(desc_ptr.desc_crc32, sizeof(struct flash_app_image_desc) - 4, APP_DESC_OFFSET)==false || 
+            int_flash_image_check(desc_ptr.sign_and_image_crc32, desc_ptr.sign_and_image_size, APP_SIGN_OFFSET)==false);
+            if(!internal)
+            {
+                nvm_head.sign_and_image_size =  desc_ptr.sign_and_image_size;
+            }
         }
     }
 }
@@ -316,8 +378,14 @@ void boot_ram_start()
     {
         ec_app_boot_flow();
         ext_flash_io_deinit();
-    }
+    }else
     #endif
+    {
+        if(sec_boot)
+        {
+            while(check_firmware_integrity(&nvm_head)==false);
+        }
+    }
     ecc_verify();
     boot_app(FLASH_ADDR+APP_OFFSET);
 }

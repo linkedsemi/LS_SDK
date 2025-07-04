@@ -237,4 +237,4 @@ uint32_t GenerateRandom32Bit()
     }
 }
 
-const uint32_t image_header[28]={0};
+const struct flash_app_image_header image_header = {0};

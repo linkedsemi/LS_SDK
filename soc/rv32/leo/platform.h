@@ -11,6 +11,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+struct flash_app_image_desc
+{
+  uint8_t magic[8];
+  uint32_t sign_and_image_size;
+  uint32_t version;
+  uint32_t reserved[2];
+  uint32_t sign_and_image_crc32;
+  uint32_t desc_crc32;
+};
+
+struct flash_app_image_header
+{
+  struct flash_app_image_desc desc;
+  uint8_t signature[64];
+};
+
 extern void (*interrupt_vector[])();
 
 __attribute__((always_inline)) static inline void e906_init()
