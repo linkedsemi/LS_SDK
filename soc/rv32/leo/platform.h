@@ -11,6 +11,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+struct flash_app_image_desc
+{
+  uint8_t magic[8];
+  uint32_t sign_and_image_size;
+  uint32_t version;
+  uint32_t reserved[2];
+  uint32_t sign_and_image_crc32;
+  uint32_t desc_crc32;
+};
+
+struct flash_app_image_header
+{
+  struct flash_app_image_desc desc;
+  uint8_t signature[64];
+};
+
 extern void (*interrupt_vector[])();
 
 __attribute__((always_inline)) static inline void e906_init()
@@ -80,12 +96,7 @@ uint32_t GenerateRandom32Bit();
 #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/3,1)
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
-#define ROM_FLASH_API
-#ifdef ROM_FLASH_API
-#define FLASH_SWINT_NUM RV_SOFT_IRQn
-#else
 #define FLASH_SWINT_NUM QSPI_IRQn
-#endif
 
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler

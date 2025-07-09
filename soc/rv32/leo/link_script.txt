@@ -17,6 +17,7 @@ SECTIONS
 	.text :
     {
 		__text_start = .;
+		KEEP(*(.rodata.image_header))
         KEEP(*(.text.Reset_Handler))
         KEEP(*(.init))
         KEEP(*(.fini))

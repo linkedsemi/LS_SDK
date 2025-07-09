@@ -1,3 +1,3 @@
 KEEP(*(.rodata.__info_array))
 . = ALIGN(0x100);
-. = 0x1800,
+. = 0x2060,

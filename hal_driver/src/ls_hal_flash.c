@@ -103,37 +103,41 @@ ROM_SYMBOL void hal_flashx_page_erase(struct hal_flash_env *env,uint32_t offset)
     hal_flashx_write_reg_operation(env,&param);
 }
 
+static void hal_flashx_erase(struct hal_flash_env *env,uint32_t offset,uint8_t opcode,uint8_t opcode_4b)
+{
+    if(env->addr4b)
+    {
+        uint8_t addr[4] = {offset>>24&0xff,offset>>16&0xff,offset>>8&0xff,offset&0xff};
+        struct flash_wr_rd_reg_param param = {
+            .buf = addr,
+            .length = sizeof(addr),
+            .opcode = opcode_4b,
+        };
+        hal_flashx_write_reg_operation(env,&param);
+    }else{
+        uint8_t addr[3] = {offset>>16&0xff,offset>>8&0xff,offset&0xff};
+        struct flash_wr_rd_reg_param param = {
+            .buf = addr,
+            .length = sizeof(addr),
+            .opcode = opcode,
+        };
+        hal_flashx_write_reg_operation(env,&param);
+    }
+}
+
 ROM_SYMBOL void hal_flashx_sector_erase(struct hal_flash_env *env,uint32_t offset)
 {
-    uint8_t addr[3] = {offset>>16&0xff,offset>>8&0xff,offset&0xff};
-    struct flash_wr_rd_reg_param param = {
-        .buf = addr,
-        .length = sizeof(addr),
-        .opcode = SECTOR_ERASE_OPCODE,
-    };
-    hal_flashx_write_reg_operation(env,&param);
+    hal_flashx_erase(env,offset,SECTOR_ERASE_OPCODE,SECTOR_ERASE4B_OPCODE);
 }
 
 ROM_SYMBOL void hal_flashx_block_32K_erase(struct hal_flash_env *env,uint32_t offset)
 {
-    uint8_t addr[3] = {offset>>16&0xff,offset>>8&0xff,offset&0xff};
-    struct flash_wr_rd_reg_param param = {
-         .buf = addr,
-         .length = sizeof(addr),
-         .opcode = BLOCK_32K_ERASE_OPCODE,
-    };
-    hal_flashx_write_reg_operation(env,&param);
+    hal_flashx_erase(env,offset,BLOCK_32K_ERASE_OPCODE,BLOCK_32K_ERASE4B_OPCODE);
 }
 
 ROM_SYMBOL void hal_flashx_block_64K_erase(struct hal_flash_env *env,uint32_t offset)
 {
-    uint8_t addr[3] = {offset>>16&0xff,offset>>8&0xff,offset&0xff};
-    struct flash_wr_rd_reg_param param = {
-        .buf = addr,
-        .length = sizeof(addr),
-        .opcode = BLOCK_64K_ERASE_OPCODE,
-    };
-    hal_flashx_write_reg_operation(env,&param);
+    hal_flashx_erase(env,offset,BLOCK_64K_ERASE_OPCODE,BLOCK_64K_ERASE4B_OPCODE);
 }
 
 ROM_SYMBOL void do_hal_flashx_read(struct hal_flash_env *env,void *param)

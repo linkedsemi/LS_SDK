@@ -236,3 +236,5 @@ uint32_t GenerateRandom32Bit()
         clk_cnt = 0;
     }
 }
+
+const struct flash_app_image_header image_header = {0};
