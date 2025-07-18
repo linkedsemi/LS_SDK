@@ -8,9 +8,25 @@
 typedef struct
 {
     volatile uint32_t PD_PER_CLKG0; //0x0
-    volatile uint32_t RESERVED0[3];
+    volatile uint32_t RESERVED_4; //0x4
+    volatile uint32_t RESERVED_8; //0x8
+    volatile uint32_t RESERVED_c; //0xc
     volatile uint32_t PD_PER_SRST0; //0x10
-    volatile uint32_t RESERVED1[15];
+    volatile uint32_t RESERVED_14; //0x14
+    volatile uint32_t RESERVED_18; //0x18
+    volatile uint32_t RESERVED_1c; //0x1c
+    volatile uint32_t RESERVED_20; //0x20
+    volatile uint32_t RESERVED_24; //0x24
+    volatile uint32_t RESERVED_28; //0x28
+    volatile uint32_t RESERVED_2c; //0x2c
+    volatile uint32_t RST_SRC; //0x30
+    volatile uint32_t RESERVED_34; //0x34
+    volatile uint32_t RESERVED_38; //0x38
+    volatile uint32_t RESERVED_3c; //0x3c
+    volatile uint32_t RESERVED_40; //0x40
+    volatile uint32_t RESERVED_44; //0x44
+    volatile uint32_t RESERVED_48; //0x48
+    volatile uint32_t RESERVED_4c; //0x4c
 #if 1
     volatile uint32_t IO_FUNC_LOCK[15];
 #else
@@ -86,6 +102,18 @@ enum SYSC_SEC_PER_REG_PD_PER_SRST0_FIELD
     SYSC_SEC_PER_SRST_SET_TRNG_N_POS = 16,
     SYSC_SEC_PER_SRST_CLR_TRNG_N_MASK = (int)0x20000,
     SYSC_SEC_PER_SRST_CLR_TRNG_N_POS = 17,
+};
+
+enum SYSC_SEC_PER_REG_RST_SRC_SEC_FIELD {
+    SYSC_SEC_PER_RST_SRC_CLR_MASK = (int)0x1,
+    SYSC_SEC_PER_RST_SRC_CLR_POS = 0,
+    SYSC_SEC_PER_RST_SRC_MASK = (int)0x70000,
+    SYSC_SEC_PER_RST_FROM_IWDT1_MASK = (int)0x10000,
+    SYSC_SEC_PER_RST_FROM_IWDT1_POS = 16,
+    SYSC_SEC_PER_RST_FROM_WWDT1_MASK = (int)0x20000,
+    SYSC_SEC_PER_RST_FROM_WWDT1_POS = 17,
+    SYSC_SEC_PER_RST_FROM_SEC_CORE_SRST_MASK = (int)0x40000,
+    SYSC_SEC_PER_RST_FROM_SEC_CORE_SRST_POS = 18,
 };
 
 enum SYSC_SEC_PER_REG_FUNC_IOA_LOCK_FIELD

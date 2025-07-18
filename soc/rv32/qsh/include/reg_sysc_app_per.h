@@ -19,7 +19,7 @@ typedef struct
     volatile uint32_t PD_PER_CLKG5; //0x24
     volatile uint32_t PD_PER_SRST4; //0x28
     volatile uint32_t PD_PER_SRST5; //0x2c
-    volatile uint32_t RESERVED0[1];
+    volatile uint32_t RST_SRC; //0x30
     volatile uint32_t PIS_SFT; //0x34
     volatile uint32_t TIMER_UART; //0x38
     volatile uint32_t SPI_I2S_INTI; //0x3c
@@ -771,6 +771,18 @@ enum SYSC_APP_PER_REG_PD_PER_SRST5_FIELD {
     SYSC_APP_PER_SRST_SET_SMB_FLT4_N_POS = 6,
     SYSC_APP_PER_SRST_CLR_SMB_FLT4_N_MASK = (int)0x80,
     SYSC_APP_PER_SRST_CLR_SMB_FLT4_N_POS = 7,
+};
+
+enum SYSC_APP_PER_REG_RST_SRC_APP_FIELD {
+    SYSC_APP_PER_RST_SRC_CLR_MASK = (int)0x1,
+    SYSC_APP_PER_RST_SRC_CLR_POS = 0,
+    SYSC_APP_PER_RST_SRC_MASK = (int)0x70000,
+    SYSC_APP_PER_RST_FROM_IWDT2_MASK = (int)0x10000,
+    SYSC_APP_PER_RST_FROM_IWDT2_POS = 16,
+    SYSC_APP_PER_RST_FROM_WWDT2_MASK = (int)0x20000,
+    SYSC_APP_PER_RST_FROM_WWDT2_POS = 17,
+    SYSC_APP_PER_RST_FROM_APP_CORE_SRST_MASK = (int)0x40000,
+    SYSC_APP_PER_RST_FROM_APP_CORE_SRST_POS = 18,
 };
 
 enum SYSC_APP_PER_REG_PIS_SFT_FIELD {

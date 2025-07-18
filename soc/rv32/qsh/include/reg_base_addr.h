@@ -43,6 +43,7 @@ extern "C" {
 #define SEC_CALC_AES_ADDR       0x40029000
 #define SEC_CALC_SM4_ADDR       0x40029400
 #define SEC_PMU_RG_SEC_ADDR     0x4002f000
+#define SEC_PMU_IWDT1_ADDR      0x4002f800
 #define APP_QSPI2_ADDR          0x40040000
 #define APP_DWDMAC1_ADDR        0x40041000
 #define APP_DWDMAC2_ADDR        0x40042000
