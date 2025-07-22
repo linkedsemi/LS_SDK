@@ -88,7 +88,19 @@ void io_cfg_input(uint8_t pin);
 void io_cfg_input_pure(uint8_t pin);
 
 /**
+  * @brief GPIO output disable
+  * @param  pin  Specific GPIO pin
+  */
+void io_cfg_disable_output(uint8_t pin);
+
+/**
   * @brief GPIO input disable
+  * @param  pin  Specific GPIO pin
+  */
+void io_cfg_disable_input(uint8_t pin);
+
+/**
+  * @brief GPIO direction disable
   * @param  pin  Specific GPIO pin
   */
 void io_cfg_disable(uint8_t pin);
@@ -264,6 +276,7 @@ bool io_is_output_enabled(uint8_t pin);
 bool io_is_input_enabled(uint8_t pin);
 bool io_is_output(uint8_t pin);
 bool io_is_input(uint8_t pin);
+bool io_is_opendrain(uint8_t pin);
 void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge);
 
 #ifdef __cplusplus

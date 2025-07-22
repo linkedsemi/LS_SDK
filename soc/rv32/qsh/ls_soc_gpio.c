@@ -294,16 +294,22 @@ void io_init(void)
     
 }
 
-void io_cfg_output(uint8_t pin)
-{
-    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    APP_PMU->IO_VAL[x->port].OE_DIN |= 1<<x->num<<16;
-}
-
 bool io_is_output_enabled(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     return READ_BIT(APP_PMU->IO_VAL[x->port].OE_DIN, 1<<x->num<<16) != 0;
+}
+
+bool io_is_opendrain(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return READ_BIT(APP_PMU->IO_CFG[x->port].OD_FIR, 1<<x->num<<16) != 0;
+}
+
+void io_cfg_output(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_VAL[x->port].OE_DIN |= 1<<x->num<<16;
 }
 
 void io_cfg_opendrain(uint8_t pin)
@@ -364,6 +370,10 @@ void io_write_pin(uint8_t pin,uint8_t val)
 void io_set_pin(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    if (io_is_opendrain(pin)) {
+        io_cfg_disable_output(pin);
+    }
+    /* io_get_output_val() depends it */
     APP_PMU->IO_VAL[x->port].DOC_DOS = 1<<x->num;
 }
 
@@ -371,6 +381,9 @@ void io_clr_pin(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     APP_PMU->IO_VAL[x->port].DOC_DOS = 1<<x->num<<16;
+    if (io_is_opendrain(pin)) {
+        io_cfg_output(pin);
+    }
 }
 
 void io_toggle_pin(uint8_t pin)
@@ -2362,12 +2375,23 @@ ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
 //     io_ae1_enable(PD11, 0);
 // }
 
-void io_cfg_disable(uint8_t pin)
+void io_cfg_disable_output(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     APP_PMU->IO_VAL[x->port].OE_DIN &= ~(1<<x->num<<16);
+}
+
+void io_cfg_disable_input(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     APP_PMU->IO_CFG[x->port].IEN1_IEN0 |= 1<<x->num;
     APP_PMU->IO_CFG[x->port].IEN1_IEN0 |= 1<<x->num<<16;
+}
+
+void io_cfg_disable(uint8_t pin)
+{
+    io_cfg_disable_output(pin);
+    io_cfg_disable_input(pin);
 }
 
 // void gpio_ana_func1_deinit(uint8_t ain)
