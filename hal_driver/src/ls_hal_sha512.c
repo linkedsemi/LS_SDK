@@ -31,17 +31,18 @@ static void block_calculate(uint32_t addr, uint32_t block_number)
 {
     LOG_HEX((uint8_t *)addr, block_number * 0x80);
     while ((SHA512->STATUS & 0x1) != 0x1) ;
-    SHA512->CTRL = (block_number - 1) << 16;
+    SHA512->CTRL |= (block_number - 1) << 16;  
     SHA512->ADDR = addr;
 
     if (isFirst)
     {
-        SHA512->CTRL |= 0xF;
+        SHA512->CTRL |= 0x3;
         isFirst = false;
     }
     else
     {
-        SHA512->CTRL |= 0xE;
+        REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_INIT_CALC ,0);
+        SHA512->CTRL |= 0x2;
     }
 
     while ((SHA512->STATUS & 0x8) != 0x8);
@@ -50,6 +51,13 @@ static void block_calculate(uint32_t addr, uint32_t block_number)
 void HAL_SHA512_SHA512_Init()
 {
     isFirst = true;
+    SHA512->CTRL = 0xc;
+}
+
+void HAL_SHA384_SHA384_Init()
+{
+    isFirst = true;
+    SHA512->CTRL = 0x8;
 }
 
 void HAL_SHA512_SHA512_Update(uint32_t *addr, uint32_t length)
@@ -123,6 +131,8 @@ void HAL_SHA512_SHA512_Final(uint8_t *digest)
         *digest++ = in >> 8;
         *digest++ = in;
     }
+    buffer_idx = 0;
+    total_cnt = 0;
 }
 
 void SHA512_IRQHandler()

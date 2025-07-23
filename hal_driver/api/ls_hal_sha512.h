@@ -7,6 +7,7 @@
 #define SHA512_BLOCK_SIZE           (0x80)
 
 void HAL_SHA512_SHA512_Init();
+void HAL_SHA384_SHA384_Init();
 void HAL_SHA512_SHA512_Update(uint32_t *addr, uint32_t length);
 void HAL_SHA512_SHA512_Final(uint8_t *digest);
 
