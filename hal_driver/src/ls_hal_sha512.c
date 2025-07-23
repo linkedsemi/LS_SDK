@@ -79,7 +79,7 @@ void HAL_SHA512_SHA512_Update(uint32_t *addr, uint32_t length)
     
     if (length % SHA512_BLOCK_SIZE)
     {
-        memcpy(&buffer[buffer_idx], msg, length % SHA512_BLOCK_SIZE);
+        memcpy(&buffer[buffer_idx], msg + (block_number * SHA512_BLOCK_SIZE), length % SHA512_BLOCK_SIZE);
         buffer_idx = length % SHA512_BLOCK_SIZE;
     }
 }

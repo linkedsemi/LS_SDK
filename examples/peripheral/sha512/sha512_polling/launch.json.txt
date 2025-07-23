@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "sha512_polling debug",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "examples/peripheral/sha512/sha512_polling/build/qsh/sha512_polling.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "reset",
+                "load",
+                "set $pc=0x10000000",
+            ],
+            "configurations": [],
+        },
+    ]
+}

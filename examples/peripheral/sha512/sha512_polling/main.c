@@ -7,6 +7,7 @@
 
 
 static uint8_t sha512_digest[0x80];
+__attribute__((aligned(4))) uint8_t aaaa[] = "8FC344A1B37DDB5BE214D27040B80C10B9880878E5A14B442A07401EC7F833EB7966C37AB01E0E933049A656F32BC7ABDFC77A7AB326BB06E8073BB2784F6BA60";
 
 static void sha_init(void)
 {
@@ -20,7 +21,7 @@ static void sha_test(void)
     io_set_pin(PH02);
     
     HAL_SHA512_SHA512_Init();
-    HAL_SHA512_SHA512_Update((uint32_t *)0x10000000, 0x1000);
+    HAL_SHA512_SHA512_Update((uint32_t *)aaaa, strlen((const char*)aaaa));
     HAL_SHA512_SHA512_Final(sha512_digest);
     LOG_HEX(sha512_digest, 0x40);
 
