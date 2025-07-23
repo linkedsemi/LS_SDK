@@ -290,7 +290,8 @@ enum IWDT_REG_PER_RSTEN4_FIELD
     IWDT_RSTEN4_TPM_SPIS2_POS = 29,
     IWDT_RSTEN4_NIST_TRNG_POS = 30,
     /* IWDT_RSTEN4_RESERVED_POS = 31, */
-    IWDT_RSTEN4_ALL_MASK = (int)(0x7fdfffff),
+    /* IWDT_RSTEN4_ALL_MASK = (int)(0x7fdfffff), */
+    IWDT_RSTEN4_ALL_MASK = (int)(0x7fdffffb),
     IWDT_RSTEN4_CACHE1_MASK = (int)(1 << 0),
     IWDT_RSTEN4_CACHE2_MASK = (int)(1 << 1),
     IWDT_RSTEN4_QSPI1_MASK = (int)(1 << 2),
