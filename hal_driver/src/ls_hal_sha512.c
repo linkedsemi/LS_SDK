@@ -7,8 +7,9 @@
 #include "common.h"
 #include "log.h"
 #include "ls_dbg.h"
+#include <core_rv32.h>
 
-static uint32_t buffer[0x20];
+__attribute__((aligned(32))) static uint32_t buffer[0x20];
 static uint32_t total_cnt;
 static uint32_t buffer_idx;
 static bool isFirst;
@@ -34,6 +35,7 @@ static void block_calculate(uint32_t addr, uint32_t block_number)
     while ((SHA512->STATUS & 0x1) != 0x1) ;
     SHA512->CTRL |= (block_number - 1) << 16;  
     SHA512->ADDR = addr;
+    csi_dcache_clean_range(addr, block_number*SHA512_BLOCK_SIZE);
 
     if (isFirst)
     {
