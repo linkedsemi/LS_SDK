@@ -6,6 +6,7 @@
 #include <string.h>
 #include "common.h"
 #include "log.h"
+#include "ls_dbg.h"
 
 static uint32_t buffer[0x20];
 static uint32_t total_cnt;
@@ -62,6 +63,7 @@ void HAL_SHA384_SHA384_Init()
 
 void HAL_SHA512_SHA512_Update(uint32_t *addr, uint32_t length)
 {   
+    LS_ASSERT(((uint32_t)addr % 4) == 0);
     uint8_t *msg = (uint8_t *)addr;
     total_cnt += length;
 
