@@ -13,6 +13,7 @@ __attribute__((aligned(32))) static uint32_t buffer[0x20];
 static uint32_t total_cnt;
 static uint32_t buffer_idx;
 static bool isFirst;
+static uint8_t read_reg_count;
 
 HAL_StatusTypeDef HAL_SHA512_Init(void)
 {
@@ -55,12 +56,14 @@ static void block_calculate(uint32_t addr, uint32_t block_number)
 void HAL_SHA512_SHA512_Init()
 {
     isFirst = true;
+    read_reg_count = 16;
     SHA512->CTRL = 0xc;
 }
 
 void HAL_SHA384_SHA384_Init()
 {
     isFirst = true;
+    read_reg_count = 12;
     SHA512->CTRL = 0x8;
 }
 
@@ -128,7 +131,7 @@ void HAL_SHA512_SHA512_Final(uint8_t *digest)
     buffer_idx += 8;
     block_calculate((uint32_t)buffer, 1);
 
-    for (uint8_t j = 0; j < 16; j++)
+    for (uint8_t j = 0; j < read_reg_count; j++)
     {
         uint32_t in = SHA512->DIGEST[15 - j];
         *digest++ = in >> 24;
