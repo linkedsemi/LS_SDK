@@ -149,10 +149,11 @@ void crypt_cbc_ecb_test(void)
 
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_128);
 
-    HAL_LSCRYPT_AES_CBC_Encrypt_IT(cbc_iv, cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, sizeof(ciphertext_buff));
+    HAL_LSCRYPT_SET_IV(cbc_iv);
+    HAL_LSCRYPT_AES_CBC_Encrypt_IT(cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_CBC_ENCRYPT_128);
 
-    HAL_LSCRYPT_AES_CBC_Decrypt_IT(cbc_iv, cbc_ciphertext_128, sizeof(cbc_ciphertext_128), plaintext_buff,sizeof(plaintext_buff));
+    HAL_LSCRYPT_AES_CBC_Decrypt_IT(cbc_ciphertext_128, sizeof(cbc_ciphertext_128), plaintext_buff,sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_CBC_DECRYPT_128);
 
 
@@ -163,10 +164,11 @@ void crypt_cbc_ecb_test(void)
     HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_192, sizeof(ecb_ciphertext_192), plaintext_buff, sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_192);
 
-    HAL_LSCRYPT_AES_CBC_Encrypt_IT(cbc_iv, cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, sizeof(ciphertext_buff));
+    HAL_LSCRYPT_SET_IV(cbc_iv);
+    HAL_LSCRYPT_AES_CBC_Encrypt_IT(cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_CBC_ENCRYPT_192);
 
-    HAL_LSCRYPT_AES_CBC_Decrypt_IT(cbc_iv, cbc_ciphertext_192, sizeof(cbc_ciphertext_192), plaintext_buff, sizeof(plaintext_buff));
+    HAL_LSCRYPT_AES_CBC_Decrypt_IT(cbc_ciphertext_192, sizeof(cbc_ciphertext_192), plaintext_buff, sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_CBC_DECRYPT_192);
 
 
@@ -177,10 +179,11 @@ void crypt_cbc_ecb_test(void)
     HAL_LSCRYPT_AES_ECB_Decrypt_IT(ecb_ciphertext_256, sizeof(ecb_ciphertext_256), plaintext_buff, sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_ECB_DECRYPT_256);
 
-    HAL_LSCRYPT_AES_CBC_Encrypt_IT(cbc_iv, cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, sizeof(ciphertext_buff));
+    HAL_LSCRYPT_SET_IV(cbc_iv);
+    HAL_LSCRYPT_AES_CBC_Encrypt_IT(cbc_ecb_plaintext, sizeof(cbc_ecb_plaintext), ciphertext_buff, sizeof(ciphertext_buff));
     while (lscrypt_type_flag == LSCRYPT_CBC_ENCRYPT_256);
 
-    HAL_LSCRYPT_AES_CBC_Decrypt_IT(cbc_iv, cbc_ciphertext_256, sizeof(cbc_ciphertext_256), plaintext_buff, sizeof(plaintext_buff));
+    HAL_LSCRYPT_AES_CBC_Decrypt_IT(cbc_ciphertext_256, sizeof(cbc_ciphertext_256), plaintext_buff, sizeof(plaintext_buff));
     while (lscrypt_type_flag == LSCRYPT_CBC_DECRYPT_256);
 }
 

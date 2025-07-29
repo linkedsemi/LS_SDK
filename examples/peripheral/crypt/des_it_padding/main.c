@@ -61,11 +61,6 @@ const uint8_t tdes_ecb_ciphertext_128_ISO10126_aligned[] = {
     0x53,0x40,0xB5,0xDF,0x02,0xF1,0x6A,0x66,0x53,0x40,0xB5,0xDF,0x02,0xF1,0x6A,0x66,
     0x26,0xad,0xb2,0x79,0x6c,0xd2,0x6f,0x6c};
 
-/**cbc-iv**/
-const uint32_t cbc_iv[] = {
-    0x05060708,
-    0x01020304};
-
 /**cbc-ecb-plaintext**/
 const uint8_t cbc_ecb_plaintext_aligned[] = {
     0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
@@ -307,7 +302,7 @@ void HAL_LSCRYPT_DES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
             if (length == encrypt_expected_length)
             {
-                LOG_I("CRYPT_TDES_ECB_ENCRYPT_Padding_ISO10126_TEST!------Length of encrypted data = %d",length);
+                LOG_I("CRYPT_TDES_ECB_ENCRYPT_Padding_ISO10126_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {
