@@ -131,7 +131,7 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_can.c
     ../hal_driver/src/ls_hal_fdcan.c
     # ../hal_driver/src/ls_hal_trngv2.c
-    # ../hal_driver/src/ls_hal_crypt.c
+    ../hal_driver/src/ls_hal_crypt.c
     ../hal_driver/src/ls_hal_qspiv2.c
     ../hal_driver/src/ls_hal_flash_qspiv2.c
     ../hal_driver/src/ls_hal_flash.c
