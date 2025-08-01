@@ -9,7 +9,6 @@ if not 'DEFAULT_OPT_LVL' in env:
 def plf_postaction(self,target):
     self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     self.AddPostAction(target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.bin'))
-    self.AddPostAction(target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
     self.AddPostAction(target,Action('python $SDK_ROOT/tools/leo/fw_desc_gen.py ${TARGET.base}.bin'))
     info_sbl_bin = self.Command('build/$IC/info_sbl.bin','$SDK_ROOT/soc/rv32/leo/bin/bram.bin',Action(self.subst('python $SDK_ROOT/tools/leo/info_sbl_merge.py')+' $SOURCE $TARGET'))
     info_array_c = self.Command('$SDK_ROOT/soc/rv32/leo/__info_array.c',info_sbl_bin,Action(self.subst('python $SDK_ROOT/tools/bin2c/bin2c.py')+ ' $SOURCE __info_array 80 4 > $TARGET'))
