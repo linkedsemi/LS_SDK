@@ -27,11 +27,12 @@ typedef uint32_t (*crc32_calc_func_t)(uint32_t crc,uint8_t *data,uint32_t length
 #define SIGN_LEN 64
 #define EXT_FLASH_SEARCH_STEP 0x1000
 #define EXT_SEARCH_START_ADDR 0x1000
+#define MIRROR_START_ADDR 0X2030
 
 __attribute__((aligned(4))) static const uint8_t ec_magic_num[] = {'L','S','E','C'};
 __attribute__((aligned(4))) static const uint8_t ec_app_magic[8] = {'L','S','E','C','_','A','P','P'};
 __attribute__((aligned(4))) uint8_t temp_buf[TEMP_BUF_SIZE];
-__attribute__((aligned(4))) static uint32_t mirror_start_addr = 0x2030;
+__attribute__((aligned(4))) static uint32_t mirror_start_addr;
 struct flash_app_image_desc nvm_head;
 struct boot_search_cfg
 {
@@ -270,6 +271,7 @@ static bool ext_flash_search(void *param1, void *param2)
     struct flash_app_image_desc *p1 = param1;
     struct fw_desc_pointer *p2 = param2;
     uint32_t ext_total_size = ext_flash_size_get_and_addressing_mode_set();
+    mirror_start_addr = MIRROR_START_ADDR;
     if(ext_flash_app_desc_ptr_read(mirror_start_addr, p1) || ext_flash_search_in_ramge(p1, p2, EXT_SEARCH_START_ADDR, ext_total_size))
     {
         return true;

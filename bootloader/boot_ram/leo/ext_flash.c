@@ -10,6 +10,7 @@ bool ext_address_reg_exist;
 
 void ext_flash_driver_init(void)
 {
+    memset(&ssi_inst,0,sizeof(ssi_inst));
     ssi_inst.REG = LSSSI;
     ssi_inst.Init.ctrl.reserved0 = 0;
     ssi_inst.Init.ctrl.frame_format = Motorola_SPI;
