@@ -42,6 +42,7 @@ int_call:
     csrc    mstatus, 8  # disable global irq to fetch mnxti correctly
     j       int_call
 exception_exit:
+    csrc    mstatus, 8  # disable global irq
     jal     ra, hal_flash_prog_erase_resume_isr
     lw      ra, 0x00(sp)
     .cfi_restore ra
