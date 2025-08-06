@@ -56,11 +56,6 @@ if(CONFIG_SOC_LE5010)
   )
 
   zephyr_linker_sources(
-    RAMFUNC_SECTION
-    xip_banned.ld
-  )
-
-  zephyr_linker_sources(
     NOINIT
     reset_retain.ld
   )
@@ -218,11 +213,6 @@ if(CONFIG_SOC_LS1010)
   # zephyr_link_libraries(
 
   # )
-  
-  zephyr_linker_sources(
-    RAMFUNC_SECTION
-    xip_banned.ld
-  )
 
   zephyr_linker_sources(
     NOINIT
