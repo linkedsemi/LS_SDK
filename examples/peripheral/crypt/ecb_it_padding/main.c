@@ -120,14 +120,6 @@ const uint8_t ecb_ciphertext_128_ISO10126_unaligned[] = {
     0xC7, 0xC7, 0xC9, 0x24, 0x1D, 0xB0, 0x4A, 0x68, 0xFC, 0x31, 0x80, 0x9E, 0x0A, 0x4D, 0x1B, 0x12};
 /****************************************************************************************************/
 
-/**cbc-iv**/
-const uint32_t cbc_iv[] = {
-    0x0c0d0e0f,
-    0x08090a0b,
-    0x04050607,
-    0x00010203,
-};
-
 /**ecb-plaintext**/
 const uint8_t cbc_ecb_plaintext_aligned[] = {
     //Block #1   
@@ -376,7 +368,7 @@ void HAL_LSCRYPT_AES_Complete_Callback(bool Encrypt, bool CBC , uint32_t length)
         {
             if (length == encrypt_expected_length)
             {
-                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO10126_TEST!------Length of encrypted data = %d",length);
+                LOG_I("CRYPT_AES_ECB_ENCRYPT_Padding_ISO10126_TEST_SUCCESS!------Length of encrypted data = %d",length);
             }
             else
             {

@@ -96,7 +96,8 @@ void des_ecb_cbc_test_64(void)
 
     // cbc
     length = sizeof(ciphertext_buff);
-    HAL_LSCRYPT_DES_CBC_Encrypt(cbc_iv,cbc_ecb_plaintext,sizeof(cbc_ecb_plaintext),ciphertext_buff,&length);    
+    HAL_LSCRYPT_SET_IV(cbc_iv);
+    HAL_LSCRYPT_DES_CBC_Encrypt(cbc_ecb_plaintext,sizeof(cbc_ecb_plaintext),ciphertext_buff,&length);    
     if (!(memcmp(des_cbc_ciphertext_64, ciphertext_buff, sizeof(des_cbc_ciphertext_64))))
     {
         LOG_I("CRYPT_DES_CBC_ENCRYPT_64_TEST_SUCCESS!");
@@ -107,7 +108,7 @@ void des_ecb_cbc_test_64(void)
     }
 
     length = sizeof(plaintext_buff);
-    HAL_LSCRYPT_DES_CBC_Decrypt(cbc_iv,des_cbc_ciphertext_64,sizeof(des_cbc_ciphertext_64),plaintext_buff,&length);    
+    HAL_LSCRYPT_DES_CBC_Decrypt(des_cbc_ciphertext_64,sizeof(des_cbc_ciphertext_64),plaintext_buff,&length);
     if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
     {
         LOG_I("CRYPT_DES_CBC_DECRYPT_64_TEST_SUCCESS!");
@@ -147,7 +148,8 @@ void tdes_ecb_cbc_test_128(void)
 
     // cbc
     length = sizeof(ciphertext_buff);    
-    HAL_LSCRYPT_DES_CBC_Encrypt(cbc_iv,cbc_ecb_plaintext,sizeof(cbc_ecb_plaintext),ciphertext_buff,&length);    
+    HAL_LSCRYPT_SET_IV(cbc_iv);
+    HAL_LSCRYPT_DES_CBC_Encrypt(cbc_ecb_plaintext,sizeof(cbc_ecb_plaintext),ciphertext_buff,&length);
     if (!(memcmp(tdes_cbc_ciphertext_128, ciphertext_buff, sizeof(tdes_cbc_ciphertext_128))))
     {
         LOG_I("CRYPT_TDES_CBC_ENCRYPT_128_TEST_SUCCESS!");
@@ -158,7 +160,7 @@ void tdes_ecb_cbc_test_128(void)
     }
 
     length = sizeof(plaintext_buff);
-    HAL_LSCRYPT_DES_CBC_Decrypt(cbc_iv,ciphertext_buff,sizeof(ciphertext_buff),plaintext_buff,&length);    
+    HAL_LSCRYPT_DES_CBC_Decrypt(ciphertext_buff,sizeof(ciphertext_buff),plaintext_buff,&length);
     if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
     {
         LOG_I("CRYPT_TDES_CBC_DECRYPT_128_TEST_SUCCESS!");
@@ -198,7 +200,8 @@ void tdes_ecb_cbc_test_192(void)
 
     // cbc
     length = sizeof(ciphertext_buff);
-    HAL_LSCRYPT_DES_CBC_Encrypt(cbc_iv,cbc_ecb_plaintext,sizeof(cbc_ecb_plaintext),ciphertext_buff,&length);    
+    HAL_LSCRYPT_SET_IV(cbc_iv);
+    HAL_LSCRYPT_DES_CBC_Encrypt(cbc_ecb_plaintext,sizeof(cbc_ecb_plaintext),ciphertext_buff,&length);
     if (!(memcmp(tdes_cbc_ciphertext_192, ciphertext_buff, sizeof(tdes_cbc_ciphertext_192))))
     {
         LOG_I("CRYPT_TDES_CBC_ENCRYPT_192_TEST_SUCCESS!");
@@ -209,7 +212,7 @@ void tdes_ecb_cbc_test_192(void)
     }
 
     length = sizeof(plaintext_buff);
-    HAL_LSCRYPT_DES_CBC_Decrypt(cbc_iv,tdes_cbc_ciphertext_192,sizeof(tdes_cbc_ciphertext_192),plaintext_buff,&length);    
+    HAL_LSCRYPT_DES_CBC_Decrypt(tdes_cbc_ciphertext_192,sizeof(tdes_cbc_ciphertext_192),plaintext_buff,&length);    
     if (!(memcmp(cbc_ecb_plaintext, plaintext_buff, sizeof(cbc_ecb_plaintext))))
     {
         LOG_I("CRYPT_TDES_CBC_DECRYPT_192_TEST_SUCCESS!");

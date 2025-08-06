@@ -25,14 +25,24 @@
 #define USB_DM_PAD PD01
 static gpio_port_pin_t uart1_txd;
 static gpio_port_pin_t uart1_rxd;
+static gpio_port_pin_t uart1_ctsn;
+static gpio_port_pin_t uart1_rtsn;
 static gpio_port_pin_t uart2_txd;
 static gpio_port_pin_t uart2_rxd;
+static gpio_port_pin_t uart2_ctsn;
+static gpio_port_pin_t uart2_rtsn;
 static gpio_port_pin_t uart3_txd;
 static gpio_port_pin_t uart3_rxd;
+static gpio_port_pin_t uart3_ctsn;
+static gpio_port_pin_t uart3_rtsn;
 static gpio_port_pin_t dwuart1_txd;
 static gpio_port_pin_t dwuart1_rxd;
+static gpio_port_pin_t dwuart1_ctsn;
+static gpio_port_pin_t dwuart1_rtsn;
 static gpio_port_pin_t dwuart2_txd;
 static gpio_port_pin_t dwuart2_rxd;
+static gpio_port_pin_t dwuart2_ctsn;
+static gpio_port_pin_t dwuart2_rtsn;
 static gpio_port_pin_t iic1_scl;
 static gpio_port_pin_t iic1_sda;
 static gpio_port_pin_t iic2_scl;
@@ -595,6 +605,24 @@ void pinmux_uart1_deinit(void)
     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart1_rxd));
 }
 
+void pinmux_uart1_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn)
+{
+    *(uint8_t *)&uart1_rtsn = rtsn;
+    *(uint8_t *)&uart1_ctsn = ctsn;
+    io_set_pin(rtsn);
+    io_cfg_output(rtsn);
+    io_cfg_input(ctsn);
+    io_pull_write(ctsn, IO_PULL_UP);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rtsn),UART1_RTSN);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&ctsn),UART1_CTSN);
+}
+
+void pinmux_uart1_rtsnctsn_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart1_ctsn));
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart1_rtsn));
+}
+
 void pinmux_uart2_init(uint8_t txd,uint8_t rxd)
 {
     I2C_DBG_IO_CHECK(txd);
@@ -610,6 +638,24 @@ void pinmux_uart2_deinit()
 {
     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_txd));
     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_rxd));
+}
+
+void pinmux_uart2_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn)
+{
+    *(uint8_t *)&uart2_rtsn = rtsn;
+    *(uint8_t *)&uart2_ctsn = ctsn;
+    io_set_pin(rtsn);
+    io_cfg_output(rtsn);
+    io_cfg_input(ctsn);
+    io_pull_write(ctsn, IO_PULL_UP);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rtsn),UART2_RTSN);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&ctsn),UART2_CTSN);
+}
+
+void pinmux_uart2_rtsnctsn_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_ctsn));
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart2_rtsn));
 }
 
 void pinmux_uart3_init(uint8_t txd,uint8_t rxd)
@@ -629,6 +675,24 @@ void pinmux_uart3_deinit()
     per_func_disable(pin2func_io((gpio_port_pin_t *)&uart3_rxd));
 }
 
+void pinmux_uart3_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn)
+{
+    *(uint8_t *)&uart3_rtsn = rtsn;
+    *(uint8_t *)&uart3_ctsn = ctsn;
+    io_set_pin(rtsn);
+    io_cfg_output(rtsn);
+    io_cfg_input(ctsn);
+    io_pull_write(ctsn, IO_PULL_UP);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rtsn),UART3_RTSN);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&ctsn),UART3_CTSN);
+}
+
+void pinmux_uart3_rtsnctsn_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart3_ctsn));
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&uart3_rtsn));
+}
+
 void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd)
 {
     I2C_DBG_IO_CHECK(txd);
@@ -646,6 +710,24 @@ void pinmux_dwuart1_deinit()
     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart1_rxd));
 }
 
+void pinmux_dwuart1_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn)
+{
+    *(uint8_t *)&dwuart1_rtsn = rtsn;
+    *(uint8_t *)&dwuart1_ctsn = ctsn;
+    io_set_pin(rtsn);
+    io_cfg_output(rtsn);
+    io_cfg_input(ctsn);
+    io_pull_write(ctsn, IO_PULL_UP);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rtsn),DWUART1_RTSN);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&ctsn),DWUART1_CTSN);
+}
+
+void pinmux_dwuart1_rtsnctsn_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart1_ctsn));
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart1_rtsn));
+}
+
 void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd)
 {
     I2C_DBG_IO_CHECK(txd);
@@ -661,6 +743,24 @@ void pinmux_dwuart2_deinit()
 {
     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart2_txd));
     per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart2_rxd));
+}
+
+void pinmux_dwuart2_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn)
+{
+    *(uint8_t *)&dwuart2_rtsn = rtsn;
+    *(uint8_t *)&dwuart2_ctsn = ctsn;
+    io_set_pin(rtsn);
+    io_cfg_output(rtsn);
+    io_cfg_input(ctsn);
+    io_pull_write(ctsn, IO_PULL_UP);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&rtsn),DWUART2_RTSN);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&ctsn),DWUART2_CTSN);
+}
+
+void pinmux_dwuart2_rtsnctsn_deinit(void)
+{
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart2_ctsn));
+    per_func_disable(pin2func_io((gpio_port_pin_t *)&dwuart2_rtsn));
 }
 
 void pinmux_i2c_dbg_init(uint8_t clk,uint8_t dat)

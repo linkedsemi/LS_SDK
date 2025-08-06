@@ -400,7 +400,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t
     return HAL_OK;
 }
 
-static void iv_set(const uint32_t iv[4])
+void HAL_LSCRYPT_SET_IV(const uint32_t iv[4])
 {
     LSCRYPT->IVR0 = iv[0];
     LSCRYPT->IVR1 = iv[1];
@@ -408,21 +408,19 @@ static void iv_set(const uint32_t iv[4])
     LSCRYPT->IVR3 = iv[3];
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t *ciphertextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t *ciphertextlength)
 {
     length_check(AES_MODE,ENCRYPT,plaintextlength,*ciphertextlength);
     crypt_in_out_length_set(plaintext, ciphertext, plaintextlength);
-    iv_set(iv);
     aes_enc_dec(true, true);
     *ciphertextlength = length_out;
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength)
 {
     length_check(AES_MODE,DECRYPT,*plaintextlength,ciphertextlength);
     crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
-    iv_set(iv);
     aes_enc_dec(false,true);
     *plaintextlength = length_out;
     return HAL_OK;
@@ -880,21 +878,19 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt_IT(const uint8_t *ciphertext,uint3
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(const uint32_t iv[4],const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
 {
     length_check(AES_MODE,ENCRYPT,plaintextlength,ciphertextlength);
     crypt_in_out_length_set(plaintext, ciphertext, plaintextlength);
-    iv_set(iv);
     aes_config(true, true, true, true);
     crypt_start();
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t plaintextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t plaintextlength)
 {
     length_check(AES_MODE,DECRYPT,plaintextlength,ciphertextlength);
     crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
-    iv_set(iv);
     aes_config(true,true,false,true);
     crypt_start();
     return HAL_OK;
@@ -976,27 +972,19 @@ HAL_StatusTypeDef HAL_LSCRYPT_DES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t
     return HAL_OK;
 }
 
-static void des_iv_set(const uint32_t iv[4])
-{
-    LSCRYPT->IVR0 = iv[0];
-    LSCRYPT->IVR1 = iv[1];
-}
-
-HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t *ciphertextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Encrypt(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t *ciphertextlength)
 {
     length_check(DES_MODE,ENCRYPT,plaintextlength,*ciphertextlength);
     crypt_in_out_length_set(plaintext, ciphertext, plaintextlength);
-    des_iv_set(iv);
     des_enc_dec(true, true);
     *ciphertextlength = length_out;
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Decrypt(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength)
 {
     length_check(DES_MODE,DECRYPT,*plaintextlength,ciphertextlength);
     crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
-    des_iv_set(iv);
     des_enc_dec(false,true);
     *plaintextlength = length_out;
     return HAL_OK;
@@ -1020,21 +1008,19 @@ HAL_StatusTypeDef HAL_LSCRYPT_DES_ECB_Decrypt_IT(const uint8_t *ciphertext,uint3
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Encrypt_IT(const uint32_t iv[4],const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Encrypt_IT(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)
 {
     length_check(DES_MODE,ENCRYPT,plaintextlength,ciphertextlength);
     crypt_in_out_length_set(plaintext, ciphertext, plaintextlength);
-    iv_set(iv);
     des_config(true, true, true, true);
     crypt_start();
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Decrypt_IT(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t plaintextlength)
+HAL_StatusTypeDef HAL_LSCRYPT_DES_CBC_Decrypt_IT(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t plaintextlength)
 {
     length_check(DES_MODE,DECRYPT,plaintextlength,ciphertextlength);
     crypt_in_out_length_set(ciphertext,plaintext,ciphertextlength);
-    iv_set(iv);
     des_config(true,true,false,true);
     crypt_start();
     return HAL_OK;

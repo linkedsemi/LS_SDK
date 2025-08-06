@@ -56,11 +56,6 @@ if(CONFIG_SOC_LE5010)
   )
 
   zephyr_linker_sources(
-    RAMFUNC_SECTION
-    xip_banned.ld
-  )
-
-  zephyr_linker_sources(
     NOINIT
     reset_retain.ld
   )
@@ -131,7 +126,7 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_can.c
     ../hal_driver/src/ls_hal_fdcan.c
     # ../hal_driver/src/ls_hal_trngv2.c
-    # ../hal_driver/src/ls_hal_crypt.c
+    ../hal_driver/src/ls_hal_crypt.c
     ../hal_driver/src/ls_hal_qspiv2.c
     ../hal_driver/src/ls_hal_flash_qspiv2.c
     ../hal_driver/src/ls_hal_flash.c
@@ -218,11 +213,6 @@ if(CONFIG_SOC_LS1010)
   # zephyr_link_libraries(
 
   # )
-  
-  zephyr_linker_sources(
-    RAMFUNC_SECTION
-    xip_banned.ld
-  )
 
   zephyr_linker_sources(
     NOINIT

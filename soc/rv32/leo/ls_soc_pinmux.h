@@ -419,6 +419,18 @@ void pinmux_uart1_init(uint8_t txd,uint8_t rxd);
 void pinmux_uart1_deinit(void);
 
 /**
+  * @brief         Set pin mux function to uart1_rtsnctsn
+  * @param  rtsn   Specific GPIO pin  
+  * @param  ctsn   Specific GPIO pin  
+  */
+void pinmux_uart1_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn);
+
+/**
+  * @brief clear  pin mux function of uart1_rtsnctsn
+  */
+void pinmux_uart1_rtsnctsn_deinit(void);
+
+/**
   * @brief          Set pin mux function to uart1_7816
    * @param  txd    Specific GPIO pin  
   * @param   ck     Specific GPIO pin  
@@ -443,6 +455,18 @@ void pinmux_uart2_init(uint8_t txd,uint8_t rxd);
 void pinmux_uart2_deinit(void);
 
 /**
+  * @brief          Set pin mux function to uart2_rtsnctsn
+  * @param  rtsn    Specific GPIO pin  
+  * @param  ctsn    Specific GPIO pin  
+  */
+void pinmux_uart2_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn);
+
+/**
+  * @brief clear  pin mux function of uart2_rtsnctsn
+  */
+void pinmux_uart2_rtsnctsn_deinit(void);
+
+/**
   * @brief       Set pin mux function to uart3
   * @param  txd   Specific GPIO pin  
   * @param rxd   Specific GPIO pin   
@@ -453,6 +477,18 @@ void pinmux_uart3_init(uint8_t txd,uint8_t rxd);
   * @brief clear  pin mux function of uart3
   */
 void pinmux_uart3_deinit(void);
+
+/**
+  * @brief       Set pin mux function to uart3_rtsnctsn
+  * @param  rtsn   Specific GPIO pin  
+  * @param  ctsn   Specific GPIO pin  
+  */
+void pinmux_uart3_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn);
+
+/**
+  * @brief clear  pin mux function of uart3_rtsnctsn
+  */
+void pinmux_uart3_rtsnctsn_deinit(void);
 
 /**
   * @brief       Set pin mux function to dwuart1
@@ -467,6 +503,18 @@ void pinmux_dwuart1_init(uint8_t txd,uint8_t rxd);
 void pinmux_dwuart1_deinit(void);
 
 /**
+  * @brief       Set pin mux function to dwuart1_rtsnctsn
+  * @param  rtsn   Specific GPIO pin  
+  * @param  ctsn   Specific GPIO pin  
+  */
+void pinmux_dwuart1_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn);
+
+/**
+  * @brief clear  pin mux function of dwuart1_rtsnctsn
+  */
+void pinmux_dwuart1_rtsnctsn_deinit(void);
+
+/**
   * @brief       Set pin mux function to dwuart2
   * @param  txd   Specific GPIO pin  
   * @param rxd   Specific GPIO pin   
@@ -477,6 +525,18 @@ void pinmux_dwuart2_init(uint8_t txd,uint8_t rxd);
   * @brief clear  pin mux function of dwuart2
   */
 void pinmux_dwuart2_deinit(void);
+
+/**
+  * @brief       Set pin mux function to dwuart2_rtsnctsn
+  * @param  rtsn   Specific GPIO pin  
+  * @param  ctsn   Specific GPIO pin  
+  */
+void pinmux_dwuart2_rtsnctsn_init(uint8_t rtsn, uint8_t ctsn);
+
+/**
+  * @brief clear  pin mux function of dwuart2_rtsnctsn
+  */
+void pinmux_dwuart2_rtsnctsn_deinit(void);
 
 /**
   * @brief Set pin mux function to adtim1 
@@ -1527,11 +1587,23 @@ void pinmux_pwm_ch8_deinit(void);
 void pinmux_ps2h1_init(uint8_t clk, uint8_t dat);
 
 /**
+ * @brief          Clear pin mux configuration for ps2h1
+ * @note           Resets the specified GPIO pins to default state
+ */
+void pinmux_ps2h1_deinit(void);
+
+/**
  * @brief          Set pin mux function to ps2h2
  * @param clk      Specific GPIO pin 
  * @param dat      Specific GPIO pin 
  */
 void pinmux_ps2h2_init(uint8_t clk, uint8_t dat);
+
+/**
+ * @brief          Clear pin mux configuration for ps2h2
+ * @note           Resets the specified GPIO pins to default state
+ */
+void pinmux_ps2h2_deinit(void);
 
 /**
  * @brief          Set pin mux function to ps2h3
@@ -1541,11 +1613,23 @@ void pinmux_ps2h2_init(uint8_t clk, uint8_t dat);
 void pinmux_ps2h3_init(uint8_t clk, uint8_t dat);
 
 /**
+ * @brief          Clear pin mux configuration for ps2h3
+ * @note           Resets the specified GPIO pins to default state
+ */
+void pinmux_ps2h3_deinit(void);
+
+/**
  * @brief          Set pin mux function to ps2h4
  * @param clk      Specific GPIO pin 
  * @param dat      Specific GPIO pin 
  */
 void pinmux_ps2h4_init(uint8_t clk, uint8_t dat);
+
+/**
+ * @brief          Clear pin mux configuration for ps2h4
+ * @note           Resets the specified GPIO pins to default state
+ */
+void pinmux_ps2h4_deinit(void);
 
 /**
  * @brief             Init IO FOR Cjtag 
