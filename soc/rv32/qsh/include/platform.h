@@ -8,6 +8,8 @@
 #include "qsh.h"
 #include "reg_sysc_sec_cpu.h"
 #include "reg_sysc_app_cpu.h"
+#include <ls_soc_clock.h>
+#include <ls_soc_reset.h>
 
 #ifndef __ASM
 #define __ASM                   __asm     /*!< asm keyword for GNU Compiler */
@@ -18,11 +20,11 @@
 #endif
 
 #ifndef __ALWAYS_STATIC_INLINE
-#define __ALWAYS_STATIC_INLINE  __attribute__((always_inline)) static inline
+#define __ALWAYS_STATIC_INLINE  __attribute__((always_inline)) __ALWAYS_STATIC_INLINE
 #endif
 
 #ifndef __STATIC_INLINE
-#define __STATIC_INLINE         static inline
+#define __STATIC_INLINE         __ALWAYS_STATIC_INLINE
 #endif
 
 __ALWAYS_STATIC_INLINE void e906_init()
@@ -139,6 +141,36 @@ __ALWAYS_STATIC_INLINE void app_cpu_reset_hold_set(void)
 __ALWAYS_STATIC_INLINE bool is_app_cpu_running(void)
 {
     return (SYSC_SEC_CPU->APP_CPU_SRST > 0);
+}
+
+__ALWAYS_STATIC_INLINE void ls_clock_control_on(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    (void)clr_pos;
+    *(volatile uint32_t *)(base + reg) = 1 << set_pos;
+}
+
+__ALWAYS_STATIC_INLINE void ls_clock_control_off(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    (void)set_pos;
+    *(volatile uint32_t *)(base + reg) = 1 << clr_pos;
+}
+
+__ALWAYS_STATIC_INLINE void ls_reset_line_assert(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    (void)set_pos;
+    *(volatile uint32_t *)(base + reg) = 1 << clr_pos;
+}
+
+__ALWAYS_STATIC_INLINE void ls_reset_line_deassert(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    (void)clr_pos;
+    *(volatile uint32_t *)(base + reg) = 1 << set_pos;
+}
+
+__ALWAYS_STATIC_INLINE void ls_reset_line_toggle(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    ls_reset_line_assert(base, reg, set_pos, clr_pos);
+    ls_reset_line_deassert(base, reg, set_pos, clr_pos);
 }
 
 #endif
