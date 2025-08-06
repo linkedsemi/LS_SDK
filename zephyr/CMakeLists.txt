@@ -342,11 +342,6 @@ if(CONFIG_SOC_LSQSH)
   )
 
   zephyr_linker_sources(
-    RAMFUNC_SECTION
-    xip_banned.ld
-  )
-
-  zephyr_linker_sources(
     NOINIT
     reset_retain.ld
   )
