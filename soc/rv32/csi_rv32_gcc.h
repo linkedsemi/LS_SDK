@@ -2920,4 +2920,186 @@ __ALWAYS_STATIC_INLINE uint32_t __UXTB16(uint32_t x)
                        (((x <<  8) >>  8) & 0xFFFF0000)));
 }
 
+__ALWAYS_STATIC_INLINE void __set_TSELECT(uint32_t tselect)
+{
+    __ASM volatile("csrw 0x7a0, %0" : : "r"(tselect));
+}
+
+__ALWAYS_STATIC_INLINE void __set_TDATA1(uint32_t tdata1)
+{
+    __ASM volatile("csrw 0x7a1, %0" : : "r"(tdata1));
+}
+
+__ALWAYS_STATIC_INLINE void __set_TDATA2(uint32_t tdata2)
+{
+    __ASM volatile("csrw 0x7a2, %0" : : "r"(tdata2));
+}
+
+__ALWAYS_STATIC_INLINE void __set_TDATA3(uint32_t tdata3)
+{
+    __ASM volatile("csrw 0x7a3, %0" : : "r"(tdata3));
+}
+
+__ALWAYS_STATIC_INLINE void __set_TINFO(uint32_t tdata4)
+{
+    __ASM volatile("csrw 0x7a4, %0" : : "r"(tdata4));
+}
+
+__ALWAYS_STATIC_INLINE void __set_TCONTROL(uint32_t tdata5)
+{
+    __ASM volatile("csrw 0x7a5, %0" : : "r"(tdata5));
+}
+
+__ALWAYS_STATIC_INLINE void __set_MCONTEXT(uint32_t mcontext)
+{
+    __ASM volatile("csrw 0x7a8, %0" : : "r"(mcontext));
+}
+
+__ALWAYS_STATIC_INLINE void __set_SCONTEXT(uint32_t scontext)
+{
+    __ASM volatile("csrw 0x7aa, %0" : : "r"(scontext));
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_TSELECT(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a0" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_TDATA1(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a1" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_TDATA2(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a2" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_TDATA3(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a3" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_TINFO(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a4" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_TCONTROL(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a5" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_MCONTEXT(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7a8" : "=r"(result));
+    return (result);
+}
+
+__ALWAYS_STATIC_INLINE uint32_t __get_SCONTEXT(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, 0x7aa" : "=r"(result));
+    return (result);
+}
+
+enum {
+    TRIGGER_TYPE_MCONTROL = 2,
+    TRIGGER_TYPE_ICOUNT = 3,
+    TRIGGER_TYPE_ITRIGGER = 4,
+    TRIGGER_TYPE_ETRIGGER = 5,
+};
+
+#define TDATA1_DEMODE_POS 27
+#define TDATA1_DEMODE_MASK 0x8000000
+#define TDATA1_TYPE_POS 28
+#define TDATA1_TYPE_MASK 0xF0000000
+
+#define MCONTROL_LOAD_POS 0
+#define MCONTROL_LOAD_MASK 0x1
+#define MCONTROL_STORE_POS 1
+#define MCONTROL_STORE_MASK 0x2
+#define MCONTROL_LOAD_POS 0
+#define MCONTROL_LOAD_MASK 0x1
+#define MCONTROL_EXECUTE_POS 2
+#define MCONTROL_EXECUTE_MASK 0x4
+#define MCONTROL_U_POS 3
+#define MCONTROL_U_MASK 0x8
+#define MCONTROL_S_POS 4
+#define MCONTROL_S_MASK 0x10
+#define MCONTROL_M_POS 6
+#define MCONTROL_M_MASK 0x40
+#define MCONTROL_MATCH_POS 7
+#define MCONTROL_MATCH_MASK 0x780
+#define MCONTROL_CHAIN_POS 11
+#define MCONTROL_CHAIN_MASK 0x800
+#define MCONTROL_ACTION_POS 12
+#define MCONTROL_ACTION_MASK 0xf000
+#define MCONTROL_SIZELO_POS 16
+#define MCONTROL_SIZELO_MASK 0x30000
+#define MCONTROL_TIMING_POS 18
+#define MCONTROL_TIMING_MASK 0x40000
+#define MCONTROL_SELECT_POS 19
+#define MCONTROL_SELECT_MASK 0x80000
+#define MCONTROL_HIT_POS 20
+#define MCONTROL_HIT_MASK 0x100000
+#define MCONTROL_SIZEHI_POS 21
+#define MCONTROL_SIZEHI_MASK 0x600000
+
+#define TCONTROL_MTE_POS 3
+#define TCONTROL_MTE_MASK 0x8
+#define TCONTROL_MPTE_POS 7
+#define TCONTROL_MPTE_MASK 0x180
+
+enum {
+    WATCH_R = MCONTROL_LOAD_MASK,
+    WATCH_W = MCONTROL_STORE_MASK,
+    WATCH_X = MCONTROL_EXECUTE_MASK,
+    WATCH_ALL = MCONTROL_LOAD_MASK | MCONTROL_STORE_MASK | MCONTROL_EXECUTE_MASK,
+};
+
+__ALWAYS_STATIC_INLINE void __set_hw_watch_point(uint32_t index, uint32_t address, uint32_t privilege)
+{
+    __set_TSELECT(index);
+    __set_TDATA1(0);
+    __set_TCONTROL(TCONTROL_MTE_MASK);
+    __set_TDATA2(address);
+
+    uint32_t tdata1 = 0;
+    tdata1 |= privilege & WATCH_ALL;
+    tdata1 |= MCONTROL_M_MASK;
+    tdata1 |= TRIGGER_TYPE_MCONTROL << TDATA1_TYPE_POS;
+    __set_TDATA1(tdata1);
+}
+
+__ALWAYS_STATIC_INLINE void __disable_hw_watch_point(uint32_t index)
+{
+    __set_TSELECT(index);
+    __set_TDATA1(0);
+    __set_TDATA2(0);
+    __set_TDATA3(0);
+    __set_TCONTROL(0);
+}
+
 #endif /* _CSI_RV32_GCC_H_ */
