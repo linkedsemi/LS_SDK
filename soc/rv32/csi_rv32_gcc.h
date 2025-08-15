@@ -314,6 +314,14 @@ __ALWAYS_STATIC_INLINE uint32_t __get_SP(void)
     return (result);
 }
 
+__ALWAYS_STATIC_INLINE uint32_t __get_RA(void)
+{
+    uint32_t result;
+
+    __ASM volatile("mv %0, ra" : "=r"(result));
+    return (result);
+}
+
 /**
   \brief   Set SP
   \details Writes the given value to the SP Register.
