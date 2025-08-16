@@ -10,8 +10,7 @@ def plf_postaction(self,target):
     self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     self.AddPostAction(target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.bin'))
     self.AddPostAction(target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
-    target_path = str(target[0]).rsplit('.', 1)[0]
-    self.Command(target_path + '_production.bin', target_path + '.bin', Action(self.subst('python $SDK_ROOT/tools/qsh/header_merge_non_secure.py') + ' -i $SOURCE -o $TARGET -a 0x10000000'))
+    self.AddPostAction(target,Action('python $SDK_ROOT/tools/qsh/header_merge_non_secure.py -i ${TARGET.base}.bin -o ${TARGET.base}_production.bin -a 0x10000000'))
 
 def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     start_src = []
@@ -227,8 +226,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         ]))
         self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_QSH'])
     if self.get('LINKSCRIPT') is None:
-        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/qsh/link_script_fpga.ld"))
-        # self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/qsh/link_script.txt"))
+        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/qsh/link_script.ld"))
     self.Append(CPPPATH = self.inc_dirs(inc_list))
     target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src),OBJPREFIX = objprefix)
     self.Depends(target,[self['LINKSCRIPT']])
