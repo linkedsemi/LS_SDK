@@ -13,13 +13,29 @@ extern "C" {
 #define QSPI_CS_HOLD 2
 #define QSPI_CS_SETUP 2
 
-//(neg,delay) = (0,0),(1,1),(0,1),(1,2)
+//(neg,delay) = (0,0), (1,1),(0,1), (1,2),(0,2), (1,3),(0,3)
 #ifdef BOOT_ROM
 #define QSPI_CAPTURE_DELAY 0
 #define QSPI_CAPTURE_NEG 0
 #else
-#define QSPI_CAPTURE_DELAY 1 
-#define QSPI_CAPTURE_NEG 0
+//fail
+// #define QSPI_CAPTURE_NEG 0
+// #define QSPI_CAPTURE_DELAY 3
+//fail
+// #define QSPI_CAPTURE_NEG 1
+// #define QSPI_CAPTURE_DELAY 3
+//ok
+// #define QSPI_CAPTURE_NEG 0
+// #define QSPI_CAPTURE_DELAY 2
+//ok
+#define QSPI_CAPTURE_NEG 1
+#define QSPI_CAPTURE_DELAY 2
+//ok
+// #define QSPI_CAPTURE_NEG 0
+// #define QSPI_CAPTURE_DELAY 1
+//fail
+// #define QSPI_CAPTURE_NEG 1
+// #define QSPI_CAPTURE_DELAY 1
 #endif
 
 #ifdef __cplusplus

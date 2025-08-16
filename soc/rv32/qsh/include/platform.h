@@ -47,6 +47,8 @@ void SWINT_Handler_ASM();
 
 void flash_swint_init();
 
+void clk_flash_init();
+
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler
 #else

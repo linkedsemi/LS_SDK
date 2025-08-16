@@ -5,7 +5,7 @@
 #if defined(LEO)
 #define SDK_HCLK_MHZ (144)
 #elif defined(QSH)
-#define SDK_HCLK_MHZ (50)
+#define SDK_HCLK_MHZ (75)
 #endif
 
 

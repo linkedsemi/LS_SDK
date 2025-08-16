@@ -11,6 +11,7 @@
 #include "FlashOS.h"
 #if defined(QSH)
 #include "ls_msp_qspiv2.h"
+#include "reg_sysc_sec_awo.h"
 #endif
 /**
  * ERROR TYPE. MUST NOT BE MODIFIED
@@ -48,11 +49,20 @@ static void io_pull_up_cfg()
 int  flashInit(){
     disable_global_irq();
 #if defined(QSH)
-    app_cpu_reset();
+    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK))
+        && (0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK))) {
+    } else {
+        app_cpu_reset();
+    }
 #endif
+
     lscache_cache_disable();
     io_pull_up_cfg();
+#if defined(LEO)
     pinmux_hal_flash_init();
+#else
+    pinmux_hal_flash_quad_init();
+#endif
     flash1.reg = (void *)LSQSPIV2;
     flash1.dual_mode_only = false;
     flash1.continuous_mode_enable = false;
@@ -61,18 +71,14 @@ int  flashInit(){
     flash1.continuous_mode_on = false;
     flash1.addr4b = false;
     hal_flash_init();
-#if defined(LEO)
     clk_flash_init();
-#endif
 
     hal_flash_software_reset();
     DELAY_US(500);
     hal_flash_release_from_deep_power_down();
     DELAY_US(100);
 
-#if !defined(QSH)
     hal_flash_qe_status_read_and_set();
-#endif
 
 #if defined(QSH)
     uint8_t jedec_id[3] = {};
