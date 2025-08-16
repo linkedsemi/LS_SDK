@@ -34,13 +34,13 @@ __attribute__((weak)) void SystemInit(){
     enable_global_irq();
 }
 
-static void set_trim_params()
+__ALWAYS_STATIC_INLINE void set_trim_params()
 {
     MODIFY_REG(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_CLK_LDO1_VSEL_MASK, 0);
     MODIFY_REG(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_CLK_LDO2_VSEL_MASK, 0);
 }
 
-static void enable_dpll()
+__ALWAYS_STATIC_INLINE void enable_dpll()
 {
     CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_CLKREF_SEL_MASK); /* clkin */
     SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr reset */
@@ -53,7 +53,7 @@ static void enable_dpll()
     while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK));
 }
 
-static void cpu_600M_ahb_300M_qspi_200M_init()
+__ALWAYS_STATIC_INLINE void cpu_600M_ahb_300M_qspi_200M_init()
 {
     SYSC_SEC_AWO->PD_AWO_CLK_CTRL1 = FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS0, 0x0)
                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS1, 0x0)
