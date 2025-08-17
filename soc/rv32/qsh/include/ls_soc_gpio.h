@@ -20,9 +20,10 @@ extern "C" {
 /**@brief IO output drive capability type */
 typedef enum
 {
-    IO_OUTPUT_QUARTER_DRIVER = 0, //1/4 output drive capability, range is 0~1
-    IO_OUTPUT_HALF_DRIVER = 1,    //1/2 output drive capability
-    IO_OUTPUT_MAX_DRIVER = 3,     //MAX output drive capability
+    IO_OUTPUT_QUARTER_DRIVER = 0, // 1/4 output drive capability
+    IO_OUTPUT_HALF_DRIVER = 1,    // 1/2 output drive capability
+    IO_OUTPUT_THREE_QUARTER_DRIVER = 0, // 3/4 output drive capability
+    IO_OUTPUT_MAX_DRIVER = 3,     // MAX output drive capability
 }io_drive_type_t;
 
 /**@brief IO pull type */

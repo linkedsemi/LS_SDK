@@ -547,11 +547,14 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 //     return pull_down(x->port,x->num)|pull_up(x->port,x->num);
 // }
 
-// void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     MODIFY_REG(PMU->IO[x->port].DS, 0x1<< (x->num) | (0x1<< (x->num +16)), (drive&0x1)<< (x->num) |(((drive&0x2)>>1)<< (x->num +16)));
-// }
+void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    bool bit0 = drive & 0x1;
+    bool bit1 = (drive & 0x2) >> 1;
+
+    MODIFY_REG(APP_PMU->IO_CFG[x->port].DS1_DS0, ((1 << APP_PMU_RG_GPIOK_DS1_POS) | 1) << x->num, ((bit1 << APP_PMU_RG_GPIOK_DS1_POS) | (bit0)) << x->num);
+}
 
 // io_drive_type_t io_drive_capacity_read(uint8_t pin)
 // {
