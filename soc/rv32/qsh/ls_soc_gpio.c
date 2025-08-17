@@ -856,6 +856,7 @@ void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt)
     if ((func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END)) {
         per_func0_set(pin, 0);
         per_func_disable_all(pin);
+        gpio_ana_deinit(pin);
         per_func_enable(pin, func);
         if (PINMUX_FUNC1 == func) {
             per_func0_set(pin, func0_alt);
@@ -2395,6 +2396,18 @@ void io_cfg_disable(uint8_t pin)
 {
     io_cfg_disable_output(pin);
     io_cfg_disable_input(pin);
+}
+
+void gpio_ana_init(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].AE_DS2 |= 1<<x->num;
+}
+
+void gpio_ana_deinit(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].AE_DS2 &= ~(1<<16<<x->num);
 }
 
 // void gpio_ana_func1_deinit(uint8_t ain)
