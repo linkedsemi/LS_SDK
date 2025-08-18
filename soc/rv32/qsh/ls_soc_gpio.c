@@ -1205,8 +1205,11 @@ ROM_SYMBOL void pinmux_hal_flash_init(void)
     per_func_enable(QSPI1_IO1_SO_PIN, PINMUX_FUNC2);
     per_func_enable(QSPI1_IO2_WP_PIN, PINMUX_FUNC2);
     per_func_enable(QSPI1_IO3_HOLD_PIN, PINMUX_FUNC2);
+    APP_PMU->QSPI1_PAD_CFG.PU1_PU0 |= 0x30;
+    APP_PMU->QSPI1_PAD_CFG.PD_PU2 &= ~(0x30<<16);
     APP_PMU->IO_VAL[15].OE_DIN |= 0x3f << 16;
     APP_PMU->QSPI1_PAD_CFG.IEN1_IEN0 &= ~0x3f;
+    APP_PMU->QSPI1_PAD_CFG.DS1_DS0 = (0x3f << 16) | 0x3f;
 }
 
 ROM_SYMBOL void pinmux_hal_flash_deinit(void)
@@ -1228,6 +1231,7 @@ ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
     APP_PMU->QSPI1_PAD_CFG.PU1_PU0 |= 0x30;
     APP_PMU->QSPI1_PAD_CFG.PD_PU2 &= ~(0x30<<16);
     APP_PMU->QSPI1_PAD_CFG.IEN1_IEN0 = 0x0;
+    APP_PMU->QSPI1_PAD_CFG.DS1_DS0 = (0x3f << 16) | 0x3f;
 }
 
 ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
