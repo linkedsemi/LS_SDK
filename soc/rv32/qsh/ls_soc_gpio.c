@@ -14,7 +14,7 @@
 #include "compile_flag.h"
 
 #if (!defined(CONFIG_SOC_LSQSH_CPU1)) && (!defined(CONFIG_SOC_LSQSH_CPU2))
-#define CONFIG_SOC_LSQSH_CPU1
+#define CONFIG_SOC_LSQSH_CPU2
 #endif
 
 static gpio_port_pin_t uart1_txd;
