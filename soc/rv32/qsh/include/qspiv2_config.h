@@ -33,7 +33,7 @@ extern "C" {
 //ok
 // #define QSPI_CAPTURE_NEG 0
 // #define QSPI_CAPTURE_DELAY 1
-//fail
+//ok
 // #define QSPI_CAPTURE_NEG 1
 // #define QSPI_CAPTURE_DELAY 1
 #endif
