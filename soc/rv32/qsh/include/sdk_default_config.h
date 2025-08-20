@@ -10,11 +10,7 @@ extern "C" {
 #endif
 
 #ifndef SDK_HSE_MHZ
-#define SDK_HSE_MHZ (16)
-#endif
-
-#if SDK_HSE_MHZ>24
-#error "The Supported HSE Max Freq is 24MHz"
+#define SDK_HSE_MHZ (25)
 #endif
 
 #ifndef SDK_LSI_USED
@@ -22,7 +18,7 @@ extern "C" {
 #endif
 
 #ifndef SDK_HCLK_MHZ
-#define SDK_HCLK_MHZ (50)
+#define SDK_HCLK_MHZ (75)
 #endif
 
 #ifndef SDK_PCLK_DIV
