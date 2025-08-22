@@ -1,0 +1,24 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../')
+env['IC'] = 'qsh'
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+src = [
+    'boot_ram.c',
+    'reset_handler.c',
+]
+inc = [
+    './'
+]
+env['LINKSCRIPT'] = File(env.subst('$SDK_ROOT/bootloader/boot_ram/qsh/bram.ld'))
+target = env.image_build('boot_ram',src,inc,with_startup=False)
+env.Append(CPPDEFINES = ['BOOT_RAM=1','GLOBAL_OUTPUT_LVL=0','NDEBUG'])
+env.Append(CCFLAGS = '-save-temps')
+env.Append(LINKFLAGS = ' -nostartfiles')
+env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+env.AddPostAction(target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
+env.AddPostAction(target,Action('$READELF -s $TARGET > ${TARGET.base}.defsym'))
+env.AddPostAction(target,Action('$OBJCOPY -O binary ${TARGET.base}.elf ${TARGET.base}.bin'))
+env.AddPostAction(target,Action('python $SDK_ROOT/tools/qsh/header_merge_non_secure.py -i ${TARGET.base}.bin -o ${TARGET.base}_header.bin -a 0x10124000'))
+env.AddPostAction(target,Action('python $SDK_ROOT/tools/qsh/header_show.py ${TARGET.base}_header.bin'))
+env.AddPostAction(target,Copy('$SDK_ROOT/soc/rv32/qsh/bin/bram.bin','${TARGET.base}.bin'))
