@@ -4,11 +4,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef FPGA_TEST
-#define QSPI_CLK_CYCLE 3
-#else
+
+#if defined(CONFIG_QSPI1_FREQ)
+#define QSPI_CLK_CYCLE ((200000000 / CONFIG_QSPI1_FREQ) - 1)
+#else 
 #define QSPI_CLK_CYCLE 1
 #endif
+
 #define QSPI_CS_INTERVAL 4
 #define QSPI_CS_HOLD 2
 #define QSPI_CS_SETUP 2
