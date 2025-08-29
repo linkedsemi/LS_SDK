@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -27,7 +27,7 @@
           <option value="2400">2400</option>
           <option value="4800">4800</option>
           <option value="7200">7200</option>
-          <option value="9600" selected="selected">9600</option>
+          <option value="9600">9600</option>
           <option value="14400">14400</option>
           <option value="19200">19200</option>
           <option value="38400">38400</option>
@@ -37,7 +37,7 @@
           <option value="230400">230400</option>
           <option value="300000">300000</option>
           <option value="400000">400000</option>
-          <option value="921600">921600</option>
+          <option value="921600" selected="selected">921600</option>
           <option value="166667">166667</option>
           <option value="1000002">1M</option>
           <option value="250000">250000</option>
@@ -100,8 +100,8 @@
     <button type="button" onclick="SendMultipleData(this,'myInput_9')" class="sendButton" data-target="box09">0x09</button> <input type="text" style="width: 380px;" id="myInput_9" placeholder=" 偏移(4字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_QUAD_PAGE_PROGRAM</span> <div class="box" id="box09"></div> <br><br>
     <button type="button" onclick="SendMultipleData(this,'myInput_a')" class="sendButton" data-target="box0a">0x0a</button> <input type="text" style="width: 380px;" id="myInput_a" placeholder=" 偏移(4字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_PAGE_PROGRAM</span> <div class="box" id="box0a"></div> <br><br>
     <button type="button" onclick="SendMultipleData(this,'myInput_b')" class="sendButton" data-target="box0b">0x0b</button> <input type="text" style="width: 380px;" id="myInput_b" placeholder=" 偏移(4字节)"><span style="margin-left: 5px;">FLASH_SECTOR_ERASE</span> <div class="box" id="box0b"></div> <br><br>
-    <button type="button" onclick="SendMultipleData(this,'myInput_c')" class="sendButton" data-target="box0c">0x0c</button> <input type="text" style="width: 380px;" id="myInput_c" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_QUAD_IO_READ</span> <div class="box" id="box0c"></div> <br><br>
-    <button type="button" onclick="SendMultipleData(this,'myInput_d')" class="sendButton" data-target="box0d">0x0d</button> <input type="text" style="width: 380px;" id="myInput_d" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_FAST_READ</span> <div class="box" id="box0d"></div> <br><br>
+    <button type="button" onclick="FlashRead(this,'myInput_c')" class="sendButton" data-target="box0c">0x0c</button> <input type="text" style="width: 380px;" id="myInput_c" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_QUAD_IO_READ</span> <div class="box" id="box0c"></div> <br><br>
+    <button type="button" onclick="FlashRead(this,'myInput_d')" class="sendButton" data-target="box0d">0x0d</button> <input type="text" style="width: 380px;" id="myInput_d" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_FAST_READ</span> <div class="box" id="box0d"></div> <br><br>
     <button type="button" onclick="sendData(this)" class="sendButton" data-target="box0e">0x0e</button> <span style="margin-left: 5px;">FLASH_DEEP_POWER_DOWN</span> <div class="box" id="box0e"></div> <br><br>
     <button type="button" onclick="sendData(this)" class="sendButton" data-target="box0f">0x0f</button> <span style="margin-left: 5px;">FLASH_RELEASE_FROM_DEEP_POWER_DOWN</span> <div class="box" id="box0f"></div> <br><br>
     <button type="button" onclick="sendData(this)" class="sendButton" data-target="box10">0x10</button> <span style="margin-left: 5px;">FLASH_READ_JEDEC_ID</span> <div class="box" id="box10"></div> <br><br>
@@ -111,11 +111,11 @@
     <button type="button" onclick="SendMultipleData(this,'myInput_14')" class="sendButton" data-target="box14">0x14</button> <input type="text" style="width: 380px;" id="myInput_14" placeholder=" 地址(3字节),索引(1字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_READ_SECURITY_AREA</span> <div class="box" id="box14"></div> <br><br>
     <button type="button" onclick="sendData(this)" class="sendButton" data-target="box15">0x15</button> <span style="margin-left: 5px;">FLASH_SOFTWARE_RESET</span> <div class="box" id="box15"></div> <br><br>
     <button type="button" onclick="SendMultipleData(this,'myInput_16')" class="sendButton" data-target="box16">0x16</button> <input type="text" style="width: 380px;" id="myInput_16" placeholder=" 数量(1字节),{地址(4字节)，数据(4字节)}*数量"><span style="margin-left: 5px;">MEM32_WRITE_MULTI</span> <div class="box" id="box16"></div> <br><br>
-    <button type="button" onclick="SendMultipleData(this,'myInput_17')" class="sendButton" data-target="box17">0x17</button> <input type="text" style="width: 380px;" id="myInput_17" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_DUAL_IO_READ</span> <div class="box" id="box17"></div> <br><br>
+    <button type="button" onclick="FlashRead(this,'myInput_17')" class="sendButton" data-target="box17">0x17</button> <input type="text" style="width: 380px;" id="myInput_17" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_DUAL_IO_READ</span> <div class="box" id="box17"></div> <br><br>
     <button type="button" onclick="SendMultipleData(this,'myInput_18')" class="sendButton" data-target="box18">0x18</button> <input type="text" style="width: 380px;" id="myInput_18" placeholder=" 偏移(4字节),长度(4字节),数据"><span style="margin-left: 5px;">FLASH_DUAL_PAGE_PROGRAM</span> <div class="box" id="box18"></div> <br><br>
     <button type="button" onclick="SendMultipleData(this,'myInput_19')" class="sendButton" data-target="box19">0x19</button> <input type="text" style="width: 380px;" id="myInput_19" placeholder=" 配置字(1字节)1:配置QPSI D2 D3;0:不配置QSPI D2 D3(1字节)"><span style="margin-left: 5px;">FLASH_INIT</span> <div class="box" id="box19"></div><br><br>
     <button type="button" onclick="sendData(this)" class="sendButton" data-target="box1a">0x1a</button> <span style="margin-left: 5px;">RAM_BIST</span> <div class="box" id="box1a"></div> <br><br>
-    <button type="button" onclick="SendMultipleData(this,'myInput_1b')" class="sendButton" data-target="box1b">0x1b</button> <input type="text" style="width: 380px;" id="myInput_1b" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_READ_SFDP</span> <div class="box" id="box1b"></div> <br><br>
+    <button type="button" onclick="FlashRead(this,'myInput_1b')" class="sendButton" data-target="box1b">0x1b</button> <input type="text" style="width: 380px;" id="myInput_1b" placeholder=" 偏移(4字节),长度(4字节)"><span style="margin-left: 5px;">FLASH_READ_SFDP</span> <div class="box" id="box1b"></div> <br><br>
   </div> 
 </div>
 

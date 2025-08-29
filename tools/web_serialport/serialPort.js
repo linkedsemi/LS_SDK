@@ -11,11 +11,17 @@ let lastGroup;
 let programFlag = false;
 let lastProgram_flag = false;
 let programLast_dataLength;
+let fileSize;
+let hexArray = [];
+const maxReadCount = 1024;
+let readflashdata = [];
+let readCount = 0;
+let remainingByteCount = 0;
 const data1 = new Uint8Array([0x55]);
 const data2 = new Uint8Array([0x3C,0x3C,0xA5,0xA5]);
 // LEO :使能dpll，写0x4000a034 = 0297； 切主频为144M，写0x4000a02c = 01011580
 const LEO_144M = "2,4000a034,0297,4000a02c,01011580";
-// LM3050 :使能dpll，写0x4000d034 = 039b； 切主频为28M，写0x4000d02c = 01000580
+// LM3050 :使能dpll，写0x4000d034 = 039b； 切主频为128M，写0x4000d02c = 01000580
 const LM3050_128M = "2,4000d034,039b,4000d02c,01000580";
 
 
@@ -91,7 +97,7 @@ async function readData() {
   let lastLineLength;
   let lastLineData;
   let init_flag = false;
-  let receiveData;
+  let count = 0;
   if (port && !port.readable.locked) {
     while (reading) {
       try {
@@ -121,31 +127,48 @@ async function readData() {
               lastLineData = lastLine.substring(4); 
               lastLineLength = Math.floor(lastLineData.replace(/ /g, '').length / 2);
             }
-            // 处理最终接收到的数据
             if(lastLineLength > 2){
-              lastLineData = lastLineData.substring(6).split(" ").reverse().join(" ");
+              lastLineData = lastLineData.substring(6);
+              lastLineLength = Math.floor(lastLineData.replace(/ /g, '').length / 2);
               if(programFlag == true){
-              // 烧录满256字节时的数据处理
-                if(lastLineData.length == 256*2 + 255){
-                  receiveData =  lastLineData.replace(/\s/g, '');
-                  console.log("receiveData",receiveData)
-                  console.log("lastGroup",lastGroup)
-                  if(receiveData === lastGroup)
+                if(readCount)
+                {
+                  if(!remainingByteCount)
                   {
-                    console.log("下载成功");
+                    if (lastLineLength === maxReadCount) {
+                      count += 1;
+                      readflashdata.push(lastLineData);
+                    }
+                    if(count === readCount){
+                      if (lastLineData == hexArray.join(" ")) {
+                        alert("Flash Program Succeed");
+                        programFlag = false;
+                      } else {
+                        alert("Flash Program Failure1");
+                      }
+                    }
                   }else{
-                    alert("Flash Program Failure");
+                    if (lastLineLength === maxReadCount) {
+                      count += 1;
+                      readflashdata.push(lastLineData);
+                    }
+                    if (lastLineLength === remainingByteCount && count === readCount) {
+                      readflashdata.push(lastLineData);
+                      if(readflashdata.join(" ") == hexArray.join(" ")) {
+                        alert("Flash Program Succeed");
+                        programFlag = false;
+                      } else {
+                        alert("Flash Program Failure2");
+                      }
+                    }
                   }
-                }else if((lastLineData.length == programLast_dataLength*2 + (programLast_dataLength-1)) && (programLast_dataLength != 0) && (lastProgram_flag == true)){
-                  receiveData =  lastLineData.replace(/\s/g, '');
-                  console.log("receiveData--",receiveData)
-                  console.log("lastGroup--",lastGroup)
-                  if(receiveData === lastGroup)
-                  {
-                    alert("Flash Program Successed");
-                    programFlag = false;
-                  }else{
-                    alert("Flash Program Failure");
+                }else{
+                  if (lastLineLength == fileSize) {
+                    if (lastLineData == hexArray.join(" ")) {
+                      alert("Flash Program Successed");
+                    } else {
+                      alert("Flash Program Failure3");
+                    }
                   }
                 }
               }
@@ -234,6 +257,30 @@ async function sendData(button) {
     } catch (error) {
       console.error('写入数据到串口设备时发生错误:', error);
     }
+}
+
+
+async function FlashRead(button, inputId) {
+  let inputValue;
+  lastButtonName = null;
+  buttonFlag = false;
+  if (button.type === 'button') {
+    buttonFlag = true;
+    buttonName = button.innerText;
+    inputValue = document.getElementById(inputId).value;
+    const targetId = button.getAttribute("data-target");
+    targetBox = document.getElementById(targetId);
+    targetBox.textContent = null;
+  } else {
+    buttonName = button;
+    inputValue = inputId;
+  }
+
+  readnum = parseInt(inputValue.split(',')[1], 16);
+  console.log("readnum",readnum)
+  let cyclecount = Math.floor(readnum/maxReadCount);
+  let residuecount = readnum%maxReadCount;
+  read_flash(readnum, cyclecount, residuecount);
 }
 
 async function SendMultipleData(button, inputId) {
@@ -349,6 +396,85 @@ function convertToLittleEndianHexArray(input, buttonName) {
   return hexResult;
 }
 
+function flashconvertToLittleEndianHexArray(input, buttonName) {
+  const groups = input.split(',');
+  const groupCount = groups.length;
+  let byte;
+  const result = [];
+  if (groupCount == 3) {
+    lastGroup = groups[2];
+  }
+  for (let index = 0; index < 2 && index < groups.length; index++) {
+    const group = groups[index];
+    const bytes = group.split('');
+
+    if (buttonName == '0x0a') {
+      if (index < groupCount - 1) {
+        while (bytes.length < 8) {
+          bytes.unshift(0);
+        }
+      } else if (bytes.length < 2) {
+        bytes.unshift(0);
+      }
+    } 
+
+    for (let i = bytes.length - 2; i >= 0; i -= 2) {
+      byte = parseInt(bytes[i] + bytes[i + 1], 16);
+      result.push(byte);
+    }
+  }
+  byte = lastGroup.split('');
+  for (let i = 0; i <= lastGroup.length - 2; i += 2) {
+    byte = parseInt(lastGroup[i] + lastGroup[i + 1], 16);
+    result.push(byte);
+  }
+
+  const hexResult = result.map(byte => {
+    const hex = byte.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  });
+  return hexResult;
+}
+
+async function flashSendMultipleData(button, inputId) {
+  let inputValue;
+  const bytes = [];
+  lastButtonName = null;
+  buttonFlag = false;
+  if (button.type === 'button') {
+    buttonFlag = true;
+    buttonName = button.innerText;
+    inputValue = document.getElementById(inputId).value;
+    const targetId = button.getAttribute("data-target");
+    targetBox = document.getElementById(targetId);
+    targetBox.textContent = null;
+  } else {
+    buttonName = button;
+    inputValue = inputId;
+  }
+  const result = flashconvertToLittleEndianHexArray(inputValue, buttonName);
+  bytes.push(buttonName);
+  for (let i = 0; i < result.length; i++) {
+    const byte = parseInt(result.slice(i, i + 1), 16);
+    bytes.push(byte);
+  }
+  try {
+    const writer = port.writable.getWriter();
+    const data = new Uint8Array(bytes);
+    await writer.write(data);
+    writer.releaseLock();
+    const hexData = Array.prototype.map.call(data, x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join(' ');
+
+    document.getElementById("receiverText").textContent += `\n发—>：${hexData}`;
+  } catch (error) {
+    console.error('写入数据到串口设备时发生错误:', error);
+    alert(error.message);
+  }
+}
+
 // 切为最高主频
 async function highest_MainFrequency() {
   var buttonId = event.target.id;
@@ -422,7 +548,7 @@ async function download_bin() {
   fileInput.addEventListener("change", function () {
     const selectedFile = fileInput.files[0];
     if (selectedFile) {
-      const fileSize = selectedFile.size;
+      fileSize = selectedFile.size;
       const reader = new FileReader();
       reader.onload = function (event) {
         const arrayBuffer = event.target.result;
@@ -449,7 +575,6 @@ function processData(arrayBuffer) {
     const byte = dataView.getUint8(i).toString(16).padStart(2, "0");
     hexString += byte;
   }
-  const hexArray = [];
   for (let j = 0; j < hexString.length; j += 2) {
     const hex = hexString.substr(j, 2);
     hexArray.push(hex);
@@ -463,9 +588,10 @@ async function flash_program(bin_file, addr) {
   let serialport_data = [];
   let offset_address = addr;
   console.log("循环次数:", clc);
+  let i = 0;
   if (clc > 0) 
   {
-    for (let i = 0; i < clc; i++) {
+    for (i = 0; i < clc; i++) {
       for (let j = 0; j < 256; j++) {
         serialport_data.push(bin_file[j + (i * 256)])
       }
@@ -476,13 +602,25 @@ async function flash_program(bin_file, addr) {
       offset_address = ((i + 1) * 256).toString(16);
     }
     programLast_dataLength = bin_file.length - 256 * clc;
-    for (let k = 0; k < programLast_dataLength; k++) {
-      serialport_data.push(bin_file[(256 * clc) + k]);
+    if(programLast_dataLength)
+    {
+      for (let k = 0; k < programLast_dataLength; k++) {
+        serialport_data.push(bin_file[(256 * clc) + k]);
+      }
+      console.log("last串口数据长度", serialport_data.length)
+      await flash_page_program("0x0a", offset_address, serialport_data.length, serialport_data);
+      lastProgram_flag = true;
+      serialport_data = [];
     }
-    console.log("last串口数据长度", serialport_data.length)
-    await flash_page_program("0x0a", offset_address, serialport_data.length, serialport_data);
-    lastProgram_flag = true;
-    serialport_data = [];
+
+    if(i == clc)
+    {
+      offset_address = 0;
+      console.log("烧录完成,开始校验");
+      readCount = Math.floor(fileSize/maxReadCount);
+      remainingByteCount = fileSize%maxReadCount;
+      read_flash(fileSize, readCount, remainingByteCount);
+    }
   } else {
     programLast_dataLength = bin_file.length
     for (let i = 0; i < bin_file.length; i++) {
@@ -495,24 +633,64 @@ async function flash_program(bin_file, addr) {
   }
 }
 
+async function read_flash(bytesNum,cycle,residualByteCount)
+{
+  let offset_address = 0;
+  let readOperateInputValue = 0;
+  if(cycle)
+    {
+      for(let i=0; i< cycle; i++)
+      {
+        offset_address = ((i)*maxReadCount).toString(16);
+        readOperateInputValue = `${offset_address},${maxReadCount.toString(16)}`
+        await new Promise((resolve, reject) => {
+          setTimeout(async () => {
+            try {
+              SendMultipleData("0x0d", readOperateInputValue);
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          }, 300);
+        });
+      }
+      if(residualByteCount)
+      {
+        offset_address = ((cycle)*maxReadCount).toString(16);
+        readOperateInputValue = `${offset_address},${residualByteCount.toString(16)}`
+        await new Promise((resolve, reject) => {
+          setTimeout(async () => {
+            try {
+              SendMultipleData("0x0d", readOperateInputValue);
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          }, 300);
+        });
+      }
+    }else{
+      readOperateInputValue = `${0},${bytesNum.toString(16)}`
+      await new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            SendMultipleData("0x0d", readOperateInputValue);
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        }, 300);
+      });
+    }
+}
+
 async function flash_page_program(command, offset_address, length, data) {
   let length_16 = length.toString(16);
   let bytes = `${offset_address},${length_16},${data.join('')}`;
-  let bytes2 = `${offset_address},${length_16}`;
   await new Promise((resolve, reject) => {
     setTimeout(async () => {
       try {
-        SendMultipleData("0x0a", bytes);
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    }, 300); 
-  });
-  await new Promise((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        SendMultipleData("0x0d", bytes2);
+        flashSendMultipleData("0x0a", bytes);
         resolve();
       } catch (error) {
         reject(error);
