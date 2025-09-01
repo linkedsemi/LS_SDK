@@ -2405,7 +2405,7 @@ void io_cfg_disable(uint8_t pin)
 void gpio_ana_init(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    APP_PMU->IO_CFG[x->port].AE_DS2 |= 1<<x->num;
+    APP_PMU->IO_CFG[x->port].AE_DS2 |= 1<<16<<x->num;
 }
 
 void gpio_ana_deinit(uint8_t pin)
