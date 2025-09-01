@@ -49,7 +49,13 @@ typedef struct
     volatile uint32_t REG_DAT10; //0x98
     volatile uint32_t REG_DAT11; //0x9c
     volatile uint32_t REG_DAT12; //0xa0
+#ifdef QSH
+    volatile uint32_t REG_DAT13; //0xa4
+    volatile uint32_t REG_DAT14; //0xa8
+    volatile uint32_t REG_DAT15; //0xac
+#else
     volatile uint32_t RESERVED0[3];
+#endif
     volatile uint32_t INJ_DAT00; //0xb0
     volatile uint32_t INJ_DAT01; //0xb4
     volatile uint32_t INJ_DAT02; //0xb8
@@ -99,6 +105,12 @@ enum ADC_REG_ADR_FIELD
     ADC_ADR_VRSEL_POS = 4,
     ADC_ADC_TEST_MASK = (int)0x8,
     ADC_ADC_TEST_POS = 3,
+#ifdef  QSH
+    ADC_ADC_TESTEN_MASK = (int)0x6,
+    ADC_ADC_TESTEN_POS = 1,
+    ADC_AMIC_TESTEN_MASK = (int)0x1,
+    ADC_AMIC_TESTEN_pos = 0,
+#endif
 };
 
 enum ADC_REG_AMIC_CTRL_FIELD
@@ -129,6 +141,10 @@ enum ADC_REG_MISC_FIELD
     ADC_TRIG_DLY_POS = 12,
     ADC_ADC_CONV_OFF_MASK = (int)0x100,
     ADC_ADC_CONV_OFF_POS = 8,
+#ifdef QSH
+    ADC_INJ_TERM_EN_MASK = (int)0x10,
+    ADC_INJ_TERM_EN_POS = 4,
+#endif
     ADC_FIF_SMPHLD_MASK = (int)0x4,
     ADC_FIF_SMPHLD_POS = 2,
     ADC_INJ_SMPHLD_MASK = (int)0x2,
@@ -139,6 +155,16 @@ enum ADC_REG_MISC_FIELD
 
 enum ADC_REG_TSMP_FIELD
 {
+#ifdef QSH
+    ADC_TSMP_CTRL_CH15_MASK = (int)0xc0000000,
+    ADC_TSMP_CTRL_CH15_POS = 30,
+    ADC_TSMP_CTRL_CH14_MASK = (int)0x30000000,
+    ADC_TSMP_CTRL_CH14_POS = 28,
+    ADC_TSMP_CTRL_CH13_MASK = (int)0xc000000,
+    ADC_TSMP_CTRL_CH13_POS = 26,
+    ADC_TSMP_CTRL_CH12_MASK = (int)0x3000000,
+    ADC_TSMP_CTRL_CH12_POS = 24,
+#endif
     ADC_TSMP_CTRL_CH11_MASK = (int)0xc00000,
     ADC_TSMP_CTRL_CH11_POS = 22,
     ADC_TSMP_CTRL_CH10_MASK = (int)0x300000,
@@ -251,8 +277,19 @@ enum ADC_REG_REG_CTRL0_FIELD
 
 enum ADC_REG_REG_CTRL1_FIELD
 {
+#ifdef QSH
+    ADC_REG_SEQ15_MASK = (int)0xf0000000,
+    ADC_REG_SEQ15_POS = 28,
+    ADC_REG_SEQ14_MASK = (int)0xf000000,
+    ADC_REG_SEQ14_POS = 24,
+    ADC_REG_SEQ13_MASK = (int)0xf00000,
+    ADC_REG_SEQ13_POS = 20,
+    ADC_REG_SEQ12_MASK = (int)0xf0000,
+    ADC_REG_SEQ12_POS = 16,
+#else
     ADC_REG_SEQLEN_MASK = (int)0xf00000,
     ADC_REG_SEQLEN_POS = 20,
+#endif
     ADC_REG_SEQ11_MASK = (int)0xf000,
     ADC_REG_SEQ11_POS = 12,
     ADC_REG_SEQ10_MASK = (int)0xf00,
@@ -265,6 +302,10 @@ enum ADC_REG_REG_CTRL1_FIELD
 
 enum ADC_REG_INJ_CTRL_FIELD
 {
+#ifdef QSH
+    ADC_REG_SEQLEN_MASK = (int)0xf00000,
+    ADC_REG_SEQLEN_POS = 20,
+#endif
     ADC_INJ_SEQLEN_MASK = (int)0x30000,
     ADC_INJ_SEQLEN_POS = 16,
     ADC_INJ_SEQ03_MASK = (int)0xf000,
@@ -305,6 +346,12 @@ enum ADC_REG_MISC_CTRL_FIELD
 {
     ADC_ADC_DIV_MASK = (int)0x1ff0000,
     ADC_ADC_DIV_POS = 16,
+#ifdef QSH
+    ADC_DMA_INJ_EN_MASK= (int)0x4000,
+    ADC_DMA_INJ_EN_POS= 14,
+    ADC_DMA_RGL_EN_MASK = (int)0x2000,
+    ADC_DMA_RGL_EN_POS = 13,
+#endif
     ADC_DMA_EN_MASK = (int)0x1000,
     ADC_DMA_EN_POS = 12,
     ADC_DATA_ALIGN_MASK = (int)0x100,
@@ -327,6 +374,16 @@ enum ADC_REG_TRIG_FIELD
 
 enum ADC_REG_CLK_CFG_FIELD
 {
+#ifdef QSH
+    ADC_CLOCK_CFG_CH15_MASK = (int)0xc0000000,
+    ADC_CLOCK_CFG_CH15_POS = 30,
+    ADC_CLOCK_CFG_CH14_MASK = (int)0x30000000,
+    ADC_CLOCK_CFG_CH14_POS = 28,
+    ADC_CLOCK_CFG_CH13_MASK = (int)0xc000000,
+    ADC_CLOCK_CFG_CH13_POS = 26,
+    ADC_CLOCK_CFG_CH12_MASK = (int)0x3000000,
+    ADC_CLOCK_CFG_CH12_POS = 24,
+#endif
     ADC_CLOCK_CFG_CH11_MASK = (int)0xc00000,
     ADC_CLOCK_CFG_CH11_POS = 22,
     ADC_CLOCK_CFG_CH10_MASK = (int)0x300000,
@@ -356,6 +413,16 @@ enum ADC_REG_CLK_CFG_FIELD
 
 enum ADC_REG_BYP_CFG_FIELD
 {
+#ifdef QSH
+    ADC_RES_BYP_CH15_MASK = (int)0x800000000,
+    ADC_RES_BYP_CH15_POS = 31,
+    ADC_RES_BYP_CH14_MASK = (int)0x400000000,
+    ADC_RES_BYP_CH14_POS = 30,
+    ADC_RES_BYP_CH13_MASK = (int)0x20000000,
+    ADC_RES_BYP_CH13_POS = 29,
+    ADC_RES_BYP_CH12_MASK = (int)0x10000000,
+    ADC_RES_BYP_CH12_POS = 28,
+#endif
     ADC_RES_BYP_CH11_MASK = (int)0x8000000,
     ADC_RES_BYP_CH11_POS = 27,
     ADC_RES_BYP_CH10_MASK = (int)0x4000000,
@@ -379,7 +446,16 @@ enum ADC_REG_BYP_CFG_FIELD
     ADC_RES_BYP_CH1_MASK = (int)0x20000,
     ADC_RES_BYP_CH1_POS = 17,
     ADC_RES_BYP_CH0_MASK = (int)0x10000,
-    ADC_RES_BYP_CH0_POS = 16,
+#ifdef QSH
+    ADC_BUF_BYP_CH15_MASK = (int)0x8000,
+    ADC_BUF_BYP_CH15_POS = 15,
+    ADC_BUF_BYP_CH14_MASK = (int)0x4000,
+    ADC_BUF_BYP_CH14_POS = 14,
+    ADC_BUF_BYP_CH13_MASK = (int)0x2000,
+    ADC_BUF_BYP_CH13_POS = 13,
+    ADC_BUF_BYP_CH12_MASK = (int)0x1000,
+    ADC_BUF_BYP_CH12_POS = 12,
+#endif
     ADC_BUF_BYP_CH11_MASK = (int)0x800,
     ADC_BUF_BYP_CH11_POS = 11,
     ADC_BUF_BYP_CH10_MASK = (int)0x400,
@@ -409,6 +485,16 @@ enum ADC_REG_BYP_CFG_FIELD
 
 enum ADC_REG_CH_CFG_FIELD
 {
+#ifdef QSH
+    ADC_CFG_CH15_MASK = (int)0x800000000,
+    ADC_CFG_CH15_POS = 31,
+    ADC_CFG_CH14_MASK = (int)0x400000000,
+    ADC_CFG_CH14_POS = 30,
+    ADC_CFG_CH13_MASK = (int)0x20000000,
+    ADC_CFG_CH13_POS = 29,
+    ADC_CFG_CH12_MASK = (int)0x10000000,
+    ADC_CFG_CH12_POS = 28,
+#endif
     ADC_CFG_CH11_MASK = (int)0x8000000,
     ADC_CFG_CH11_POS = 27,
     ADC_CFG_CH10_MASK = (int)0x4000000,
@@ -433,6 +519,16 @@ enum ADC_REG_CH_CFG_FIELD
     ADC_CFG_CH1_POS = 17,
     ADC_CFG_CH0_MASK = (int)0x10000,
     ADC_CFG_CH0_POS = 16,
+#ifdef QSH
+    ADC_EN_CH15_MASK = (int)0x8000,
+    ADC_EN_CH15_POS = 15,
+    ADC_EN_CH14_MASK = (int)0x4000,
+    ADC_EN_CH14_POS = 14,
+    ADC_EN_CH13_MASK = (int)0x2000,
+    ADC_EN_CH13_POS = 13,
+    ADC_EN_CH12_MASK = (int)0x1000,
+    ADC_EN_CH12_POS = 12,
+#endif
     ADC_EN_CH11_MASK = (int)0x800,
     ADC_EN_CH11_POS = 11,
     ADC_EN_CH10_MASK = (int)0x400,
@@ -559,6 +655,26 @@ enum ADC_REG_REG_DAT12_FIELD
     ADC_REG_DAT12_POS = 0,
 };
 
+#ifdef QSH
+enum ADC_REG_REG_DAT13_FIELD
+{
+    ADC_REG_DAT13_MASK = (int)0xffff,
+    ADC_REG_DAT13_POS = 0,
+};
+
+enum ADC_REG_REG_DAT14_FIELD
+{
+    ADC_REG_DAT14_MASK = (int)0xffff,
+    ADC_REG_DAT14_POS = 0,
+};
+
+enum ADC_REG_REG_DAT15_FIELD
+{
+    ADC_REG_DAT15_MASK = (int)0xffff,
+    ADC_REG_DAT15_POS = 0,
+};
+#endif
+
 enum ADC_REG_INJ_DAT00_FIELD
 {
     ADC_INJ_DAT00_MASK = (int)0xffff,
@@ -597,7 +713,11 @@ enum ADC_REG_FIFO_FLVL_FIELD
 
 enum ADC_REG_STAT_FIELD
 {
+#ifdef QSH
+    ADC_FSM_MASK = (int)0x7,
+#else
     ADC_FSM_MASK = (int)0x3,
+#endif
     ADC_FSM_POS = 0,
     ADC_CNVT_REQ_MASK = (int)0xf0,
     ADC_CNVT_REQ_POS = 4,

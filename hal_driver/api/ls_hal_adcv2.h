@@ -241,6 +241,12 @@ typedef struct __ADC_HandleTypeDef
 #define ADC_REGULAR_RANK_10                0x0000000AU
 #define ADC_REGULAR_RANK_11                0x0000000BU
 #define ADC_REGULAR_RANK_12                0x0000000CU
+#ifdef QSH
+#define ADC_REGULAR_RANK_13                0x0000000DU
+#define ADC_REGULAR_RANK_14                0x0000000EU
+#define ADC_REGULAR_RANK_15                0x0000000FU
+#define ADC_REGULAR_RANK_16                0x00000010U
+#endif
 
 
 /** 
