@@ -189,7 +189,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flashx_write_reg_func,struct hal_flash_en
     lsqspiv2_stg_write_register(env->reg,ptr->opcode,ptr->buf,ptr->length);
 }
 
-static void cfg_ca_high_low_set(bool addr4b,uint8_t opcode,uint32_t offset,struct lsqspiv2_stg_cfg *cfg)
+static void FLASH_API_SECTION(cfg_ca_high_low_set,bool addr4b,uint8_t opcode,uint32_t offset,struct lsqspiv2_stg_cfg *cfg)
 {
     if(addr4b)
     {
@@ -202,7 +202,7 @@ static void cfg_ca_high_low_set(bool addr4b,uint8_t opcode,uint32_t offset,struc
     }
 }
 
-static void flash_program_param_set(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type,bool addr4b,struct lsqspiv2_stg_cfg *cfg)
+static void FLASH_API_SECTION(flash_program_param_set,uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type,bool addr4b,struct lsqspiv2_stg_cfg *cfg)
 {
     cfg->ctrl.sw_cyc = addr4b?39:31;
     cfg->ctrl.sw_en = 1;
@@ -239,21 +239,21 @@ static void flash_program_param_set(uint32_t offset,uint8_t *data,uint16_t lengt
     cfg->data = data;
 }
 
-ROM_SYMBOL void hal_flashx_quad_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_quad_page_program,struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg param;
     flash_program_param_set(offset,data,length,QUAD_WIRE,env->addr4b,&param);
     hal_flashx_program_operation(env,&param);
 }
 
-ROM_SYMBOL void hal_flashx_dual_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_dual_page_program,struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg param;
     flash_program_param_set(offset,data,length,DUAL_WIRE,env->addr4b,&param);
     hal_flashx_program_operation(env,&param);
 }
 
-ROM_SYMBOL void hal_flashx_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_page_program,struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg param;
     flash_program_param_set(offset,data,length,SINGLE_WIRE,env->addr4b,&param);
@@ -270,7 +270,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flashx_read_func,struct hal_flash_env *en
     lsqspiv2_stg_read_write(env->reg,param);
 }
 
-static void hal_flashx_read_loop(struct hal_flash_env *env,struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint32_t offset,uint32_t length,bool addr4b)
+static void FLASH_API_SECTION(hal_flashx_read_loop,struct hal_flash_env *env,struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint32_t offset,uint32_t length,bool addr4b)
 {
     while(length)
     {
@@ -289,7 +289,7 @@ static void hal_flashx_read_loop(struct hal_flash_env *env,struct lsqspiv2_stg_c
     }
 }
 
-ROM_SYMBOL void hal_flashx_quad_io_read(struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_quad_io_read,struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -314,7 +314,7 @@ ROM_SYMBOL void hal_flashx_quad_io_read(struct hal_flash_env *env,uint32_t offse
     hal_flashx_read_loop(env,&cfg,env->addr4b?QUAD_IO_READ4B_OPCODE:QUAD_IO_READ_OPCODE,offset,length,env->addr4b);
 }
 
-ROM_SYMBOL void hal_flashx_dual_io_read(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint32_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_dual_io_read,struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint32_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 7;
@@ -339,7 +339,7 @@ ROM_SYMBOL void hal_flashx_dual_io_read(struct hal_flash_env *env,uint32_t offse
     hal_flashx_read_loop(env,&cfg,env->addr4b?DUAL_IO_READ4B_OPCODE:DUAL_IO_READ_OPCODE,offset,length,env->addr4b);
 }
 
-ROM_SYMBOL void hal_flashx_read_addr_8bit_dummy(struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length,uint8_t opcode,bool addr4b)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_read_addr_8bit_dummy,struct hal_flash_env *env,uint32_t offset, uint8_t * data, uint32_t length,uint8_t opcode,bool addr4b)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = addr4b?47:39;
@@ -380,7 +380,7 @@ ROM_SYMBOL void XIP_BANNED_FUNC(do_hal_flashx_read_reg_func,struct hal_flash_env
     lsqspiv2_stg_read_register(env->reg,ptr->opcode,ptr->buf,ptr->length);
 }
 
-ROM_SYMBOL void hal_flashx_read_unique_id(struct hal_flash_env *env,uint8_t unique_serial_id[16])
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_read_unique_id,struct hal_flash_env *env,uint8_t unique_serial_id[16])
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 39;
@@ -407,7 +407,7 @@ ROM_SYMBOL void hal_flashx_read_unique_id(struct hal_flash_env *env,uint8_t uniq
     hal_flashx_read_operation(env,&cfg);
 }
 
-ROM_SYMBOL void hal_flashx_program_security_area(struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_program_security_area,struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 31;
@@ -433,7 +433,7 @@ ROM_SYMBOL void hal_flashx_program_security_area(struct hal_flash_env *env,uint8
     hal_flashx_program_operation(env,&cfg);
 }
 
-ROM_SYMBOL void hal_flashx_read_security_area(struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_read_security_area,struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
     cfg.ctrl.sw_cyc = 39;
