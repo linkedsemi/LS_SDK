@@ -21,6 +21,13 @@ typedef struct {
     volatile uint32_t DOC_DOS;
 } reg_io_val_t;
 
+typedef struct {
+    volatile uint32_t RESERVED0;
+    volatile uint32_t PD_PU;
+    volatile uint32_t DS_IEN;
+    volatile uint32_t FIR_DS1;
+} reg_peci_io_cfg_t;
+
 typedef struct
 {
     volatile uint32_t RESERVED0[11];
@@ -39,7 +46,7 @@ typedef struct
     volatile uint32_t GPIO_INTR_RAW[16]; //0x140
     reg_io_cfg_t IO_CFG[15];//0x180
     reg_io_val_t IO_VAL[16];//0x360
-    reg_io_cfg_t PECI_PAD_CFG;//0x3e0
+    reg_peci_io_cfg_t PECI_PAD_CFG;//0x3e0
 #if 0
     volatile uint32_t IOA_PU0_PU1; //0x184
     volatile uint32_t IOA_PU2_PD; //0x188
@@ -183,7 +190,7 @@ typedef struct
     volatile uint32_t PECI_PAD_DS_FIR; //0x3ec
 #endif
 } reg_app_pmu_rg_t;
-_Static_assert(sizeof(reg_app_pmu_rg_t) == 0x400, "reg_app_pmu_rg_t size error.");
+_Static_assert(sizeof(reg_app_pmu_rg_t) == 0x3f0, "reg_app_pmu_rg_t size error.");
 
 enum APP_PMU_RG_REG_CLKG_SRST_FIELD {
     APP_PMU_RG_CLKG_SET_TIM_MASK = (int)0x1,
