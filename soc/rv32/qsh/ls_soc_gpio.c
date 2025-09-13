@@ -778,6 +778,32 @@ void per_func_enable(uint8_t pin, uint8_t func_num)
     SYSC_APP_AWO->IO_FUNC[func_num][x->port >> 1] |= 1 << (((x->port % 2) * 16)+ x->num);
 }
 
+bool is_per_func_enable(uint8_t pin, uint8_t func_num)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    uint32_t bit_offset = ((x->port % 2) * 16) + x->num;
+    uint32_t port_index = x->port >> 1;
+
+    if (func_num < PINMUX_FUNC1 || func_num > PINMUX_FUNC4) {
+        return false;
+    }
+
+    for (uint8_t i = PINMUX_FUNC1; i <= PINMUX_FUNC4; i++) {
+        uint32_t func_val = SYSC_APP_AWO->IO_FUNC[i][port_index] & (1 << bit_offset);
+        if (i == func_num) {
+            if (func_val == 0) {
+                return false;
+            }
+        } else {
+            if (func_val != 0) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 void per_func_disable(uint8_t pin, uint8_t func_num)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -853,6 +879,24 @@ bool per_func0_alt_check(uint8_t pin, uint8_t alt)
 
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt)
 {
+    if (is_per_func_enable(pin, func)) {
+        if (func == per_func_get(pin)) {
+            switch(func) {
+            case PINMUX_FUNC1:
+                if (per_func0_alt_get(pin) == func0_alt) {
+                    return;
+                }
+                break;
+            case PINMUX_FUNC2:
+            case PINMUX_FUNC3:
+            case PINMUX_FUNC4:
+                return;
+                break;
+            default:
+                break;
+            }
+        }
+    }
     if ((func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END)) {
         per_func0_set(pin, 0);
         per_func_disable_all(pin);
