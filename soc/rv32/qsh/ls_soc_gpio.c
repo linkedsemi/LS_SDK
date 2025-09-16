@@ -550,18 +550,29 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    bool bit0 = drive & 0x1;
-    bool bit1 = (drive & 0x2) >> 1;
 
-    MODIFY_REG(APP_PMU->IO_CFG[x->port].DS1_DS0, ((1 << APP_PMU_RG_GPIOK_DS1_POS) | 1) << x->num, ((bit1 << APP_PMU_RG_GPIOK_DS1_POS) | (bit0)) << x->num);
+    bool bit0 = drive & 0x1;
+    bool bit1 = (drive >> 1) & 0x1;
+    bool bit2 = (drive >> 2) & 0x1;
+
+    if (bit2 && ((pin < PM04) || (pin > PM15))) {
+        while(1);
+    }
+
+    MODIFY_REG(APP_PMU->IO_CFG[x->port].DS1_DS0, ((1 << x->num << 16)) | 1 << x->num, (bit1 << x->num << 16) | (bit0 << x->num));
+    MODIFY_REG(APP_PMU->IO_CFG[x->port].AE_DS2, 1 << x->num, (bit2 << x->num));
 }
 
-// io_drive_type_t io_drive_capacity_read(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     uint32_t tmp = READ_REG(PMU->IO[x->port].DS);
-//     return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
-// }
+io_drive_type_t io_drive_capacity_read(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+
+    bool bit0 = (READ_REG(APP_PMU->IO_CFG[x->port].DS1_DS0) >> x->num) & 0x1;
+    bool bit1 = (READ_REG(APP_PMU->IO_CFG[x->port].DS1_DS0) >> x->num >> 16) & 0x1;
+    bool bit2 = (READ_REG(APP_PMU->IO_CFG[x->port].AE_DS2) >> x->num) & 0x1;
+
+    return (bit0 | (bit1 << 1) | (bit2 << 2));
+}
 
 void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
 {
