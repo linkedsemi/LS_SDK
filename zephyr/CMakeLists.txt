@@ -300,6 +300,8 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/ls_hal_sm4.c
     ../hal_driver/src/ls_hal_crypt.c
     ../hal_driver/src/ls_hal_otbn.c
+    ../hal_driver/src/otbn/ls_otbn_ecc.c
+    ../hal_driver/src/otbn/text_array/otbn_text.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha256.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha384.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha512.c
