@@ -48,6 +48,5 @@ void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
     SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_SET_QSPI_N_MASK;
     __NOP(); __NOP();
     SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_QSPI_MASK;
-    qspiv2_global_int_ctrl_fn_init();
 }
 #endif
