@@ -31,7 +31,13 @@ ROM_SYMBOL void sw_fifo_flush(struct fifo_env *ptr)
 
 ROM_SYMBOL uint16_t sw_fifo_element_amount(struct fifo_env *ptr)
 {
-    return abs(ptr->wr_idx-ptr->rd_idx);
+    if(ptr->wr_idx>=ptr->rd_idx)
+    {
+        return ptr->wr_idx-ptr->rd_idx;
+    }else
+    {
+        return 2*ptr->length+ptr->wr_idx-ptr->rd_idx;
+    }
 }
 
 ROM_SYMBOL LL_PKT_ISR bool general_fifo_put(struct fifo_env *ptr,void *data)
