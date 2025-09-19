@@ -12,7 +12,9 @@ void ls_assert(const char *expr,const char *file,int line)
 //    iob_output_set(2);
 //    *(uint32_t *)0x50020020 = 0;
 //    *(uint32_t *)0x5002003c = 0;
+#if !defined(KERNEL)
     LOG_RAW("Assertion Failed: file %s, line %d, %s\n",file,line,expr);
+#endif
     while(1);
 }
 
