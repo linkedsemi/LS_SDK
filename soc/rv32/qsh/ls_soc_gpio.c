@@ -849,6 +849,11 @@ void per_func_disable_all(uint8_t pin)
     }
 }
 
+bool is_per_func_valid(uint8_t func)
+{
+    return (func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END);
+}
+
 int per_func_get(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -911,7 +916,6 @@ void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt)
     if ((func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END)) {
         per_func0_set(pin, 0);
         per_func_disable_all(pin);
-        gpio_ana_deinit(pin);
         per_func_enable(pin, func);
         if (PINMUX_FUNC1 == func) {
             per_func0_set(pin, func0_alt);
