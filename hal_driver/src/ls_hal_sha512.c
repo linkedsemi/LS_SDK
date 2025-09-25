@@ -32,7 +32,7 @@ HAL_StatusTypeDef HAL_SHA512_DeInit(void)
 
 static void block_calculate(uint32_t addr, uint32_t block_number)
 {
-    LOG_HEX((uint8_t *)addr, block_number * 0x80);
+    /* LOG_HEX((uint8_t *)addr, block_number * 0x80); */
     while ((SHA512->STATUS & 0x1) != 0x1) ;
     REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_BLOCK_NUM, (block_number - 1));
     SHA512->ADDR = addr;
