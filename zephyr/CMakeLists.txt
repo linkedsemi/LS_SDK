@@ -379,3 +379,53 @@ if(CONFIG_SOC_LSQSH)
   )
 
 endif()
+
+if(CONFIG_SOC_LSRAPTOR_E906)
+  zephyr_include_directories(
+    . 
+    ../soc
+    ../soc/rv32
+    ../hal_driver/inc
+    ../hal_driver/api
+    ../module/common
+    # ../module/crc
+    ../module/debug
+    ../module/debug/RTT
+    # ../module/static_buffer
+    # ../module/tinyfs
+    # ../module/tinycrypt/lib/include
+  )
+
+  zephyr_library_include_directories(
+        # .
+        # ../soc
+        # ../soc/rv32
+        # ../soc/rv32/leo
+        #'module/calendar
+        ../module/common
+        ../module/crc
+        ../module/debug
+        ../module/debug/RTT
+        ../module/static_buffer
+        # ../module/tinyfs
+        # ../module/tinycrypt/lib/include
+        #'module/micro-ecc
+        #'module/adpcm
+        #'module/ble
+        #'module/ble/prf
+  )
+
+  # zephyr_library_sources(
+
+  #   # ../soc/rv32/int_call_asm.S
+  # )
+
+  # zephyr_link_libraries(
+
+  # )
+  
+  zephyr_compile_definitions(RAPTOR)
+  zephyr_compile_definitions(GLOBAL_OUTPUT_LVL=0)
+
+  # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
+endif()
