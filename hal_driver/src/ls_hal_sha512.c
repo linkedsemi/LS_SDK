@@ -34,20 +34,21 @@ static void block_calculate(uint32_t addr, uint32_t block_number)
 {
     LOG_HEX((uint8_t *)addr, block_number * 0x80);
     while ((SHA512->STATUS & 0x1) != 0x1) ;
-    SHA512->CTRL |= (block_number - 1) << 16;  
+    REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_BLOCK_NUM, (block_number - 1));
     SHA512->ADDR = addr;
     LS_ASSERT(((uint32_t)addr % 32) == 0);
     csi_dcache_clean_range((uint32_t *)addr, block_number*SHA512_BLOCK_SIZE);
 
     if (isFirst)
     {
-        SHA512->CTRL |= 0x3;
+        REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_INIT_CALC, 1);
+        REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_START, 1);
         isFirst = false;
     }
     else
     {
         REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_INIT_CALC ,0);
-        SHA512->CTRL |= 0x2;
+        REG_FIELD_WR(SHA512->CTRL, SHA512_CTRL_START, 1);
     }
 
     while ((SHA512->STATUS & 0x8) != 0x8);
