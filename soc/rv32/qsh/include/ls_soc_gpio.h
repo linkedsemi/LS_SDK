@@ -282,6 +282,9 @@ bool is_per_func_valid(uint8_t func);
 void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge);
 void gpio_ana_init(uint8_t pin);
 void gpio_ana_deinit(uint8_t pin);
+void io_sl_st_init(uint8_t pin);
+void io_filter_enable(uint8_t pin);
+void io_filter_disable(uint8_t pin);
 
 #ifdef __cplusplus
 }
