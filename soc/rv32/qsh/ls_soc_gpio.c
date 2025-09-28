@@ -747,6 +747,24 @@ void io_func_cfg_lock(uint8_t pin, bool lock)
     }
 }
 
+void io_sl_st_init(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].SL_ST |= 1<<x->num;
+}
+
+void io_filter_enable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].OD_FIR |= 1<<x->num;
+}
+
+void io_filter_disable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].OD_FIR &= ~(1<<16<<x->num);
+}
+
 // void io_v33_exti_config(uint8_t pin,exti_edge_t edge)
 // {
 //     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
