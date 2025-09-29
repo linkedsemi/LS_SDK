@@ -61,15 +61,12 @@ static void aes_config(bool iv_en,bool cbc,bool enc,bool ie)
 
 static inline uint32_t get_uint32_t(const uint8_t *data)
 {
-    return data[0]<<24|data[1]<<16|data[2]<<8|data[3];
+    return __builtin_bswap32(*(const uint32_t *)data);
 }
 
 static inline void set_uint32_t(uint32_t src,uint8_t *dst)
 {
-    *dst++ = src>>24;
-    *dst++ = src>>16;
-    *dst++ = src>>8;
-    *dst++ = src;
+    *(uint32_t *)dst = __builtin_bswap32(src);
 }
 
 static void block_data_in(const uint8_t *in)
