@@ -308,6 +308,8 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/otbn/ls_hal_otbn_ecc256.c
     ../hal_driver/src/otbn/ls_hal_otbn_ecc384.c
     ../hal_driver/src/otbn/ls_hal_otbn_sm2.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sm3.c
+    ../hal_driver/src/otbn/text_array/sm3_text.c
     ../hal_driver/src/otbn/text_array/ecc256_base_mult_text.c
     ../hal_driver/src/otbn/text_array/ecc256_ecdsa_verify_text.c
     ../hal_driver/src/otbn/text_array/ecc256_scalar_mult_text.c

@@ -13,6 +13,7 @@ extern "C" {
 #define SHA384_RESULT_SIZE          (0x30)
 #define SHA512_RESULT_SIZE          (0x40)
 
+#define SM3_BLOCK_SIZE              (0x40)
 #define SHA256_BLOCK_SIZE           (0x40)
 #define SHA384_BLOCK_SIZE           (0x80)
 #define SHA512_BLOCK_SIZE           (0x80)
@@ -52,6 +53,11 @@ bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
                           uint8_t *info, uint32_t info_len,
                           uint8_t *okm, uint32_t okm_len);
+
+
+void HAL_OTBN_SM3_Init();
+void HAL_OTBN_SM3_Final(uint8_t result[0x20]);
+void HAL_OTBN_SM3_Update(uint8_t *msg, uint32_t length);
 
 
 #ifdef __cplusplus
