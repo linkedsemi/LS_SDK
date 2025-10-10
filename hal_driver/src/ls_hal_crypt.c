@@ -427,14 +427,12 @@ static void aes_ctr_enc(uint8_t *cnt)
 {
     uint32_t i,length;
     uint8_t result[AES_BLOCK_SIZE];
-    uint8_t flag[AES_BLOCK_SIZE];
     uint8_t initial_cnt[AES_BLOCK_SIZE];
     memcpy(initial_cnt, cnt, AES_BLOCK_SIZE);
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, false, true, false);
     do
     {
-        memset(flag, 0, AES_BLOCK_SIZE);
         block_data_in(cnt);
         REG_FIELD_WR(LSCRYPT->CR,CRYPT_GO,1);
         while (REG_FIELD_RD(LSCRYPT->SR, CRYPT_AESRIF) == 0);
