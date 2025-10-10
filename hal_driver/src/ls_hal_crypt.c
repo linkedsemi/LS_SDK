@@ -428,7 +428,8 @@ static void aes_ctr_enc(uint8_t *cnt)
     uint32_t i,length;
     uint8_t result[AES_BLOCK_SIZE];
     uint8_t flag[AES_BLOCK_SIZE];
-
+    uint8_t initial_cnt[AES_BLOCK_SIZE];
+    memcpy(initial_cnt, cnt, AES_BLOCK_SIZE);
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, false, true, false);
     do
@@ -445,19 +446,16 @@ static void aes_ctr_enc(uint8_t *cnt)
             *current_out++ = result[i] ^ *current_in++;
         }
         length_residue -= length;
-        if (++cnt[AES_BLOCK_SIZE - 1] == 0x00)
-            flag[AES_BLOCK_SIZE - 2] = true;
-        for (i = AES_BLOCK_SIZE - 1; i > 0; i--)
+        i = AES_BLOCK_SIZE - 1;
+        if(++cnt[i] == 0x0) // Check LSB overflow
         {
-            if (flag[i])
+            while((cnt[i] == 0x0) && (i>0)) // Inner logic loop: keeps propagating carry IF the current byte is 0
             {
-                if (++cnt[i] == 0x00)
-                    flag[i - 1] = true;
+                ++cnt[--i];
             }
         }
-        if (flag[0])
-            cnt[0]++;
     } while (length_residue);
+    memcpy(cnt, initial_cnt, AES_BLOCK_SIZE);
 }
 
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out)
