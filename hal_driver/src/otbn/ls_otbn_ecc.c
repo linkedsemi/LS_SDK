@@ -10,9 +10,9 @@
 #include "reg_sysc_sec_cpu.h"
 #include "qsh.h"
 
-static ls_otbn_curve_id cur_curve = LS_OTBN_CURVE_MAX;
+static ls_otbn_fireware_t cur_curve = OTBN_UNUSED;
 
-int ls_otbn_load_curve_fireware(ls_otbn_curve_id curve_id)
+int ls_otbn_load_curve_fireware(ls_otbn_fireware_t curve_id)
 {
     int err = 0;
     
@@ -35,21 +35,21 @@ int ls_otbn_load_curve_fireware(ls_otbn_curve_id curve_id)
 
     switch (curve_id)
     {
-    case LS_OTBN_CURVE_ECC_P256:
+    case OTBN_ECDSA_P256:
         imem_size = LS_OTBN_ECDSA_P256_IMEM_SIZE;
         dmem_size = LS_OTBN_ECDSA_P256_DMEM_SIZE;
         dmem_end = LS_OTBN_ECDSA_P256_DMEM_END;
         imem_image = (uint32_t *)p256_imem;
         dmem_image = (uint32_t *)p256_dmem;
         break;
-    case LS_OTBN_CURVE_ECC_P384:
+    case OTBN_ECDSA_P384:
         imem_size = LS_OTBN_ECDSA_P384_IMEM_SIZE;
         dmem_size = LS_OTBN_ECDSA_P384_DMEM_SIZE;
         dmem_end = LS_OTBN_ECDSA_P384_DMEM_END;
         imem_image = (uint32_t *)p384_imem;
         dmem_image = (uint32_t *)p384_dmem;
         break;
-    case LS_OTBN_CURVE_SM2:
+    case OTBN_SM2:
         imem_size = LS_OTBN_SM2_IMEM_SIZE;
         dmem_size = LS_OTBN_SM2_DMEM_SIZE;
         dmem_end = LS_OTBN_SM2_DMEM_END;
@@ -66,11 +66,11 @@ int ls_otbn_load_curve_fireware(ls_otbn_curve_id curve_id)
     return err;
 }
 
-int get_curve_otbn_info(ls_otbn_curve_id curve, ecc_remote_addr *info)
+int get_curve_otbn_info(ls_otbn_fireware_t curve, ecc_remote_addr *info)
 {
     switch (curve)
     {
-    case LS_OTBN_CURVE_ECC_P256:
+    case OTBN_ECDSA_P256:
         info->remote_random_addr = LS_OTBN_ECDSA_P256_RANDOM_SEED_OFFSET;
         info->remote_mode_addr = LS_OTBN_ECDSA_P256_MODE_OFFSET;
         info->remote_addr_d0 = LS_OTBN_ECDSA_P256_D0_OFFSET;
@@ -84,7 +84,7 @@ int get_curve_otbn_info(ls_otbn_curve_id curve, ecc_remote_addr *info)
         info->curve_size = 32;
         break;
     
-    case LS_OTBN_CURVE_ECC_P384:
+    case OTBN_ECDSA_P384:
         info->remote_random_addr = LS_OTBN_ECDSA_P384_RANDOM_SEED_OFFSET;
         info->remote_mode_addr = LS_OTBN_ECDSA_P384_MODE_OFFSET;
         info->remote_addr_d0 = LS_OTBN_ECDSA_P384_D0_OFFSET;
@@ -98,7 +98,7 @@ int get_curve_otbn_info(ls_otbn_curve_id curve, ecc_remote_addr *info)
         info->curve_size = 48;
         break;
 
-    case LS_OTBN_CURVE_SM2:
+    case OTBN_SM2:
         info->remote_random_addr = LS_OTBN_SM2_RANDOM_SEED_OFFSET;
         info->remote_mode_addr = LS_OTBN_SM2_MODE_OFFSET;
         info->remote_addr_d0 = LS_OTBN_SM2_D0_OFFSET;

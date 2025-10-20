@@ -21,14 +21,12 @@ static const uint32_t state_init[8] = {
 };
 static uint32_t currnt_state[8];
 
-static uint32_t sha_idx;
-static uint32_t totash_sm3_msg_chunks;
 static uint32_t totash_sm3_msg_total_len;
 static uint32_t remain_len;
 static uint8_t remain_data[SM3_BLOCK_SIZE];
 void HAL_OTBN_SM3_Init()
 {
-    totash_sm3_msg_chunks = 0;
+    totash_sm3_msg_total_len = 0;
     remain_len = 0;
     // sha_idx = SM3_DMEM_MSG_OFFSET;
     HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
@@ -120,7 +118,6 @@ void HAL_OTBN_SM3_Final(uint8_t result[0x20])
     }
     sm3_msg_write(remain_data,1);
 
-    uint32_t rs[8];
     for (uint8_t i = 0; i < 8; i++)
     {
         *result++ = (uint8_t)(currnt_state[7 - i] >> 24);
@@ -128,6 +125,8 @@ void HAL_OTBN_SM3_Final(uint8_t result[0x20])
         *result++ = (uint8_t)(currnt_state[7 - i] >> 8);
         *result++ = (uint8_t)(currnt_state[7 - i] >> 0);
     }
+    totash_sm3_msg_total_len = 0;
+    remain_len = 0;
     // memcpy32(currnt_state,state_init,32);
     // HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
 }
