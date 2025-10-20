@@ -2,6 +2,24 @@
 #define REG_CAP_TYPE_H_
 #include <stdint.h>
 
+#if defined(CONFIG_CAP_V2)
+typedef struct {
+    volatile uint32_t RESERVED0[1];         /* 0x00 */
+    volatile uint32_t CAP_PRE_DIV;          /* 0x04 */
+    volatile uint32_t CAP_CNT_EN;           /* 0x08 */
+    volatile uint32_t RESERVED1[1];         /* 0x0C */
+    volatile uint32_t INTR1_MSK;            /* 0x10 */
+    volatile uint32_t INTR1_CLR;            /* 0x14 */
+    volatile uint32_t INTR1_STT;            /* 0x18 */
+    volatile uint32_t INTR1_RAW;            /* 0x1C */
+    volatile uint32_t INTR2_MSK;            /* 0x20 */
+    volatile uint32_t INTR2_CLR;            /* 0x24 */
+    volatile uint32_t INTR2_STT;            /* 0x28 */
+    volatile uint32_t INTR2_RAW;            /* 0x2C */
+    volatile uint32_t CAP_CTRL[16];         /* 0x30 .. 0x6C */
+    volatile uint32_t CAP_COUNT[32];        /* 0x70 .. 0xEC */
+} reg_cap_t;
+#else
 typedef struct
 {
     volatile uint32_t RESERVED0[1];         //0x00
@@ -15,7 +33,9 @@ typedef struct
     volatile uint32_t CAP_CTRL[8];          //0x20 0x24 0x28 0x2c 0x30 0x34 0x38 0x3c
     volatile uint32_t CAP_COUNT[16];        //0x40 0x44 0x48 0x4C 0x50 0x54 0x58 0x5C 0x60 0x64 0x68 0x6C 0x70 0x74 0x78 0x7C
 }reg_cap_t;
-   
+
+#endif
+
 enum CAP_REG_CAP_CTRL_FIELD
 {
     CAP_EN_MASK = (int)0x1,

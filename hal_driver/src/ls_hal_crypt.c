@@ -66,15 +66,12 @@ static void aes_config(bool iv_en,bool cbc,bool enc,bool ie)
 
 static inline uint32_t get_uint32_t(const uint8_t *data)
 {
-    return data[0]<<24|data[1]<<16|data[2]<<8|data[3];
+    return __builtin_bswap32(*(const uint32_t *)data);
 }
 
 static inline void set_uint32_t(uint32_t src,uint8_t *dst)
 {
-    *dst++ = src>>24;
-    *dst++ = src>>16;
-    *dst++ = src>>8;
-    *dst++ = src;
+    *(uint32_t *)dst = __builtin_bswap32(src);
 }
 
 static void block_data_in(const uint8_t *in)
@@ -430,13 +427,12 @@ static void aes_ctr_enc(uint8_t *cnt)
 {
     uint32_t i,length;
     uint8_t result[AES_BLOCK_SIZE];
-    uint8_t flag[AES_BLOCK_SIZE];
-
+    uint8_t initial_cnt[AES_BLOCK_SIZE];
+    memcpy(initial_cnt, cnt, AES_BLOCK_SIZE);
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, false, true, false);
     do
     {
-        memset(flag, 0, AES_BLOCK_SIZE);
         block_data_in(cnt);
         REG_FIELD_WR(LSCRYPT->CR,CRYPT_GO,1);
         while (REG_FIELD_RD(LSCRYPT->SR, CRYPT_AESRIF) == 0);
@@ -448,19 +444,16 @@ static void aes_ctr_enc(uint8_t *cnt)
             *current_out++ = result[i] ^ *current_in++;
         }
         length_residue -= length;
-        if (++cnt[AES_BLOCK_SIZE - 1] == 0x00)
-            flag[AES_BLOCK_SIZE - 2] = true;
-        for (i = AES_BLOCK_SIZE - 1; i > 0; i--)
+        i = AES_BLOCK_SIZE - 1;
+        if(++cnt[i] == 0x0) // Check LSB overflow
         {
-            if (flag[i])
+            while((cnt[i] == 0x0) && (i>0)) // Inner logic loop: keeps propagating carry IF the current byte is 0
             {
-                if (++cnt[i] == 0x00)
-                    flag[i - 1] = true;
+                ++cnt[--i];
             }
         }
-        if (flag[0])
-            cnt[0]++;
     } while (length_residue);
+    memcpy(cnt, initial_cnt, AES_BLOCK_SIZE);
 }
 
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out)

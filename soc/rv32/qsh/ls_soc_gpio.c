@@ -550,18 +550,29 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    bool bit0 = drive & 0x1;
-    bool bit1 = (drive & 0x2) >> 1;
 
-    MODIFY_REG(APP_PMU->IO_CFG[x->port].DS1_DS0, ((1 << APP_PMU_RG_GPIOK_DS1_POS) | 1) << x->num, ((bit1 << APP_PMU_RG_GPIOK_DS1_POS) | (bit0)) << x->num);
+    bool bit0 = drive & 0x1;
+    bool bit1 = (drive >> 1) & 0x1;
+    bool bit2 = (drive >> 2) & 0x1;
+
+    if (bit2 && ((pin < PM04) || (pin > PM15))) {
+        while(1);
+    }
+
+    MODIFY_REG(APP_PMU->IO_CFG[x->port].DS1_DS0, ((1 << x->num << 16)) | 1 << x->num, (bit1 << x->num << 16) | (bit0 << x->num));
+    MODIFY_REG(APP_PMU->IO_CFG[x->port].AE_DS2, 1 << x->num, (bit2 << x->num));
 }
 
-// io_drive_type_t io_drive_capacity_read(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     uint32_t tmp = READ_REG(PMU->IO[x->port].DS);
-//     return ((tmp & (0x1 <<x->num))?0x1:0) | ((tmp & (0x1 <<(x->num+16)))?0x2:0);
-// }
+io_drive_type_t io_drive_capacity_read(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+
+    bool bit0 = (READ_REG(APP_PMU->IO_CFG[x->port].DS1_DS0) >> x->num) & 0x1;
+    bool bit1 = (READ_REG(APP_PMU->IO_CFG[x->port].DS1_DS0) >> x->num >> 16) & 0x1;
+    bool bit2 = (READ_REG(APP_PMU->IO_CFG[x->port].AE_DS2) >> x->num) & 0x1;
+
+    return (bit0 | (bit1 << 1) | (bit2 << 2));
+}
 
 void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge)
 {
@@ -736,6 +747,24 @@ void io_func_cfg_lock(uint8_t pin, bool lock)
     }
 }
 
+void io_sl_st_init(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].SL_ST |= 1<<x->num;
+}
+
+void io_filter_enable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].OD_FIR |= 1<<x->num;
+}
+
+void io_filter_disable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].OD_FIR &= ~(1<<16<<x->num);
+}
+
 // void io_v33_exti_config(uint8_t pin,exti_edge_t edge)
 // {
 //     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -838,6 +867,11 @@ void per_func_disable_all(uint8_t pin)
     }
 }
 
+bool is_per_func_valid(uint8_t func)
+{
+    return (func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END);
+}
+
 int per_func_get(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -900,7 +934,6 @@ void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt)
     if ((func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END)) {
         per_func0_set(pin, 0);
         per_func_disable_all(pin);
-        gpio_ana_deinit(pin);
         per_func_enable(pin, func);
         if (PINMUX_FUNC1 == func) {
             per_func0_set(pin, func0_alt);
