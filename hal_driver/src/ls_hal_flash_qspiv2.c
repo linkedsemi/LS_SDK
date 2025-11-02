@@ -139,10 +139,10 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_continuous_mode_start,struct hal_flas
     uint32_t cpu_stat = enter_critical();
     if(env->dual_mode_only)
     {
-        hal_flashx_dual_continuous_mode_enter(env->reg,env->addr4b);
+        hal_flashx_dual_continuous_mode_enter(env->reg,false);
     }else
     {
-        hal_flashx_quad_continuous_mode_enter(env->reg,env->addr4b);
+        hal_flashx_quad_continuous_mode_enter(env->reg,false);
     }
     env->continuous_mode_on = true;
     exit_critical(cpu_stat);
@@ -158,10 +158,10 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_continuous_mode_stop,struct hal_flash
     uint32_t cpu_stat = enter_critical();
     if(env->dual_mode_only)
     {
-        hal_flashx_dual_continuous_mode_exit(env->reg,env->addr4b);
+        hal_flashx_dual_continuous_mode_exit(env->reg,false);
     }else
     {
-        hal_flashx_quad_continuous_mode_exit(env->reg,env->addr4b);
+        hal_flashx_quad_continuous_mode_exit(env->reg,false);
     }
     env->continuous_mode_on = false;
     exit_critical(cpu_stat);
