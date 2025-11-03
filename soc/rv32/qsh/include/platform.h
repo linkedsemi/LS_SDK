@@ -2,6 +2,7 @@
 #define PLATFORM_H_
 #include <stdint.h>
 #include <stdbool.h>
+#include <errno.h>
 #include "field_manipulate.h"
 #include "sdk_config.h"
 #include "core_rv32.h"
@@ -143,6 +144,94 @@ __ALWAYS_STATIC_INLINE void app_cpu_reset_hold_set(void)
 __ALWAYS_STATIC_INLINE bool is_app_cpu_running(void)
 {
     return (SYSC_SEC_CPU->APP_CPU_SRST > 0);
+}
+
+static inline int soc_eth_tx_delay_set(uint32_t addr, uint8_t delay)
+{
+    int ret = 0;
+
+    switch (addr) {
+    case APP_ETH1_ADDR:
+        REG_FIELD_WR(SYSC_APP_CPU->ETH1_PHY_CTRL, SYSC_APP_CPU_ETH1_RGMII_TX_DELAY_SEL, delay);
+        break;
+    case APP_ETH2_ADDR:
+        REG_FIELD_WR(SYSC_APP_CPU->ETH2_PHY_CTRL, SYSC_APP_CPU_ETH2_RGMII_TX_DELAY_SEL, delay);
+        break;
+    default:
+        ret = -EINVAL;
+        break;
+    }
+
+    return ret;
+}
+
+static inline int soc_eth_rx_delay_set(uint32_t addr, uint8_t delay)
+{
+    int ret = 0;
+
+    switch (addr) {
+    case APP_ETH1_ADDR:
+        REG_FIELD_WR(SYSC_APP_CPU->ETH1_PHY_CTRL, SYSC_APP_CPU_ETH1_RGMII_RX_DELAY_SEL, delay);
+        break;
+    case APP_ETH2_ADDR:
+        REG_FIELD_WR(SYSC_APP_CPU->ETH2_PHY_CTRL, SYSC_APP_CPU_ETH2_RGMII_RX_DELAY_SEL, delay);
+        break;
+    default:
+        ret = -EINVAL;
+        break;
+    }
+
+    return ret;
+}
+
+static inline int soc_eth_tx_delay_get(uint32_t addr, uint8_t *delay)
+{
+    int ret = 0;
+
+    if (NULL == delay) {
+        ret = -EINVAL;
+        goto error;
+    }
+
+    switch (addr) {
+    case APP_ETH1_ADDR:
+        *delay = REG_FIELD_RD(SYSC_APP_CPU->ETH1_PHY_CTRL, SYSC_APP_CPU_ETH1_RGMII_TX_DELAY_SEL);
+        break;
+    case APP_ETH2_ADDR:
+        *delay = REG_FIELD_RD(SYSC_APP_CPU->ETH2_PHY_CTRL, SYSC_APP_CPU_ETH2_RGMII_TX_DELAY_SEL);
+        break;
+    default:
+        ret = -EINVAL;
+        break;
+    }
+
+error:
+    return ret;
+}
+
+static inline int soc_eth_rx_delay_get(uint32_t addr, uint8_t *delay)
+{
+    int ret = 0;
+
+    if (NULL == delay) {
+        ret = -EINVAL;
+        goto error;
+    }
+
+    switch (addr) {
+    case APP_ETH1_ADDR:
+        *delay = REG_FIELD_RD(SYSC_APP_CPU->ETH1_PHY_CTRL, SYSC_APP_CPU_ETH1_RGMII_RX_DELAY_SEL);
+        break;
+    case APP_ETH2_ADDR:
+        *delay = REG_FIELD_RD(SYSC_APP_CPU->ETH2_PHY_CTRL, SYSC_APP_CPU_ETH2_RGMII_RX_DELAY_SEL);
+        break;
+    default:
+        ret = -EINVAL;
+        break;
+    }
+
+error:
+    return ret;
 }
 
 __ALWAYS_STATIC_INLINE void ls_clock_control_on(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
