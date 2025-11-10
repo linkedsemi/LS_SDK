@@ -17,6 +17,11 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_init,struct hal_flash_env *env)
     }
 }
 
+bool hal_flashx_inited(struct hal_flash_env *env)
+{
+    return lsqspiv2_direct_read_mode(env->reg);
+}
+
 static void XIP_BANNED_FUNC(hal_flashx_quad_continuous_mode_enter,reg_lsqspiv2_t *reg,bool addr4b)
 {
     uint8_t dummy;

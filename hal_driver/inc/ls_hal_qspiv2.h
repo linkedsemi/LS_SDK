@@ -62,6 +62,8 @@ void lsqspiv2_stg_read_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data
 
 void lsqspiv2_stg_write_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
 
+static inline bool lsqspiv2_direct_read_mode(reg_lsqspiv2_t *reg){return reg->QSPI_CTRL1&LSQSPIV2_MODE_DAC_MASK?true:false;}
+
 #if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void lsqspiv2_stg_read_write(reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *);
 __attribute__((long_call)) void lsqspiv2_stg_write_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
