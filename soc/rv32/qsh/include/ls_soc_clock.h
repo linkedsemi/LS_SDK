@@ -112,6 +112,7 @@
 #define IOPMP_CLOCK      GEN_CLOCK(IOPMP)
 #define QSPI1_CLOCK      GEN_CLOCK(QSPI1)
 #define SHA512_CLOCK     GEN_CLOCK(SHA512)
+#define OTFAD_AES_CLOCK  GEN_CLOCK(OTFAD_AES)
 #define CALC_CRC_CLOCK   GEN_CLOCK(CALC_CRC)
 #define CALC_CLOCK       GEN_CLOCK(CALC)
 #define CRYPT_CLOCK      GEN_CLOCK(CRYPT)
@@ -263,6 +264,7 @@
 #define IOPMP_CLK_BASE      sysc_sec_cpu
 #define QSPI1_CLK_BASE      sysc_sec_cpu
 #define SHA512_CLK_BASE     sysc_sec_cpu
+#define OTFAD_AES_CLK_BASE  sysc_sec_cpu
 #define CALC_CRC_CLK_BASE   sysc_sec_cpu
 #define CALC_CLK_BASE       sysc_sec_cpu
 #define CRYPT_CLK_BASE      sysc_sec_cpu
@@ -397,6 +399,7 @@
 #define IOPMP_CLK_REG      PD_CPU_CLKG0_CLK_REG
 #define QSPI1_CLK_REG      PD_CPU_CLKG0_CLK_REG
 #define SHA512_CLK_REG     PD_CPU_CLKG0_CLK_REG
+#define OTFAD_AES_CLK_REG  PD_CPU_CLKG0_CLK_REG
 #define CALC_CRC_CLK_REG   PD_CPU_CLKG1_CLK_REG
 #define CALC_CLK_REG       PD_CPU_CLKG1_CLK_REG
 #define CRYPT_CLK_REG      PD_CPU_CLKG1_CLK_REG
@@ -831,6 +834,10 @@
 #define SHA512_CLK_SET_POS     8
 #define SHA512_CLK_CLR_MASK    0x200
 #define SHA512_CLK_CLR_POS     9
+#define OTFAD_AES_CLK_SET_MASK 0x400
+#define OTFAD_AES_CLK_SET_POS  10
+#define OTFAD_AES_CLK_CLR_MASK 0x800
+#define OTFAD_AES_CLK_CLR_POS  11
 #define CALC_CRC_CLK_SET_MASK  0x1
 #define CALC_CRC_CLK_SET_POS   0
 #define CALC_CRC_CLK_CLR_MASK  0x2
