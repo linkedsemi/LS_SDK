@@ -346,6 +346,8 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32/qsh/ls_msp_crypt.c
     ../soc/rv32/qsh/ls_msp_sha.c
     ../soc/rv32/qsh/ls_msp_sm4.c
+    ../hal_driver/src/ls_hal_otp_ctrl.c
+    ../soc/rv32/qsh/ls_msp_otp_ctrl.c
   )
 
   zephyr_linker_sources(
