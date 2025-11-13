@@ -183,6 +183,10 @@ typedef struct {
 #define CLIC_CLICCFG_NMBIT_Pos                 5U                                    /*!< CLIC CLICCFG: NMBIT Position */
 #define CLIC_CLICCFG_NMBIT_Msk                 (0x3UL << CLIC_CLICCFG_NMBIT_Pos)     /*!< CLIC CLICCFG: NMBIT Mask */
 
+#define CLIC_INTATTR_TRIG_LEVEL                0U
+#define CLIC_INTATTR_TRIG_EDGE_RISING          1U
+#define CLIC_INTATTR_TRIG_EDGE_FALLING         3U
+
 /*@} end of group CSI_CLIC */
 
 /**
