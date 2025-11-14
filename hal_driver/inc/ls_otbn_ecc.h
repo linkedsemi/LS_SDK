@@ -48,9 +48,9 @@ extern const uint8_t p256_dmem[224];
 #define LS_OTBN_ECDSA_P256_MODE_KEYGEN        0x000003d4
 #define LS_OTBN_ECDSA_P256_MODE_SHARED_KEY    0x000005ec
 
-extern const uint8_t p384_imem[5572];
+extern const uint8_t p384_imem[5556];
 extern const uint8_t p384_dmem[1152];
-#define LS_OTBN_ECDSA_P384_IMEM_SIZE    5572
+#define LS_OTBN_ECDSA_P384_IMEM_SIZE    5556
 #define LS_OTBN_ECDSA_P384_DMEM_SIZE    1152
 #define LS_OTBN_ECDSA_P384_DMEM_END     0x00000c00
 /* random */
