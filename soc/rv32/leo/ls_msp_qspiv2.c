@@ -26,8 +26,8 @@ void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 }
 #else
 
-const uint32_t (*qspiv2_global_int_disable_fn)() = enter_critical;
-const void (*qspiv2_global_int_restore_fn)(uint32_t) = exit_critical;
+uint32_t (*qspiv2_global_int_disable_fn)() = enter_critical;
+void (*qspiv2_global_int_restore_fn)(uint32_t) = exit_critical;
 
 void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 {
