@@ -120,11 +120,9 @@ static void flash_swint_init()
     csi_vic_enable_irq(FLASH_SWINT_NUM);
 }
 
-void qspiv2_global_int_ctrl_fn_init();
 void sys_init_none()
 {
     clk_flash_init();
-    qspiv2_global_int_ctrl_fn_init();
     flash1.reg = LSQSPIV2;
     flash1.dual_mode_only = false;
     flash1.writing = false;
