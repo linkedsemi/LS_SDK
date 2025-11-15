@@ -6,10 +6,9 @@
 #include "cpu.h"
 #include "compile_flag.h"
 
-ROM_SYMBOL uint32_t (*qspiv2_global_int_disable_fn)();
-ROM_SYMBOL void (*qspiv2_global_int_restore_fn)(uint32_t);
-
 #if defined(BOOT_ROM)
+uint32_t (*qspiv2_global_int_disable_fn)();
+void (*qspiv2_global_int_restore_fn)(uint32_t);
 void qspiv2_global_int_dummy(){}
 void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 {
@@ -27,15 +26,8 @@ void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 }
 #else
 
-#if FLASH_PROG_ALGO==1
-void qspiv2_global_int_ctrl_fn_init(){}
-#else
-void qspiv2_global_int_ctrl_fn_init()
-{
-    qspiv2_global_int_disable_fn = enter_critical;
-    qspiv2_global_int_restore_fn = exit_critical;
-}
-#endif
+uint32_t (*qspiv2_global_int_disable_fn)() = enter_critical;
+void (*qspiv2_global_int_restore_fn)(uint32_t) = exit_critical;
 
 void XIP_BANNED_FUNC(lsqspiv2_msp_init,reg_lsqspiv2_t *reg)
 {
