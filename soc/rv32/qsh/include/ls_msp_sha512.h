@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #ifdef SEC_CALC_SHA512_ADDR
-#define SHA512 ((reg_sha512_t *)SEC_CALC_SHA512_ADDR)
+#define LS_SHA512 ((reg_sha512_t *)SEC_CALC_SHA512_ADDR)
 #endif
 
 void HAL_SHA512_MSP_Init(void);

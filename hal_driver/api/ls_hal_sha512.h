@@ -4,7 +4,7 @@
 #include "HAL_def.h"
 #include <stdbool.h>
 
-#define SHA512_BLOCK_SIZE           (0x80)
+#define LS_SHA512_BLOCK_SIZE           (0x80)
 
 void HAL_SHA512_SHA512_Init();
 void HAL_SHA384_SHA384_Init();
