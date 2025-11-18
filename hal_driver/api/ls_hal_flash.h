@@ -208,6 +208,9 @@ void hal_flashx_read_security_area(struct hal_flash_env *env,uint8_t idx,uint16_
 void hal_flashx_software_reset(struct hal_flash_env *env);
 
 /** \brief Check and Set Quad Enable Status */
+bool hal_flashx_qe_status_read(struct hal_flash_env *env);
+
+/** \brief Check and Set Quad Enable Status */
 void hal_flashx_qe_status_read_and_set(struct hal_flash_env *env);
 
 /** \brief Suspend Program or Erase Operation */
@@ -294,6 +297,8 @@ void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
 void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 
 void hal_flash_software_reset();
+
+bool hal_flash_qe_status_read();
 
 void hal_flash_qe_status_read_and_set();
 

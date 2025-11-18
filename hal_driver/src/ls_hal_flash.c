@@ -208,6 +208,13 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_erase_security_area,struct hal_flas
     hal_flashx_write_reg_operation(env,&param);
 }
 
+ROM_SYMBOL bool FLASH_API_SECTION(hal_flashx_qe_status_read,struct hal_flash_env *env)
+{
+    uint8_t status_reg[2];
+    hal_flashx_read_status_register_1(env,&status_reg[1]);
+    return (0x02 == (status_reg[1]&0x02));
+}
+
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_qe_status_read_and_set,struct hal_flash_env *env)
 {
     uint8_t status_reg[2];
@@ -353,6 +360,8 @@ void FLASH_API_SECTION(hal_flash_program_security_area,uint8_t idx,uint16_t addr
 void FLASH_API_SECTION(hal_flash_read_security_area,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length){hal_flashx_read_security_area(&flash1,idx,addr,data,length);}
 
 void XIP_BANNED_FUNC(hal_flash_software_reset){hal_flashx_software_reset(&flash1);}
+
+bool FLASH_API_SECTION(hal_flash_qe_status_read,){return hal_flashx_qe_status_read(&flash1);}
 
 void FLASH_API_SECTION(hal_flash_qe_status_read_and_set,){hal_flashx_qe_status_read_and_set(&flash1);}
 
