@@ -13,12 +13,14 @@ def usage():
     print("  -a, --address    execution address (hex)")
     print("  -i, --ifilename  input filename")
     print("  -o, --ofilename  output filename")
+    print("  -p, --padding    4KB size padding")
 
 _exe_addr = 0
 _ifilename = ""
 _ofilename = ""
+padding_flag = False
 
-opts, args = getopt.getopt(sys.argv[1:], 'hva:i:o:', ['help','version','address=','ifilename=','ofilename='])
+opts, args = getopt.getopt(sys.argv[1:], 'hva:i:o:p', ['help','version','address=','ifilename=','ofilename=','padding'])
 for opt_name, opt_value in opts:
     # print(opt_name)
     if opt_name in ('-h','--help'):
@@ -36,6 +38,9 @@ for opt_name, opt_value in opts:
     if opt_name in ('-o','--ofilename'):
         _ofilename = opt_value
         # print("output filename is ", _ofilename)
+    if opt_name in ('-p','--padding'):
+        padding_flag = True
+        # print("output filename is ", _ofilename)
 
 if not os.path.exists(_ifilename):
     print(sys.argv)
@@ -48,6 +53,8 @@ image_data = open(_ifilename,'rb').read()
 test_word0              = 0xa5a53c3c
 test_word1              = 0x5a5ac3c3
 offset                  = 0x100
+if padding_flag:
+    offset              = 0x1000
 length                  = len(image_data)
 version                 = 0x1
 decrypt_key_id          = 0
@@ -58,6 +65,8 @@ count                   = [0xFF] * 16
 realtime_decrypt_lock   = 0
 sign                    = [0xFF] * 64
 encrypt_key             = [0xFF] * 144
+if padding_flag:
+    padding             = [0xFF] * (0x1000 - 0x100)
 
 image_header  = struct.pack('5I', test_word0, test_word1, offset, length, version)
 image_header += struct.pack('4B', decrypt_key_id, public_key_id, kek_enable, realtime_decrypt_lock)
@@ -66,6 +75,8 @@ image_header += struct.pack('144B', *encrypt_key)
 image_header += struct.pack('64B', *sign)
 image_header += struct.pack('I', exe_addr)
 image_header += struct.pack('I', zlib.crc32(image_header))
+if padding_flag:
+    image_header += struct.pack('3840B', *padding)
 with open(_ofilename,'wb') as out:
     out.write(image_header)
     out.write(image_data)
