@@ -560,7 +560,6 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t
         *out++ = __builtin_bswap32(LSCRYPT->RES1);
         *out++ = __builtin_bswap32(LSCRYPT->RES0);
     }
-    return 0;
     return HAL_OK;
 }
 
