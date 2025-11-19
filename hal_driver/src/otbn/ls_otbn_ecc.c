@@ -22,17 +22,17 @@ int ls_otbn_load_curve_fireware(ls_otbn_fireware_t curve_id)
     uint32_t *dmem_image;
     uint32_t dmem_end;
 
+    if(!HAL_OTBN_In_Idle_State())
+    {
+        printf("The otbn is not in idle state,can not program otbn\n");
+        return -1;
+    }
+
     if(cur_curve == curve_id)
     {
         return 0;
     }
-
-    if(!HAL_OTBN_In_Idle_State())
-    {
-        //printf("The otbn is not in idle state,can not program otbn\r\n");
-        return -1;
-    }
-
+    cur_curve = curve_id;
     switch (curve_id)
     {
     case OTBN_ECDSA_P256:
@@ -57,8 +57,10 @@ int ls_otbn_load_curve_fireware(ls_otbn_fireware_t curve_id)
         dmem_image = (uint32_t *)sm2_dmem;
         break;
     default:
+        printf("ecc curve not suppoted!!\n");
         return -1;
     }
+    // printf("otbn load imem, curve_id: %d\n",curve_id);
     err |= HAL_OTBN_DMEM_Set(0, 0, dmem_end);
     err |= HAL_OTBN_IMEM_Write(0, imem_image, imem_size);
     err |= HAL_OTBN_DMEM_Write(0, dmem_image, dmem_size);
@@ -119,6 +121,7 @@ int get_curve_otbn_info(ls_otbn_fireware_t curve, ecc_remote_addr *info)
 
     if(ls_otbn_load_curve_fireware(curve) != 0)
     {
+        printf("otbn software config error\n"); 
         return -1;
     }
     
