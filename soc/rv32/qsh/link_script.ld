@@ -14,7 +14,7 @@ SECTIONS
 		. = ALIGN(8);
 	} >RAM
 
-    __data_lma__ = ALIGN (4);
+    __data_lma__ = LOADADDR(.data);
 
 	.data :
 	{
