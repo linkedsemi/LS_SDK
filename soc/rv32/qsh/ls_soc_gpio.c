@@ -472,12 +472,6 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
     case IO_PULL_UP:
-        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
-        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
-        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
-
-        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
-    break;
     case IO_PULL_UP0:
         APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
 
