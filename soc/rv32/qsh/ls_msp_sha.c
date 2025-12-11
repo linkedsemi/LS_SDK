@@ -25,7 +25,7 @@ void HAL_LSSHA_MSP_DeInit(void)
 
 uint8_t HAL_SHA_DMA_Handshake_Get(void)
 {
-    return CH_SHA256;
+    return DMA_SHA256;
 }
 
 void HAL_LSSHA_MSP_Busy_Set(void)

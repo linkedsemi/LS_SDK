@@ -5,183 +5,180 @@
 extern "C" {
 #endif
 
-typedef enum
-{
-    CH_I2C1_RX      = 0,
-    CH_I2C1_TX      = 1,
-    CH_I2C2_RX      = 2,
-    CH_I2C2_TX      = 3,
-    CH_I2C3_RX      = 4,
-    CH_I2C3_TX      = 5,
-    CH_I2C4_RX      = 6,
-    CH_I2C4_TX      = 7,
-    CH_I2C5_RX      = 8,
-    CH_I2C5_TX      = 9,
-    CH_I2C6_RX      = 10,
-    CH_I2C6_TX      = 11,
-    CH_I2C7_RX      = 12,
-    CH_I2C7_TX      = 13,
-    CH_I2C8_RX      = 14,
-    CH_I2C8_TX      = 15,
-    CH_I2C9_RX      = 16,
-    CH_I2C9_TX      = 17,
-    CH_I2C10_RX     = 18,
-    CH_I2C10_TX     = 19,
-    CH_I2C11_RX     = 20,
-    CH_I2C11_TX     = 21,
-    CH_I2C12_RX     = 22,
-    CH_I2C12_TX     = 23,
-    CH_I2C13_RX     = 24,
-    CH_I2C13_TX     = 25,
-    CH_I2C14_RX     = 26,
-    CH_I2C14_TX     = 27,
-    CH_I2C15_RX     = 28,
-    CH_I2C15_TX     = 29,
-    CH_I2C16_RX     = 30,
-    CH_I2C16_TX     = 31,
-    CH_I3C1_RX      = 32,
-    CH_I3C1_TX      = 33,
-    CH_I3C2_RX      = 34,
-    CH_I3C2_TX      = 35,
-    CH_I3C3_RX      = 36,
-    CH_I3C3_TX      = 37,
-    CH_I3C4_RX      = 38,
-    CH_I3C4_TX      = 39,
-    CH_I3C5_RX      = 40,
-    CH_I3C5_TX      = 41,
-    CH_I3C6_RX      = 42,
-    CH_I3C6_TX      = 43,
-    CH_I3C7_RX      = 44,
-    CH_I3C7_TX      = 45,
-    CH_I3C8_RX      = 46,
-    CH_I3C8_TX      = 47,
-    CH_I3C9_RX      = 48,
-    CH_I3C9_TX      = 49,
-    CH_I3C10_RX     = 50,
-    CH_I3C10_TX     = 51,
-    CH_I3C11_RX     = 52,
-    CH_I3C11_TX     = 53,
-    CH_I3C12_RX     = 54,
-    CH_I3C12_TX     = 55,
-    CH_I3C13_RX     = 56,
-    CH_I3C13_TX     = 57,
-    CH_I3C14_RX     = 58,
-    CH_I3C14_TX     = 59,
-    CH_UART1_RX     = 60,
-    CH_UART1_TX     = 61,
-    CH_UART2_RX     = 62,
-    CH_UART2_TX     = 63,
-    CH_UART3_RX     = 64,
-    CH_UART3_TX     = 65,
-    CH_UART4_RX     = 66,
-    CH_UART4_TX     = 67,
-    CH_UART5_RX     = 68,
-    CH_UART5_TX     = 69,
-    CH_UART6_RX     = 70,
-    CH_UART6_TX     = 71,
-    CH_UART7_RX     = 72,
-    CH_UART7_TX     = 73,
-    CH_UART8_RX     = 74,
-    CH_UART8_TX     = 75,
-    CH_UART9_RX     = 76,
-    CH_UART9_TX     = 77,
-    CH_UART10_RX    = 78,
-    CH_UART10_TX    = 79,
-    CH_UART11_RX    = 80,
-    CH_UART11_TX    = 81,
-    CH_UART12_RX    = 82,
-    CH_UART12_TX    = 83,
-    CH_SPI1_RX      = 84,
-    CH_SPI1_TX      = 85,
-    CH_SPI2_RX      = 86,
-    CH_SPI2_TX      = 87,
-    CH_ADC1         = 88,
-    CH_ADC1_DMA_RGL = 89,
-    CH_ADC1_DMA_INJ = 90,
-    CH_ADC2         = 91,
-    CH_ADC2_DMA_RGL = 92,
-    CH_ADC2_DMA_INJ = 93,
-    CH_PARAL_TX     = 94,
-    CH_PARAL_RX     = 95,
-    CH_ADTIM1_CH1   = 96,
-    CH_ADTIM1_CH2   = 97,
-    CH_ADTIM1_CH3   = 98,
-    CH_ADTIM1_CH4   = 99,
-    CH_ADTIM1_UP    = 100,
-    CH_ADTIM1_TRIG  = 101,
-    CH_ADTIM1_COM   = 102,
-    CH_ADTIM2_CH1   = 103,
-    CH_ADTIM2_CH2   = 104,
-    CH_ADTIM2_CH3   = 105,
-    CH_ADTIM2_CH4   = 106,
-    CH_ADTIM2_UP    = 107,
-    CH_ADTIM2_TRIG  = 108,
-    CH_ADTIM2_COM   = 109,
-    CH_GPTIMA1_CH1  = 110,
-    CH_GPTIMA1_CH2  = 111,
-    CH_GPTIMA1_CH3  = 112,
-    CH_GPTIMA1_CH4  = 113,
-    CH_GPTIMA1_UP   = 114,
-    CH_GPTIMA1_TRIG = 115,
-    CH_GPTIMA2_CH1  = 116,
-    CH_GPTIMA2_CH2  = 117,
-    CH_GPTIMA2_CH3  = 118,
-    CH_GPTIMA2_CH4  = 119,
-    CH_GPTIMA2_UP   = 120,
-    CH_GPTIMA2_TRIG = 121,
-    CH_GPTIMB1_CH1  = 122,
-    CH_GPTIMB1_CH2  = 123,
-    CH_GPTIMB1_CH3  = 124,
-    CH_GPTIMB1_CH4  = 125,
-    CH_GPTIMB1_UP   = 126,
-    CH_GPTIMB1_TRIG = 127,
-    CH_GPTIMC1_CH1  = 128,
-    CH_GPTIMC1_CH2  = 129,
-    CH_GPTIMC1_UP   = 130,
-    CH_GPTIMC1_TRIG = 131,
-    CH_GPTIMC1_COM  = 132,
-    CH_BSTIM1_UP    = 133,
-    CH_BSTIM2_UP    = 134,
-    CH_FILTER_TX    = 135,
-    CH_FILTER_RX    = 136,
-    CH_PWM_CHN0     = 137,
-    CH_PWM_CHN1     = 138,
-    CH_PWM_CHN2     = 139,
-    CH_PWM_CHN3     = 140,
-    CH_PWM_CHN4     = 141,
-    CH_PWM_CHN5     = 142,
-    CH_PWM_CHN6     = 143,
-    CH_PWM_CHN7     = 144,
-    CH_PWM_CHN8     = 145,
-    CH_PWM_CHN9     = 146,
-    CH_PWM_CHN10    = 147,
-    CH_PWM_CHN11    = 148,
-    CH_PWM_CHN12    = 149,
-    CH_PWM_CHN13    = 150,
-    CH_PWM_CHN14    = 151,
-    CH_PWM_CHN15    = 152,
-    CH_PDM_CH0      = 153,
-    CH_PDM_CH1      = 154,
-    CH_QSPI1_DMA_TX = 155,
-    CH_QSPI1_DMA_RX = 156,
-    CH_QSPI2_DMA_TX = 157,
-    CH_QSPI2_DMA_RX = 158,
-    CH_CRYPT_WR     = 159,
-    CH_CRYPT_RD     = 160,
-    CH_PSRAM_TX     = 161,
-    CH_PSRAM_RX     = 162,
-    CH_SPI3_RX      = 163,
-    CH_SPI3_TX      = 164,
-    CH_SPI4_RX      = 165,
-    CH_SPI4_TX      = 166,
-    CH_SPIS1_RX     = 167,
-    CH_SPIS1_TX     = 168,
-    CH_SPIS2_RX     = 169,
-    CH_SPIS2_TX     = 170,
-    CH_OTFAD_AES    = 171,
-    CH_SHA512       = 172,
-    CH_SHA256       = 173,
-} DMA_ChnSig_TypeDef;
+#define DMA_I2C1_RX      0
+#define DMA_I2C1_TX      1
+#define DMA_I2C2_RX      2
+#define DMA_I2C2_TX      3
+#define DMA_I2C3_RX      4
+#define DMA_I2C3_TX      5
+#define DMA_I2C4_RX      6
+#define DMA_I2C4_TX      7
+#define DMA_I2C5_RX      8
+#define DMA_I2C5_TX      9
+#define DMA_I2C6_RX      10
+#define DMA_I2C6_TX      11
+#define DMA_I2C7_RX      12
+#define DMA_I2C7_TX      13
+#define DMA_I2C8_RX      14
+#define DMA_I2C8_TX      15
+#define DMA_I2C9_RX      16
+#define DMA_I2C9_TX      17
+#define DMA_I2C10_RX     18
+#define DMA_I2C10_TX     19
+#define DMA_I2C11_RX     20
+#define DMA_I2C11_TX     21
+#define DMA_I2C12_RX     22
+#define DMA_I2C12_TX     23
+#define DMA_I2C13_RX     24
+#define DMA_I2C13_TX     25
+#define DMA_I2C14_RX     26
+#define DMA_I2C14_TX     27
+#define DMA_I2C15_RX     28
+#define DMA_I2C15_TX     29
+#define DMA_I2C16_RX     30
+#define DMA_I2C16_TX     31
+#define DMA_I3C1_RX      32
+#define DMA_I3C1_TX      33
+#define DMA_I3C2_RX      34
+#define DMA_I3C2_TX      35
+#define DMA_I3C3_RX      36
+#define DMA_I3C3_TX      37
+#define DMA_I3C4_RX      38
+#define DMA_I3C4_TX      39
+#define DMA_I3C5_RX      40
+#define DMA_I3C5_TX      41
+#define DMA_I3C6_RX      42
+#define DMA_I3C6_TX      43
+#define DMA_I3C7_RX      44
+#define DMA_I3C7_TX      45
+#define DMA_I3C8_RX      46
+#define DMA_I3C8_TX      47
+#define DMA_I3C9_RX      48
+#define DMA_I3C9_TX      49
+#define DMA_I3C10_RX     50
+#define DMA_I3C10_TX     51
+#define DMA_I3C11_RX     52
+#define DMA_I3C11_TX     53
+#define DMA_I3C12_RX     54
+#define DMA_I3C12_TX     55
+#define DMA_I3C13_RX     56
+#define DMA_I3C13_TX     57
+#define DMA_I3C14_RX     58
+#define DMA_I3C14_TX     59
+#define DMA_UART1_RX     60
+#define DMA_UART1_TX     61
+#define DMA_UART2_RX     62
+#define DMA_UART2_TX     63
+#define DMA_UART3_RX     64
+#define DMA_UART3_TX     65
+#define DMA_UART4_RX     66
+#define DMA_UART4_TX     67
+#define DMA_UART5_RX     68
+#define DMA_UART5_TX     69
+#define DMA_UART6_RX     70
+#define DMA_UART6_TX     71
+#define DMA_UART7_RX     72
+#define DMA_UART7_TX     73
+#define DMA_UART8_RX     74
+#define DMA_UART8_TX     75
+#define DMA_UART9_RX     76
+#define DMA_UART9_TX     77
+#define DMA_UART10_RX    78
+#define DMA_UART10_TX    79
+#define DMA_UART11_RX    80
+#define DMA_UART11_TX    81
+#define DMA_UART12_RX    82
+#define DMA_UART12_TX    83
+#define DMA_SPI1_RX      84
+#define DMA_SPI1_TX      85
+#define DMA_SPI2_RX      86
+#define DMA_SPI2_TX      87
+#define DMA_ADC1         88
+#define DMA_ADC1_DMA_RGL 89
+#define DMA_ADC1_DMA_INJ 90
+#define DMA_ADC2         91
+#define DMA_ADC2_DMA_RGL 92
+#define DMA_ADC2_DMA_INJ 93
+#define DMA_PARAL_TX     94
+#define DMA_PARAL_RX     95
+#define DMA_ADTIM1_CH1   96
+#define DMA_ADTIM1_CH2   97
+#define DMA_ADTIM1_CH3   98
+#define DMA_ADTIM1_CH4   99
+#define DMA_ADTIM1_UP    100
+#define DMA_ADTIM1_TRIG  101
+#define DMA_ADTIM1_COM   102
+#define DMA_ADTIM2_CH1   103
+#define DMA_ADTIM2_CH2   104
+#define DMA_ADTIM2_CH3   105
+#define DMA_ADTIM2_CH4   106
+#define DMA_ADTIM2_UP    107
+#define DMA_ADTIM2_TRIG  108
+#define DMA_ADTIM2_COM   109
+#define DMA_GPTIMA1_CH1  110
+#define DMA_GPTIMA1_CH2  111
+#define DMA_GPTIMA1_CH3  112
+#define DMA_GPTIMA1_CH4  113
+#define DMA_GPTIMA1_UP   114
+#define DMA_GPTIMA1_TRIG 115
+#define DMA_GPTIMA2_CH1  116
+#define DMA_GPTIMA2_CH2  117
+#define DMA_GPTIMA2_CH3  118
+#define DMA_GPTIMA2_CH4  119
+#define DMA_GPTIMA2_UP   120
+#define DMA_GPTIMA2_TRIG 121
+#define DMA_GPTIMB1_CH1  122
+#define DMA_GPTIMB1_CH2  123
+#define DMA_GPTIMB1_CH3  124
+#define DMA_GPTIMB1_CH4  125
+#define DMA_GPTIMB1_UP   126
+#define DMA_GPTIMB1_TRIG 127
+#define DMA_GPTIMC1_CH1  128
+#define DMA_GPTIMC1_CH2  129
+#define DMA_GPTIMC1_UP   130
+#define DMA_GPTIMC1_TRIG 131
+#define DMA_GPTIMC1_COM  132
+#define DMA_BSTIM1_UP    133
+#define DMA_BSTIM2_UP    134
+#define DMA_FILTER_TX    135
+#define DMA_FILTER_RX    136
+#define DMA_PWM_CHN0     137
+#define DMA_PWM_CHN1     138
+#define DMA_PWM_CHN2     139
+#define DMA_PWM_CHN3     140
+#define DMA_PWM_CHN4     141
+#define DMA_PWM_CHN5     142
+#define DMA_PWM_CHN6     143
+#define DMA_PWM_CHN7     144
+#define DMA_PWM_CHN8     145
+#define DMA_PWM_CHN9     146
+#define DMA_PWM_CHN10    147
+#define DMA_PWM_CHN11    148
+#define DMA_PWM_CHN12    149
+#define DMA_PWM_CHN13    150
+#define DMA_PWM_CHN14    151
+#define DMA_PWM_CHN15    152
+#define DMA_PDM_CH0      153
+#define DMA_PDM_CH1      154
+#define DMA_QSPI1_DMA_TX 155
+#define DMA_QSPI1_DMA_RX 156
+#define DMA_QSPI2_DMA_TX 157
+#define DMA_QSPI2_DMA_RX 158
+#define DMA_CRYPT_WR     159
+#define DMA_CRYPT_RD     160
+#define DMA_PSRAM_TX     161
+#define DMA_PSRAM_RX     162
+#define DMA_SPI3_RX      163
+#define DMA_SPI3_TX      164
+#define DMA_SPI4_RX      165
+#define DMA_SPI4_TX      166
+#define DMA_SPIS1_RX     167
+#define DMA_SPIS1_TX     168
+#define DMA_SPIS2_RX     169
+#define DMA_SPIS2_TX     170
+#define DMA_OTFAD_AES    171
+#define DMA_SHA512       172
+#define DMA_SHA256       173
 
 #ifdef __cplusplus
 }

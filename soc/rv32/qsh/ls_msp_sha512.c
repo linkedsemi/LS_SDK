@@ -26,5 +26,5 @@ void HAL_SHA512_MSP_DeInit(void)
 
 uint8_t HAL_SHA512_DMA_Handshake_Get(void)
 {
-    return CH_SHA512;
+    return DMA_SHA512;
 }

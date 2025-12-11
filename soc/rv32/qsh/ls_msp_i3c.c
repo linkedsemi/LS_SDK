@@ -24,10 +24,10 @@ uint8_t HAL_I3C_TX_DMA_Handshake_Get(I3C_TypeDef *inst)
     switch ((uint32_t)inst)
     {
     case (uint32_t)I3C9:
-        handshake = CH_I3C9_TX;
+        handshake = DMA_I3C9_TX;
         break;
     case (uint32_t)I3C10:
-        handshake = CH_I3C10_TX;
+        handshake = DMA_I3C10_TX;
         break;
     default :
        LS_ASSERT(0);
@@ -41,10 +41,10 @@ uint8_t HAL_I3C_RX_DMA_Handshake_Get(I3C_TypeDef *inst)
     switch ((uint32_t)inst)
     {
     case (uint32_t)I3C9:
-        handshake = CH_I3C9_RX;
+        handshake = DMA_I3C9_RX;
         break;
     case (uint32_t)I3C10:
-        handshake = CH_I3C10_RX;
+        handshake = DMA_I3C10_RX;
         break;
     default :
        LS_ASSERT(0);
