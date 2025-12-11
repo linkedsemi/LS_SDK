@@ -7,7 +7,7 @@
     ((_CHANNELNB_) << (ADC_REG_SEQ01_POS * ((_RANKNB_)-1)))
 
 #define ADC_REG_SEQ1_RK(_CHANNELNB_, _RANKNB_)  \
-    ((_CHANNELNB_) << (ADC_REG_SEQ09_POS * ((_RANKNB_)-1)))
+    ((_CHANNELNB_) << (ADC_REG_SEQ09_POS * ((_RANKNB_)-9)))
 
 #define ADC_INJ_SEQ_RK(_CHANNELNB_, _RANKNB_)   \
     ((_CHANNELNB_) << (ADC_INJ_SEQ01_POS * ((_RANKNB_)-1)))
