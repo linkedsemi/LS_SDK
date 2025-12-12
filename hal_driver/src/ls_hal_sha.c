@@ -10,6 +10,7 @@
 static uint64_t total_length;
 static uint32_t current_word;
 static uint8_t current_block_bytes;
+static bool first_update;
 
 HAL_StatusTypeDef HAL_LSSHA_Init(void)
 {
@@ -30,13 +31,12 @@ static void sha_variable_init()
     total_length = 0;
     current_block_bytes = 0;
     current_word = 0;
-    LSSHA->SHA_START = 1;
-    LSSHA->SHA_CTRL &= ~SHA_FST_DAT_MASK;
 }
 
 HAL_StatusTypeDef HAL_LSSHA_SHA256_Init()
 {
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,0);
+    first_update = false;
     sha_variable_init();
     return HAL_OK;
 }
@@ -44,6 +44,7 @@ HAL_StatusTypeDef HAL_LSSHA_SHA256_Init()
 HAL_StatusTypeDef HAL_LSSHA_SHA224_Init()
 {
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,1)|FIELD_BUILD(SHA_CALC_SM3,0);
+    first_update = false;
     sha_variable_init();
     return HAL_OK;
 }
@@ -51,6 +52,7 @@ HAL_StatusTypeDef HAL_LSSHA_SHA224_Init()
 HAL_StatusTypeDef HAL_LSSHA_SM3_Init()
 {
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,1);
+    first_update = false;
     sha_variable_init();
     return HAL_OK;
 }
@@ -92,6 +94,12 @@ static void sha_start(bool end)
 
 HAL_StatusTypeDef HAL_LSSHA_Update(const uint8_t *data,uint32_t length)
 {
+    if((!first_update))
+    {
+        LSSHA->SHA_START = 1;
+        LSSHA->SHA_CTRL &= ~SHA_FST_DAT_MASK;
+        first_update = true;
+    }
     LSSHA->INTR_M = 0;
     total_length += length*8;
     while(length)
