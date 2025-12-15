@@ -473,29 +473,49 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
     case IO_PULL_UP:
-    case IO_PULL_UP0:
+    case IO_PULL_UP1:// 0b001
         APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
-
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
-    case IO_PULL_UP1:
+    case IO_PULL_UP2:// 0b010
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
-
         APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
-
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
-    case IO_PULL_UP2:
-        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
-        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
-
-        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
-
+    case IO_PULL_UP3: // 0b011
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
+    case IO_PULL_UP4: // 0b100
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+    case IO_PULL_UP5: // 0b101
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+ case IO_PULL_UP6: // 0b110
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+ case IO_PULL_UP7: // 0b111
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+
     case IO_PULL_DOWN:
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
@@ -800,7 +820,7 @@ void per_func_enable(uint8_t pin, uint8_t func_num)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_APP_AWO->IO_FUNC[func_num][x->port >> 1] |= 1 << (((x->port % 2) * 16)+ x->num);
-    }
+}
 
 bool is_per_func_enable(uint8_t pin, uint8_t func_num)
 {

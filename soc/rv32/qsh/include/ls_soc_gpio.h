@@ -30,9 +30,13 @@ typedef enum
 typedef enum
 {
     IO_PULL_DISABLE,
-    IO_PULL_UP0,
     IO_PULL_UP1,
     IO_PULL_UP2,
+    IO_PULL_UP3,
+    IO_PULL_UP4,
+    IO_PULL_UP5,
+    IO_PULL_UP6,
+    IO_PULL_UP7,
     IO_PULL_DOWN,
     IO_PULL_UP,
     IO_PULL_UP_DOWN,
