@@ -120,10 +120,10 @@ void HAL_OTBN_SM3_Final(uint8_t result[0x20])
 
     for (uint8_t i = 0; i < 8; i++)
     {
-        *result++ = (uint8_t)(currnt_state[7 - i] >> 24);
-        *result++ = (uint8_t)(currnt_state[7 - i] >> 16);
-        *result++ = (uint8_t)(currnt_state[7 - i] >> 8);
-        *result++ = (uint8_t)(currnt_state[7 - i] >> 0);
+        *result++ = (uint8_t)(currnt_state[i] >> 24);
+        *result++ = (uint8_t)(currnt_state[i] >> 16);
+        *result++ = (uint8_t)(currnt_state[i] >> 8);
+        *result++ = (uint8_t)(currnt_state[i]);
     }
     totash_sm3_msg_total_len = 0;
     remain_len = 0;
