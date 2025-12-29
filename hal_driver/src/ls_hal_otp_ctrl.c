@@ -133,7 +133,24 @@ static void otp_read_en_check(uint32_t offset, uint8_t *data, uint32_t length)
     {
         if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20)) & 0x1)
         {
-            memset(data + (i - bit_start) * ONEBIT_BYTES, OTP_BYTE_DEFAULT_VALUE, ONEBIT_BYTES);
+             //Calculate the address range of the current protection block
+            uint32_t block_start = i * ONEBIT_BYTES;
+            uint32_t block_end = block_start + ONEBIT_BYTES - 1;
+
+            //Calculate the intersection of the query and the request scope
+            uint32_t request_end = offset + length - 1;
+            uint32_t fill_start = (block_start > offset) ? block_start : offset;
+            uint32_t fill_end = (block_end < request_end) ? block_end : request_end;
+
+            if (fill_end >= fill_start) {
+                //The actual length that needs to be filled
+                uint32_t fill_length = fill_end - fill_start + 1;
+                uint32_t data_offset = fill_start - offset;
+
+                //Fill only within the valid range
+                memset(data + data_offset, OTP_BYTE_DEFAULT_VALUE, fill_length);
+            }
+
         }
     }
 }
