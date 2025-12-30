@@ -1,5 +1,4 @@
 #include "ls_msp_iwdg.h"
-
 #include "reg_sec_pmu_rg.h"
 #include "reg_sysc_app_cpu.h"
 #include "reg_sysc_app_per.h"
@@ -68,4 +67,15 @@ void HAL_IWDG_MSP_DEBUG(reg_iwdg_t *iwdg, uint8_t debug_en) {
     default:
       break;
   }
+}
+
+int HAL_IWDG_IS_MATCH(reg_iwdg_t *iwdg,uint8_t flags)
+{
+    if (flags == WDT_FLAG_RESET_CPU_CORE) {
+        return (iwdg == SEC_IWDG || iwdg == APP_IWDG);
+    }
+    if (flags == WDT_FLAG_RESET_SOC) {
+        return (iwdg == SEC_PMU_IWDG);
+    }
+    return 0;
 }
