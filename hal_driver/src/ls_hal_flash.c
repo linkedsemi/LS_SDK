@@ -82,6 +82,26 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_chip_erase,struct hal_flash_env *en
     hal_flashx_chip_erase_operation(env,NULL);
 }
 
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register_0,struct hal_flash_env *env,uint8_t status_0)
+{
+    struct flash_wr_rd_reg_param param = {
+        .buf = &status_0,
+        .length = sizeof(status_0),
+        .opcode = WRTIE_STATUS_REGISTER_0_OPCODE,
+    };
+    hal_flashx_write_reg_operation(env, &param);
+}
+
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register_1,struct hal_flash_env *env,uint8_t status_1)
+{
+    struct flash_wr_rd_reg_param param = {
+        .buf = &status_1,
+        .length = sizeof(status_1),
+        .opcode = WRITE_STATUS_REGISTER_1_OPCODE,
+    };
+    hal_flashx_write_reg_operation(env, &param);
+}
+
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register,struct hal_flash_env *env,uint16_t status)
 {
     struct flash_wr_rd_reg_param param = {
@@ -314,6 +334,10 @@ void XIP_BANNED_FUNC(hal_flash_read_status_register_1_ram,uint8_t *status_reg_1)
 void XIP_BANNED_FUNC(hal_flash_read_status_register_1,uint8_t *status_reg_1){hal_flashx_read_status_register_1(&flash1,status_reg_1);}
 
 bool XIP_BANNED_FUNC(hal_flash_write_in_process){return hal_flashx_write_in_process(&flash1);}
+
+void FLASH_API_SECTION(hal_flash_write_status_register_0, uint8_t status_0){hal_flashx_write_status_register_0(&flash1, status_0);}
+
+void FLASH_API_SECTION(hal_flash_write_status_register_1, uint8_t status_1){hal_flashx_write_status_register_1(&flash1, status_1);}
 
 void FLASH_API_SECTION(hal_flash_write_status_register,uint16_t status){hal_flashx_write_status_register(&flash1,status);}
 
