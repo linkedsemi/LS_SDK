@@ -124,36 +124,29 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
     return HAL_OK;
 }
 
+/* Hardware and implementation that prohibits reading here can be ignored.
 static void otp_read_en_check(uint32_t offset, uint8_t *data, uint32_t length)
 {
-    uint32_t bit_start = offset / ONEBIT_BYTES;
-    uint32_t bit_end = (offset + length - 1) / ONEBIT_BYTES;
 
-    for (uint32_t i = bit_start; i <= bit_end; i++)
+    uint8_t *start = data;
+    uint8_t *end = &data[ONEBIT_BYTES-offset%ONEBIT_BYTES] > &data[length] ?
+        &data[length] : &data[ONEBIT_BYTES-offset%ONEBIT_BYTES];
+    while(1)
     {
-        if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20)) & 0x1)
+        uint32_t i = (start - data + offset)/ONEBIT_BYTES;
+        if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / ONEBIT_BYTES] >> (i % ONEBIT_BYTES)) & 0x1)
         {
-             //Calculate the address range of the current protection block
-            uint32_t block_start = i * ONEBIT_BYTES;
-            uint32_t block_end = block_start + ONEBIT_BYTES - 1;
-
-            //Calculate the intersection of the query and the request scope
-            uint32_t request_end = offset + length - 1;
-            uint32_t fill_start = (block_start > offset) ? block_start : offset;
-            uint32_t fill_end = (block_end < request_end) ? block_end : request_end;
-
-            if (fill_end >= fill_start) {
-                //The actual length that needs to be filled
-                uint32_t fill_length = fill_end - fill_start + 1;
-                uint32_t data_offset = fill_start - offset;
-
-                //Fill only within the valid range
-                memset(data + data_offset, OTP_BYTE_DEFAULT_VALUE, fill_length);
-            }
-
+            memset(start,OTP_BYTE_DEFAULT_VALUE,end-start);
         }
+        if(end == &data[length])
+        {
+            break;
+        }
+        start = end;
+        end = &end[ONEBIT_BYTES]>&data[length]?&data[length]:&end[ONEBIT_BYTES];
     }
 }
+*/
 
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 {
@@ -210,7 +203,7 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
         }
     }
 
-    otp_read_en_check(offset, data, length);
+    //otp_read_en_check(offset, data, length);//Hardware and implementation that prohibits reading here can be ignored.
 
     return HAL_OK;
 }
