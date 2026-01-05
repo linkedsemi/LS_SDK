@@ -46,6 +46,22 @@ void HAL_OTP_SET_RD_Addr(uint32_t addr[0x4])
     }
 }
 
+void HAL_OTP_GET_WR_Addr(uint32_t addr[0x4])
+{
+    for (uint8_t i = 0; i < 0x4; i++)
+    {
+        addr[i] = OTP_CTRL->WR_FORBIDDEN_ADDR[i];
+    }
+}
+
+void HAL_OTP_GET_RD_Addr(uint32_t addr[0x4])
+{
+    for (uint8_t i = 0; i < 0x4; i++)
+    {
+        addr[i] = OTP_CTRL->RD_FORBIDDEN_ADDR[i];
+    }
+}
+
 static void otp_single_wirte(uint32_t *buffer, uint32_t offset, uint32_t length, bool pas)
 {
     uint32_t idx = 0;
