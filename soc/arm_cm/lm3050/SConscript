@@ -67,7 +67,6 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
         'src/ls_hal_flash_swint.c',
         'src/ls_hal_adcv2_dma.c',
-        # 'src/calc_div.c',
         'src/ls_hal_dmacv2.c',
         'src/ls_hal_adcv2.c',
         'src/ls_hal_dac_dma.c',
@@ -81,7 +80,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_pdm_dma.c',
         'src/ls_hal_pdm.c',
         'src/ls_hal_pis.c',
-        # 'src/ls_hal_qspi.c',
+        'src/flash_inst1.c',
         'src/ls_hal_rtcv2.c',
         # 'src/lsspi_dma.c',
         'src/ls_hal_spi_i2s.c',
