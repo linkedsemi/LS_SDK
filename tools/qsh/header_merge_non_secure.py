@@ -32,6 +32,8 @@ for opt_name, opt_value in opts:
     if opt_name in ('-a','--address'):
         _exe_addr = int(opt_value, 16)
         # print("execute address: ", hex(_exe_addr))
+        if (_exe_addr >= 0x8000000) and (_exe_addr < (0x8000000 + 16 * 1024 * 1024)):
+            _exe_addr = 0
     if opt_name in ('-i','--ifilename'):
         _ifilename = opt_value
         # print("input filename is ", _ifilename)
