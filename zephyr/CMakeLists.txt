@@ -366,7 +366,6 @@ if(CONFIG_SOC_LSQSH)
     -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
     -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
     -a ${CONFIG_FLASH_BASE_ADDRESS}
-    -p
   )
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
