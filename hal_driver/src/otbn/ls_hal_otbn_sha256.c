@@ -69,7 +69,7 @@ void HAL_OTBN_SHA256_Init()
     Sha256_BlockNumber_Update(0x20);
 }
 
-static void sha256_msg_write(uint8_t *msg)
+static void sha256_msg_write(const uint8_t *msg)
 {
     HAL_OTBN_DMEM_Write(index, (uint32_t *)msg, SHA256_BLOCK_SIZE);
     index += SHA256_BLOCK_SIZE;
@@ -80,7 +80,7 @@ static void sha256_msg_write(uint8_t *msg)
     }
 }
 
-void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
+void HAL_OTBN_SHA256_Update(const uint8_t *msg, uint32_t length)
 {   
     totasha256_hmac_cnt += length;
     if (remain_len)

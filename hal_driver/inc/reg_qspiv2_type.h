@@ -33,20 +33,20 @@ typedef struct
     volatile uint32_t FIFO_FLVL; //0x68
     volatile uint32_t RESERVED3;
     volatile uint32_t PART0_ADDR_START;//0x70
-    volatile uint32_t PART0_ADDR_END;
-    volatile uint32_t PART1_ADDR_START;
-    volatile uint32_t PART1_ADDR_END;
+    volatile uint32_t PART0_ADDR_END; //0x74
+    volatile uint32_t PART1_ADDR_START; //0x78
+    volatile uint32_t PART1_ADDR_END; //0x7c
     volatile uint32_t PART0_DECRYPT_CTRL;//x80
-    volatile uint32_t PART1_DECRYPT_CTRL;
-    volatile uint32_t PART0_NONCE[3];
-    volatile uint32_t PART1_NONCE[3];
+    volatile uint32_t PART1_DECRYPT_CTRL; //0x84
+    volatile uint32_t PART0_NONCE[3]; //0x88-0x90
+    volatile uint32_t PART1_NONCE[3]; //0x94-0x9c
     volatile uint32_t RESERVED4;//0xa0
-    volatile uint32_t PART0_KEY[8];
-    volatile uint32_t PART1_KEY[8];
-    volatile uint32_t PART0_LOCK;
-    volatile uint32_t PART1_LOCK;
-    volatile uint32_t AES_CLR;
-    volatile uint32_t BACKUP_OFFSET;
+    volatile uint32_t PART0_KEY[8]; //0xa4-0xc0
+    volatile uint32_t PART1_KEY[8]; //0xc4-0xe0
+    volatile uint32_t PART0_LOCK; //0xe4
+    volatile uint32_t PART1_LOCK; //0xe8
+    volatile uint32_t AES_CLR; //0xec
+    volatile uint32_t BACKUP_OFFSET; //0xf0
 }reg_lsqspiv2_t;
 
 enum LSQSPIV2_REG_QSPI_CTRL0_FIELD
