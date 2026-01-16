@@ -481,23 +481,12 @@ HAL_StatusTypeDef HAL_AES_CBC_Crypt_Blocks(uint8_t mode, unsigned char iv[16], c
     const unsigned char * end_addr = input + inlen;
     uint32_t *in = (uint32_t *)input;
     uint32_t *out = (uint32_t *)output;
-
     uint32_t *u32_iv = (uint32_t *)iv;
-    uint32_t *ending_u32_iv = malloc(32);
-    uint32_t *initial_iv = ending_u32_iv;
-    
-    if (ending_u32_iv == NULL) 
-        return -1;
 
-    *ending_u32_iv++ = __builtin_bswap32(*u32_iv++);
-    *ending_u32_iv++ = __builtin_bswap32(*u32_iv++);
-    *ending_u32_iv++ = __builtin_bswap32(*u32_iv++);
-    *ending_u32_iv++ = __builtin_bswap32(*u32_iv++);
-
-    LSCRYPT->IVR3 = *initial_iv++;
-    LSCRYPT->IVR2 = *initial_iv++;
-    LSCRYPT->IVR1 = *initial_iv++;
-    LSCRYPT->IVR0 = *initial_iv++;
+    LSCRYPT->IVR3 = __builtin_bswap32(*u32_iv++);
+    LSCRYPT->IVR2 = __builtin_bswap32(*u32_iv++);
+    LSCRYPT->IVR1 = __builtin_bswap32(*u32_iv++);
+    LSCRYPT->IVR0 = __builtin_bswap32(*u32_iv++);
 
     if(mode == ENCRYPT)
     {
@@ -531,20 +520,13 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t
     uint32_t *out = (uint32_t *)output;
 
     uint32_t *u32_counter = (uint32_t *)counter;
-    uint32_t *ending_u32_counter = malloc(32);
-    uint32_t *initial_counter = ending_u32_counter;
 
     aes_config(false, true, false, false, false, not_swapped, ctr);
 
-    *ending_u32_counter++ = __builtin_bswap32(*u32_counter++);
-    *ending_u32_counter++ = __builtin_bswap32(*u32_counter++);
-    *ending_u32_counter++ = __builtin_bswap32(*u32_counter++);
-    *ending_u32_counter++ = __builtin_bswap32(*u32_counter++);
-
-    LSCRYPT->IVR3 = *initial_counter++;
-    LSCRYPT->IVR2 = *initial_counter++;
-    LSCRYPT->IVR1 = *initial_counter++;
-    LSCRYPT->IVR0 = *initial_counter++;
+    LSCRYPT->IVR3 = __builtin_bswap32(*u32_counter++);
+    LSCRYPT->IVR2 = __builtin_bswap32(*u32_counter++);
+    LSCRYPT->IVR1 = __builtin_bswap32(*u32_counter++);
+    LSCRYPT->IVR0 = __builtin_bswap32(*u32_counter++);
 
     while (in < (uint32_t*)end_addr)
     {
