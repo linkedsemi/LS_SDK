@@ -317,6 +317,7 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/otbn/text_array/sha256_text.c
     ../hal_driver/src/otbn/text_array/sha512_text.c
     ../hal_driver/src/otbn/text_array/sm2_text.c
+    ../hal_driver/src/otbn/text_array/rsa_text.c
     ../soc/rv32/qsh/ls_msp_otbn.c
     ../soc/rv32/systick.c
     # ../soc/rv32/int_call_asm.S
