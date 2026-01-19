@@ -40,6 +40,10 @@ void HAL_OTBN_INTR_Test(bool enable);
 
 void HAL_OTBN_INTR_EN(bool enable);
 
+uint32_t HAL_OTBN_Error_Bit_Get(void);
+
+void HAL_OTBN_Checksum_Clear(void);
+
 HAL_StatusTypeDef HAL_OTBN_IMEM_Write(uint32_t offset, uint32_t *src, uint32_t size);
 
 HAL_StatusTypeDef HAL_OTBN_IMEM_Read(uint32_t offset, uint32_t *dst, uint32_t size);

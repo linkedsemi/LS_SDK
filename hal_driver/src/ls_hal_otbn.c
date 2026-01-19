@@ -95,6 +95,18 @@ void HAL_OTBN_CMD_Write_Polling(enum HAL_OTBN_CMD cmd)
     LSOTBN->INTR_STATE = OTBN_INTR_STATE_DONE_MASK;
 }
 
+uint32_t HAL_OTBN_Error_Bit_Get(void)
+{
+    uint32_t err_bit = LSOTBN->ERR_BITS;
+    LSOTBN->ERR_BITS = 0;
+    return err_bit;
+}
+
+void HAL_OTBN_Checksum_Clear(void)
+{
+    LSOTBN->LOAD_CHECKSUM = 0;
+}
+
 static void (*callback_func)(void *);
 static void *callback_param;
 void HAL_OTBN_CMD_Write_IT(enum HAL_OTBN_CMD cmd, void(* func)(void *), void *param)
