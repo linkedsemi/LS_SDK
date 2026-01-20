@@ -33,6 +33,7 @@ bool boot_sm2_verify(struct HAL_OTBN_SM2_Verify_Param *param);
 void HAL_OTBN_SM2_ValidPoint_CallBack(bool result);
 void HAL_OTBN_SM2_ValidPoint_IT(uint32_t *x, uint32_t *y);
 bool HAL_OTBN_SM2_ValidPoint_Polling(uint8_t *x, uint8_t *y);
+bool HAL_OTBN_SM2_ValidPoint_Polling_v2(uint8_t *x, uint8_t *y);
 
 void HAL_OTBN_SM2_ScalarMult_CallBack();
 void HAL_OTBN_SM2_ScalarMult_IT(struct HAL_OTBN_SM2_ScalarMult_Param *param);
