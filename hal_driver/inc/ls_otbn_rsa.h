@@ -20,11 +20,11 @@ extern "C" {
 #define RSA_OFFSET_D              0x00000220
 #define RSA_OFFSET_INOUT          0x00000420
 
-#define RSA_IMEM_SIZE             1592
-#define RSA_DMEM_SIZE             0
-
-extern const uint8_t rsa_imem[1592];
+extern const uint8_t rsa_imem[];
+extern const uint32_t rsa_imem_size;
 // extern const uint8_t rsa_dmem[];
+#define RSA_IMEM_SIZE             rsa_imem_size
+#define RSA_DMEM_SIZE             0
 
 enum {
   /* Length of the RSA-2048 modulus and private exponent in bits. */
