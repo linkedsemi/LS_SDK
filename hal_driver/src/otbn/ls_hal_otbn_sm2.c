@@ -103,12 +103,14 @@ bool HAL_OTBN_SM2_ValidPoint_Polling(uint8_t *x, uint8_t *y)
 bool HAL_OTBN_SM2_ValidPoint_Polling_v2(uint8_t *x, uint8_t *y)
 {
     uint32_t data = 0;
-    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_imem, sizeof(sm2_imem));
-    HAL_OTBN_DMEM_Set(0, 0, LS_OTBN_SM2_DMEM_SIZE);
-    HAL_OTBN_DMEM_Write(0, (uint32_t *)sm2_dmem, sizeof(sm2_dmem));
+    uint32_t mode = LS_OTBN_SM2_MODE_VALID_POINT;
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_imem, LS_OTBN_SM2_IMEM_SIZE);
+    HAL_OTBN_DMEM_Set(0, 0, LS_OTBN_SM2_DMEM_END);
+    HAL_OTBN_DMEM_Write(0, (uint32_t *)sm2_dmem, LS_OTBN_SM2_DMEM_SIZE);
 
+    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_MODE_OFFSET, &mode, sizeof(uint32_t));
     HAL_OTBN_DMEM_Write(LS_OTBN_SM2_X_OFFSET, (uint32_t *)x, SM2_DMEM_X_SIZE);
-    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_X_OFFSET, (uint32_t *)y, SM2_DMEM_X_SIZE);
+    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_Y_OFFSET, (uint32_t *)y, SM2_DMEM_Y_SIZE);
     HAL_OTBN_DMEM_Write(LS_OTBN_SM2_OK, &data, sizeof(uint32_t));
     
     HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);

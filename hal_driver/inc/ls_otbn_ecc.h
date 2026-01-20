@@ -20,10 +20,12 @@ typedef struct ls_otbn_current_remote_addr
 #define LS_OTBN_TRUE  0x00000739
 #define LS_OTBN_FALSE 0x000001d4
 
-extern const uint8_t p256_imem[4304];
-extern const uint8_t p256_dmem[224];
-#define LS_OTBN_ECDSA_P256_IMEM_SIZE    4304
-#define LS_OTBN_ECDSA_P256_DMEM_SIZE    224
+extern const uint8_t p256_imem[];
+extern const uint8_t p256_dmem[];
+extern const uint32_t p256_imem_size;
+extern const uint32_t p256_dmem_size;
+#define LS_OTBN_ECDSA_P256_IMEM_SIZE    p256_imem_size
+#define LS_OTBN_ECDSA_P256_DMEM_SIZE    p256_dmem_size
 #define LS_OTBN_ECDSA_P256_DMEM_END     0x260
 #define LS_OTBN_ECDSA_P256_OK                 0x00000104
 /* random */
@@ -48,10 +50,12 @@ extern const uint8_t p256_dmem[224];
 #define LS_OTBN_ECDSA_P256_MODE_KEYGEN        0x000003d4
 #define LS_OTBN_ECDSA_P256_MODE_SHARED_KEY    0x000005ec
 
-extern const uint8_t p384_imem[5556];
-extern const uint8_t p384_dmem[1152];
-#define LS_OTBN_ECDSA_P384_IMEM_SIZE    5556
-#define LS_OTBN_ECDSA_P384_DMEM_SIZE    1152
+extern const uint8_t p384_imem[];
+extern const uint8_t p384_dmem[];
+extern const uint32_t p384_imem_size;
+extern const uint32_t p384_dmem_size;
+#define LS_OTBN_ECDSA_P384_IMEM_SIZE    p384_imem_size
+#define LS_OTBN_ECDSA_P384_DMEM_SIZE    p384_dmem_size
 #define LS_OTBN_ECDSA_P384_DMEM_END     0x00000c00
 /* random */
 #define LS_OTBN_ECDSA_P384_RANDOM_SEED_OFFSET 0x00000140
@@ -76,10 +80,12 @@ extern const uint8_t p384_dmem[1152];
 #define LS_OTBN_ECDSA_P384_MODE_SHARED_KEY    0x000005ec
 
 /* SM2 */
-extern const uint8_t sm2_imem[2784];
-extern const uint8_t sm2_dmem[240];
-#define LS_OTBN_SM2_IMEM_SIZE    2784
-#define LS_OTBN_SM2_DMEM_SIZE    240
+extern const uint8_t sm2_imem[];
+extern const uint8_t sm2_dmem[];
+extern const uint32_t sm2_imem_size;
+extern const uint32_t sm2_dmem_size;
+#define LS_OTBN_SM2_IMEM_SIZE    sm2_imem_size
+#define LS_OTBN_SM2_DMEM_SIZE    sm2_dmem_size
 #define LS_OTBN_SM2_DMEM_END     0x480
 #define LS_OTBN_SM2_OK         0x00000320
 /* random */
