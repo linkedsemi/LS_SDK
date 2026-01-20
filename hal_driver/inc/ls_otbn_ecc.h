@@ -76,10 +76,10 @@ extern const uint8_t p384_dmem[1152];
 #define LS_OTBN_ECDSA_P384_MODE_SHARED_KEY    0x000005ec
 
 /* SM2 */
-extern const uint8_t sm2_imem[2716];
+extern const uint8_t sm2_imem[2784];
 extern const uint8_t sm2_dmem[240];
-#define LS_OTBN_SM2_IMEM_SIZE    2716
-#define LS_OTBN_SM2_DMEM_SIZE    224
+#define LS_OTBN_SM2_IMEM_SIZE    2784
+#define LS_OTBN_SM2_DMEM_SIZE    240
 #define LS_OTBN_SM2_DMEM_END     0x480
 #define LS_OTBN_SM2_OK         0x00000320
 /* random */
@@ -103,6 +103,7 @@ extern const uint8_t sm2_dmem[240];
 #define LS_OTBN_SM2_MODE_VERIFY           0x00000727
 #define LS_OTBN_SM2_MODE_KEYGEN           0x000003d4
 #define LS_OTBN_SM2_MODE_SHARED_KEY       0x000005ec
+#define LS_OTBN_SM2_MODE_VALID_POINT      0x000005e8
 
 
 #define LS_OTBN_MODE_SIGN             0x0000015b

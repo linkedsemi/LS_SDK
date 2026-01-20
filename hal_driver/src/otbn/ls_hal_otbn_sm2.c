@@ -1,4 +1,6 @@
 #include "ls_hal_otbn_sm2.h"
+#include "ls_otbn_ecc.h"
+#include "ls_hal_otbn.h"
 
 #define SM2_FUNC_VALIDPOINT     (0x10)
 #define SM2_FUNC_SCALARMULT     (0x20)
@@ -98,6 +100,30 @@ bool HAL_OTBN_SM2_ValidPoint_Polling(uint8_t *x, uint8_t *y)
     return data;
 }
 
+bool HAL_OTBN_SM2_ValidPoint_Polling_v2(uint8_t *x, uint8_t *y)
+{
+    uint32_t data = 0;
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_imem, sizeof(sm2_imem));
+    HAL_OTBN_DMEM_Set(0, 0, LS_OTBN_SM2_DMEM_SIZE);
+    HAL_OTBN_DMEM_Write(0, (uint32_t *)sm2_dmem, sizeof(sm2_dmem));
+
+    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_X_OFFSET, (uint32_t *)x, SM2_DMEM_X_SIZE);
+    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_X_OFFSET, (uint32_t *)y, SM2_DMEM_X_SIZE);
+    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_OK, &data, sizeof(uint32_t));
+    
+    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
+    
+    HAL_OTBN_DMEM_Read(LS_OTBN_SM2_OK, &data, sizeof(uint32_t));
+    if(data == LS_OTBN_TRUE)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 __attribute__((weak)) void HAL_OTBN_SM2_ScalarMult_CallBack() {}
 __attribute__((weak)) void HAL_OTBN_SM2_Verify_CallBack(bool result) {}
 __attribute__((weak)) void HAL_OTBN_SM2_ValidPoint_CallBack(bool result) {}
@@ -168,3 +194,4 @@ void HAL_OTBN_SM2_ScalarMult_IT(struct HAL_OTBN_SM2_ScalarMult_Param *param)
     HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_ScalarMult_Cb, param);
 
 }
+
