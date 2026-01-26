@@ -22,6 +22,19 @@ extern "C" {
                 : "a0", "a1", "a2", "a3","a4");\
         }while(0)
 
+#define SWINT_FUNC_CALL_INLINE_ASM_ADDR(func,addr,bit_mask)\
+        do{\
+            __asm ("la a4,"#func"\n" : : : );\
+            uint32_t mask = (bit_mask);\
+            uint32_t pending_addr = (addr);\
+            __asm ("sb %0,0(%1)\n"\
+                    SWINT_LOOP_LABEL":\n"\
+                    "lb %0,0(%1)\n"\
+                    "bnez %0,"SWINT_LOOP_LABEL"\n"\
+                    : : "r"(mask),"r"(pending_addr) \
+                : "a0", "a1", "a2", "a3","a4");\
+        }while(0)
+
 #ifdef __cplusplus
 }
 #endif
