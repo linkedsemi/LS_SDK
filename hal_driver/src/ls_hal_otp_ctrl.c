@@ -46,6 +46,22 @@ void HAL_OTP_SET_RD_Addr(uint32_t addr[0x4])
     }
 }
 
+void HAL_OTP_GET_WR_Addr(uint32_t addr[0x4])
+{
+    for (uint8_t i = 0; i < 0x4; i++)
+    {
+        addr[i] = OTP_CTRL->WR_FORBIDDEN_ADDR[i];
+    }
+}
+
+void HAL_OTP_GET_RD_Addr(uint32_t addr[0x4])
+{
+    for (uint8_t i = 0; i < 0x4; i++)
+    {
+        addr[i] = OTP_CTRL->RD_FORBIDDEN_ADDR[i];
+    }
+}
+
 static void otp_single_wirte(uint32_t *buffer, uint32_t offset, uint32_t length, bool pas)
 {
     uint32_t idx = 0;
@@ -124,19 +140,29 @@ HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length)
     return HAL_OK;
 }
 
+/* Hardware and implementation that prohibits reading here can be ignored.
 static void otp_read_en_check(uint32_t offset, uint8_t *data, uint32_t length)
 {
-    uint32_t bit_start = offset / ONEBIT_BYTES;
-    uint32_t bit_end = (offset + length - 1) / ONEBIT_BYTES;
 
-    for (uint32_t i = bit_start; i <= bit_end; i++)
+    uint8_t *start = data;
+    uint8_t *end = &data[ONEBIT_BYTES-offset%ONEBIT_BYTES] > &data[length] ?
+        &data[length] : &data[ONEBIT_BYTES-offset%ONEBIT_BYTES];
+    while(1)
     {
-        if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / 0x20] >> (i % 0x20)) & 0x1)
+        uint32_t i = (start - data + offset)/ONEBIT_BYTES;
+        if ((OTP_CTRL->RD_FORBIDDEN_ADDR[i / ONEBIT_BYTES] >> (i % ONEBIT_BYTES)) & 0x1)
         {
-            memset(data + (i - bit_start) * ONEBIT_BYTES, OTP_BYTE_DEFAULT_VALUE, ONEBIT_BYTES);
+            memset(start,OTP_BYTE_DEFAULT_VALUE,end-start);
         }
+        if(end == &data[length])
+        {
+            break;
+        }
+        start = end;
+        end = &end[ONEBIT_BYTES]>&data[length]?&data[length]:&end[ONEBIT_BYTES];
     }
 }
+*/
 
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 {
@@ -193,7 +219,7 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
         }
     }
 
-    otp_read_en_check(offset, data, length);
+    //otp_read_en_check(offset, data, length);//Hardware and implementation that prohibits reading here can be ignored.
 
     return HAL_OK;
 }

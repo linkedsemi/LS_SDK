@@ -17,11 +17,14 @@ extern "C" {
 
 #define BROM_SEC_ADDR           0x01000000
 #define CACHE1_ADDR             0x08000000
+#define CACHE1_SIZE             0x04000000
 #define QSPI_CACHE_SIZE         0x04000000
 #define SRAM1_ADDR              0x10000000
 #define SRAM2_ADDR              0x10080000
+#define SRAM_SIZE               0x00140000
 #define PSRAM_ADDR              0x18000000
 #define CACHE2_ADDR             0x1c000000
+#define CACHE2_SIZE             0x04000000
 #define PERIPH_ADDR             0x40000000
 #define LTPI_SCM_SLV_ADDR       0x80000000
 #define SEC_QSPI1_ADDR          0x40000000
@@ -35,6 +38,7 @@ extern "C" {
 #define SEC_OTP_CTRL_ADDR       0x40003000
 #define SEC_NIST_TRNG_ADDR      0x40004000
 #define SEC_CALC_SHA512_ADDR    0x40005000
+#define SEC_AES_OTFAD_ADDR      0X40006000
 #define SEC_OTBN_ADDR           0x40010000
 #define SEC_QSPI1_CCH_ADDR      0x40020000
 #define SEC_SYSC_AWO_SEC_ADDR   0x40021000

@@ -156,8 +156,8 @@ typedef struct __DMA_Controller_HandleTypeDef
         struct_var.ctl.tt_fc = type;\
         struct_var.ctl.dms = 0;\
         struct_var.ctl.sms = 0;\
-        struct_var.ctl.llp_dst_en = type == P2M && lli;\
-        struct_var.ctl.llp_src_en = type == M2P && lli;\
+        struct_var.ctl.llp_dst_en = type == P2M && (uint32_t)lli;\
+        struct_var.ctl.llp_src_en = type == M2P && (uint32_t)lli;\
         struct_var.ctl.reserved1 = 0;\
         struct_var.ctl.block_ts = size;\
         struct_var.ctl.done = 0;\

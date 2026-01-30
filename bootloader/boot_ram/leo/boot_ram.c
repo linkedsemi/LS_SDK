@@ -336,9 +336,11 @@ void ec_app_boot_flow()
         {
             do{
                 uint32_t offset = APP_DESC_OFFSET;
-                while(offset < (desc_ptr.sign_and_image_size + sizeof(struct flash_app_image_desc)))
+                uint32_t erased_size = 0;
+                while(erased_size < (desc_ptr.sign_and_image_size + sizeof(struct flash_app_image_desc)))
                 {
                     hal_flash_sector_erase(offset);
+                    erased_size += FLASH_SECTOR_SIZE;
                     offset += FLASH_SECTOR_SIZE;
                 }
                 image_copy(mirror_start_addr, desc_ptr.sign_and_image_size + sizeof(struct flash_app_image_desc));

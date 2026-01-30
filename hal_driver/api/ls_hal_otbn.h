@@ -30,6 +30,18 @@ enum HAL_OTBN_CMD
     HAL_OTBN_CMD_SEC_WIPE_IMEM      = 0x1e,
 };
 
+/* The encryption algorithm library supported by otbn*/
+typedef enum{
+    OTBN_UNUSED = 0,
+    OTBN_SHA256,
+    OBTN_SHA384,
+    OTBN_SHA512,
+    OTBN_SM3,
+    OTBN_ECDSA_P256,
+    OTBN_ECDSA_P384,
+    OTBN_SM2,
+}ls_otbn_fireware_t;
+
 void HAL_OTBN_Init(void);
 
 void HAL_OTBN_CMD_Write_Polling(enum HAL_OTBN_CMD cmd);

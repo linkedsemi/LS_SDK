@@ -29,9 +29,9 @@ struct hal_flash_env
 extern struct hal_flash_env flash1;
 
 /// Flash Page Size
-#define FLASH_PAGE_SIZE (256) 
+#define FLASH_PAGE_SIZE (256)
 /// Flash Sector Size
-#define FLASH_SECTOR_SIZE (0x1000) 
+#define FLASH_SECTOR_SIZE (0x1000)
 /// Status Register 1 SUS1 Mask
 #define STATUS_REG1_SUS1_MASK (0x80)
 /// Status Register 1 SUS2 Mask
@@ -39,6 +39,8 @@ extern struct hal_flash_env flash1;
 
 /** \brief Initialize SPI Flash driver */
 void hal_flashx_init(struct hal_flash_env *env);
+
+bool hal_flashx_inited(struct hal_flash_env *env);
 
 /** \brief Enter SPI Flash continuous mode */
 void hal_flashx_continuous_mode_start(struct hal_flash_env *env);
@@ -58,7 +60,7 @@ void hal_flashx_read_status_register_0_ram(struct hal_flash_env *env,uint8_t *st
  */
 void hal_flashx_read_status_register_0(struct hal_flash_env *env,uint8_t *status_reg_0);
 
-/** \brief Read Status Register 1 (can't be called during XIP) 
+/** \brief Read Status Register 1 (can't be called during XIP)
  *  \param[in] env
  *  \param[out] status_reg_1
  */
@@ -76,7 +78,21 @@ void hal_flashx_read_status_register_1(struct hal_flash_env *env,uint8_t *status
  */
 bool hal_flashx_write_in_process(struct hal_flash_env *env);
 
-/** \brief Write Status Register 
+/** \brief Write Status Register 0 (Single byte)
+ *  \note This writes only Status Register 0 (8-bit)
+ *  \param[in] env The handle of flash env
+ *  \param[in] status_0 The 8-bit value to write to Status Register 0
+ */
+void hal_flashx_write_status_register_0(struct hal_flash_env *env, uint8_t status_0);
+
+/** \brief Write Status Register 1 (Single byte)
+ *  \note This writes only Status Register 1 (8-bit)
+ *  \param[in] env The handle of flash env
+ *  \param[in] status_1 The 8-bit value to write to Status Register 1
+ */
+void hal_flashx_write_status_register_1(struct hal_flash_env *env, uint8_t status_1);
+
+/** \brief Write Status Register
  *  \param[in] env
  *  \param[in] status The value to write to Status Register
  */
@@ -86,7 +102,7 @@ void hal_flashx_multi_io_page_program(struct hal_flash_env *env,uint32_t offset,
 
 void hal_flashx_dual_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length);
 
-/** \brief Quad Page Program 
+/** \brief Quad Page Program
  *  \param[in] env The handle of flash env
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  *  \param[in] data The pointer of the data to program into Flash
@@ -94,7 +110,7 @@ void hal_flashx_dual_page_program(struct hal_flash_env *env,uint32_t offset,uint
  */
 void hal_flashx_quad_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length);
 
-/** \brief Page Program 
+/** \brief Page Program
  *  \param[in] env The handle of flash env
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  *  \param[in] data The pointer of the data to program into Flash
@@ -102,7 +118,7 @@ void hal_flashx_quad_page_program(struct hal_flash_env *env,uint32_t offset,uint
  */
 void hal_flashx_page_program(struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint16_t length);
 
-/** \brief Page Erase 
+/** \brief Page Erase
  *  \param[in] env The handle of flash env
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  */
@@ -115,7 +131,7 @@ void hal_flashx_page_erase(struct hal_flash_env *env,uint32_t offset);
 void hal_flashx_sector_erase(struct hal_flash_env *env,uint32_t offset);
 
 
-/** \brief 32K block Erase 
+/** \brief 32K block Erase
  *  \note 擦除需要按照32k的块对齐。
  *  \param[in] env The handle of flash env
  *  \param[in] offset Offset to FLASH_BASE_ADDR
@@ -166,7 +182,7 @@ void hal_flashx_deep_power_down(struct hal_flash_env *env);
 /** \brief Release From Deep Power Down */
 void hal_flashx_release_from_deep_power_down(struct hal_flash_env *env);
 
-/** \brief Read ID  
+/** \brief Read ID
  *  \param[in] env The handle of flash env
  *  \param[out] jedec_id The buffer for JEDEC ID
  */
@@ -184,7 +200,7 @@ void hal_flashx_read_unique_id(struct hal_flash_env *env,uint8_t unique_serial_i
  */
 void hal_flashx_erase_security_area(struct hal_flash_env *env,uint8_t idx);
 
-/** \brief Program Security Area 
+/** \brief Program Security Area
  *  \param[in] env The handle of flash env
  *  \param[in] idx The index of security area
  *  \param[in] addr The address of security area
@@ -193,7 +209,7 @@ void hal_flashx_erase_security_area(struct hal_flash_env *env,uint8_t idx);
  */
 void hal_flashx_program_security_area(struct hal_flash_env *env,uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 
-/** \brief Read Security Area 
+/** \brief Read Security Area
  *  \param[in] env The handle of flash env
  *  \param[in] idx The index of security area
  *  \param[in] addr The address of security area
@@ -204,6 +220,9 @@ void hal_flashx_read_security_area(struct hal_flash_env *env,uint8_t idx,uint16_
 
 /** \brief Software Reset */
 void hal_flashx_software_reset(struct hal_flash_env *env);
+
+/** \brief Check and Set Quad Enable Status */
+bool hal_flashx_qe_status_read(struct hal_flash_env *env);
 
 /** \brief Check and Set Quad Enable Status */
 void hal_flashx_qe_status_read_and_set(struct hal_flash_env *env);
@@ -246,6 +265,10 @@ void hal_flash_read_status_register_1_ram(uint8_t *status_reg_1);
 void hal_flash_read_status_register_1(uint8_t *status_reg_1);
 
 bool hal_flash_write_in_process();
+
+void hal_flash_write_status_register_0(uint8_t status_0);
+
+void hal_flash_write_status_register_1(uint8_t status_1);
 
 void hal_flash_write_status_register(uint16_t status);
 
@@ -292,6 +315,8 @@ void hal_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
 void hal_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 
 void hal_flash_software_reset();
+
+bool hal_flash_qe_status_read();
 
 void hal_flash_qe_status_read_and_set();
 

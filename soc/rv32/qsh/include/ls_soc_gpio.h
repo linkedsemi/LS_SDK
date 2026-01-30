@@ -30,9 +30,13 @@ typedef enum
 typedef enum
 {
     IO_PULL_DISABLE,
-    IO_PULL_UP0,
     IO_PULL_UP1,
     IO_PULL_UP2,
+    IO_PULL_UP3,
+    IO_PULL_UP4,
+    IO_PULL_UP5,
+    IO_PULL_UP6,
+    IO_PULL_UP7,
     IO_PULL_DOWN,
     IO_PULL_UP,
     IO_PULL_UP_DOWN,
@@ -282,6 +286,9 @@ bool is_per_func_valid(uint8_t func);
 void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge);
 void gpio_ana_init(uint8_t pin);
 void gpio_ana_deinit(uint8_t pin);
+void io_sl_st_init(uint8_t pin);
+void io_filter_enable(uint8_t pin);
+void io_filter_disable(uint8_t pin);
 
 #ifdef __cplusplus
 }

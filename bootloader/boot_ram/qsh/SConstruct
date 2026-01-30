@@ -12,7 +12,7 @@ inc = [
 ]
 env['LINKSCRIPT'] = File(env.subst('$SDK_ROOT/bootloader/boot_ram/qsh/bram.ld'))
 target = env.image_build('boot_ram',src,inc,with_startup=False)
-env.Append(CPPDEFINES = ['BOOT_RAM=1','GLOBAL_OUTPUT_LVL=0','NDEBUG'])
+env.Append(CPPDEFINES = ['BOOT_RAM=1','GLOBAL_OUTPUT_LVL=3'])
 env.Append(CCFLAGS = '-save-temps')
 env.Append(LINKFLAGS = ' -nostartfiles')
 env.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))

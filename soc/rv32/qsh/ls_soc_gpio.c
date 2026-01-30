@@ -12,7 +12,8 @@
 #include "reg_sec_pmu_rg.h"
 #include "reg_app_pmu_rg.h"
 #include "compile_flag.h"
-
+#include "log.h"
+#include "stdio.h"
 #if (!defined(CONFIG_SOC_LSQSH_CPU1)) && (!defined(CONFIG_SOC_LSQSH_CPU2))
 #define CONFIG_SOC_LSQSH_CPU2
 #endif
@@ -144,10 +145,10 @@ static gpio_port_pin_t dwuart4_rxd;
 // static gpio_port_pin_t gptimb1_ch4;
 // static gpio_port_pin_t gptimb1_etr;
 
-// static gpio_port_pin_t gptimc1_ch1;
-// static gpio_port_pin_t gptimc1_ch1n;
-// static gpio_port_pin_t gptimc1_ch2;
-// static gpio_port_pin_t gptimc1_bk;
+static gpio_port_pin_t gptimc1_ch1;
+static gpio_port_pin_t gptimc1_ch1n;
+static gpio_port_pin_t gptimc1_ch2;
+static gpio_port_pin_t gptimc1_bk;
 // /* ps2h io init */
 // static gpio_port_pin_t ps2h1_clk;
 // static gpio_port_pin_t ps2h1_dat;
@@ -472,35 +473,49 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
     case IO_PULL_UP:
+    case IO_PULL_UP1:// 0b001
         APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
-        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
-        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
-
-        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
-    break;
-    case IO_PULL_UP0:
-        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
-
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
-    case IO_PULL_UP1:
+    case IO_PULL_UP2:// 0b010
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
-
         APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
-
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
-    case IO_PULL_UP2:
-        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
-        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
-
-        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
-
+    case IO_PULL_UP3: // 0b011
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
     break;
+    case IO_PULL_UP4: // 0b100
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+    case IO_PULL_UP5: // 0b101
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+ case IO_PULL_UP6: // 0b110
+        APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+ case IO_PULL_UP7: // 0b111
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PU1_PU0 |= 1<<x->num<<16;
+        APP_PMU->IO_CFG[x->port].PD_PU2 |= 1<<x->num;
+        APP_PMU->IO_CFG[x->port].PD_PU2 &= ~(1<<x->num<<16);
+    break;
+
     case IO_PULL_DOWN:
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num);
         APP_PMU->IO_CFG[x->port].PU1_PU0 &= ~(1<<x->num<<16);
@@ -747,6 +762,24 @@ void io_func_cfg_lock(uint8_t pin, bool lock)
     }
 }
 
+void io_sl_st_init(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].SL_ST |= 1<<x->num;
+}
+
+void io_filter_enable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].OD_FIR |= 1<<x->num;
+}
+
+void io_filter_disable(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    APP_PMU->IO_CFG[x->port].OD_FIR &= ~(1<<16<<x->num);
+}
+
 // void io_v33_exti_config(uint8_t pin,exti_edge_t edge)
 // {
 //     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -829,6 +862,13 @@ void per_func0_set(uint8_t pin,uint8_t per_func)
 }
 
 void per_func0_enable(uint8_t pin,uint8_t per_func)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
+    per_func_enable(pin, 0);
+}
+
+void per_func1_enable(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
@@ -2771,22 +2811,22 @@ void gpio_ana_deinit(uint8_t pin)
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&fdcan_rxd));
 // }
 
-// static void timer_ch_io_output_cfg(uint8_t pin,uint8_t default_val)
-// {
-//     io_write_pin(pin, default_val);
-//     io_cfg_output(pin);
-// }
+static void timer_ch_io_output_cfg(uint8_t pin,uint8_t default_val)
+{
+    io_write_pin(pin, default_val);
+    io_cfg_output(pin);
+}
 
-// static void timer_ch_io_cfg(uint8_t pin,bool output,uint8_t default_val)
-// {
-//     if(output)
-//     {
-//         timer_ch_io_output_cfg(pin,default_val);
-//     }else
-//     {
-//         io_cfg_input(pin);
-//     }
-// }
+static void timer_ch_io_cfg(uint8_t pin,bool output,uint8_t default_val)
+{
+    if(output)
+    {
+        timer_ch_io_output_cfg(pin,default_val);
+    }else
+    {
+        io_cfg_input(pin);
+    }
+}
 
 // void pinmux_adtim1_ch1_init(uint8_t pin,bool output,uint8_t default_val)
 // {
@@ -3158,57 +3198,57 @@ void gpio_ana_deinit(uint8_t pin)
 //     set_gpio_mode((gpio_port_pin_t *)&gptimb1_etr);
 // }
 
-// void pinmux_gptimc1_ch1_init(uint8_t pin,bool output,uint8_t default_val)
-// {
-//     I2C_DBG_IO_CHECK(pin);
-//     *(uint8_t *)&gptimc1_ch1 = pin;
-//     timer_ch_io_cfg(pin,output,default_val);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&pin),GPTIMC1_CH1);
-// }
 
-// void pinmux_gptimc1_ch1_deinit(void)
-// {
-//     set_gpio_mode((gpio_port_pin_t *)&gptimc1_ch1);
-// }
+void pinmux_gptimc1_ch1_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    // I2C_DBG_IO_CHECK(pin);
+    *(uint8_t *)&gptimc1_ch1 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    per_func1_enable(pin,FIOF_GPTIMC1_CH1);// FIOF_GPTIMC1_CH1 pr FIOM_GPTIMC1_CH1
+}
 
-// void pinmux_gptimc1_ch1n_init(uint8_t pin)
-// {
-//     I2C_DBG_IO_CHECK(pin);
-//     *(uint8_t *)&gptimc1_ch1n = pin;
-//     timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&gptimc1_ch1));
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&pin),GPTIMC1_CH1N);
-// }
+void pinmux_gptimc1_ch1_deinit(void)
+{
+    set_gpio_mode((gpio_port_pin_t *)&gptimc1_ch1);
+}
 
-// void pinmux_gptimc1_ch1n_deinit(void)
-// {
-//     set_gpio_mode((gpio_port_pin_t *)&gptimc1_ch1n);
-// }
+void pinmux_gptimc1_ch1n_init(uint8_t pin)
+{
+    *(uint8_t *)&gptimc1_ch1n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&gptimc1_ch1));
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&pin),FIOM_GPTIMC1_CH1N);
+}
 
-// void pinmux_gptimc1_ch2_init(uint8_t pin,bool output,uint8_t default_val)
-// {
-//     I2C_DBG_IO_CHECK(pin);
-//     *(uint8_t *)&gptimc1_ch2 = pin;
-//     timer_ch_io_cfg(pin,output,default_val);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&pin),GPTIMC1_CH2);
-// }
+void pinmux_gptimc1_ch1n_deinit(void)
+{
+    set_gpio_mode((gpio_port_pin_t *)&gptimc1_ch1n);
+}
 
-// void pinmux_gptimc1_ch2_deinit(void)
-// {
-//     set_gpio_mode((gpio_port_pin_t *)&gptimc1_ch2);
-// }
+void pinmux_gptimc1_ch2_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimc1_ch2 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    per_func1_enable(pin,FIOF_GPTIMC1_CH2);
+}
 
-// void pinmux_gptimc1_bk_init(uint8_t pin)
-// {
-//     I2C_DBG_IO_CHECK(pin);
-//     *(uint8_t *)&gptimc1_bk = pin;
-//     io_cfg_input(pin);
-//     per_func_enable(pin2func_io((gpio_port_pin_t *)&pin),GPTIMC1_BK);
-// }
+void pinmux_gptimc1_ch2_deinit(void)
+{
+    set_gpio_mode((gpio_port_pin_t *)&gptimc1_ch2);
+}
 
-// void pinmux_gptimc1_bk_deinit(void)
-// {
-//     set_gpio_mode((gpio_port_pin_t *)&gptimc1_bk);
-// }
+void pinmux_gptimc1_bk_init(uint8_t pin)
+{
+    *(uint8_t *)&gptimc1_bk = pin;
+    io_cfg_input(pin);
+    per_func_enable(pin2func_io((gpio_port_pin_t *)&pin),FIOM_GPTIMC1_BK);
+}
+
+void pinmux_gptimc1_bk_deinit(void)
+{
+    set_gpio_mode((gpio_port_pin_t *)&gptimc1_bk);
+}
+
+
 
 static void usb_io_cfg(uint8_t dp,uint8_t dm, bool host)
 {

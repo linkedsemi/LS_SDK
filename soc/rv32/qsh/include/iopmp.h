@@ -1,6 +1,8 @@
 #ifndef _IOPMP_H
 #define _IOPMP_H
 
+#include <errno.h>
+
 #define IOPMP_MD_CFG      0x00
 #define IOPMP_CFG0        0x04
 #define IOPMP_CFG1        0x08
@@ -95,13 +97,16 @@ inline static void iopmp_config_region(uint32_t dev, uint8_t idx, uint32_t addr,
     iopmp_set_pmpxcfg(dev, idx, attr);
 }
 
-inline static void iopmp_config_region_napot4(uint32_t dev, uint8_t idx,
+#if !defined(IS_POWER_OF_TWO)
+#define IS_POWER_OF_TWO(x) (((x) != 0U) && (((x) & ((x) - 1U)) == 0U))
+#endif
+
+inline static int iopmp_config_region_napot(uint32_t dev, uint8_t idx,
                                     uint32_t addr, uint64_t size,
                                     bool read, bool write, bool exe, bool lock)
 {
-    if (addr % size != 0) {
-        return;
-    } else {
+    int ret = 0;
+    if ((0 == (addr % size)) && (IS_POWER_OF_TWO(size))) {
         iopmp_cfg_attr_t iopmp_cfg_attr = {
             .COMP_READ = read,
             .COMP_WRITE = write,
@@ -110,7 +115,11 @@ inline static void iopmp_config_region_napot4(uint32_t dev, uint8_t idx,
             .COMP_LOCK = lock,
         };
         iopmp_config_region(dev, idx, addr2napot(addr, size), iopmp_cfg_attr);
+    } else {
+        ret = -EINVAL;
     }
+
+    return ret;
 }
 
 inline static void iopmp_config_region_tor(uint32_t dev, uint8_t idx, uint32_t addr,

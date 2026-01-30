@@ -119,6 +119,7 @@ static void flash_swint_init()
     csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
     csi_vic_enable_irq(FLASH_SWINT_NUM);
 }
+
 void sys_init_none()
 {
     clk_flash_init();

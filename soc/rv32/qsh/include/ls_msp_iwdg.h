@@ -17,6 +17,14 @@ extern "C" {
 #define APP_IWDG ((reg_iwdg_t *)APP_IWDT2_ADDR) /*!< LSIWDG Macro for Register Access*/
 #endif
 
+#define WDT_FLAG_RESET_SHIFT		(0)
+
+#define WDT_FLAG_RESET_CPU_CORE		(1 << WDT_FLAG_RESET_SHIFT)
+
+#define WDT_FLAG_RESET_SOC		(2 << WDT_FLAG_RESET_SHIFT)
+
+
+
 
 void HAL_IWDG_MSP_Init(reg_iwdg_t *iwdg);
 
@@ -24,6 +32,7 @@ void HAL_IWDG_MSP_DeInit(reg_iwdg_t *iwdg);
 
 void HAL_IWDG_MSP_DEBUG(reg_iwdg_t *iwdg, uint8_t debug_en);
 
+int HAL_IWDG_IS_MATCH(reg_iwdg_t *iwdg,uint8_t flags);
 #ifdef __cplusplus
 }
 #endif

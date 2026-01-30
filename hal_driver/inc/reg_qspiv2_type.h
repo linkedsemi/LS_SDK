@@ -10,7 +10,7 @@ typedef struct
 {
     volatile uint32_t QSPI_CTRL0; //0x0
     volatile uint32_t QSPI_CTRL1; //0x4
-    volatile uint32_t QSPI_SRST; //0x8
+    volatile uint32_t QSPI_SRST_N; //0x8
     volatile uint32_t FIFO_THR; //0xc
     volatile uint32_t DAC_CTRL; //0x10
     volatile uint32_t DAC_CMD; //0x14

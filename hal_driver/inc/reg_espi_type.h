@@ -61,6 +61,18 @@ typedef struct
     volatile uint32_t INTERRUPT_RAW;     // 0x20C   interrupt raw status; Reset:0x0
     volatile uint32_t STATUS;            // 0x210   current eSPI status defined by the eSPI protocol; Reset:0x0
     volatile uint32_t STATUS_SEND;       // 0x214   the status send inthe last eSPI command; Reset:0x0
+    volatile uint32_t RESERVED11[58];    // 0x218
+    volatile uint32_t CFG_RECOVER_CTL;   // 0x300
+    volatile uint32_t RESERVED12[1];     // 0x304
+    volatile uint32_t GEN_CFG_R;         // 0x308
+    volatile uint32_t RESERVED13[1];     // 0x30c
+    volatile uint32_t PER_CH0_CFG_R;     // 0x310 
+    volatile uint32_t RESERVED14[3];     // 0x314
+    volatile uint32_t VWIR_CH1_CFG_R;    // 0x320
+    volatile uint32_t RESERVED15[3];     // 0x324
+    volatile uint32_t OOB_CH2_CFG_R;     // 0x330
+    volatile uint32_t RESERVED16[3];     // 0x334
+    volatile uint32_t FLS_CH3_CFG_R;     // 0x340
 } reg_espi_t;
 
 enum ESPI_REG_DEV_ID_FIELD
@@ -566,6 +578,16 @@ enum ESPI_REG_STATUS_SEND_FIELD
     // the status send inthe last eSPI command; Type:RO; Reset:0x00
     ESPI_STATUS_SEND_MASK = (int)0xFFFF,
     ESPI_STATUS_SEND_POS = 0
+};
+
+enum ESPI_REG_CFG_RECOVER_FIEDL
+{
+    ESPI_AHB_CFG_WR_MASK = (int)0x1,
+    ESPI_AHB_CFG_WR_POS = 0,
+    ESPI_CFG_HCLK_EN_MASK = (int)0x2,
+    ESPI_CFG_HCLK_EN_POS = 1,
+    ESPI_CFG_ECLK_EN_MASK = (int)0x4,
+    ESPI_CFG_ECLK_EN_POS = 2,
 };
 
 #endif /* REG_ESPI_TYPE_H_ */

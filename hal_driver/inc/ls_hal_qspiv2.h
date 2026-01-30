@@ -61,10 +61,25 @@ void lsqspiv2_stg_send_command(reg_lsqspiv2_t *reg,uint8_t opcode);
 void lsqspiv2_stg_read_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
 
 void lsqspiv2_stg_write_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);
-void hal_flashx_quad_continuous_mode_enter(reg_lsqspiv2_t *reg,bool addr4b);
-void hal_flashx_quad_continuous_mode_exit(reg_lsqspiv2_t *reg,bool addr4b);
-void hal_flashx_dual_continuous_mode_enter(reg_lsqspiv2_t *reg,bool addr4b);
-void hal_flashx_dual_continuous_mode_exit(reg_lsqspiv2_t *reg,bool addr4b);
+
+static inline bool lsqspiv2_direct_read_mode(reg_lsqspiv2_t *reg){
+    return (reg->QSPI_CTRL1&(LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK|LSQSPIV2_MODE_DAC_MASK))
+        ==(LSQSPIV2_MODE_DAC_MASK|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+}
+
+static inline int lsqspiv2_backup_offset_set(reg_lsqspiv2_t *reg, uint32_t offset){
+    if (0 == (offset % (16 * 1024))) {
+        LSQSPIV2->BACKUP_OFFSET = offset >> 14;;
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+static inline uint32_t lsqspiv2_backup_offset_get(reg_lsqspiv2_t *reg, uint32_t offset){
+    return LSQSPIV2->BACKUP_OFFSET << 14;;
+}
+
 #if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void lsqspiv2_stg_read_write(reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *);
 __attribute__((long_call)) void lsqspiv2_stg_write_register(reg_lsqspiv2_t *reg,uint8_t opcode,uint8_t *data,uint8_t length);

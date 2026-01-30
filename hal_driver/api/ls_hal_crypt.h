@@ -57,6 +57,21 @@ enum padding_mode
     Padding_ISO10126,
 };
 
+enum data_type
+{
+    not_swapped,
+    halfword_exchange,
+    byte_swap,
+    bit_string_exchange,
+};
+
+enum mode_select
+{
+    ecb,
+    cbc,
+    ctr,
+};
+
 void HAL_LSCRYPT_SetRandFunc(void *func);
 
 /** \brief LSCRYPT Initialize 
@@ -123,7 +138,9 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint8_t *plaintext,uint32_t 
  */
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint8_t *ciphertext,uint32_t ciphertextlength,uint8_t *plaintext,uint32_t *plaintextlength);
 
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out);
+HAL_StatusTypeDef HAL_AES_ECB_Crypt_Blocks(uint8_t mode, const uint8_t *input, uint32_t inlen, uint8_t *output);
+HAL_StatusTypeDef HAL_AES_CBC_Crypt_Blocks(uint8_t mode, unsigned char iv[16], const uint8_t *input, uint32_t inlen, uint8_t *output);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t *input, uint32_t inlen, uint8_t *output);
 
 /** \brief LSCRYPT AES ECB Encrypt (Interrupt Mode)
  *  \param[in] plaintext Input data

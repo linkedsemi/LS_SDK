@@ -3,7 +3,7 @@
 #include "field_manipulate.h"
 #include "hal_flash_int.h"
 
-#if FLASH_PROG_ALGO==1
+#if FLASH_PROG_ALGO==1 || !defined(LEO)
 #define QSPIV2_ENTER_CRITICAL ENTER_CRITICAL
 #define QSPIV2_EXIT_CRITICAL EXIT_CRITICAL
 #else
@@ -112,8 +112,11 @@ static void XIP_BANNED_FUNC(read_data_from_fifo,reg_lsqspiv2_t *reg,struct lsqsp
 ROM_SYMBOL void XIP_BANNED_FUNC(lsqspiv2_stg_read_write,reg_lsqspiv2_t *reg,struct lsqspiv2_stg_cfg *cfg)
 {
     uint32_t cpu_stat = QSPIV2_ENTER_CRITICAL();
-    reg->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
     REG_FIELD_WR(reg->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
+    reg->QSPI_SRST_N = 0;
+    reg->STG_REQ_T = reg->STG_REQ_T;
+    reg->QSPI_SRST_N = 1;
+    reg->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
     uint32_t *ctrl = (uint32_t *)&cfg->ctrl;
     reg->STG_CTRL = *ctrl;
     reg->STG_CA_HIGH = cfg->ca_high;

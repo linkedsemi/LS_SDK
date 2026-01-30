@@ -308,6 +308,8 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/otbn/ls_hal_otbn_ecc256.c
     ../hal_driver/src/otbn/ls_hal_otbn_ecc384.c
     ../hal_driver/src/otbn/ls_hal_otbn_sm2.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sm3.c
+    ../hal_driver/src/otbn/text_array/sm3_text.c
     ../hal_driver/src/otbn/text_array/ecc256_base_mult_text.c
     ../hal_driver/src/otbn/text_array/ecc256_ecdsa_verify_text.c
     ../hal_driver/src/otbn/text_array/ecc256_scalar_mult_text.c
@@ -315,6 +317,7 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/otbn/text_array/sha256_text.c
     ../hal_driver/src/otbn/text_array/sha512_text.c
     ../hal_driver/src/otbn/text_array/sm2_text.c
+    ../hal_driver/src/otbn/text_array/rsa_text.c
     ../soc/rv32/qsh/ls_msp_otbn.c
     ../soc/rv32/systick.c
     # ../soc/rv32/int_call_asm.S
@@ -344,6 +347,8 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32/qsh/ls_msp_crypt.c
     ../soc/rv32/qsh/ls_msp_sha.c
     ../soc/rv32/qsh/ls_msp_sm4.c
+    ../hal_driver/src/ls_hal_otp_ctrl.c
+    ../soc/rv32/qsh/ls_msp_otp_ctrl.c
   )
 
   zephyr_linker_sources(

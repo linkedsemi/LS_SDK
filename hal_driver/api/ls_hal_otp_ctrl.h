@@ -14,6 +14,10 @@ void HAL_OTP_SET_WR_Addr(uint32_t addr[0x4]);
 
 void HAL_OTP_SET_RD_Addr(uint32_t addr[0x4]);
 
+void HAL_OTP_GET_WR_Addr(uint32_t addr[0x4]);
+
+void HAL_OTP_GET_RD_Addr(uint32_t addr[0x4]);
+
 HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length);
 
 HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length);
