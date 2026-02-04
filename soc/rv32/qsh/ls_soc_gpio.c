@@ -570,10 +570,6 @@ void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
     bool bit1 = (drive >> 1) & 0x1;
     bool bit2 = (drive >> 2) & 0x1;
 
-    if (bit2 && ((pin < PM04) || (pin > PM15))) {
-        while(1);
-    }
-
     MODIFY_REG(APP_PMU->IO_CFG[x->port].DS1_DS0, ((1 << x->num << 16)) | 1 << x->num, (bit1 << x->num << 16) | (bit0 << x->num));
     MODIFY_REG(APP_PMU->IO_CFG[x->port].AE_DS2, 1 << x->num, (bit2 << x->num));
 }
