@@ -21,8 +21,7 @@ extern uint32_t __next_ram_size;
 struct boot_otp otp_cfg;
 
 #define FLASH_BASE_ADDRESS 0x8000000
-
-__attribute__((aligned(4))) uint8_t temp_buf[TEMP_BUF_SIZE];
+#define IMAGE_OFFSET       0x10000 //IMAGE_OFFSET = CONFIG_FLASH_BASE_ADDRESS - FLASH_BASE_ADDRESS - 0x100
 
 void boot_flash_read(uint32_t offset, uint8_t *data, uint32_t length)
 {
@@ -146,7 +145,7 @@ int main()
     LOG_I("Flash Boot...");
 
     while (1) {
-        uint32_t offset = 0x10000;  //offset + 0x100 == CONFIG_FLASH_BASE_ADDRESS - FLASH_BASE_ADDRESS
+        uint32_t offset = IMAGE_OFFSET;
         uint32_t exe_addr;
         if (!boot_nonsecure(&exe_addr, offset)) {
             continue;
