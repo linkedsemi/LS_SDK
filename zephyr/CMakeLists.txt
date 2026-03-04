@@ -383,4 +383,23 @@ if(CONFIG_SOC_LSQSH)
     -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
   )
 
+if(0)
+  # cpu1 enable xip mode in bootram 
+  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+    -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram_cpu1_xip.bin
+    -o ${PROJECT_BINARY_DIR}/bram_header_xip.bin
+    -a 0x10124000
+  )
+
+  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/file_merge.py
+    -i ${PROJECT_BINARY_DIR}/bram_header_xip.bin
+    -a 0x0
+    -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    -a 0x10000
+    -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_2os_cpu1_xip.bin
+  )
+endif()
+
 endif()
