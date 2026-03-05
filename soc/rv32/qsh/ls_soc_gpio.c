@@ -556,11 +556,17 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 //     }
 // }
 
-// io_pull_type_t io_pull_read(uint8_t pin)
-// {
-//     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-//     return pull_down(x->port,x->num)|pull_up(x->port,x->num);
-// }
+uint8_t io_pull_read(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+
+    uint8_t bit0 = APP_PMU->IO_CFG[x->port].PU1_PU0 & (1<<x->num);
+    uint8_t bit1 = APP_PMU->IO_CFG[x->port].PU1_PU0 & (1<<x->num<<16);
+    uint8_t bit2 = APP_PMU->IO_CFG[x->port].PD_PU2 & (1<<x->num);
+    uint8_t bit3 = APP_PMU->IO_CFG[x->port].PD_PU2 & (1<<x->num<<16);
+
+    return bit0 | (bit1 << 1) | (bit2 << 2) | (bit3 << 3);
+}
 
 void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
 {
@@ -888,6 +894,12 @@ void per_func_disable_all(uint8_t pin)
 bool is_per_func_valid(uint8_t func)
 {
     return (func >= PINMUX_FUNC_START) && (func <= PINMUX_FUNC_END);
+}
+
+int per_func_en_get(uint8_t pin, uint8_t func)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return SYSC_APP_AWO->IO_FUNC[func][x->port >> 1] & (1 << (((x->port % 2) * 16)+ x->num));
 }
 
 int per_func_get(uint8_t pin)
@@ -2507,6 +2519,12 @@ void gpio_ana_deinit(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     APP_PMU->IO_CFG[x->port].AE_DS2 &= ~(1<<16<<x->num);
+}
+
+bool gpio_ana_enabled(uint8_t pin)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    return (APP_PMU->IO_CFG[x->port].AE_DS2 & 1<<16<<x->num) != 0;
 }
 
 // void gpio_ana_func1_deinit(uint8_t ain)
