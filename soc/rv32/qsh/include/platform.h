@@ -9,8 +9,18 @@
 #include "qsh.h"
 #include "reg_sysc_sec_cpu.h"
 #include "reg_sysc_app_cpu.h"
+#include "reg_sysc_sec_per.h"
+#include "reg_sysc_app_per.h"
+#include "reg_sysc_sec_awo.h"
+#include "reg_sysc_app_awo.h"
+#include "reg_sec_pmu_rg.h"
+#include "reg_app_pmu_rg.h"
 #include <ls_soc_clock.h>
 #include <ls_soc_reset.h>
+#include <ls_soc_gpio.h>
+#include <ls_soc_gpio_def.h>
+#include <per_func_mux.h>
+
 
 #ifndef __ASM
 #define __ASM                   __asm     /*!< asm keyword for GNU Compiler */
