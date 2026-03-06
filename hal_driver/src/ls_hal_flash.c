@@ -87,7 +87,7 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register_0,struct hal_
     struct flash_wr_rd_reg_param param = {
         .buf = &status_0,
         .length = sizeof(status_0),
-        .opcode = WRTIE_STATUS_REGISTER_0_OPCODE,
+        .opcode = WRITE_STATUS_REGISTER_0_OPCODE,
     };
     hal_flashx_write_reg_operation(env, &param);
 }
