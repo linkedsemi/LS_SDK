@@ -139,6 +139,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/ls_hal_i3c_controller.c',
         'src/ls_hal_i3c_irq.c',
         'src/ls_hal_i3c_target.c',
+        'src/flash_inst1.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
         'common/common.c',

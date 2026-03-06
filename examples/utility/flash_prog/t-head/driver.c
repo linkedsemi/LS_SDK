@@ -9,6 +9,9 @@
 #include "cpu.h"
 #include "ls_hal_cache.h"
 #include "FlashOS.h"
+#if !defined(NDEBUG)
+#include "log.h"
+#endif
 #if defined(QSH)
 #include "ls_msp_qspiv2.h"
 #include "reg_sysc_sec_awo.h"
@@ -70,16 +73,20 @@ int  flashInit(){
     flash1.suspend_count = 0;
     flash1.continuous_mode_on = false;
     flash1.addr4b = false;
-    hal_flash_init();
+    hal_flashx_init(&flash1);
     clk_flash_init();
 
-    hal_flash_software_reset();
+    hal_flashx_software_reset(&flash1);
     DELAY_US(500);
-    hal_flash_release_from_deep_power_down();
+    hal_flashx_release_from_deep_power_down(&flash1);
     DELAY_US(100);
 
-    hal_flash_qe_status_read_and_set();
+    hal_flashx_qe_status_read_and_set(&flash1);
 
+#if !defined(NDEBUG)
+    log_en = true;
+    LOG_INIT();
+#endif
 #if defined(QSH)
     uint8_t jedec_id[3] = {};
     hal_flashx_read_id(&flash1, jedec_id);
@@ -90,6 +97,9 @@ int  flashInit(){
     } else {
         return ERROR_INIT;
     }
+#if !defined(NDEBUG)
+    LOG_I("jedec-id = [%02x %02x %02x];", jedec_id[0], jedec_id[1], jedec_id[2]);
+#endif
 #endif
 
     return 0;
@@ -103,6 +113,9 @@ int  flashInit(){
  * Otherwise return 0.
  */
 int  flashUnInit(){
+#if !defined(NDEBUG)
+    LOG_I("%s", __func__);
+#endif
     return 0;
 }
 
@@ -115,7 +128,10 @@ int  flashUnInit(){
  * Otherwise return 0.
  */
 int  flashID(unsigned int* flashID){
-    hal_flash_read_id((uint8_t *)flashID);
+#if !defined(NDEBUG)
+    LOG_I("%s", __func__);
+#endif
+    hal_flashx_read_id(&flash1, (uint8_t *)flashID);
     return 0;
 }
 
@@ -132,6 +148,9 @@ int  flashID(unsigned int* flashID){
  * Otherwise return 0.
  */
 int flashProgram(char* dst, char *src, int size){
+#if !defined(NDEBUG)
+    LOG_I("%s: dst:0x%x src:0x%x size:0x%x", __func__, dst, src, size);
+#endif
     uint32_t current = (uint32_t)dst;
     uint8_t *data = (uint8_t *)src;
     uint16_t length;
@@ -144,6 +163,9 @@ int flashProgram(char* dst, char *src, int size){
     }
     if(length)
     {
+#if !defined(NDEBUG)
+        LOG_I("%s: dst:0x%x size:0x%x", __func__, current - FLASH_BASE_ADDR, length);
+#endif
         hal_flashx_multi_io_page_program(&flash1, current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
@@ -152,6 +174,9 @@ int flashProgram(char* dst, char *src, int size){
     while(size)
     {
         length = size > 256 ? 256 : size;
+#if !defined(NDEBUG)
+        LOG_I("%s: dst:0x%x size:0x%x", __func__, current - FLASH_BASE_ADDR, length);
+#endif
         hal_flashx_multi_io_page_program(&flash1, current - FLASH_BASE_ADDR,(void *)data,length);
         size -= length;
         current += length;
@@ -172,6 +197,9 @@ int flashProgram(char* dst, char *src, int size){
  * Otherwise return 0.
  */
 int flashRead(char* dst, char *src, int length){
+#if !defined(NDEBUG)
+    LOG_I("%s: dst:0x%x src:0x%x size:0x%x", __func__, dst, src, length);
+#endif
     hal_flashx_multi_io_read(&flash1, (uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
     return 0;
 }
@@ -188,10 +216,16 @@ int flashRead(char* dst, char *src, int length){
  * Otherwise return 0
  */
 int flashErase(char *dst, int size){
+#if !defined(NDEBUG)
+    LOG_I("%s: data:0x%x size:0x%x", __func__, dst, size);
+#endif
     uint32_t offset = (uint32_t)dst;
     while(size)
     {
-        hal_flash_sector_erase(offset);
+#if !defined(NDEBUG)
+        LOG_I("%s: data:0x%x", __func__, offset);
+#endif
+        hal_flashx_sector_erase(&flash1, offset);
         if(size > FLASH_SECTOR_SIZE)
         {
             size -= FLASH_SECTOR_SIZE;
@@ -211,7 +245,10 @@ int flashErase(char *dst, int size){
  * Otherwise return 0.
  */
 int flashChipErase( ){
-    hal_flash_chip_erase();
+#if !defined(NDEBUG)
+    LOG_I("%s", __func__);
+#endif
+    hal_flashx_chip_erase(&flash1);
     return 0;
 }
 
@@ -241,6 +278,9 @@ int flashChecksum(char*dst, int length, int checksum) {
     char *p_buf = (char *)g_rwBuffer;
 
     for(int i = 0; i < length / sizeof(g_rwBuffer); i++) {
+#if !defined(NDEBUG)
+        LOG_I("%s pos:0x%x size:0x%x", __func__, dst + current, sizeof(g_rwBuffer));
+#endif
         flashRead(p_buf, dst + current, sizeof(g_rwBuffer));
         for (int i = 0; i < sizeof(g_rwBuffer); i++) {
             sum += p_buf[i];
@@ -248,12 +288,18 @@ int flashChecksum(char*dst, int length, int checksum) {
         current += sizeof(g_rwBuffer);
     }
     if (remain) {
+#if !defined(NDEBUG)
+        LOG_I("%s pos:0x%x size:0x%x", __func__, dst + current, remain);
+#endif
         flashRead(p_buf, dst + current, remain);
         for (int i = 0; i < remain; i++) {
             sum += p_buf[i];
         }
     }
 
+#if !defined(NDEBUG)
+    LOG_I("%s sum:0x%x " "%s" "checksum:0x%x", __func__, sum, sum == checksum ? "==" : "!=", checksum);
+#endif
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
 

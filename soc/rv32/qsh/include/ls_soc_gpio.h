@@ -235,7 +235,7 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull);
   * @param  pin  Specific GPIO pin 
   * @retval GPIO pullup and pulldown state This parameter can be a value of @ref io_pull_type_t    
   */
-io_pull_type_t io_pull_read(uint8_t pin);
+uint8_t io_pull_read(uint8_t pin);
 
 /**
   * @brief GPIO external interrupt callback
@@ -268,10 +268,12 @@ bool io_sec_get_exti_status(uint8_t pin, exti_edge_t edge);
 bool io_app_get_exti_status(uint8_t pin, exti_edge_t edge);
 void io_clr_exti(uint8_t pin, exti_edge_t edge);
 void per_func_disable_all(uint8_t pin);
+int per_func_en_get(uint8_t pin, uint8_t func);
 int per_func_get(uint8_t pin);
 int per_func0_alt_get(uint8_t pin);
 bool per_func_check(uint8_t pin, uint8_t func);
 bool per_func0_alt_check(uint8_t pin, uint8_t alt);
+bool is_per_func_enable(uint8_t pin, uint8_t func_num);
 void pinmux_cfg_pin_func_alt(uint8_t pin, uint8_t func, uint8_t func0_alt);
 void io_func_cfg_lock(uint8_t pin, bool lock);
 void io_exti_clr_cfg_lock(uint8_t pin, exti_edge_t edge, bool lock);
@@ -286,6 +288,7 @@ bool is_per_func_valid(uint8_t func);
 void ext_intr_mask(volatile uint32_t *mask,volatile uint32_t *clr,uint8_t num,exti_edge_t edge);
 void gpio_ana_init(uint8_t pin);
 void gpio_ana_deinit(uint8_t pin);
+bool gpio_ana_enabled(uint8_t pin);
 void io_sl_st_init(uint8_t pin);
 void io_filter_enable(uint8_t pin);
 void io_filter_disable(uint8_t pin);
