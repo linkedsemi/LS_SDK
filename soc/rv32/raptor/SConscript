@@ -1,0 +1,197 @@
+import os
+import sys
+Import('env')
+env['ABI'] = 'ilp32f'
+env['ARCH'] = 'rv32imafc_zifencei_xtheade'
+if not 'DEFAULT_OPT_LVL' in env:
+    env['DEFAULT_OPT_LVL'] = '-Os'
+
+def plf_postaction(self,target):
+    self.AddPostAction(target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+    self.AddPostAction(target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.bin'))
+    self.AddPostAction(target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
+    self.AddPostAction(target,Action('python $SDK_ROOT/tools/qsh/header_merge_non_secure.py -i ${TARGET.base}.bin -o ${TARGET.base}_production.bin -a 0x10000000'))
+
+def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
+    start_src = []
+    if with_startup:
+        start_src = ['$SDK_ROOT/soc/rv32/startup.c']
+    sdk_src = []
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+        'rv32/systick.c',
+        'rv32/int_call_asm.S',
+        'rv32/raptor/exception_entry.S',
+        'rv32/raptor/platform.c',
+        'rv32/qsh/delay_asm.S',
+        'rv32/raptor/ls_soc_gpio.c',
+        'rv32/raptor/ls_msp_ssiv2.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+        'src/otbn/text_array/ecc256_base_mult_text.c',
+        'src/otbn/text_array/ecc256_ecdsa_verify_text.c',
+        'src/otbn/text_array/ecc256_scalar_mult_text.c',
+        'src/otbn/text_array/ecc384_ecdsa_verify_text.c',
+        'src/otbn/text_array/sha256_text.c',
+        'src/otbn/text_array/sha512_text.c',
+        'src/otbn/text_array/sm3_text.c',
+        'src/otbn/text_array/sm2_text.c',
+        'src/otbn/text_array/otbn_text.c',
+        'src/otbn/ls_hal_otbn_sm2.c',
+        'src/otbn/ls_hal_otbn_sm3.c',
+        'src/otbn/ls_hal_otbn_hash.c',
+        'src/otbn/ls_hal_otbn_sha256.c',
+        'src/otbn/ls_hal_otbn_sha384.c',
+        'src/otbn/ls_hal_otbn_sha512.c',
+        'src/otbn/ls_hal_otbn_ecc256.c',
+        'src/otbn/ls_hal_otbn_ecc384.c',
+        # 'src/ls_hal_flash_swint.c',
+        'src/ls_hal_ssiv2.c',
+        # 'src/ls_hal_sha.c',
+        # 'src/ls_hal_sha_dma.c',
+        # 'src/ls_hal_sha512.c',
+        # 'src/ls_hal_sm4.c',
+        # 'src/ls_hal_crc.c',
+        # 'src/ls_hal_can.c',
+        # 'src/ls_hal_fdcan.c',
+        # 'src/ls_hal_crypt.c',
+        # 'src/ls_hal_qspiv2.c',
+        # 'src/ls_hal_flash_qspiv2.c',
+        # 'src/ls_hal_flash.c',
+        # 'src/ls_hal_cache.c',
+        # 'src/ls_hal_comp.c',
+        # 'src/ls_hal_uart.c',
+        # 'src/ls_hal_dwuart.c',
+        # 'src/ls_hal_dwuart_dma.c',
+        # 'src/ls_hal_dwtrng.c',
+        # 'src/ls_hal_adcv2.c',
+        # 'src/ls_hal_adcv2_dma.c',
+        # 'src/ls_hal_dac.c',
+        # 'src/ls_hal_dac_dma.c',
+        # 'src/ls_hal_uart_dma.c',
+        # 'src/ls_hal_ssi.c',
+        # 'src/ls_hal_spi_i2s.c',
+        # 'src/ls_hal_spi_i2s_dma.c',
+        # 'src/ls_hal_spis.c',
+        # 'src/ls_hal_spis_dma.c',
+        # 'src/ls_hal_timer.c',
+        # 'src/ls_hal_touchkey.c',
+        # 'src/ls_hal_i2c.c',
+        # 'src/ls_hal_kscan.c',
+        # 'src/ls_hal_rtcv2.c',
+        # 'src/ls_hal_pwm.c',
+        # 'src/ls_hal_pdm.c',
+        # 'src/ls_hal_pdm_dma.c',
+        # 'src/ls_hal_dmacv3.c',
+        # 'src/ls_hal_cec.c',
+        # 'src/ls_hal_owm.c',
+        # 'src/ls_hal_cap.c',
+        # 'src/ls_hal_i2c_dma.c',
+        # 'src/ls_hal_ssi_dma.c',
+        # 'src/ls_hal_wwdg.c',
+        # 'src/ls_hal_iwdgv2.c',
+        # 'src/ls_hal_ps2h.c',
+        # 'src/ls_hal_pis.c',
+        # 'src/ls_hal_otbn.c',
+        # 'src/ls_hal_otp_ctrl.c',
+        # 'src/ls_hal_mjtag.c',
+        # 'src/ls_hal_i3c_controller_dma.c',
+        # 'src/ls_hal_i3c_controller.c',
+        # 'src/ls_hal_i3c_irq.c',
+        # 'src/ls_hal_i3c_target.c',
+    ]))
+    sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/',x),[
+        'common/common.c',
+        # 'common/circular_doubly_linked_list.c',
+        'common/linked_async_framework.c',
+        'common/async_call.c',
+        # 'common/sw_timer.c',
+        # 'calendar/calendar.c',
+        'crc/crc16.c',
+        'crc/crc32.c',
+        'debug/log.c',
+        'debug/mini-printf/mini-printf.c',
+        'debug/ls_dbg.c',
+        'debug/RTT/SEGGER_RTT.c',
+        'debug/semihosting/riscv/semihosting.c',
+        'static_buffer/linked_buffer.c',
+        'static_buffer/fifo.c',
+        # 'tinyfs/tinyfs_nvm.c',
+        # 'tinyfs/tinyfs_write_cache.c',
+        # 'tinyfs/tinyfs.c',
+        # 'tinycrypt/lib/source/sha256.c',
+        # 'tinycrypt/lib/source/utils.c',
+    ]))
+    inc_list = list(map(lambda x:os.path.join('$SDK_ROOT/',x),[
+        'hal_driver/inc',
+        'hal_driver/api',
+        'hal_driver/api/otbn',
+        'module/common',
+        #'module/calendar',
+        'module/crc',
+        'module/debug',
+        'module/debug/mini-printf',
+        'module/debug/RTT',
+        'module/debug/semihosting/riscv',
+        'module/static_buffer',
+        # 'module/tinyfs',
+        # 'module/tinycrypt/lib/include',
+        'module/micro-ecc',
+        # 'module/adpcm',
+        'soc',
+        'soc/rv32',
+        'soc/rv32/raptor',
+        'soc/rv32/raptor/include',
+    ]))
+    
+    if usb:
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
+            # 'rv32/raptor/ls_msp_usb.c',
+        ]))
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
+            'src/ls_tusb_dcd.c',
+            'src/ls_tusb_hcd.c'
+        ]))
+        sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/module/tinyusb',x),[
+            'src/tusb.c',
+            'src/device/usbd.c',
+            'src/device/usbd_control.c',
+            'src/common/tusb_fifo.c',
+            'src/host/hub.c',
+            'src/host/usbh.c',
+            'src/class/audio/audio_device.c',
+            'src/class/bth/bth_device.c',
+            'src/class/cdc/cdc_device.c',
+            'src/class/cdc/cdc_host.c',
+            'src/class/cdc/cdc_rndis_host.c',
+            'src/class/dfu/dfu_device.c',
+            'src/class/dfu/dfu_rt_device.c',
+            'src/class/hid/hid_device.c',
+            'src/class/hid/hid_host.c',
+            'src/class/midi/midi_device.c',
+            'src/class/msc/msc_device.c',
+            'src/class/msc/msc_host.c',
+            'src/class/net/ecm_rndis_device.c',
+            'src/class/net/ncm_device.c',
+            'src/class/usbtmc/usbtmc_device.c',
+            'src/class/vendor/vendor_device.c',
+            'src/class/vendor/vendor_host.c',
+            'src/class/video/video_device.c',
+        ]))
+        inc_list += list(map(lambda x:os.path.join('$SDK_ROOT/module/tinyusb',x),[
+            'src',
+            'src/common',
+            'src/device',
+            'src/host',
+            'src/osal',
+            'hw'
+        ]))
+        self.Append(CPPDEFINES = ['CFG_TUSB_MCU=OPT_MCU_RAPTOR'])
+    if self.get('LINKSCRIPT') is None:
+        self['LINKSCRIPT'] = File(self.subst("$SDK_ROOT/soc/rv32/raptor/link_script.ld"))
+    self.Append(CPPPATH = self.inc_dirs(inc_list))
+    target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src),OBJPREFIX = objprefix)
+    self.Depends(target,[self['LINKSCRIPT']])
+    return target
+
+env.AddMethod(plf_postaction)
+env.AddMethod(plf_build)

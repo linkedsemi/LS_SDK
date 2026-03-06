@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "raptor ssiv2",
+            "type": "gdb",
+            "request": "attach",
+            "target": "10.10.20.23:1025",
+            "executable": "examples/peripheral/ssiv2/build/raptor/ssiv2.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "reset",
+                "load",
+                "set $pc=0x500000",
+            ],
+            "configurations": [],
+        },
+    ]
+}

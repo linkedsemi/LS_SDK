@@ -1,0 +1,212 @@
+#ifndef RAPTOR_H_
+#define RAPTOR_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef C908
+  #define  OFFSET_IRQ  14
+#else
+  #define  OFFSET_IRQ  0 
+#endif
+
+#define    CPU_WDT0_IRQn                          16-OFFSET_IRQ
+#define    CPU_SPI2_IRQn                          17-OFFSET_IRQ
+#define    CPU_SPI1_IRQn                          18-OFFSET_IRQ
+#define    CPU_SPI0_IRQn                          19-OFFSET_IRQ
+#define    CPU_SGPIO_MST1_IRQn                    20-OFFSET_IRQ
+#define    CPU_SGPIO_MST0_IRQn                    21-OFFSET_IRQ
+#define    CPU_SGPIO_MONITOR_IRQn                 22-OFFSET_IRQ
+#define    CPU_SGETH0_TX_IRQn0                    23-OFFSET_IRQ
+#define    CPU_SGETH0_TX_IRQn1                    24-OFFSET_IRQ
+#define    CPU_SGETH0_TX_IRQn2                    25-OFFSET_IRQ
+#define    CPU_SGETH0_TX_IRQn3                    26-OFFSET_IRQ
+#define    CPU_SGETH0_SBD_IRQn                    27-OFFSET_IRQ
+#define    CPU_SGETH0_RX_IRQn0                    28-OFFSET_IRQ
+#define    CPU_SGETH0_RX_IRQn1                    29-OFFSET_IRQ
+#define    CPU_SGETH0_RX_IRQn2                    30-OFFSET_IRQ
+#define    CPU_SGETH0_RX_IRQn3                    31-OFFSET_IRQ
+#define    CPU_PECI0_IRQn                         32-OFFSET_IRQ
+#define    CPU_PCIE2_IRQn                         33-OFFSET_IRQ
+#define    CPU_LPC1_IRQn                          34-OFFSET_IRQ
+#define    CPU_LPC0_IRQn                          35-OFFSET_IRQ
+#define    CPU_I3C15_IRQn                         36-OFFSET_IRQ
+#define    CPU_I3C14_IRQn                         37-OFFSET_IRQ
+#define    CPU_I3C13_IRQn                         38-OFFSET_IRQ
+#define    CPU_I3C12_IRQn                         39-OFFSET_IRQ
+#define    CPU_I3C11_IRQn                         40-OFFSET_IRQ
+#define    CPU_I3C10_IRQn                         41-OFFSET_IRQ
+#define    CPU_I3C9_IRQn                          42-OFFSET_IRQ
+#define    CPU_I3C8_IRQn                          43-OFFSET_IRQ
+#define    CPU_I3C7_IRQn                          44-OFFSET_IRQ
+#define    CPU_I3C6_IRQn                          45-OFFSET_IRQ
+#define    CPU_I3C5_IRQn                          46-OFFSET_IRQ
+#define    CPU_I3C4_IRQn                          47-OFFSET_IRQ
+#define    CPU_I3C3_IRQn                          48-OFFSET_IRQ
+#define    CPU_I3C2_IRQn                          49-OFFSET_IRQ
+#define    CPU_I3C1_IRQn                          50-OFFSET_IRQ
+#define    CPU_I3C0_IRQn                          51-OFFSET_IRQ
+#define    CPU_I2C15_IRQn                         52-OFFSET_IRQ
+#define    CPU_I2C14_IRQn                         53-OFFSET_IRQ
+#define    CPU_I2C13_IRQn                         54-OFFSET_IRQ
+#define    CPU_I2C12_IRQn                         55-OFFSET_IRQ
+#define    CPU_GDMA1_IRQn                         56-OFFSET_IRQ
+#define    CPU_GDMA0_IRQn                         57-OFFSET_IRQ
+#define    CPU_FWSPI_IRQn                         58-OFFSET_IRQ
+#define    CPU_ESPI1_IRQn                         59-OFFSET_IRQ
+#define    CPU_ESPI0_IRQn                         60-OFFSET_IRQ
+#define    CPU_AHB_DMA0_IRQn                      61-OFFSET_IRQ
+#define    CPU_C908_IRQn                          62-OFFSET_IRQ
+#define    CPU_AXI_IOPMP0_IRQn                    63-OFFSET_IRQ
+#define    CPU_AXI_DMA1_IRQn                      64-OFFSET_IRQ
+#define    CPU_AHB_IOPMP1_IRQn                    65-OFFSET_IRQ
+#define    CPU_AHB_IOPMP0_IRQn                    66-OFFSET_IRQ
+#define    PIPE_VPN1_IRQn                         67-OFFSET_IRQ
+#define    PIPE_VPN0_IRQn                         68-OFFSET_IRQ
+#define    CPU_SD_WAKEUP_IRQn                     69-OFFSET_IRQ
+#define    CPU_SD_IRQn                            70-OFFSET_IRQ
+#define    PIPE_PCIE1_CTRL_IRQn                   71-OFFSET_IRQ
+#define    PIPE_PCIE0_CTRL_IRQn                   72-OFFSET_IRQ
+#define    PIPE_EMMC_WAKEUP_IRQn                  73-OFFSET_IRQ
+#define    PIPE_EMMC_IRQn                         74-OFFSET_IRQ
+#define    PIPE_AXI_IOPMP1_IRQn                   75-OFFSET_IRQ
+#define    PERIPH_AXI_IOPMP2_IRQn                 76-OFFSET_IRQ
+#define    PERIPH_WDT4_IRQn                       77-OFFSET_IRQ
+#define    PERIPH_USB301_IRQn                     78-OFFSET_IRQ
+#define    PERIPH_USB300_IRQn                     79-OFFSET_IRQ
+#define    PERIPH_USB201_IRQn                     80-OFFSET_IRQ
+#define    PERIPH_USB200_IRQn                     81-OFFSET_IRQ
+#define    PERIPH_UART15_IRQn                     82-OFFSET_IRQ
+#define    PERIPH_UART14_IRQn                     83-OFFSET_IRQ
+#define    PERIPH_UART13_IRQn                     84-OFFSET_IRQ
+#define    PERIPH_UART12_IRQn                     85-OFFSET_IRQ
+#define    PERIPH_I2C11_IRQn                      86-OFFSET_IRQ
+#define    PERIPH_I2C10_IRQn                      87-OFFSET_IRQ
+#define    PERIPH_I2C9_IRQn                       88-OFFSET_IRQ
+#define    PERIPH_I2C8_IRQn                       89-OFFSET_IRQ
+#define    PERIPH_I2C7_IRQn                       90-OFFSET_IRQ
+#define    PERIPH_I2C6_IRQn                       91-OFFSET_IRQ
+#define    PERIPH_I2C5_IRQn                       92-OFFSET_IRQ
+#define    PERIPH_I2C4_IRQn                       93-OFFSET_IRQ
+#define    PERIPH_I2C3_IRQn                       94-OFFSET_IRQ
+#define    PERIPH_I2C2_IRQn                       95-OFFSET_IRQ
+#define    PERIPH_I2C1_IRQn                       96-OFFSET_IRQ
+#define    PERIPH_I2C0_IRQn                       97-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_TX_IRQn0         98-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_TX_IRQn1         99-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_TX_IRQn2         100-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_TX_IRQn3         101-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_RX_IRQn0         102-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_RX_IRQn1         103-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_RX_IRQn2         104-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_PERCH_RX_IRQn3         105-OFFSET_IRQ
+#define    PERIPH_ETH1_SBD_IRQn                   106-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_TX_IRQn0         107-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_TX_IRQn1         108-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_TX_IRQn2         109-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_TX_IRQn3         110-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_RX_IRQn0         111-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_RX_IRQn1         112-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_RX_IRQn2         113-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_PERCH_RX_IRQn3         114-OFFSET_IRQ
+#define    PERIPH_ETH0_SBD_IRQn                   115-OFFSET_IRQ
+#define    CPU_SOFT1_E906_IRQn                    116-OFFSET_IRQ
+#define    CPU_SOFT1_C908_IRQn                    117-OFFSET_IRQ
+#define    CPU_SOFT0_E906_IRQn                    118-OFFSET_IRQ
+#define    CPU_SOFT0_C908_IRQn                    119-OFFSET_IRQ
+#define    CPU_WDT1_IRQn                          120-OFFSET_IRQ
+#define    DDR_WDT2_IRQn                          121-OFFSET_IRQ
+#define    PIPE_WDT3_IRQn                         122-OFFSET_IRQ
+#define    ANA_WDT5_IRQn                          123-OFFSET_IRQ
+#define    CPU_WDT6_IRQn                          124-OFFSET_IRQ
+#define    CPU_WDT7_IRQn                          125-OFFSET_IRQ
+#define    CPU_SHA512_IRQn                        126-OFFSET_IRQ
+#define    CPU_SHA256_IRQn                        127-OFFSET_IRQ
+#define    CPU_CRYPT_IRQn                         128-OFFSET_IRQ
+#define    CPU_CALC_SM4_IRQn                      129-OFFSET_IRQ
+#define    CPU_RTC_IRQn                           130-OFFSET_IRQ
+#define    CPU_UART11_IRQn                        131-OFFSET_IRQ
+#define    CPU_UART10_IRQn                        132-OFFSET_IRQ
+#define    CPU_UART9_IRQn                         133-OFFSET_IRQ
+#define    CPU_UART8_IRQn                         134-OFFSET_IRQ
+#define    CPU_UART7_IRQn                         135-OFFSET_IRQ
+#define    CPU_UART6_IRQn                         136-OFFSET_IRQ
+#define    CPU_UART5_IRQn                         137-OFFSET_IRQ
+#define    CPU_UART4_IRQn                         138-OFFSET_IRQ
+#define    CPU_UART3_IRQn                         139-OFFSET_IRQ
+#define    CPU_UART2_IRQn                         140-OFFSET_IRQ
+#define    CPU_UART1_IRQn                         141-OFFSET_IRQ
+#define    CPU_UART0_IRQn                         142-OFFSET_IRQ
+#define    CPU_PWM_IRQn                           143-OFFSET_IRQ
+#define    CPU_CAP_IRQn                           144-OFFSET_IRQ
+#define    CPU_JTAGM1_IRQn                        145-OFFSET_IRQ
+#define    CPU_JTAGM0_IRQn                        146-OFFSET_IRQ
+#define    CPU_CAN_IRQn                           147-OFFSET_IRQ
+#define    CPU_LTPI1_PHY_IRQn                     148-OFFSET_IRQ
+#define    CPU_LTPI1_SCM_IRQn                     149-OFFSET_IRQ
+#define    CPU_LTPI0_PHY_IRQn                     150-OFFSET_IRQ
+#define    CPU_LTPI0_SCM_IRQn                     151-OFFSET_IRQ
+#define    CPU_OTBN_IRQn                          152-OFFSET_IRQ
+#define    PIN_MUX_EXT1_IRQn                      153-OFFSET_IRQ
+#define    PIN_MUX_EXT0_IRQn                      154-OFFSET_IRQ
+#define    CPU_ADC0_IRQn                          155-OFFSET_IRQ
+#define    CPU_NIST_TRNG_IRQn                     156-OFFSET_IRQ
+#define    CPU_OTP_IRQn                           157-OFFSET_IRQ
+#define    CPU_TIM_IRQn                           158-OFFSET_IRQ
+#define    CPU_ADTIM0_IRQn                        159-OFFSET_IRQ
+#define    CPU_ADTIM1_IRQn                        160-OFFSET_IRQ
+#define    PIPE_GDMA2_IRQn                        161-OFFSET_IRQ
+#define    PIPE_GRAPHIC_IRQn                      162-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_TX_IRQn3               163-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_TX_IRQn2               164-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_TX_IRQn1               165-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_TX_IRQn0               166-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_RX_IRQn3               167-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_RX_IRQn2               168-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_RX_IRQn1               169-OFFSET_IRQ
+#define    PIPE_CPU_SGETH2_RX_IRQn0               170-OFFSET_IRQ        
+#define    PIPE_CPU_SGETH2_SBD_IRQn               171-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_TX_IRQn3               172-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_TX_IRQn2               173-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_TX_IRQn1               174-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_TX_IRQn0               175-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_RX_IRQn3               176-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_RX_IRQn2               177-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_RX_IRQn1               178-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_RX_IRQn0               179-OFFSET_IRQ
+#define    PIPE_CPU_SGETH1_SBD_IRQn               180-OFFSET_IRQ
+#define    PIPE_DPTX_IRQn                         181-OFFSET_IRQ
+#define    CPU_ADC1_IRQn                          182-OFFSET_IRQ
+#define    CPU_PECI1_IRQn                         183-OFFSET_IRQ
+#define    PIN_MUX_APB_EXTI0_IRQn                 184-OFFSET_IRQ
+#define    PIN_MUX_APB_EXTI1_IRQn                 185-OFFSET_IRQ   
+#define    PIN_MUX_APB_EXTI2_IRQn                 186-OFFSET_IRQ   
+#define    PIN_MUX_APB_EXTI3_IRQn                 187-OFFSET_IRQ
+#define    CPU_SGPIO_MONITOR1_IRQn                188-OFFSET_IRQ
+#define    CPU_OTBN_SYSC_IRQn                     189-OFFSET_IRQ
+#define    CPU_C908_RSTIND_IRQn                   190-OFFSET_IRQ
+#define    CPU_OTFAD_AES_IRQn                     191-OFFSET_IRQ
+#define    PERIPH_VIRTUAL_USB1_IRQn               192-OFFSET_IRQ
+#define    PERIPH_VIRTUAL_USB0_IRQn               193-OFFSET_IRQ 
+#define    ANA_TOP_CRG_LVD_L_09V_IRQn             194-OFFSET_IRQ 
+#define    ANA_TOP_CRG_LVD_H_09V_IRQn             195-OFFSET_IRQ          
+#define    CPU_ADC2_IRQn	                      196-OFFSET_IRQ 
+#define    DDR_AXISRAM1_MEM_ERROR2_IRQn           197-OFFSET_IRQ
+#define    DDR_AXISRAM1_MEM_ERROR1_IRQn           198-OFFSET_IRQ
+#define    CPU_SRAM2_MEM_ERROR2_IRQn              199-OFFSET_IRQ
+#define    CPU_SRAM2_MEM_ERROR1_IRQn              200-OFFSET_IRQ
+#define    CPU_SRAM0_MEM_ERROR2_IRQn              201-OFFSET_IRQ
+#define    CPU_SRAM0_MEM_ERROR1_IRQn              202-OFFSET_IRQ      
+#define    CPU_CPU1_SYS_RST_INTR_IRQn             203-OFFSET_IRQ         
+#define    CPU_C908_RST_READY_INTR_IRQn           204-OFFSET_IRQ  
+#define    IRQN_MAX                               240
+
+#define QSPI1_IRQN           30 //软件中断号
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
