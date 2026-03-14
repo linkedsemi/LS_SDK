@@ -33,9 +33,9 @@
  *   [MSB]         HID | MSC | CDC          [LSB]
  */
 #define _PID_MAP(itf, n)  ( (CFG_TUD_##itf) << (n) )
-#define USB_PID           (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) | \
-                           _PID_MAP(MIDI, 3) | _PID_MAP(VENDOR, 4) )
-
+// #define USB_PID           (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) |
+//                            _PID_MAP(MIDI, 3) | _PID_MAP(VENDOR, 4) )
+#define USB_PID   0x0001
 #define USB_VID   0xCafe
 #define USB_BCD   0x0200
 
@@ -181,44 +181,119 @@ char const* string_desc_arr [] =
   "Linkedsemi",                     // 1: Manufacturer
   "Linkedsemi Keyboard",              // 2: Product
   "v1.0",                      // 3: Serials, should use chip ID
+  (const char[]){'M', 0, 'S', 0, 'F', 0, 'T', 0, '1', 0, '0', 0, '0', 0, 0x01, 0}, // 0xEE: Windows OS String Descriptor ("MSFT100")      
 };
 
-static uint16_t _desc_str[32];
+
+// Microsoft OS 1.0 Extended Compat ID Descriptor
+uint8_t const desc_ms_os_compat_id[] = 
+{
+    0x28, 0x00, 0x00, 0x00, // length--Size of this struct = 16 + bCount*24
+    0x00, 0x01,             // bcdVersion--1.00 -> 0x0100
+    0x04, 0x00,             // index--Command index - 0x0004 for extended compatibility id
+    0x01,                   // count--Number of interfaces for which an extended compatibility feature descriptor is defined
+    0, 0, 0, 0, 0, 0, 0,    // reserved[7]
+
+    0x00,                   // firstInterfaceNumber--Interface number for which an extended compatibility feature descriptor is defined
+    0x01,                   // reserved
+    0, 0, 0, 0, 0, 0, 0, 0, // compatibleID[8]--String describing the compatible id
+    0, 0, 0, 0, 0, 0, 0, 0, // subCompatibleID[8]--String describing the sub compatible id
+    0, 0, 0, 0, 0, 0        // reserved[6]
+};
+
+// Microsoft OS 1.0 Extended Property Descriptor
+uint8_t const desc_ms_os_property[] = 
+{
+    U32_TO_U8S_LE(0x0000004C),  // dwLength--Size of this struct:0x0000004c=76
+    0x00, 0x01,                 // bcdVersion--1.00 -> 0x0100
+    0x05, 0x00,                 // wIndex--Command index - Extended property OS descriptor: 0x0005 
+    0x01, 0x00,                 // wCount--One custom property
+    U32_TO_U8S_LE(0x00000042),  // dwSize--0x00000042 (66 bytes for this property)
+    U32_TO_U8S_LE(0x00000004),  // wPropertyDataType (REG_DWORD)
+    U16_TO_U8S_LE(0x0030),      // wPropertyNameLength (48 bytes)
+    // bPropertyName: "SelectiveSuspendEnabled" (Unicode)
+    // 48 Bytes EnableDshowRedirection (Unicode string end with NULL)
+    'S', 0x00, 'e', 0x00, 'l', 0x00, 'e', 0x00, 'c', 0x00, 't', 0x00, 'i', 0x00, 'v', 0x00,
+    'e', 0x00, 'S', 0x00, 'u', 0x00, 's', 0x00, 'p', 0x00, 'e', 0x00, 'n', 0x00, 'd', 0x00,
+    'E', 0x00, 'n', 0x00, 'a', 0x00, 'b', 0x00, 'l', 0x00, 'e', 0x00, 'd', 0x00, 0x00, 0x00,
+    U32_TO_U8S_LE(0x00000004),    // dwPropertyDataLength--0x00000004 (Sizeof(DWORD))
+    0x01, 0x00, 0x00, 0x00,   // bPropertyData--0x00000001 (DWORD data)
+};
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
-  (void) langid;
+    (void)langid;
+    
+    static uint16_t _desc_str[32];
+    uint8_t chr_count;
 
-  uint8_t chr_count;
-
-  if ( index == 0)
-  {
-    memcpy(&_desc_str[1], string_desc_arr[0], 2);
-    chr_count = 1;
-  }else
-  {
-    // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.
-    // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
-
-    if ( !(index < sizeof(string_desc_arr)/sizeof(string_desc_arr[0])) ) return NULL;
-
-    const char* str = string_desc_arr[index];
-
-    // Cap at max char
-    chr_count = (uint8_t) strlen(str);
-    if ( chr_count > 31 ) chr_count = 31;
-
-    // Convert ASCII string into UTF-16
-    for(uint8_t i=0; i<chr_count; i++)
+    if (index == 0)
     {
-      _desc_str[1+i] = str[i];
+        memcpy(&_desc_str[1], string_desc_arr[0], 2);
+        chr_count = 1;
     }
-  }
+    else
+    {
+        // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.
+        // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
+        if (index == 0xEE)
+        {
+            const char *str = string_desc_arr[4];
+            uint8_t len = 8; // "MSFT100" + 0x01 (共8字符)
+            for (uint8_t i = 0; i < len; i++)
+            {
+                _desc_str[1 + i] = ((uint16_t *)str)[i]; // 直接复制UTF-16数据
+            }
+            _desc_str[0] = (TUSB_DESC_STRING << 8) | (2 * len + 2);
+            return _desc_str;
+        }
 
-  // first byte is length (including header), second byte is string type
-  _desc_str[0] = (uint16_t) ((TUSB_DESC_STRING << 8 ) | (2*chr_count + 2));
+        if (index > 4)
+        {
+            return NULL;
+        }
+        const char *str = string_desc_arr[index];
+        // Cap at max char
+        chr_count = (uint8_t)strlen(str);
+        if (chr_count > 31)
+        {
+            chr_count = 31;
+        }
+        // Convert ASCII string into UTF-16
+        for (uint8_t i = 0; i < chr_count; i++)
+        {
+            _desc_str[1 + i] = str[i];
+        }
+    }
 
-  return _desc_str;
+    // first byte is length (including header), second byte is string type
+    _desc_str[0] = (uint16_t)((TUSB_DESC_STRING << 8) | (2 * chr_count + 2));
+    
+    return _desc_str;
+}
+
+bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request)
+{
+    // nothing to with DATA & ACK stage
+    if (stage != CONTROL_STAGE_SETUP)
+        return true;
+
+    // 处理OS描述符请求（0xC0）
+    if (request->bmRequestType == 0xC0)
+    {
+        // Get Microsoft OS 1.0 compatible descriptor 
+        return tud_control_xfer(rhport, request, (void *)desc_ms_os_compat_id, sizeof(desc_ms_os_compat_id));
+    }
+
+    // 处理扩展属性请求 (0xC1)
+    if (request->bmRequestType == 0xC1)
+    {
+        // Get Microsoft OS 1.0 property descriptor
+        tud_control_xfer(rhport, request, (void *)desc_ms_os_property, sizeof(desc_ms_os_property));
+        return true;
+    }
+
+    return false; // 其他厂商请求
 }
