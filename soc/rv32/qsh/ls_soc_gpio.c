@@ -818,7 +818,7 @@ static uint8_t pin2func_io(gpio_port_pin_t *x)
     return x->port * 16 + x->num;
 }
 
-void per_func_enable(uint8_t pin, uint8_t func_num)
+void XIP_BANNED_FUNC(per_func_enable,uint8_t pin, uint8_t func_num)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_APP_AWO->IO_FUNC[func_num][x->port >> 1] |= 1 << (((x->port % 2) * 16)+ x->num);
@@ -1304,7 +1304,7 @@ void pinmux_dwuart4_deinit()
 //     per_func_disable(pin2func_io((gpio_port_pin_t *)&owm_pin));
 // }
 
-ROM_SYMBOL void pinmux_hal_flash_init(void)
+ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flash_init,)
 {
     per_func_enable(QSPI1_CLK_PIN, PINMUX_FUNC2);
     per_func_enable(QSPI1_CSN_PIN, PINMUX_FUNC2);
@@ -1319,7 +1319,7 @@ ROM_SYMBOL void pinmux_hal_flash_init(void)
     APP_PMU->QSPI1_PAD_CFG.DS1_DS0 = (0x3f << 16) | 0x3f;
 }
 
-ROM_SYMBOL void pinmux_hal_flash_deinit(void)
+ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flash_deinit,)
 {
     per_func_disable(QSPI1_CLK_PIN, PINMUX_FUNC2);
     per_func_disable(QSPI1_CSN_PIN, PINMUX_FUNC2);
@@ -1327,7 +1327,7 @@ ROM_SYMBOL void pinmux_hal_flash_deinit(void)
     per_func_disable(QSPI1_IO1_SO_PIN, PINMUX_FUNC2);
 }
 
-ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
+ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flash_quad_init,)
 {
     per_func_enable(QSPI1_CLK_PIN, PINMUX_FUNC2);
     per_func_enable(QSPI1_CSN_PIN, PINMUX_FUNC2);
@@ -1341,7 +1341,7 @@ ROM_SYMBOL void pinmux_hal_flash_quad_init(void)
     APP_PMU->QSPI1_PAD_CFG.DS1_DS0 = (0x3f << 16) | 0x3f;
 }
 
-ROM_SYMBOL void pinmux_hal_flash_quad_deinit(void)
+ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flash_quad_deinit,)
 {
     per_func_disable(QSPI1_CLK_PIN, PINMUX_FUNC2);
     per_func_disable(QSPI1_CSN_PIN, PINMUX_FUNC2);
