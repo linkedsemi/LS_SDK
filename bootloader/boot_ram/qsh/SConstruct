@@ -4,8 +4,7 @@ env['SDK_ROOT'] = Dir('../../../')
 env['IC'] = 'qsh'
 env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
 src = [
-    # 'boot_ram.c',
-    'boot_ram_cpu1_xip.c',
+    'boot_ram.c',
     'reset_handler.c',
 ]
 inc = [
@@ -22,5 +21,4 @@ env.AddPostAction(target,Action('$READELF -s $TARGET > ${TARGET.base}.defsym'))
 env.AddPostAction(target,Action('$OBJCOPY -O binary ${TARGET.base}.elf ${TARGET.base}.bin'))
 env.AddPostAction(target,Action('python $SDK_ROOT/tools/qsh/header_merge_non_secure.py -i ${TARGET.base}.bin -o ${TARGET.base}_header.bin -a 0x10124000'))
 env.AddPostAction(target,Action('python $SDK_ROOT/tools/qsh/header_show.py ${TARGET.base}_header.bin'))
-# env.AddPostAction(target,Copy('$SDK_ROOT/soc/rv32/qsh/bin/bram.bin','${TARGET.base}.bin'))
-env.AddPostAction(target,Copy('$SDK_ROOT/soc/rv32/qsh/bin/bram_cpu1_xip.bin','${TARGET.base}.bin'))
+env.AddPostAction(target,Copy('$SDK_ROOT/soc/rv32/qsh/bin/bram.bin','${TARGET.base}.bin'))

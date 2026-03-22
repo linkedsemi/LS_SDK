@@ -14,11 +14,17 @@
 #include "ls_hal_cache.h"
 #include "cpu.h"
 #include "ls_dbg.h"
+#include "hal_flash_int.h"
+#include "field_manipulate.h"
 
-extern uint32_t __next_ram_size;
 struct boot_otp otp_cfg;
 
-__attribute__((aligned(4))) uint8_t temp_buf[TEMP_BUF_SIZE];
+/*
+name     address   size
+bootram  0x8000000 64(kB)
+image    0x8010000
+*/
+#define IMAGE_OFFSET       0x10000
 
 void boot_flash_read(uint32_t offset, uint8_t *data, uint32_t length)
 {
@@ -37,10 +43,16 @@ uint32_t boot_crc32(uint8_t *data, uint32_t length)
 
 void boot_flash_start_xip(uint32_t offset)
 {
-    lsqspiv2_direct_quad_read_config(LSQSPIV2, false);
-#if 0
-    LSQSPIV2->BACKUP_OFFSET = offset >> 14;
-#endif
+    flash1.continuous_mode_enable = true;
+    flash1.continuous_mode_on = false;
+    hal_flashx_init(&flash1);
+    hal_flashx_continuous_mode_start(&flash1);
+    lsqspiv2_direct_quad_read_config(LSQSPIV2, true);
+
+    REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1, LSQSPIV2_MODE_DAC, 1);
+    MODIFY_REG(LSQSPIV2->QSPI_CTRL1, LSQSPIV2_CAP_DLY_MASK, 0 << LSQSPIV2_CAP_DLY_POS);
+
+    pinmux_hal_flash_quad_init();
     lscache_cache_enable(1);
 }
 
@@ -53,15 +65,10 @@ static bool boot_nonsecure(uint32_t *exe_addr, uint32_t offset)
     if (crc != header.header_crc)
         return false;
 
-    LOG_I("flash_image --exe_addr:0x%x", header.exe_addr);
-    if (SRAM1_ADDR > header.exe_addr) {
-        *exe_addr = header.exe_addr;
+    if (header.exe_addr == 0x0) {
+        *exe_addr = FLASH_CACHE_ADDR + IMAGE_OFFSET + header.offset;
         boot_flash_start_xip(offset);
     } else {
-        if ((uint32_t)&__next_ram_size < header.length) {
-            LOG_I("__next_ram_size: 0x%x < image size: 0x%x", (uint32_t)&__next_ram_size, header.length);
-            return false;
-        }
         *exe_addr = header.exe_addr;
         boot_flash_read(offset + header.offset, (uint8_t *)header.exe_addr, header.length);
     }
@@ -85,9 +92,6 @@ static void set_runtime_cfg()
         log_hex_output_fn = log_hex_output;
     }
 
-    qspiv2_global_int_disable_fn = enter_critical;
-    qspiv2_global_int_restore_fn = exit_critical;
-
     flash1.reg = (void *)LSQSPIV2;
     flash1.dual_mode_only = false;
     flash1.continuous_mode_enable = false;
@@ -96,7 +100,7 @@ static void set_runtime_cfg()
     flash1.continuous_mode_on = false;
     flash1.addr4b = false;
 
-    pinmux_hal_flash_quad_init();
+   // pinmux_hal_flash_quad_init();
 }
 
 static void boot_flash_swint_init()
@@ -137,7 +141,7 @@ int main()
     LOG_I("Flash Boot...");
 
     while (1) {
-        uint32_t offset = 64 * 1024;
+        uint32_t offset = IMAGE_OFFSET;
         uint32_t exe_addr;
         if (!boot_nonsecure(&exe_addr, offset)) {
             continue;
