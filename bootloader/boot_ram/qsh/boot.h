@@ -112,7 +112,7 @@ void boot_uart_rx_cb();
 void boot_uart_read(uint8_t *buf,uint16_t length, bool it_mode);
 void boot_uart_write(uint8_t *buf,uint16_t length, bool it_mode);
 
-void boot_flash_start_xip(uint32_t offset);
+void boot_flash_start_xip(void);
 void boot_flash_sm4_realtime_decrypt(uint8_t *nonce, uint8_t *key, uint32_t start, uint32_t end, bool lock);
 void boot_flash_read(uint32_t offset, uint8_t * data, uint32_t length);
 

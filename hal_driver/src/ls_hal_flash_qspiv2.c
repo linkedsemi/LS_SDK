@@ -7,7 +7,9 @@
 
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_init,struct hal_flash_env *env)
 {
+    uint32_t offset = lsqspiv2_backup_offset_get(env->reg,0);
     lsqspiv2_init(env->reg);
+    lsqspiv2_backup_offset_set(env->reg,offset);
     if(env->dual_mode_only)
     {
         lsqspiv2_direct_dual_read_config(env->reg,env->continuous_mode_enable);
