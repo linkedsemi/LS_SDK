@@ -22,7 +22,15 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length);
 
 HAL_StatusTypeDef HAL_OTP_Write(uint32_t offset, uint8_t *data, uint32_t length);
 
+HAL_StatusTypeDef OTP_SET_RD_ADDR_LENTH(uint32_t offset, uint32_t length);
 
+HAL_StatusTypeDef OTP_SET_WR_ADDR_LENTH(uint32_t offset, uint32_t length);
+
+HAL_StatusTypeDef HAL_OTP_Check_And_Read(uint32_t offset, uint8_t *data, uint32_t length);
+
+HAL_StatusTypeDef HAL_OTP_Check_And_Write(uint32_t offset, uint8_t *data, uint32_t length);
+
+HAL_StatusTypeDef Get_Life_Cycle_Status(uint8_t *lc_value);
 #ifdef __cplusplus
 }
 #endif

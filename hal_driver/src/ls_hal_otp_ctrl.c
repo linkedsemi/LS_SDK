@@ -7,6 +7,7 @@
 #define ONEBIT_BYTES            (0x20)
 #define OTP_BYTE_DEFAULT_VALUE  (0xFF)
 #define SINGLE_WRITE_MAX_LENGTH (0x20)
+#define OTP_MEM_TOTAL_BYTES    (0x1000)
 
 static void otp_check_power_ready()
 {
@@ -223,3 +224,159 @@ HAL_StatusTypeDef HAL_OTP_Read(uint32_t offset, uint8_t *data, uint32_t length)
 
     return HAL_OK;
 }
+
+/**
+ * @brief  Set the OTP read protection range.
+ * @param  offset: Starting address (must be 32-byte aligned).
+ * @param  length: Length of the range (must be 32-byte aligned).
+ * @return HAL_OK: Success.
+ * HAL_INVALIAD_PARAM: Invalid parameters.
+ */
+HAL_StatusTypeDef OTP_SET_RD_ADDR_LENTH(uint32_t offset, uint32_t length)
+{
+
+    if ((offset % ONEBIT_BYTES != 0) || (length % ONEBIT_BYTES != 0) || (length == 0))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
+    if ((offset > OTP_MEM_TOTAL_BYTES) || ((offset + length) > OTP_MEM_TOTAL_BYTES))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
+    uint32_t addr_bitmap[4];
+    HAL_OTP_GET_RD_Addr(addr_bitmap);
+
+    uint32_t start_bit = offset / ONEBIT_BYTES;
+    uint32_t bit_count = length / ONEBIT_BYTES;
+
+    for (uint32_t i = start_bit; i < start_bit + bit_count; i++)
+    {
+        if (i < 128) {
+            addr_bitmap[i / 32] |= (1U << (i % 32));
+        }
+    }
+
+    HAL_OTP_SET_RD_Addr(addr_bitmap);
+    return HAL_OK;
+}
+
+/**
+ * @brief  Set the OTP write protection range.
+ * Set the OTP write protection range.
+ * @param  offset: Starting address (must be 32-byte aligned).
+ * @param  length: Length of the range (must be 32-byte aligned).
+ * @return HAL_OK: Success.
+ * HAL_INVALIAD_PARAM: Invalid parameters.
+ */
+HAL_StatusTypeDef OTP_SET_WR_ADDR_LENTH(uint32_t offset, uint32_t length)
+{
+    if ((offset % ONEBIT_BYTES != 0) || (length % ONEBIT_BYTES != 0) || (length == 0))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
+    if ((offset > OTP_MEM_TOTAL_BYTES) || ((offset + length) > OTP_MEM_TOTAL_BYTES))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
+    uint32_t addr_bitmap[4];
+    HAL_OTP_GET_WR_Addr(addr_bitmap);
+
+    uint32_t start_bit = offset / ONEBIT_BYTES;
+    uint32_t bit_count = length / ONEBIT_BYTES;
+
+    for (uint32_t i = start_bit; i < start_bit + bit_count; i++)
+    {
+        if (i < 128) {
+            addr_bitmap[i / 32] |= (1U << (i % 32));
+        }
+    }
+
+    HAL_OTP_SET_WR_Addr(addr_bitmap);
+    return HAL_OK;
+}
+
+/**
+ * @brief  Check the OTP read protection range.
+ * @param  offset: Starting address (must be 32-byte aligned).
+ * @param  length: Length of the range (must be 32-byte aligned).
+ * @return HAL_OK: Success.
+ * HAL_INVALIAD_PARAM: Invalid parameters.
+ * HAL_INVALID_OPERATION: The OTP read protection range is violated.
+ */
+HAL_StatusTypeDef HAL_OTP_Check_And_Read(uint32_t offset, uint8_t *data, uint32_t length)
+{
+    if (((offset + length) > OTP_MEM_TOTAL_BYTES) || (length == 0))
+        return HAL_INVALIAD_PARAM;
+
+    otp_check_power_ready();
+
+    uint32_t rd_bitmap[0x4];
+    HAL_OTP_GET_RD_Addr(rd_bitmap);
+
+    /* RD 禁读位图按 32Byte(onebit) 为一个块 */
+    uint32_t first_blk = offset / ONEBIT_BYTES;
+    uint32_t last_blk = (offset + length - 1) / ONEBIT_BYTES;
+
+    for (uint32_t blk = first_blk; blk <= last_blk; blk++)
+    {
+        if (((rd_bitmap[blk / 32] >> (blk % 32)) & 0x1u) != 0)
+            return HAL_INVALID_OPERATION;
+    }
+
+    return HAL_OTP_Read(offset, data, length);
+}
+
+/**
+ * @brief  Check the OTP write protection range.
+ * @param  offset: Starting address (must be 32-byte aligned).
+ * @param  length: Length of the range (must be 32-byte aligned).
+ * @return HAL_OK: Success.
+ * HAL_INVALIAD_PARAM: Invalid parameters.
+ * HAL_INVALID_OPERATION: The OTP protection range is violated, cannot write.
+ */
+HAL_StatusTypeDef HAL_OTP_Check_And_Write(uint32_t offset, uint8_t *data, uint32_t length)
+{
+    if ((length == 0) || ((offset + length) > OTP_MEM_TOTAL_BYTES))
+        return HAL_INVALIAD_PARAM;
+
+    otp_check_power_ready();
+
+    uint32_t wr_bitmap[0x4];
+    HAL_OTP_GET_WR_Addr(wr_bitmap);
+
+    uint32_t first_blk = offset / ONEBIT_BYTES;
+    uint32_t last_blk = (offset + length - 1) / ONEBIT_BYTES;
+
+    for (uint32_t blk = first_blk; blk <= last_blk; blk++)
+    {
+        if (((wr_bitmap[blk / 32] >> (blk % 32)) & 0x1u) != 0)
+            return HAL_INVALID_OPERATION;
+    }
+
+    return HAL_OTP_Write(offset, data, length);
+}
+
+/**
+ * @brief  Get the life cycle status.
+ * @param  lc_value: The life cycle status value.
+ lc_value=0x00: FRA
+ lc_value=0xFC: NON_DEBUG
+ lc_value=0xFE: APP_DEBUG
+ lc_value=0xFF: BLANK
+ * @return HAL_OK: Success.
+ * HAL_INVALIAD_PARAM: Invalid parameters.
+ */
+HAL_StatusTypeDef Get_Life_Cycle_Status(uint8_t *lc_value)
+{
+    if (lc_value == NULL)
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
+    return HAL_OTP_Check_And_Read(0x8c, lc_value, 1);
+}
+
