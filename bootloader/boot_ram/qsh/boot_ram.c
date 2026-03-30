@@ -16,15 +16,12 @@
 #include "ls_dbg.h"
 #include "hal_flash_int.h"
 #include "field_manipulate.h"
-
+// #include "ls_msp_qspiv2.h"
+extern uint32_t __next_ram_size;
 struct boot_otp otp_cfg;
 
-/*
-name     address   size
-bootram  0x8000000 64(kB)
-image    0x8010000
-*/
-#define IMAGE_OFFSET       0x10000
+#define FLASH_BASE_ADDRESS 0x8000000
+#define IMAGE_OFFSET       0x10000 //IMAGE_OFFSET = CONFIG_FLASH_BASE_ADDRESS - FLASH_BASE_ADDRESS - 0x100
 
 void boot_flash_read(uint32_t offset, uint8_t *data, uint32_t length)
 {
@@ -41,18 +38,12 @@ uint32_t boot_crc32(uint8_t *data, uint32_t length)
     return HAL_LSCRC_CRC_CALC(&CRC32_PARAM, data, length);
 }
 
-void boot_flash_start_xip(uint32_t offset)
+void boot_flash_start_xip(void)
 {
-    flash1.continuous_mode_enable = true;
-    flash1.continuous_mode_on = false;
-    hal_flashx_init(&flash1);
-    hal_flashx_continuous_mode_start(&flash1);
-    lsqspiv2_direct_quad_read_config(LSQSPIV2, true);
-
-    REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1, LSQSPIV2_MODE_DAC, 1);
-    MODIFY_REG(LSQSPIV2->QSPI_CTRL1, LSQSPIV2_CAP_DLY_MASK, 0 << LSQSPIV2_CAP_DLY_POS);
-
     pinmux_hal_flash_quad_init();
+    hal_flashx_continuous_mode_start(&flash1);
+    lsqspiv2_direct_quad_read_config(LSQSPIV2, false);
+    
     lscache_cache_enable(1);
 }
 
@@ -65,10 +56,14 @@ static bool boot_nonsecure(uint32_t *exe_addr, uint32_t offset)
     if (crc != header.header_crc)
         return false;
 
-    if (header.exe_addr == 0x0) {
-        *exe_addr = FLASH_CACHE_ADDR + IMAGE_OFFSET + header.offset;
-        boot_flash_start_xip(offset);
+    if (SRAM1_ADDR > header.exe_addr) {
+        // *exe_addr = header.exe_addr;
+        *exe_addr = FLASH_BASE_ADDRESS + offset + sizeof(imageHeader_t); //0x100 : header size
+        // boot_flash_start_xip(offset);
     } else {
+        if ((uint32_t)&__next_ram_size < header.length) {
+            return false;
+        }
         *exe_addr = header.exe_addr;
         boot_flash_read(offset + header.offset, (uint8_t *)header.exe_addr, header.length);
     }
@@ -92,6 +87,9 @@ static void set_runtime_cfg()
         log_hex_output_fn = log_hex_output;
     }
 
+    // qspiv2_global_int_disable_fn = enter_critical;
+    // qspiv2_global_int_restore_fn = exit_critical;
+
     flash1.reg = (void *)LSQSPIV2;
     flash1.dual_mode_only = false;
     flash1.continuous_mode_enable = false;
@@ -100,7 +98,7 @@ static void set_runtime_cfg()
     flash1.continuous_mode_on = false;
     flash1.addr4b = false;
 
-   // pinmux_hal_flash_quad_init();
+//    pinmux_hal_flash_quad_init();
 }
 
 static void boot_flash_swint_init()
@@ -113,12 +111,68 @@ static void boot_flash_swint_init()
     csi_vic_enable_irq(FLASH_SWINT_NUM);
 }
 
+static void cpu_600M_ahb_300M_qspi_200M_init()
+{
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL1 = FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS0, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS1, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS2, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS3, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS4, 0x3)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_HBUS, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_OTP, 0x1);
+    SYSC_SEC_AWO->CLKG_DIV_DPLL = SYSC_SEC_AWO_CLKG_DIV_DPLL_CLR_MASK;
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL0 = 
+                                  // FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1, 0x1)
+                                     FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_M1, 0x1) /* set ahb_clk = 1/2 * cpu_clk */
+                                 //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
+    SYSC_SEC_AWO->CLKG_DIV_DPLL = SYSC_SEC_AWO_CLKG_DIV_DPLL_SET_MASK;
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL0 =
+                                  // FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1, 0x1)
+                                     FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS, 0x10)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_M1, 0x1)
+                                 //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x10)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
+}
+
+static void enable_dpll()
+{
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_CLKREF_SEL_MASK); /* clkin */
+    SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr reset */
+    SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_RSTN_MASK); /* enable pll1 */
+    while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK));
+
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_CLKREF_SEL_MASK); /* clkin */
+    SET_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_EN_MASK); /* clr reset */
+    SET_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_RSTN_MASK); /* enable pll2 */
+    while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK));
+}
+
+
 void platform_init()
 {
     __enable_irq();
 
     boot_otp_read(0x0, (uint8_t *)&otp_cfg, sizeof(otp_cfg));
     set_runtime_cfg();
+
+    LSCACHE->CCR = FIELD_BUILD(LSCACHE_EN, 0);
+    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK))
+        && (0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK))) {
+        enable_dpll();
+        cpu_600M_ahb_300M_qspi_200M_init();
+    }
+
+    hal_flashx_init(&flash1);
 
     boot_flash_swint_init();
     uint8_t jedec_id[3] = {};
@@ -130,7 +184,7 @@ void platform_init()
     } else {
         while(1);
     }
-    hal_flash_qe_status_read_and_set();
+    // hal_flash_qe_status_read_and_set();
     HAL_LSCRC_Init();
 }
 
@@ -138,7 +192,8 @@ int main()
 {
     platform_init();
 
-    LOG_I("Flash Boot...");
+    boot_flash_start_xip();
+    LOG_I("RAM Boot...");
 
     while (1) {
         uint32_t offset = IMAGE_OFFSET;
