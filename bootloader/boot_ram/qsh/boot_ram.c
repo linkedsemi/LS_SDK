@@ -172,6 +172,8 @@ void platform_init()
         cpu_600M_ahb_300M_qspi_200M_init();
     }
 
+    LOG_INIT();
+
     hal_flashx_init(&flash1);
 
     boot_flash_swint_init();
@@ -193,7 +195,7 @@ int main()
     platform_init();
 
     boot_flash_start_xip();
-    LOG_I("RAM Boot...");
+    LOG_I("Xip started...");
 
     while (1) {
         uint32_t offset = IMAGE_OFFSET;
