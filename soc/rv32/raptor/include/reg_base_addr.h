@@ -55,10 +55,10 @@
 #define REG_SGPIO_MST0_BASE        0x4200c000
 #define REG_SGPIO_MST1_BASE        0x4200d000
 #define REG_LTPI1_SCM_BASE         0x4200e000
-#define REG_UART8_BASE             0x42100000
-#define REG_UART9_BASE             0x42101000
-#define REG_UART10_BASE            0x42102000
-#define REG_UART11_BASE            0x42103000
+#define REG_DWUART8_BASE           0x42100000
+#define REG_DWUART9_BASE           0x42101000
+#define REG_DWUART10_BASE          0x42102000
+#define REG_DWUART11_BASE          0x42103000
 #define REG_JTAGM1_BASE            0x42104000
 #define REG_SGPIO_SLAVE_BASE       0x42105000
 #define REG_LTPI0_CTRL_BASE        0x42106000
@@ -93,19 +93,19 @@
 #define REG_CPU1_SYS_CFG_BASE      0x60500000
 #define REG_WDT1_BASE              0x60501000
 #define REG_GDMA0_BASE             0x60502000
-#define REG_UART0_BASE             0x60503000
-#define REG_UART1_BASE             0x60504000
-#define REG_UART2_BASE             0x60505000
-#define REG_UART3_BASE             0x60506000
-#define REG_UART4_BASE             0x60507000
-#define REG_UART5_BASE             0x60508000
-#define REG_UART6_BASE             0x60509000
-#define REG_UART7_BASE             0x6050a000
+#define REG_DWUART0_BASE           0x60503000
+#define REG_DWUART1_BASE           0x60504000
+#define REG_DWUART2_BASE           0x60505000
+#define REG_DWUART3_BASE           0x60506000
+#define REG_DWUART4_BASE           0x60507000
+#define REG_DWUART5_BASE           0x60508000
+#define REG_DWUART6_BASE           0x60509000
+#define REG_DWUART7_BASE           0x6050a000
 #define REG_ADC0_BASE              0x6050b000
 #define REG_ADC1_BASE              0x6050c000
 #define REG_ADC2_BASE              0x6050d000
 #define REG_GDMA1_BASE             0x6050E000
-#define REG_WDT7_BASE     	   0x6050F000
+#define REG_WDT7_BASE     	       0x6050F000
 #define REG_CPU1_CACHE_BASE        0x60510000
 
 /******************************* CPU1_SYS AHB *******************************/
@@ -166,10 +166,10 @@
 #define REG_I2C9_BASE              0x9600b000
 #define REG_I2C10_BASE             0x9600c000
 #define REG_I2C11_BASE             0x9600d000
-#define REG_UART12_BASE            0x9600e000
-#define REG_UART13_BASE            0x9600f000
-#define REG_UART14_BASE            0x96010000
-#define REG_UART15_BASE            0x96011000
+#define REG_DWUART12_BASE          0x9600e000
+#define REG_DWUART13_BASE          0x9600f000
+#define REG_DWUART14_BASE          0x96010000
+#define REG_DWUART15_BASE          0x96011000
 #define REG_VIRTUAL_USB0_BASE      0x96012000
 #define REG_VIRTUAL_USB1_BASE      0x96013000
 
