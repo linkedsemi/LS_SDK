@@ -2,6 +2,11 @@
 #include "mini-printf.h"
 #include "SEGGER_RTT.h"
 #include "ls_hal_uart.h"
+#include "field_manipulate.h"
+#include "ls_hal_dwuart.h"
+#include "ls_msp_uart.h"
+
+
 #include "ls_soc_gpio.h"
 #include "sdk_config.h"
 #include "cpu.h"
@@ -38,32 +43,51 @@ void ram_log_print(char *ptr, int len);
 
 #if (LOG_BACKEND&UART_LOG)
 
-#if (LOG_UART_INST == LOG_UART1)
-#define LOG_UART  UART1
-#define LOG_PINMUX_INIT_FUNC pinmux_uart1_init
-#define LOG_PINMUX_DEINIT_FUNC pinmux_uart1_deinit
-#define LOG_LL_MSP_INIT_FUNC LL_UART1_MSP_Init
-#define LOG_LL_MSP_DEINIT_FUNC LL_UART1_MSP_DeInit
-
-#elif  (LOG_UART_INST == LOG_UART2)
-#define LOG_UART  UART2
-#define LOG_PINMUX_INIT_FUNC pinmux_uart2_init
-#define LOG_PINMUX_DEINIT_FUNC pinmux_uart2_deinit
-#define LOG_LL_MSP_INIT_FUNC LL_UART2_MSP_Init
-#define LOG_LL_MSP_DEINIT_FUNC LL_UART2_MSP_DeInit
-
-#elif  (LOG_UART_INST == LOG_UART3)
-#define LOG_UART  UART3
-#define LOG_PINMUX_INIT_FUNC pinmux_uart3_init
-#define LOG_PINMUX_DEINIT_FUNC pinmux_uart3_deinit
-#define LOG_LL_MSP_INIT_FUNC LL_UART3_MSP_Init
-#define LOG_LL_MSP_DEINIT_FUNC LL_UART3_MSP_DeInit
+#ifdef RAPTOR
+    #if  (LOG_UART_INST == LOG_DWUART8)
+    #define LOG_UART  DWUART8
+    #define LOG_PINMUX_INIT_FUNC pinmux_uart8_init
+    #define LOG_PINMUX_DEINIT_FUNC pinmux_uart8_deinit
+    #define LOG_LL_MSP_INIT_FUNC LL_DWUART8_MSP_Init
+    #define LOG_LL_MSP_DEINIT_FUNC LL_DWUART8_MSP_DeInit
+    #endif
 #else
-#error "No This Uart Instance..."
-#endif
+    #if (LOG_UART_INST == LOG_UART1)
+    #define LOG_UART  UART1
+    #define LOG_PINMUX_INIT_FUNC pinmux_uart1_init
+    #define LOG_PINMUX_DEINIT_FUNC pinmux_uart1_deinit
+    #define LOG_LL_MSP_INIT_FUNC LL_UART1_MSP_Init
+    #define LOG_LL_MSP_DEINIT_FUNC LL_UART1_MSP_DeInit
 
+    #elif  (LOG_UART_INST == LOG_UART2)
+    #define LOG_UART  UART2
+    #define LOG_PINMUX_INIT_FUNC pinmux_uart2_init
+    #define LOG_PINMUX_DEINIT_FUNC pinmux_uart2_deinit
+    #define LOG_LL_MSP_INIT_FUNC LL_UART2_MSP_Init
+    #define LOG_LL_MSP_DEINIT_FUNC LL_UART2_MSP_DeInit
+
+    #elif  (LOG_UART_INST == LOG_UART3)
+    #define LOG_UART  UART3
+    #define LOG_PINMUX_INIT_FUNC pinmux_uart3_init
+    #define LOG_PINMUX_DEINIT_FUNC pinmux_uart3_deinit
+    #define LOG_LL_MSP_INIT_FUNC LL_UART3_MSP_Init
+    #define LOG_LL_MSP_DEINIT_FUNC LL_UART3_MSP_DeInit
+    #else
+    #error "No This Uart Instance..."
+    #endif
+#endif
 static void uart_log_tx(char *ptr,int len)
 {
+#ifdef RAPTOR
+    while (len)
+    {
+        if (LOG_UART->USR & DWUART_TFNF_MASK)
+        {
+            len--;
+            LOG_UART->RBR_THR_DLL = (*ptr++ & 0xff);
+        }
+    }
+#else
     while (len)
     {
         if (REG_FIELD_RD(LOG_UART->SR, UART_SR_TFNF))
@@ -72,13 +96,29 @@ static void uart_log_tx(char *ptr,int len)
             LOG_UART->TBR = (*ptr++ & (uint8_t)0xFF);
         }
     }
+#endif
 }
 
 static void uart_log_init()
 {
     LOG_LL_MSP_INIT_FUNC();
     LOG_PINMUX_INIT_FUNC(LOG_UART_TXD, LOG_UART_RXD);
-    
+#ifdef RAPTOR
+    // Bautrate
+    REG_FIELD_WR(LOG_UART->LCR, DWUART_DLAB, 1);
+    // LOG_UART->DLF = DWUART_BAUDRATE_115200 & 0xf; //0x20000 & 0xf = 0
+    // LOG_UART->RBR_THR_DLL = (DWUART_BAUDRATE_115200 >> 16) & DWUART_DIVISOR_LATCH_LOW_MASK; //2
+    LOG_UART->DLF = 2; 
+    LOG_UART->RBR_THR_DLL = 0x17;   //2
+    REG_FIELD_WR(LOG_UART->LCR, DWUART_DLAB, 0);
+    // Line Controller
+    LOG_UART->LCR = FIELD_BUILD(DWUART_DLS, DWUART_BYTESIZE8) |
+                            FIELD_BUILD(DWUART_STOP, DWUART_STOPBITS1) |
+                            FIELD_BUILD(DWUART_PEN, 0) |
+                            FIELD_BUILD(DWUART_EPS, DWUART_NOPARITY);
+    // FIFO Controller
+    LOG_UART->IIR_FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
+#else
     REG_FIELD_WR(LOG_UART->LCR, UART_LCR_BRWEN, 1);
     LOG_UART->BRR = LOG_UART_BAUDRATE;
     REG_FIELD_WR(LOG_UART->LCR, UART_LCR_BRWEN, 0);
@@ -87,6 +127,7 @@ static void uart_log_init()
                  FIELD_BUILD(UART_LCR_STOP, LOG_UART_STOPBITS) |
                  FIELD_BUILD(UART_LCR_PARITY, LOG_UART_PARITY) |
                  FIELD_BUILD(UART_LCR_MSB, LOG_UART_MSBEN);
+#endif
 }
 
 void uart_log_pause()

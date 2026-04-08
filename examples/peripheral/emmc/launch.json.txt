@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "raptor emmc",
+            "type": "gdb",
+            "request": "attach",
+            "target": "10.10.20.23:1025",
+            "executable": "examples/peripheral/emmc/build/raptor/emmc.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "set output-radix 16",
+                "reset",
+                "load",
+                "set $pc=0x500000",
+            ],
+            "configurations": [],
+        },
+    ]
+}
