@@ -4,10 +4,12 @@
 #include "hal_flash_int.h"
 #include "reg_cpu1_sys.h"
 #include "reg_sysc_awo.h"
+#include "ls_soc_gpio.h"
 
 static void fwqspi_pin_enable(){
-    REG_FIELD_WR(SYSC_AWO_CFG->FUNC1_AABBCCDD_EN, SYSC_AWO_FUNC1_IOBB_EN, 0x3f);//sclk/ss_0/1/2/dat[0]/[1]
-    REG_FIELD_WR(SYSC_AWO_CFG->GPAABBCCDD_IE, SYSC_AWO_GPIOBB_IE, 0x30);//dat0/1 ie
+    // REG_FIELD_WR(SYSC_AWO_CFG->FUNC1_AABBCCDD_EN, SYSC_AWO_FUNC1_IOBB_EN, 0x3f);//sclk/ss_0/1/2/dat[0]/[1]
+    // REG_FIELD_WR(SYSC_AWO_CFG->GPAABBCCDD_IE, SYSC_AWO_GPIOBB_IE, 0x30);//dat0/1 ie
+    pinmux_ssiv2_init();
 }
 
 HAL_StatusTypeDef HAL_SSIV2_Init(uint32_t div_para, enum slave_select slave_sel, uint8_t clk_edg_sel)
