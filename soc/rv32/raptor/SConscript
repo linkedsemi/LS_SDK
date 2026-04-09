@@ -49,7 +49,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'src/otbn/ls_hal_otbn_sha512.c',
         'src/otbn/ls_hal_otbn_ecc256.c',
         'src/otbn/ls_hal_otbn_ecc384.c',
-        # 'src/ls_hal_flash_swint.c',
+        'src/ls_hal_flash_swint.c',
         'src/ls_hal_ssiv2.c',
         'src/ls_hal_emmc.c',
         'src/ls_hal_otpv2.c',
