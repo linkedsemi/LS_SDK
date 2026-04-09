@@ -1,9 +1,9 @@
-// #ifndef PER_FUNC_MUX_MULT_H_
-// #define PER_FUNC_MUX_MULT_H_
+#ifndef PER_FUNC_MUX_MULT_H_
+#define PER_FUNC_MUX_MULT_H_
 
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // #define FIOA_ADTIM1_CH1  1
 // #define FIOA_ADTIM1_CH1N 2
@@ -475,8 +475,8 @@
 // #define FIOT_USB20_DBG12    30
 // #define FIOT_USB20_DBG13    31
 
-// #ifdef __cplusplus
-// }
-// #endif
+#ifdef __cplusplus
+}
+#endif
 
-// #endif
+#endif

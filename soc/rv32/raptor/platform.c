@@ -23,17 +23,17 @@ __attribute__((aligned(64))) void (*interrupt_vector[IRQN_MAX])();
 struct SSIV2_HandleTypeDef flash;
 
 __attribute__((weak)) void SystemInit(){
-//     e906_init();
+    e906_init();
 //     // MODIFY_REG(V33_RG->TRIM0,V33_RG_HSE_CTRL_MASK,7<<V33_RG_HSE_CTRL_POS);
 //     // REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_CLK_SEL_LS, SDK_LSI_USED ? 1 : 2);
 //     // V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
 //     // V33_RG->PMU_SET_VAL = V33_RG_PMU_SET_TGGL_MASK | PMU_CLK_VAL;
 //     // V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
-//     if(SDK_HSE_USED)
-//     {//delay for hse stabilization
-//         rv32_delay_asm(14400,1);
-//     }
-//     enable_global_irq();
+    // if(SDK_HSE_USED)
+    // {//delay for hse stabilization
+    //     rv32_delay_asm(14400,1);
+    // }
+    enable_global_irq();
 // }
 
 // __ALWAYS_STATIC_INLINE void set_trim_params()
@@ -130,8 +130,9 @@ void sys_init_none()
 //     clk_flash_init();
 //     // set_all_irq_priority_to_lowest_level();
     // io_init();
-    // log_en = true;
-    // LOG_INIT();
+
+    log_en = true;
+    LOG_INIT();
 
 //     // pinmux_hal_flash_init();
 //     // pinmux_hal_flash_quad_init();
@@ -157,11 +158,11 @@ void rv_set_int_isr(uint8_t type,void (*isr)())
     interrupt_vector[type] = isr;
 }
 
-// void SWINT_Handler_C(uint32_t *args)
-// {
-//     uint32_t (*func)(uint32_t,uint32_t,uint32_t,uint32_t) = (void *)args[11];
-//     args[15] = func(args[15],args[14],args[13],args[12]);
-// }
+void SWINT_Handler_C(uint32_t *args)
+{
+    uint32_t (*func)(uint32_t,uint32_t,uint32_t,uint32_t) = (void *)args[11];
+    args[15] = func(args[15],args[14],args[13],args[12]);
+}
 
 // __attribute__((weak)) int _close (int fildes){  return -1;}
 

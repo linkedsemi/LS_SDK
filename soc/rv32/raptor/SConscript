@@ -22,10 +22,14 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'rv32/int_call_asm.S',
         'rv32/raptor/exception_entry.S',
         'rv32/raptor/platform.c',
-        'rv32/qsh/delay_asm.S',
+        'rv32/raptor/delay_asm.S',
         'rv32/raptor/ls_soc_gpio.c',
         'rv32/raptor/ls_msp_ssiv2.c',
         'rv32/raptor/ls_msp_emmc.c',
+        'rv32/raptor/ls_msp_otpv2.c',
+        'rv32/raptor/ls_msp_uart.c',
+        'rv32/raptor/sys_stat.c',
+        'rv32/raptor/cpu.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
         'src/otbn/text_array/ecc256_base_mult_text.c',
@@ -48,6 +52,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_flash_swint.c',
         'src/ls_hal_ssiv2.c',
         'src/ls_hal_emmc.c',
+        'src/ls_hal_otpv2.c',
         # 'src/ls_hal_sha.c',
         # 'src/ls_hal_sha_dma.c',
         # 'src/ls_hal_sha512.c',

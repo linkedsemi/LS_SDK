@@ -24,23 +24,23 @@
 #define __STATIC_INLINE         __ALWAYS_STATIC_INLINE
 #endif
 
-// __ALWAYS_STATIC_INLINE void e906_init()
-// {
-//     uint32_t value = __get_MSTATUS();
-//     MODIFY_REG(value,0x6000,0x2000); 
-//     __set_MSTATUS(value);//enable fpu
-//     value = __get_MHCR();
-//     value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);
-//     __set_MHCR(value);
-// }
+__ALWAYS_STATIC_INLINE void e906_init()
+{
+    uint32_t value = __get_MSTATUS();
+    MODIFY_REG(value,0x6000,0x2000); 
+    __set_MSTATUS(value);//enable fpu
+    value = __get_MHCR();
+    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);
+    __set_MHCR(value);
+}
 
 void sys_init_none(void);
 
-// void rv_set_int_isr(uint8_t type,void (*isr)());
+void rv_set_int_isr(uint8_t type,void (*isr)());
 
-// void rv32_delay_asm(uint32_t,uint32_t);
+void rv32_delay_asm(uint32_t,uint32_t);
 
-// void SWINT_Handler_ASM();
+void SWINT_Handler_ASM();
 
 // void flash_swint_init();
 
@@ -52,16 +52,16 @@ void sys_init_none(void);
 // #define FLASH_SWINT_HANDLER SWINT_Handler_ASM
 // #endif
 
-// #ifdef BOOT_ROM
-// void rom_delay(uint32_t us);
-// #define DELAY_US(a) rom_delay(a)
-// #else
-// #define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
-// #endif
-// #define DELAY_MS(a) DELAY_US((a)*1000)
+#ifdef BOOT_ROM
+void rom_delay(uint32_t us);
+#define DELAY_US(a) rom_delay(a)
+#else
+#define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
+#endif
+#define DELAY_MS(a) DELAY_US((a)*1000)
 
 // #define FLASH_SWINT_NUM QSPI1_IRQN
-// #define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
+#define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
 
 // __ALWAYS_STATIC_INLINE void cpu_intr_sec_unmask(void)
 // {
