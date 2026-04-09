@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #ifndef SDK_HCLK_MHZ
-#define SDK_HCLK_MHZ (75)
+#define SDK_HCLK_MHZ (3)
 #endif
 
 #ifndef SDK_PCLK_DIV
@@ -30,13 +30,14 @@ extern "C" {
 #endif
 
 #ifndef LOG_UART_INST
-#define LOG_UART_INST (LOG_UART1)
+#define LOG_DWUART8 8
+#define LOG_UART_INST (LOG_DWUART8)
 #endif
 #ifndef LOG_UART_TXD
-#define LOG_UART_TXD (PN04)
+#define LOG_UART_TXD (PN06)
 #endif
 #ifndef LOG_UART_RXD
-#define LOG_UART_RXD (PN03)
+#define LOG_UART_RXD (PN07)
 #endif
 #ifndef LOG_UART_BAUDRATE
 #define LOG_UART_BAUDRATE UART_BAUDRATE_115200
