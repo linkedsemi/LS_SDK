@@ -146,7 +146,7 @@ uint8_t io_get_output_val(uint16_t pin)
     return (SYSC_AWO_CFG->IO_VAL[x->port/4] >> ((x->port % 4)*8 + x->num)) & 0x1;
 }
 
-uint8_t io_sec_get_input_val(uint16_t pin)
+uint8_t io_get_input_val(uint16_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     return (SYSC_AWO_CFG->IO_INPUT[x->port/4] >> ((x->port % 4)*8 + x->num)) & 0x1;

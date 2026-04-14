@@ -139,15 +139,6 @@ void io_toggle_pin(uint16_t pin);
 uint8_t io_get_output_val(uint16_t pin);
 
 /**
-  * @brief get GPIO input level
-  * @param  pin  Specific GPIO pin
-  * @retval GPIO input level
-  *              0 means low level
-  *              1 means high level
-  */
-uint16_t io_get_input_val(uint16_t pin);
-
-/**
   * @brief get GPIO level
   * @param  pin  Specific GPIO pin
   * @retval GPIO level
@@ -157,22 +148,13 @@ uint16_t io_get_input_val(uint16_t pin);
 uint16_t io_read_pin(uint16_t pin);
 
 /**
-  * @brief sec cpu get GPIO input level
+  * @brief get GPIO input level
   * @param  pin  Specific GPIO pin
   * @retval GPIO input level
   *              0 means low level
   *              1 means high level
   */
-uint8_t io_sec_get_input_val(uint16_t pin);
-
-/**
-  * @brief sec cpu get GPIO level
-  * @param  pin  Specific GPIO pin
-  * @retval GPIO level
-  *              0 means low level
-  *              1 means high level
-  */
-uint16_t io_sec_read_pin(uint16_t pin);
+uint8_t io_get_input_val(uint16_t pin);
 
 /**
   * @brief app cpu get GPIO input level
