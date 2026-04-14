@@ -23,6 +23,9 @@
 #define IOPMP_MODE_NA4    0x2
 #define IOPMP_MODE_NAPOT  0x3
 
+#define PMPCFG_STRIDE sizeof(unsigned long)
+#define PMPCFG_SLOTS  8
+
 typedef union {
     uint32_t value;
     struct {
@@ -48,7 +51,7 @@ typedef union {
 typedef union {
     uint32_t value;
     struct {
-        iopmp_cfg_attr_t arr[4];
+        iopmp_cfg_attr_t arr[PMPCFG_STRIDE];
     };
 } iopmp_cfg_t;
 
@@ -74,27 +77,53 @@ inline static void iopmp_config_enable(uint32_t dev, bool enable)
 
 inline static void iopmp_set_pmpaddrx(uint32_t dev, uint8_t idx, uint32_t addr)
 {
-    uint32_t reg = dev + IOPMP_ADDR0 + (idx * 4);
+    uint32_t reg = dev + IOPMP_ADDR0 + (idx * sizeof(uint32_t));
     sys_write32(addr, reg);
 }
 
-inline static void iopmp_set_pmpxcfg(uint32_t dev, uint8_t idx, iopmp_cfg_attr_t attr)
+inline static uint32_t iopmp_get_pmpaddrx(uint32_t dev, uint8_t idx)
 {
-    uint32_t reg = dev + IOPMP_CFG0 + ((idx / 4) * 4);
+    uint32_t reg = dev + IOPMP_ADDR0 + (idx * sizeof(uint32_t));
+    return sys_read32(reg);
+}
+
+inline static void iopmp_set_pmpxcfg(uint32_t dev, uint8_t idx, uint32_t val)
+{
+    uint32_t reg = dev + IOPMP_CFG0 + (idx * sizeof(uint32_t));
+    sys_write32(val, reg);
+}
+
+inline static uint32_t iopmp_get_pmpxcfg(uint32_t dev, uint8_t idx)
+{
+    uint32_t reg = dev + IOPMP_CFG0 + (idx * sizeof(uint32_t));
+    return sys_read32(reg);
+}
+
+inline static void iopmp_set_pmpxcfg_by_idx(uint32_t dev, uint8_t idx, iopmp_cfg_attr_t attr)
+{
+    uint32_t reg = dev + IOPMP_CFG0 + ROUND_DOWN(idx, PMPCFG_STRIDE);
     iopmp_cfg_t iopmp_cfg;
     iopmp_cfg.value = sys_read32(reg);
-    iopmp_cfg.arr[idx % 4].value = attr.value;
+    iopmp_cfg.arr[idx % PMPCFG_STRIDE].value = attr.value;
     sys_write32(iopmp_cfg.value, reg);
+}
+
+inline static uint32_t iopmp_get_pmpxcfg_by_idx(uint32_t dev, uint8_t idx)
+{
+    uint32_t reg = dev + IOPMP_CFG0 + ROUND_DOWN(idx, PMPCFG_STRIDE);
+    iopmp_cfg_t iopmp_cfg;
+    iopmp_cfg.value = sys_read32(reg);
+    return iopmp_cfg.arr[idx % PMPCFG_STRIDE].value;
 }
 
 inline static void iopmp_config_region(uint32_t dev, uint8_t idx, uint32_t addr, iopmp_cfg_attr_t attr)
 {
-    if (idx > 7) {
+    if (idx >= PMPCFG_SLOTS) {
         return;
     }
 
     iopmp_set_pmpaddrx(dev, idx, addr);
-    iopmp_set_pmpxcfg(dev, idx, attr);
+    iopmp_set_pmpxcfg_by_idx(dev, idx, attr);
 }
 
 #if !defined(IS_POWER_OF_TWO)
