@@ -42,6 +42,30 @@ extern const unsigned char one_bits[];
 #endif /* __GNUC__ >= 7 */
 #endif
 
+/**
+ * @brief Check if @p ptr is aligned to @p align alignment
+ */
+#ifndef IS_ALIGNED
+#define IS_ALIGNED(ptr, align) (((uintptr_t)(ptr)) % (align) == 0)
+#endif
+
+/**
+ * @brief Value of @p x rounded up to the next multiple of @p align.
+ */
+#ifndef ROUND_UP
+#define ROUND_UP(x, align)                                   \
+	((((unsigned long)(x) + ((unsigned long)(align) - 1)) / \
+	  (unsigned long)(align)) * (unsigned long)(align))
+#endif
+
+/**
+ * @brief Value of @p x rounded down to the previous multiple of @p align.
+ */
+#ifndef ROUND_DOWN
+#define ROUND_DOWN(x, align)                                 \
+	(((unsigned long)(x) / (unsigned long)(align)) * (unsigned long)(align))
+#endif
+
 __attribute__((always_inline)) static inline int32_t time_diff(uint32_t time0,uint32_t time1)
 {
     int32_t diff = time0 - time1;
