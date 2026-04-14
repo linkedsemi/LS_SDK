@@ -6,11 +6,11 @@ extern "C" {
 #endif
 
 #ifdef REG_OTP_BASE
-#define OTP2 ((reg_axi_otp_t *)(REG_OTP_BASE + 0x1100))
+#define SYS_SIDE_OTP ((reg_axi_otp_t *)(REG_OTP_BASE + 0x1100))
 #endif
 
 #ifdef REG_OTP_CYP_BASE
-#define OTP3 ((reg_axi_otp_t *)(REG_OTP_CYP_BASE + 0x1100))
+#define CRP_SIDE_OTP ((reg_axi_otp_t *)(REG_OTP_CYP_BASE + 0x1100))
 #endif
 
 void HAL_LSOTPV2_MSP_Init();

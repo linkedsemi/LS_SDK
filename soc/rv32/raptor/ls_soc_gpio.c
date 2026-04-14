@@ -262,12 +262,12 @@ void per_func5_disable(uint16_t pin)
 
 void pinmux_ssiv2_init()
 {
-    per_func1_enable(PBB00);
-    per_func1_enable(PBB01);
-    per_func1_enable(PBB02);
-    per_func1_enable(PBB03);
-    per_func1_enable(PBB04);
-    per_func1_enable(PBB05);
+    per_func1_enable(PBB00); //clk
+    per_func1_enable(PBB01); //ss_0
+    per_func1_enable(PBB02); //ss_1
+    per_func1_enable(PBB03); //ss_2
+    per_func1_enable(PBB04); //dat0
+    per_func1_enable(PBB05); //dat1
     io_cfg_input(PBB04);
     io_cfg_input(PBB05);
 }

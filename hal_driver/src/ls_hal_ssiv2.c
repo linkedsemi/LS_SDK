@@ -18,14 +18,10 @@ HAL_StatusTypeDef HAL_SSIV2_Init(uint32_t div_para, enum slave_select slave_sel,
     fwqspi_pin_enable();
     CPU1_SYS_CFG->SOFT_FWSPI_SS_IN_N = 1; //软件配置片选是否有效位，低有效(此处硬件CS)
     REG_FIELD_WR(flash.reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
-    MODIFY_REG(flash.reg->ddress_block.CTRLR0, CTRLR0_SSTE_MASK | CTRLR0_SPI_FRF_MASK | CTRLR0_DFS_MASK, TOGGLE_DISABLE << CTRLR0_SSTE_POS | STANDARD_SPI_FORMAT << CTRLR0_SPI_FRF_POS | DFS_8_BIT << CTRLR0_DFS_POS);
+    MODIFY_REG(flash.reg->ddress_block.CTRLR0, 
+        CTRLR0_SSTE_MASK | CTRLR0_SPI_FRF_MASK | CTRLR0_DFS_MASK, 
+        TOGGLE_DISABLE << CTRLR0_SSTE_POS | STANDARD_SPI_FORMAT << CTRLR0_SPI_FRF_POS | DFS_8_BIT << CTRLR0_DFS_POS);
     REG_FIELD_WR(flash.reg->ddress_block.BAUDR, BAUDR_SCKDV, div_para); // Fsclk_out = Fssi_clk/BAUDR
-
-    switch (slave_sel){
-        case 1:CPU1_SYS_CFG->SOFT_FWSPI_SLAVE_SEL = 0;break;
-        case 2:CPU1_SYS_CFG->SOFT_FWSPI_SLAVE_SEL = 1;break;
-        case 4:CPU1_SYS_CFG->SOFT_FWSPI_SLAVE_SEL = 2;break;
-    }
     flash.slave_select = slave_sel;
     //软件配置fwspi输出clk是否反转，复位值0，0：根据fwspi配置输出；1：根据fwspi配置取反输出。
     CPU1_SYS_CFG->SOFT_FWSPI_OSCLK_INV_SEL = clk_edg_sel;
@@ -112,7 +108,10 @@ void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr,
 
 void hal_flash_fast_read(uint32_t offset, uint8_t *data, uint32_t length)
 {
+    // Turn off the global interrupt when reading
+    uint32_t flash_read_stat = enter_critical();
     lsssiv2_stg_read_register(flash.reg, offset, true, FAST_READ4B_OPCODE, data, 1, length);
+    exit_critical(flash_read_stat);
 }
 
 void hal_flash_page_program(uint32_t offset, uint8_t *data, uint16_t length)
