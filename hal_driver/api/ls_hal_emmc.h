@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "reg_emmc_type.h"
-#include "ls_msp_emmc.h"
 
 #define BIT(n)  (1UL << (n))
 #define CONFIG_SDHC_BUFFER_ALIGNMENT 32
@@ -216,37 +215,37 @@ struct sdhci_command {
     uint32_t timeout_ms; /*!< data timeout in milliseconds */
 };
 
-// struct sdhc_data {
-//     unsigned int block_addr; /*!< Block to start read from */
-//     unsigned int block_size; /*!< Block size */
-//     unsigned int blocks; /*!< Number of blocks */
-//     unsigned int bytes_xfered; /*!< populated with number of bytes sent by SDHC */
-//     void *data; /*!< Data to transfer or receive */
-//     int timeout_ms; /*!< data timeout in milliseconds */
-// };
+struct sdhc_data {
+    unsigned int block_addr; /*!< Block to start read from */
+    unsigned int block_size; /*!< Block size */
+    unsigned int blocks; /*!< Number of blocks */
+    unsigned int bytes_xfered; /*!< populated with number of bytes sent by SDHC */
+    void *data; /*!< Data to transfer or receive */
+    int timeout_ms; /*!< data timeout in milliseconds */
+};
 
-// typedef struct sdhci_host {
-//     uint32_t  mapbase;
-//     struct sdhci_data *sdhci_data;
-//     struct sdhci_command *sdhci_command;
-//     void *usdhc_adma2_table;
-//     volatile bool transfer_sem;
-//     uint16_t error_code;
-//     uint32_t irq_status;
-//     uint32_t max_clk;
-//     uint8_t index;
-//     uint8_t is_emmc_card;
-//     uint8_t io_fixed_1v8;
-//     uint8_t power_mode;
-//     uint8_t have_phy;
-//     uint8_t mshc_ctrl_r;
-//     uint32_t rx_delay_line;
-//     uint32_t tx_delay_line;
-//     uint32_t transfer_status;
-//     uint8_t bus_width;
-//     uint32_t current_speed;
-//     bool execute_tuning;
-// }sdhci_host;
+typedef struct sdhci_host {
+    uint32_t  mapbase;
+    struct sdhci_data *sdhci_data;
+    struct sdhci_command *sdhci_command;
+    void *usdhc_adma2_table;
+    volatile bool transfer_sem;
+    uint16_t error_code;
+    uint32_t irq_status;
+    uint32_t max_clk;
+    uint8_t index;
+    uint8_t is_emmc_card;
+    uint8_t io_fixed_1v8;
+    uint8_t power_mode;
+    uint8_t have_phy;
+    uint8_t mshc_ctrl_r;
+    uint32_t rx_delay_line;
+    uint32_t tx_delay_line;
+    uint32_t transfer_status;
+    uint8_t bus_width;
+    uint32_t current_speed;
+    bool execute_tuning;
+}sdhci_host;
 
 static void sys_write32(uint32_t data, uint32_t addr)
 {
