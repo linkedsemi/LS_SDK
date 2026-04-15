@@ -319,4 +319,15 @@ uint32_t linkedsemi_sdhci_request(sdhci_host *host, struct sdhc_command *cmd, st
 uint32_t sdhci_card_busy(sdhci_host *sdhci_host);
 void HAL_LSEMMC_IRQHandler(sdhci_host *host);
 
+uint32_t sd_idle(struct sdhci_host *host);
+uint32_t mmc_card_init(struct sdhci_host *host);
+uint32_t mmc_set_rst_n_function_enable(struct sdhci_host *host);
+uint32_t mmc_set_bootpartition_enable_boot1(struct sdhci_host *host);
+uint32_t mmc_set_bootpartition_enable_boot2(struct sdhci_host *host);
+uint32_t mmc_set_partition_access_boot1(struct sdhci_host *host);
+uint32_t mmc_set_partition_access_boot2(struct sdhci_host *host);
+uint32_t mmc_read_ext_csd(struct sdhci_host *host, uint8_t *rbuf);
+void mmc_boot_partition_en(struct sdhci_host *host);
+uint32_t mmc_read_blocks(struct sdhci_host *host, uint8_t *rbuf, uint32_t start_block, uint32_t num_blocks);
+uint32_t mmc_write_blocks(struct sdhci_host *host, const uint8_t *wbuf, uint32_t start_block, uint32_t num_blocks);
 #endif /* LS_HAL_EMMC_H_ */
