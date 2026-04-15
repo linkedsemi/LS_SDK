@@ -30,8 +30,8 @@ int main()
     sys_init_none();
 
     uint32_t offset = 0x0;
-    
-    HAL_SSIV2_Init(div_para, slave1, 0);
+    flash.slave_select = slave1;
+    HAL_SSIV2_Init(div_para, 0);
 
     hal_flash_software_reset();
 

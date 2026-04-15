@@ -1,6 +1,7 @@
 #include <string.h>
 #include "platform.h"
 #include "ls_soc_gpio.h"
+#include "ls_hal_emmc.h"
 #include "ls_msp_emmc.h"
 #include "log.h"
 

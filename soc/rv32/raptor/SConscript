@@ -25,7 +25,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'rv32/raptor/delay_asm.S',
         'rv32/raptor/ls_soc_gpio.c',
         'rv32/raptor/ls_msp_ssiv2.c',
-        # 'rv32/raptor/ls_msp_emmc.c',
+        'rv32/raptor/ls_msp_emmc.c',
         'rv32/raptor/ls_msp_otpv2.c',
         'rv32/raptor/ls_msp_uart.c',
         'rv32/raptor/sys_stat.c',

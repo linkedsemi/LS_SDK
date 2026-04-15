@@ -51,7 +51,7 @@ struct SSIV2_HandleTypeDef
 
 extern struct SSIV2_HandleTypeDef flash;
 
-HAL_StatusTypeDef HAL_SSIV2_Init(uint32_t div_para, enum slave_select slave_sel, uint8_t clk_edg_sel);
+HAL_StatusTypeDef HAL_SSIV2_Init(uint32_t div_para, uint8_t clk_edg_sel);
 HAL_StatusTypeDef HAL_SSIV2_DeInit(void);
 void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint8_t dummy_cycles, uint32_t length);
 void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint16_t length);
