@@ -22,7 +22,6 @@ HAL_StatusTypeDef HAL_SSIV2_Init(uint32_t div_para, uint8_t clk_edg_sel)
         CTRLR0_SSTE_MASK | CTRLR0_SPI_FRF_MASK | CTRLR0_DFS_MASK, 
         TOGGLE_DISABLE << CTRLR0_SSTE_POS | STANDARD_SPI_FORMAT << CTRLR0_SPI_FRF_POS | DFS_8_BIT << CTRLR0_DFS_POS);
     REG_FIELD_WR(flash.reg->ddress_block.BAUDR, BAUDR_SCKDV, div_para); // Fsclk_out = Fssi_clk/BAUDR
-    // flash.slave_select = slave_sel;
     //软件配置fwspi输出clk是否反转，复位值0，0：根据fwspi配置输出；1：根据fwspi配置取反输出。
     CPU1_SYS_CFG->SOFT_FWSPI_OSCLK_INV_SEL = clk_edg_sel;
     return HAL_OK;
