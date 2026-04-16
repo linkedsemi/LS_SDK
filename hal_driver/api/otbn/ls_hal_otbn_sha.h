@@ -17,9 +17,10 @@ extern "C" {
 #define SHA256_BLOCK_SIZE           (0x40)
 #define SHA384_BLOCK_SIZE           (0x80)
 #define SHA512_BLOCK_SIZE           (0x80)
+#define SM3_BYTES_NUM 0x20
 
 void HAL_OTBN_SHA256_Init();
-void HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length);
+void HAL_OTBN_SHA256_Update(const uint8_t *msg, uint32_t length);
 void HAL_OTBN_SHA256_Final(uint8_t result[SHA256_RESULT_SIZE]);
 void HAL_OTBN_SHA256_HMAC_SetKey(uint8_t *key, uint32_t key_size);
 void HAL_OTBN_SHA256_HMAC_Update(uint8_t *msg, uint32_t msg_size);
@@ -54,11 +55,11 @@ bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *info, uint32_t info_len,
                           uint8_t *okm, uint32_t okm_len);
 
-
 void HAL_OTBN_SM3_Init();
 void HAL_OTBN_SM3_Final(uint8_t result[0x20]);
 void HAL_OTBN_SM3_Update(uint8_t *msg, uint32_t length);
-
+bool HAL_OTBN_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len);
+HAL_StatusTypeDef HAL_OTBN_SM3_HMAC(uint8_t out[SM3_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
 #ifdef __cplusplus
 }

@@ -130,3 +130,73 @@ void HAL_OTBN_SM3_Final(uint8_t result[0x20])
     // memcpy32(currnt_state,state_init,32);
     // HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
 }
+
+bool HAL_OTBN_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
+{
+    uint32_t ct = 0x1;
+    uint8_t Data[4];
+	uint32_t digest_len = 0x20;
+	uint8_t digest[0x20];
+	uint32_t index = (out_len + 0x1f) / 0x20;
+
+    if (Z == NULL || out_len == 0 || Zlen == 0 || out == NULL)
+        return false;
+
+    for (uint32_t i = 0; i < index; i++)
+    {
+        Data[0] = (ct >> 24) & 0xFF;
+        Data[1] = (ct >> 16) & 0xFF;
+        Data[2] = (ct >> 8) & 0xFF;
+        Data[3] = (ct >> 0) & 0xFF;
+        HAL_OTBN_SM3_Init();
+        HAL_OTBN_SM3_Update(Z, Zlen);
+        HAL_OTBN_SM3_Update(Data, 4);
+        HAL_OTBN_SM3_Final(digest);
+        if ((i == index - 1) && (out_len % 0x20 != 0))
+                digest_len = (out_len) % 0x20;
+        memcpy(out + 0x20 * i, digest, digest_len);
+        ct++;
+    }
+    return true;
+}
+
+#define B 64
+#define I_PAD 0x36
+#define O_PAD 0x5C
+
+HAL_StatusTypeDef HAL_OTBN_SM3_HMAC(uint8_t out[SM3_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+{
+    uint8_t kh[SM3_BYTES_NUM];
+    uint8_t kx[B];
+    uint8_t i;
+
+    if (key_len > B)
+    {
+        HAL_OTBN_SM3_Init();
+        HAL_OTBN_SM3_Update(key, key_len);
+        HAL_OTBN_SM3_Final(kh);
+        key_len = SM3_BYTES_NUM;
+        key = kh;
+    }
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = I_PAD ^ key[i];
+    for (i = key_len; i < B; i++)
+        kx[i] = I_PAD ^ 0;
+
+    HAL_OTBN_SM3_Init();
+    HAL_OTBN_SM3_Update(kx, B);
+    HAL_OTBN_SM3_Update(data, data_len);
+    HAL_OTBN_SM3_Final(out);
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = O_PAD ^ key[i];
+    for (i = key_len; i < B; i++)
+        kx[i] = O_PAD ^ 0;
+
+    HAL_OTBN_SM3_Init();
+    HAL_OTBN_SM3_Update(kx, B);
+    HAL_OTBN_SM3_Update(out, SM3_BYTES_NUM);
+    HAL_OTBN_SM3_Final(out);
+    return HAL_OK;
+}
