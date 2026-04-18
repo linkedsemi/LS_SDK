@@ -16,6 +16,7 @@
 // #include "reg_sec_pmu_rg.h"
 // #include "reg_sysc_sec_awo.h"
 #include "raptor.h"
+#include "reg_cpu1_sys.h"
 
 // #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
@@ -133,6 +134,8 @@ void sys_init_none()
 
     log_en = true;
     LOG_INIT();
+    //gpio 时钟初始化
+    SET_BIT(CPU1_SYS_CFG->TOP_SYS_CFG_REG1, 1<<TOP_SYS_PIN_MUX_APB_CLK_CLK_CG0_3_POS);
 
 //     // pinmux_hal_flash_init();
 //     // pinmux_hal_flash_quad_init();
