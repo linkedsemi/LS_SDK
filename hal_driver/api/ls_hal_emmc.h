@@ -185,7 +185,6 @@ struct sdhci_data {
     bool enable_auto_command12; /*!< Enable auto CMD12 */
     bool enable_auto_command23; /*!< Enable auto CMD23 */
     bool enableIgnoreError; /*!< Enable to ignore error event to read/write all the data */
-    bool execute_tuning; /*!< execute tuning flag */
     uint32_t block_size; /*!< Block size */
     uint32_t block_count; /*!< Block count */
     uint32_t *rx_data; /*!< Buffer to save data read */
@@ -224,29 +223,6 @@ struct sdhc_data {
     int timeout_ms; /*!< data timeout in milliseconds */
 };
 
-typedef struct sdhci_host {
-    uint32_t  mapbase;
-    struct sdhci_data *sdhci_data;
-    struct sdhci_command *sdhci_command;
-    void *usdhc_adma2_table;
-    volatile bool transfer_sem;
-    uint16_t error_code;
-    uint32_t irq_status;
-    uint32_t max_clk;
-    uint8_t index;
-    uint8_t is_emmc_card;
-    uint8_t io_fixed_1v8;
-    uint8_t power_mode;
-    uint8_t have_phy;
-    uint8_t mshc_ctrl_r;
-    uint32_t rx_delay_line;
-    uint32_t tx_delay_line;
-    uint32_t transfer_status;
-    uint8_t bus_width;
-    uint32_t current_speed;
-    bool execute_tuning;
-}sdhci_host;
-
 static void sys_write32(uint32_t data, uint32_t addr)
 {
     *(volatile uint32_t *)addr = data;
@@ -283,51 +259,50 @@ static uint8_t sys_read8(uint32_t addr)
     return value;
 }
 
-static inline void sdhci_writeb(sdhci_host *host, uint8_t val, uint32_t reg)
+static inline void sdhci_writeb(uint32_t mapbase, uint8_t val, uint32_t reg)
 {
-    sys_write8(val, host->mapbase + reg);
+    sys_write8(val, mapbase + reg);
 }
 
-static inline void sdhci_writew(sdhci_host *host, uint16_t val, uint32_t reg)
+static inline void sdhci_writew(uint32_t mapbase, uint16_t val, uint32_t reg)
 {
-    sys_write16(val, host->mapbase + reg);
+    sys_write16(val, mapbase + reg);
 }
 
-static inline void sdhci_writel(sdhci_host *host, uint32_t val, uint32_t reg)
+static inline void sdhci_writel(uint32_t mapbase, uint32_t val, uint32_t reg)
 {
-    sys_write32(val, host->mapbase + reg);
+    sys_write32(val, mapbase + reg);
 }
 
-static inline uint8_t sdhci_readb(sdhci_host *host, uint32_t reg)
+static inline uint8_t sdhci_readb(uint32_t mapbase, uint32_t reg)
 {
-    return sys_read8(host->mapbase + reg);
+    return sys_read8(mapbase + reg);
 }
 
-static inline uint16_t sdhci_readw(sdhci_host *host, int reg)
+static inline uint16_t sdhci_readw(uint32_t mapbase, int reg)
 {
-    return sys_read16(host->mapbase + reg);
+    return sys_read16(mapbase + reg);
 }
 
-static inline uint32_t sdhci_readl(sdhci_host *host, uint32_t reg)
+static inline uint32_t sdhci_readl(uint32_t mapbase, uint32_t reg)
 {
-    return sys_read32(host->mapbase + reg);
+    return sys_read32(mapbase + reg);
 }
 
-HAL_StatusTypeDef HAL_EMMC_Init(sdhci_host *hemmc);
-HAL_StatusTypeDef HAL_EMMC_DeInit(sdhci_host *host);
-uint32_t linkedsemi_sdhci_request(sdhci_host *host, struct sdhc_command *cmd, struct sdhc_data *data);
-uint32_t sdhci_card_busy(sdhci_host *sdhci_host);
-void HAL_LSEMMC_IRQHandler(sdhci_host *host);
+HAL_StatusTypeDef HAL_EMMC_Init(uint32_t mapbase);
+HAL_StatusTypeDef HAL_EMMC_DeInit(uint32_t mapbase);
+uint32_t linkedsemi_sdhci_request(uint32_t mapbase, struct sdhc_command *cmd, struct sdhc_data *data);
+uint32_t sdhci_card_busy(uint32_t mapbase);
 
-uint32_t sd_idle(struct sdhci_host *host);
-uint32_t mmc_card_init(struct sdhci_host *host);
-uint32_t mmc_set_rst_n_function_enable(struct sdhci_host *host);
-uint32_t mmc_set_bootpartition_enable_boot1(struct sdhci_host *host);
-uint32_t mmc_set_bootpartition_enable_boot2(struct sdhci_host *host);
-uint32_t mmc_set_partition_access_boot1(struct sdhci_host *host);
-uint32_t mmc_set_partition_access_boot2(struct sdhci_host *host);
-uint32_t mmc_read_ext_csd(struct sdhci_host *host, uint8_t *rbuf);
-void mmc_boot_partition_en(struct sdhci_host *host);
-uint32_t mmc_read_blocks(struct sdhci_host *host, uint8_t *rbuf, uint32_t start_block, uint32_t num_blocks);
-uint32_t mmc_write_blocks(struct sdhci_host *host, const uint8_t *wbuf, uint32_t start_block, uint32_t num_blocks);
+uint32_t sd_idle(uint32_t mapbase);
+uint32_t mmc_card_init(uint32_t mapbase);
+uint32_t mmc_set_rst_n_function_enable(uint32_t mapbase);
+uint32_t mmc_set_bootpartition_enable_boot1(uint32_t mapbase);
+uint32_t mmc_set_bootpartition_enable_boot2(uint32_t mapbase);
+uint32_t mmc_set_partition_access_boot1(uint32_t mapbase);
+uint32_t mmc_set_partition_access_boot2(uint32_t mapbase);
+uint32_t mmc_read_ext_csd(uint32_t mapbase, uint8_t *rbuf);
+void mmc_boot_partition_en(uint32_t mapbase);
+uint32_t mmc_read_blocks(uint32_t mapbase, uint8_t *rbuf, uint32_t start_block, uint32_t num_blocks);
+uint32_t mmc_write_blocks(uint32_t mapbase, const uint8_t *wbuf, uint32_t start_block, uint32_t num_blocks);
 #endif /* LS_HAL_EMMC_H_ */

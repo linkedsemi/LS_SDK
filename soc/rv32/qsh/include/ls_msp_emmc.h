@@ -3,6 +3,7 @@
 #include "reg_base_addr.h"
 #include "reg_emmc_type.h"
 #include "ls_hal_emmc.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,8 +17,8 @@ extern "C" {
 #define LSEMMC2 APP_EMMC2_CFG_ADDR
 #endif
 
-void HAL_LSEMMC_MSP_Init(sdhci_host *host);
-void HAL_LSEMMC_MSP_DeInit(sdhci_host *host);
+void HAL_LSEMMC_MSP_Init(uint32_t mapbase);
+void HAL_LSEMMC_MSP_DeInit(uint32_t mapbase);
 
 #ifdef __cplusplus
 }

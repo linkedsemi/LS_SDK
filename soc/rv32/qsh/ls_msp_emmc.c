@@ -6,20 +6,7 @@
 #include "qsh.h"
 #include "reg_sysc_app_cpu.h"
 #include "reg_sysc_app_awo.h"
-
-static sdhci_host *emmc_inst_env[2];
-
-void HAL_LSEMMC_IRQHandler(sdhci_host *host);
-
-void LSEMMC1_IRQHandler(void)
-{
-    HAL_LSEMMC_IRQHandler(emmc_inst_env[0]);
-}
-
-void LSEMMC2_IRQHandler(void)
-{
-    HAL_LSEMMC_IRQHandler(emmc_inst_env[1]);
-}
+#include <stdint.h>
 
 void lsqsh_emmc_txck_rxck_config()
 {
@@ -53,47 +40,37 @@ void lsqsh_emmc_txck_rxck_config()
     SET_BIT(SYSC_APP_AWO->EMMC1_CORE_TIM_CLK, SYSC_APP_AWO_EMMC1_CLK_TIM_CG_MASK);
 }
 
-void HAL_LSEMMC_MSP_Init(sdhci_host *host)
+void HAL_LSEMMC_MSP_Init(uint32_t mapbase)
 {
     lsqsh_emmc_txck_rxck_config();
-    switch (host->mapbase)
+    switch (mapbase)
     {
         case LSEMMC1:
             SYSC_APP_CPU->PD_CPU_CLKG1 = SYSC_APP_CPU_CLKG_CLR_EMMC1_MASK;
             SYSC_APP_CPU->PD_CPU_SRST1 = SYSC_APP_CPU_SRST_CLR_EMMC1_MASK;
             SYSC_APP_CPU->PD_CPU_SRST1 = SYSC_APP_CPU_SRST_SET_EMMC1_MASK;
             SYSC_APP_CPU->PD_CPU_CLKG1 = SYSC_APP_CPU_CLKG_SET_EMMC1_MASK;
-            emmc_inst_env[0] = host;
-            rv_set_int_isr(EMMC1_IRQN, LSEMMC1_IRQHandler);
-            csi_vic_clear_pending_irq(EMMC1_IRQN);
-            csi_vic_enable_irq(EMMC1_IRQN);
         break;
         case LSEMMC2:
             SYSC_APP_CPU->PD_CPU_CLKG1 = SYSC_APP_CPU_CLKG_CLR_EMMC2_MASK;
             SYSC_APP_CPU->PD_CPU_SRST1 = SYSC_APP_CPU_SRST_CLR_EMMC2_MASK;
             SYSC_APP_CPU->PD_CPU_SRST1 = SYSC_APP_CPU_SRST_SET_EMMC2_MASK;
             SYSC_APP_CPU->PD_CPU_CLKG1 = SYSC_APP_CPU_CLKG_SET_EMMC2_MASK;
-            emmc_inst_env[1] = host;
-            rv_set_int_isr(EMMC2_IRQN, LSEMMC2_IRQHandler);
-            csi_vic_clear_pending_irq(EMMC2_IRQN);
-            csi_vic_enable_irq(EMMC2_IRQN);
         break;
         default:
         break;
     }
 }
 
-void HAL_LSEMMC_MSP_DeInit(sdhci_host *host)
+void HAL_LSEMMC_MSP_DeInit(uint32_t mapbase)
 {
-    switch (host->mapbase)
+    switch (mapbase)
     {
         case LSEMMC1:
             SYSC_APP_CPU->PD_CPU_CLKG1 = SYSC_APP_CPU_CLKG_CLR_EMMC1_MASK;
-            csi_vic_disable_irq(EMMC1_IRQN);
         break;
         case LSEMMC2:
             SYSC_APP_CPU->PD_CPU_CLKG1 = SYSC_APP_CPU_CLKG_CLR_EMMC2_MASK;
-            csi_vic_disable_irq(EMMC2_IRQN);
         break;
         default:
         break;

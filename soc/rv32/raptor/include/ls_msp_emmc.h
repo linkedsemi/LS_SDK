@@ -13,9 +13,8 @@ extern "C" {
 #define LSEMMC REG_EMMC0_BASE
 #endif
 
-
-void HAL_LSEMMC_MSP_Init(sdhci_host *host);
-void HAL_LSEMMC_MSP_DeInit(sdhci_host *host);
+void HAL_LSEMMC_MSP_Init(uint32_t mapbase);
+void HAL_LSEMMC_MSP_DeInit(uint32_t mapbase);
 
 #ifdef __cplusplus
 }

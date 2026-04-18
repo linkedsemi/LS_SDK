@@ -81,14 +81,7 @@ void emmc_clk_stable(void) {
   REG_FIELD_WR(PIPE_SYS_CFG -> EMMC_CTL0, PIPE_SYS_EMMC_SOFT_INT_TMCLK_STABLE, 0x1);  //bit24
 }
 
-static sdhci_host *emmc_inst_env[1];
-
-void LSEMMC_IRQHandler(void)
-{
-    HAL_LSEMMC_IRQHandler(emmc_inst_env[0]);
-}
-
-void HAL_LSEMMC_MSP_Init(sdhci_host *host)
+void HAL_LSEMMC_MSP_Init(uint32_t mapbase)
 {
   //复位操作
   WRITE_REG(PIPE_SYS_CFG -> SOFT_RST_N_REG0_CLR, 0xffffff);
@@ -121,13 +114,9 @@ void HAL_LSEMMC_MSP_Init(sdhci_host *host)
    //总线clk
     REG_FIELD_WR(CPU1_SYS_CFG -> PIPE_SYS_CFG_REG1, PIPE_SYS_EMMC_AXI_CLK_CLK_CG0_5, 0x1); 
     REG_FIELD_WR(CPU1_SYS_CFG -> PIPE_SYS_CFG_REG3, PIPE_SYS_EMMC_AHB_CLK_CLK_CG0_1, 0x1);
-    emmc_inst_env[0] = host;
-    rv_set_int_isr(PIPE_EMMC_IRQn, LSEMMC_IRQHandler);
-    csi_vic_clear_pending_irq(PIPE_EMMC_IRQn);
-    csi_vic_enable_irq(PIPE_EMMC_IRQn);
 }
 
-void HAL_LSEMMC_MSP_DeInit(sdhci_host *host)
+void HAL_LSEMMC_MSP_DeInit(uint32_t mapbase)
 {
-    csi_vic_disable_irq(PIPE_EMMC_IRQn);
+
 }

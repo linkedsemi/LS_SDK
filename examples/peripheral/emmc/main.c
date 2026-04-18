@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <string.h>
 #include "platform.h"
 #include "ls_soc_gpio.h"
@@ -15,16 +16,16 @@ int block_addr = 0;
 
 uint8_t card_buffer[MMC_EXT_CSD_BYTES];
 
-static sdhci_host emmc;
+uint32_t mapbase;
 
 void EMMC_INIT(void)
 {
 #ifdef QSH
-    emmc.mapbase = LSEMMC1;
+    mapbase = LSEMMC1;
 #elif defined(RAPTOR)
-    emmc.mapbase = LSEMMC;
+    mapbase = LSEMMC;
 #endif
-    HAL_EMMC_Init(&emmc);
+    HAL_EMMC_Init(mapbase);
 }
 
 #ifdef QSH
@@ -61,43 +62,43 @@ int main()
     LOG_I("init\n");
     uint32_t ret;
     memset(buf1, 1, sizeof(buf1));
-    if(sd_idle(&emmc))
+    if(sd_idle(mapbase))
     {
         LOG_I("Card error on CMD0");
     }
 
-    if(!mmc_card_init(&emmc))
+    if(!mmc_card_init(mapbase))
     {
         LOG_I("mmc_card_init successful\n");
     }
 
-    // mmc_set_rst_n_function_enable(&emmc);
-    // mmc_set_bootpartition_enable_boot1(&emmc);
-    // mmc_set_bootpartition_enable_boot2(&emmc);
-    // mmc_set_partition_access_boot1(&emmc);
-    // mmc_set_partition_access_boot2(&emmc);
+    // mmc_set_rst_n_function_enable(mapbase);
+    // mmc_set_bootpartition_enable_boot1(mapbase);
+    // mmc_set_bootpartition_enable_boot2(mapbase);
+    // mmc_set_partition_access_boot1(mapbase);
+    // mmc_set_partition_access_boot2(mapbase);
 
-    // mmc_read_ext_csd(&emmc, card_buffer);
+    // mmc_read_ext_csd(mapbase, card_buffer);
 
-    // mmc_boot_partition_en(&emmc);
+    // mmc_boot_partition_en(mapbase);
 
     // 从用户区读
-    // ret = mmc_read_blocks(&emmc, buf, 0, 2);
-    // if(ret)
-    // {
-    //     LOG_I("Single block card read failed\n");
-    // }
+    ret = mmc_read_blocks(mapbase, buf, 0, 2);
+    if(ret)
+    {
+        LOG_I("Single block card read failed\n");
+    }
 
-    // mmc_boot_partition_en(&emmc);
+    // mmc_boot_partition_en(mapbase);
 
 
-	// ret = mmc_write_blocks(&emmc, buf1, 0, 1);
+	// ret = mmc_write_blocks(mapbase, buf1, 0, 1);
     // if(ret)
     // {
     //     LOG_I("Single block card write failed\n");
     // }
 
-    // ret = mmc_read_blocks(&emmc, buf, 0, 2);
+    // ret = mmc_read_blocks(mapbase, buf, 0, 2);
     // if(ret)
     // {
     //     LOG_I("Single block card read failed\n");
