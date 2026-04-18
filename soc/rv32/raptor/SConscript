@@ -34,6 +34,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'rv32/raptor/ls_msp_crypt.c',
         'rv32/raptor/ls_msp_otbn.c',
         'rv32/raptor/ls_msp_sm4.c',
+        'rv32/raptor/ls_msp_iwdg.c',
     ]))
     sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/hal_driver/',x),[
         'src/otbn/text_array/ecc256_base_mult_text.c',
@@ -71,7 +72,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_cache.c',
         # 'src/ls_hal_comp.c',
         # 'src/ls_hal_uart.c',
-        # 'src/ls_hal_dwuart.c',
+        'src/ls_hal_dwuart.c',
         # 'src/ls_hal_dwuart_dma.c',
         # 'src/ls_hal_dwtrng.c',
         # 'src/ls_hal_adcv2.c',
@@ -99,7 +100,7 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         # 'src/ls_hal_i2c_dma.c',
         # 'src/ls_hal_ssi_dma.c',
         # 'src/ls_hal_wwdg.c',
-        # 'src/ls_hal_iwdgv2.c',
+        'src/ls_hal_iwdgv2.c',
         # 'src/ls_hal_ps2h.c',
         # 'src/ls_hal_pis.c',
         'src/ls_hal_otbn.c',
