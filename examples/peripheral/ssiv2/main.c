@@ -1,6 +1,7 @@
 #include "ls_hal_ssiv2.h"
 #include "hal_flash_int.h"
 
+struct SSIV2_HandleTypeDef flash;
 #define TEMP_BUF_SIZE  256 //page max size 256 Bytes
 
 __attribute__((aligned(4))) uint8_t temp_buf[TEMP_BUF_SIZE];
@@ -30,20 +31,21 @@ int main()
     sys_init_none();
 
     uint32_t offset = 0x0;
+    flash.reg = LSSSIV2;
     flash.slave_select = slave1;
-    HAL_SSIV2_Init(div_para, 0);
+    HAL_SSIV2_Init(flash.reg, div_para, 0);
 
-    hal_flash_software_reset();
+    hal_flashx_software_reset_v2(flash.reg, flash.slave_select);
 
-    hal_flash_read_status_register_0(status_reg_0);
+    hal_flashx_read_status_register_0_v2(flash.reg, flash.slave_select, status_reg_0);
 
-    hal_flash_block_32K_erase(offset);
+    hal_flashx_block_32K_erase_v2(flash.reg, flash.slave_select, offset);
     
-    hal_flash_fast_read(offset, temp_buf, sizeof(temp_buf));
+    hal_flashx_fast_read_v2(flash.reg, flash.slave_select, offset, temp_buf, sizeof(temp_buf));
 
-    hal_flash_page_program(offset, data, sizeof(data));
+    hal_flashx_page_program_v2(flash.reg, flash.slave_select, offset, data, sizeof(data));
 
-    hal_flash_fast_read(offset, temp_buf, sizeof(temp_buf));
+    hal_flashx_fast_read_v2(flash.reg, flash.slave_select, offset, temp_buf, sizeof(temp_buf));
 
     while (1);
 }

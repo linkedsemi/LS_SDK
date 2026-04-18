@@ -12,16 +12,16 @@ static void fwqspi_pin_enable(){
     pinmux_ssiv2_init();
 }
 
-HAL_StatusTypeDef HAL_SSIV2_Init(uint32_t div_para, uint8_t clk_edg_sel)
+HAL_StatusTypeDef HAL_SSIV2_Init(reg_axi_ssi_t *reg, uint32_t div_para, uint8_t clk_edg_sel)
 {
     HAL_LSSSIV2_MSP_Init();
     fwqspi_pin_enable();
     CPU1_SYS_CFG->SOFT_FWSPI_SS_IN_N = 1; //软件配置片选是否有效位，低有效(此处硬件CS)
-    REG_FIELD_WR(flash.reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
-    MODIFY_REG(flash.reg->ddress_block.CTRLR0, 
+    REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
+    MODIFY_REG(reg->ddress_block.CTRLR0, 
         CTRLR0_SSTE_MASK | CTRLR0_SPI_FRF_MASK | CTRLR0_DFS_MASK, 
         TOGGLE_DISABLE << CTRLR0_SSTE_POS | STANDARD_SPI_FORMAT << CTRLR0_SPI_FRF_POS | DFS_8_BIT << CTRLR0_DFS_POS);
-    REG_FIELD_WR(flash.reg->ddress_block.BAUDR, BAUDR_SCKDV, div_para); // Fsclk_out = Fssi_clk/BAUDR
+    REG_FIELD_WR(reg->ddress_block.BAUDR, BAUDR_SCKDV, div_para); // Fsclk_out = Fssi_clk/BAUDR
     //软件配置fwspi输出clk是否反转，复位值0，0：根据fwspi配置输出；1：根据fwspi配置取反输出。
     CPU1_SYS_CFG->SOFT_FWSPI_OSCLK_INV_SEL = clk_edg_sel;
     return HAL_OK;
@@ -33,18 +33,18 @@ HAL_StatusTypeDef HAL_SSIV2_DeInit(void)
     return HAL_OK;
 }
 
-void lsssiv2_stg_send_command(reg_axi_ssi_t *reg, uint8_t opcode){
+void lsssiv2_stg_send_command(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t opcode){
     // CTRLR0 can be configured only when it is turned off
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
     MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK, TX_ONLY<<CTRLR0_TMOD_POS);
     REG_FIELD_WR(reg->ddress_block.SSIENR,SSIENR_SSIC_EN, SSIC_ENABLE);
     reg->ddress_block.DR0 = opcode;
-    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, flash.slave_select);
+    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
     while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
     REG_FIELD_WR(reg->ddress_block.SER,SER_SER, 0);
 }
 
-void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint8_t dummy_cycles, uint32_t length)
+void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint8_t dummy_cycles, uint32_t length)
 {
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
     MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK, EEPROM_READ<<CTRLR0_TMOD_POS);
@@ -63,7 +63,7 @@ void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr, 
             reg->ddress_block.DR0 = 0x00;
         }
     }
-    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, flash.slave_select);
+    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
     while(length)
     {
         if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
@@ -76,9 +76,9 @@ void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr, 
     REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
 }
 
-void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint16_t length)
+void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint16_t length)
 {
-    lsssiv2_stg_send_command(flash.reg, WRITE_ENABLE_OPCODE);
+    lsssiv2_stg_send_command(reg, slave_select, WRITE_ENABLE_OPCODE);
     reg->ddress_block.DR0 = opcode;
     if(is_addr)
     {
@@ -88,7 +88,7 @@ void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr,
         reg->ddress_block.DR0 = addr&0xFF;
     }
     //Slave Select Enable Flag: After opening, start sending and receiving data
-    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, flash.slave_select);
+    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
     while(length)
     {
         if(READ_BIT(reg->ddress_block.SR, SR_TFNF_MASK))
@@ -101,60 +101,60 @@ void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint32_t addr, bool is_addr,
     REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
     uint8_t status_reg_0;
     do{
-        hal_flash_read_status_register_0(&status_reg_0);
+        hal_flashx_read_status_register_0_v2(reg, slave_select, &status_reg_0);
     }while(status_reg_0 & 0x01);
 }
 
-void hal_flash_fast_read(uint32_t offset, uint8_t *data, uint32_t length)
+void hal_flashx_fast_read_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint8_t *data, uint32_t length)
 {
     // Turn off the global interrupt when reading
     uint32_t flash_read_stat = enter_critical();
-    lsssiv2_stg_read_register(flash.reg, offset, true, FAST_READ4B_OPCODE, data, 1, length);
+    lsssiv2_stg_read_register(reg, slave_select, offset, true, FAST_READ4B_OPCODE, data, 1, length);
     exit_critical(flash_read_stat);
 }
 
-void hal_flash_page_program(uint32_t offset, uint8_t *data, uint16_t length)
+void hal_flashx_page_program_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint8_t *data, uint16_t length)
 {
-    lsssiv2_stg_write_register(flash.reg, offset, true, PAGE_PROGRAM4B_OPCODE, data, length);
+    lsssiv2_stg_write_register(reg, slave_select, offset, true, PAGE_PROGRAM4B_OPCODE, data, length);
 }
 
-void hal_flash_read_status_register_0(uint8_t *status_reg_0)
+void hal_flashx_read_status_register_0_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t *status_reg_0)
 {
-    lsssiv2_stg_read_register(flash.reg, 0, false, READ_STATUS_REGISTER_0_OPCODE, status_reg_0, 0, 1);
+    lsssiv2_stg_read_register(reg, slave_select, 0, false, READ_STATUS_REGISTER_0_OPCODE, status_reg_0, 0, 1);
 }
 
-void hal_flash_read_status_register_1(uint8_t *status_reg_1)
+void hal_flashx_read_status_register_1_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t *status_reg_1)
 {
-    lsssiv2_stg_read_register(flash.reg, 0, false, READ_STATUS_REGISTER_1_OPCODE, status_reg_1, 0, 1);
+    lsssiv2_stg_read_register(reg, slave_select, 0, false, READ_STATUS_REGISTER_1_OPCODE, status_reg_1, 0, 1);
 }
 
-void hal_flash_write_status_register_0(uint8_t status_0)
+void hal_flashx_write_status_register_0_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t status_0)
 {
-    lsssiv2_stg_write_register(flash.reg, 0, false, WRITE_STATUS_REGISTER_0_OPCODE, &status_0, 1);
+    lsssiv2_stg_write_register(reg, slave_select, 0, false, WRITE_STATUS_REGISTER_0_OPCODE, &status_0, 1);
 }
 
-void hal_flash_write_status_register_1(uint8_t status_1)
+void hal_flashx_write_status_register_1_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t status_1)
 {
-    lsssiv2_stg_write_register(flash.reg, 0, false, WRITE_STATUS_REGISTER_1_OPCODE, &status_1, 1);
+    lsssiv2_stg_write_register(reg, slave_select, 0, false, WRITE_STATUS_REGISTER_1_OPCODE, &status_1, 1);
 }
 
-void hal_flash_sector_erase(uint32_t offset)
+void hal_flashx_sector_erase_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset)
 {
-    lsssiv2_stg_write_register(flash.reg, offset, true, SECTOR_ERASE4B_OPCODE, NULL, 0);
+    lsssiv2_stg_write_register(reg, slave_select, offset, true, SECTOR_ERASE4B_OPCODE, NULL, 0);
 }
 
-void hal_flash_block_32K_erase(uint32_t offset)
+void hal_flashx_block_32K_erase_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset)
 {
-    lsssiv2_stg_write_register(flash.reg, offset, true, BLOCK_32K_ERASE4B_OPCODE, NULL, 0);
+    lsssiv2_stg_write_register(reg, slave_select, offset, true, BLOCK_32K_ERASE4B_OPCODE, NULL, 0);
 }
 
-void hal_flash_block_64K_erase(uint32_t offset)
+void hal_flashx_block_64K_erase_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset)
 {
-    lsssiv2_stg_write_register(flash.reg, offset, true, BLOCK_64K_ERASE4B_OPCODE, NULL, 0);
+    lsssiv2_stg_write_register(reg, slave_select, offset, true, BLOCK_64K_ERASE4B_OPCODE, NULL, 0);
 }
 
-void hal_flash_software_reset()
+void hal_flashx_software_reset_v2(reg_axi_ssi_t *reg, uint8_t slave_select)
 {
-    lsssiv2_stg_send_command(flash.reg, RESET_EN_OPCODE);
-    lsssiv2_stg_send_command(flash.reg, RESET_OPCODE);
+    lsssiv2_stg_send_command(reg, slave_select, RESET_EN_OPCODE);
+    lsssiv2_stg_send_command(reg, slave_select, RESET_OPCODE);
 }
