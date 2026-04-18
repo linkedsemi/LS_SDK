@@ -19,4 +19,8 @@ HAL_StatusTypeDef HAL_OTPV2_DeInit();
 
 HAL_StatusTypeDef HAL_OTPV2_Read_Write(bool is_system_side, bool is_read, uint32_t offset, uint32_t *data, uint32_t length);
 
+HAL_StatusTypeDef HAL_OTPV2_Read(uint32_t offset, uint32_t *data, uint32_t length);
+
+HAL_StatusTypeDef HAL_OTPV2_Write(uint32_t offset, uint32_t *data, uint32_t length);
+
 #endif
