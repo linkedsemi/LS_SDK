@@ -424,6 +424,9 @@ void pinmux_dwuart8_init(uint16_t txd,uint16_t rxd);
   */
 void pinmux_dwuart8_deinit(void);
 
+void pinmux_dwuart12_init(uint16_t txd,uint16_t rxd);
+void pinmux_dwuart12_deinit(void);
+
 /**
   * @brief Set pin mux function to adtim1 
   * @param   pin Specific GPIO pin 

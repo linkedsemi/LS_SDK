@@ -63,6 +63,8 @@ void LL_DWUART2_MSP_Init(void);
 void LL_DWUART2_MSP_DeInit(void);
 void LL_DWUART8_MSP_Init(void);
 void LL_DWUART8_MSP_DeInit(void);
+void LL_DWUART12_MSP_Init(void);
+void LL_DWUART12_MSP_DeInit(void);
 
 struct __DWUART_HandleTypeDef;
 void HAL_DWUART_MSP_Init(struct __DWUART_HandleTypeDef *inst);
