@@ -8,8 +8,6 @@
 #include "raptor.h"
 #include <stdint.h>
 
-static uint32_t EDN_URND_BUS_IN;
-
 void HAL_LSOTBN_MSP_Init(void)
 {
     CPU0_SYS_CFG -> CPU0_SYS_CRG_CPU0_SYS_AHB_CLK_TOP_RST_N_REG0_CLR = 0x00000004;
