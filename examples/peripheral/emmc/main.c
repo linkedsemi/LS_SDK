@@ -5,7 +5,9 @@
 #include "ls_hal_emmc.h"
 #include "ls_msp_emmc.h"
 #include "log.h"
+#include "common.h"
 
+#define emmc_buf_addr ((uint8_t *)0xB0000000)
 #define SECTOR_COUNT 32
 #define SECTOR_SIZE  512 /* subsystem should set all cards to 512 byte blocks */
 #define BUF_SIZE     (SECTOR_SIZE * SECTOR_COUNT)
@@ -61,7 +63,9 @@ int main()
     EMMC_INIT();
     LOG_I("init\n");
     uint32_t ret;
+#ifdef QSH
     memset(buf1, 1, sizeof(buf1));
+#endif
     if(sd_idle(mapbase))
     {
         LOG_I("Card error on CMD0");
@@ -83,6 +87,7 @@ int main()
     // mmc_boot_partition_en(mapbase);
 
     // 从用户区读
+#ifdef QSH
     ret = mmc_read_blocks(mapbase, buf, 0, 2);
     if(ret)
     {
@@ -103,6 +108,30 @@ int main()
     // {
     //     LOG_I("Single block card read failed\n");
     // }
+#elif defined(RAPTOR)
+    ret = mmc_read_blocks(mapbase, emmc_buf_addr, 0, 2);
+    if(ret)
+    {
+        LOG_I("Single block card read failed\n");
+    }
+    memcpy32((uint32_t *)buf, (uint32_t *)emmc_buf_addr, (2*512)/4);
 
+    memset(emmc_buf_addr, 1, sizeof(buf1));
+
+	ret = mmc_write_blocks(mapbase, emmc_buf_addr, 0, 1);
+    if(ret)
+    {
+        LOG_I("Single block card write failed\n");
+    }
+    memset(emmc_buf_addr, 0, sizeof(buf1));
+
+    ret = mmc_read_blocks(mapbase, emmc_buf_addr, 0, 2);
+    if(ret)
+    {
+        LOG_I("Single block card read failed\n");
+    }
+    memcpy32((uint32_t *)buf, (uint32_t *)emmc_buf_addr, (2*512)/4);
+
+#endif
     while (1);
 }
