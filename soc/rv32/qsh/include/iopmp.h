@@ -64,7 +64,27 @@ static ALWAYS_INLINE void sys_write32(uint32_t data, mem_addr_t addr)
 
 inline static uint32_t addr2napot(uint32_t addr, uint64_t size)
 {
-    return ((addr >> 2) |(size - 1) >> 3);
+    return (addr >> 2) | ((size - 1) >> 3);
+}
+
+inline static uint32_t napot_reg2size(uint32_t reg)
+{
+    uint32_t mask = ((reg ^ (reg + 1)) >> 1);
+    return ((mask << 3) | 0x7) + 1;
+}
+
+inline static uint32_t napot_reg2addr(uint32_t reg)
+{
+    uint32_t mask = ((reg ^ (reg + 1)) >> 1);
+    return (reg & ~mask) << 2;
+}
+
+inline static uint32_t napot_reg2addr_size(uint32_t reg, uint32_t *addr, uint32_t *size)
+{
+    uint32_t mask = ((reg ^ (reg + 1)) >> 1);
+    *addr = (reg & ~mask) << 2;
+    *size = ((mask << 3) | 0x7) + 1;
+    return 0;
 }
 
 inline static void iopmp_config_enable(uint32_t dev, bool enable)
