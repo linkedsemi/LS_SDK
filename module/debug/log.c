@@ -44,12 +44,12 @@ void ram_log_print(char *ptr, int len);
 #if (LOG_BACKEND&UART_LOG)
 
 #ifdef RAPTOR
-    #if  (LOG_UART_INST == LOG_DWUART8)
-    #define LOG_UART  DWUART8
-    #define LOG_PINMUX_INIT_FUNC pinmux_dwuart8_init
-    #define LOG_PINMUX_DEINIT_FUNC pinmux_dwuart8_deinit
-    #define LOG_LL_MSP_INIT_FUNC LL_DWUART8_MSP_Init
-    #define LOG_LL_MSP_DEINIT_FUNC LL_DWUART8_MSP_DeInit
+    #if  (LOG_UART_INST == LOG_DWUART12)
+    #define LOG_UART  DWUART12
+    #define LOG_PINMUX_INIT_FUNC pinmux_dwuart12_init
+    #define LOG_PINMUX_DEINIT_FUNC pinmux_dwuart12_deinit
+    #define LOG_LL_MSP_INIT_FUNC LL_DWUART12_MSP_Init
+    #define LOG_LL_MSP_DEINIT_FUNC LL_DWUART12_MSP_DeInit
     #endif
 #else
     #if (LOG_UART_INST == LOG_UART1)

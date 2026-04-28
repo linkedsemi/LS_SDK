@@ -30,14 +30,14 @@ extern "C" {
 #endif
 
 #ifndef LOG_UART_INST
-#define LOG_DWUART8 8
-#define LOG_UART_INST (LOG_DWUART8)
+#define LOG_DWUART12 12
+#define LOG_UART_INST (LOG_DWUART12)
 #endif
 #ifndef LOG_UART_TXD
-#define LOG_UART_TXD (PN06)
+#define LOG_UART_TXD (PCC03)
 #endif
 #ifndef LOG_UART_RXD
-#define LOG_UART_RXD (PN07)
+#define LOG_UART_RXD (PCC02)
 #endif
 #ifndef LOG_UART_BAUDRATE
 #define LOG_UART_BAUDRATE UART_BAUDRATE_115200
