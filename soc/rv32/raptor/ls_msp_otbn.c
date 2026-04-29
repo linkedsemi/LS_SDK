@@ -8,17 +8,20 @@
 #include "raptor.h"
 #include <stdint.h>
 
+static uint32_t EDN_URND_BUS_IN;
+
 void HAL_LSOTBN_MSP_Init(void)
 {
-    CPU0_SYS_CFG -> CPU0_SYS_CRG_CPU0_SYS_AHB_CLK_TOP_RST_N_REG0_CLR = 0x00000004;
+    CPU0_SYS_CFG -> CPU0_SYS_CRG_CPU0_SYS_AHB_CLK_TOP_RST_N_REG0_CLR = 0x00040000;
     CPU0_SYS_CFG -> CPU0_SYS_CRG_CPU0_SYS_AHB_CLK_TOP_RST_N_REG0 = 0xffffffff;
-    REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG2, CPU0_SYS_OTBN_EDN_APB_CLK_CLK_CG0_16, 0x1);    
+    REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG2, CPU0_SYS_OTBN_EDN_APB_CLK_CLK_CG0_16, 0x1);
+    REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG2, CPU0_SYS_OTBN_OTP_APB_CLK_CLK_CG0_4, 0x1);
     REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG1, CPU0_SYS_OTBN_AHB_CLK_CLK_CG0_18, 0x1);
 
     for (uint8_t i = 0; i < 16; i++)
     {
         while (!REG_FIELD_RD(CPU0_SYS_CFG->OTBN_CFG_RO, CPU0_SYS_EDN_URND_REQ)) ;
-        CPU0_SYS_CFG->EDN_URND_BUS = i + 1;
+        CPU0_SYS_CFG->EDN_URND_BUS = ++EDN_URND_BUS_IN;
         REG_FIELD_WR(CPU0_SYS_CFG->OTBN_CFG_RW, CPU0_SYS_EDN_URND_ACK, 1);
     }
 
@@ -37,6 +40,7 @@ void HAL_LSOTBN_MSP_DeInit(void)
 {
     REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG1, CPU0_SYS_OTBN_AHB_CLK_CLK_CG0_18, 0x0);
     REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG2, CPU0_SYS_OTBN_EDN_APB_CLK_CLK_CG0_16, 0x0);
+    REG_FIELD_WR(CPU0_SYS_CFG->CPU0_SYS_CFG_REG2, CPU0_SYS_OTBN_OTP_APB_CLK_CLK_CG0_4, 0x0);
     csi_vic_disable_irq(CPU_OTBN_IRQn);
     csi_vic_disable_irq(CPU_OTBN_SYSC_IRQn);
 }
@@ -67,26 +71,24 @@ void HAL_OTBN_SYSC_IRQHandler(void)
     }
     if (intr & CO_BIT(8))
     { 
-        rand_data[0] = *( volatile uint32_t*)(REG_DEBUG1_BASE);
+        rand_data[0] = ++EDN_URND_BUS_IN;
         CPU0_SYS_CFG->EDN_RND_BUS = rand_data[0];  
         CPU0_SYS_CFG->OTBN_CFG_RW |= CO_BIT(8);
         CPU0_SYS_CFG->OTBN_INTR_CLR = CO_BIT(8);
     }
     if (intr & CO_BIT(9))
     {
-        rand_data[0] = *( volatile uint32_t*)(REG_DEBUG1_BASE);
+        rand_data[0] = ++EDN_URND_BUS_IN;
         CPU0_SYS_CFG->EDN_URND_BUS = rand_data[0]; 
         CPU0_SYS_CFG->OTBN_CFG_RW |= CO_BIT(10);
         CPU0_SYS_CFG->OTBN_INTR_CLR = CO_BIT(9);
     }
     if (intr & CO_BIT(10))
     {
-        for (uint8_t i = 0; i < 4; i++)
-            rand_data[i] = *( volatile uint32_t*)(REG_DEBUG1_BASE);
-        CPU0_SYS_CFG->OTBN_OTP_KEY_0 = rand_data[0];  
-        CPU0_SYS_CFG->OTBN_OTP_KEY_1 = rand_data[1];
-        CPU0_SYS_CFG->OTBN_OTP_KEY_2 = rand_data[2];
-        CPU0_SYS_CFG->OTBN_OTP_KEY_3 = rand_data[3];
+        CPU0_SYS_CFG->OTBN_OTP_KEY_0 = ++EDN_URND_BUS_IN;  
+        CPU0_SYS_CFG->OTBN_OTP_KEY_1 = ++EDN_URND_BUS_IN;
+        CPU0_SYS_CFG->OTBN_OTP_KEY_2 = ++EDN_URND_BUS_IN;
+        CPU0_SYS_CFG->OTBN_OTP_KEY_3 = ++EDN_URND_BUS_IN;
         CPU0_SYS_CFG->OTBN_CFG_RW |= CO_BIT(12);
         CPU0_SYS_CFG->OTBN_INTR_CLR = CO_BIT(10);
     }
