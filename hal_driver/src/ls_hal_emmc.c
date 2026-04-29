@@ -6,12 +6,13 @@
 #ifdef QSH
     #include "reg_sysc_sec_cpu.h"
 #endif
+#ifdef RAPTOR
+    #include "reg_pipe_sys.h"
+#endif
+
 #include "platform.h"
 #include "log.h"
 #include <string.h>
-
-//qsh 0x40049000
-//raptor 0x92000000
 
 HAL_StatusTypeDef HAL_EMMC_Init(uint32_t mapbase)
 {
@@ -601,7 +602,9 @@ uint32_t mmc_card_init(uint32_t mapbase)
         LOG_I("Failed on sending RCA to card");
         return ret;
     }
-
+#ifdef RAPTOR
+    PIPE_SYS_CFG -> EMMC_CCLK_TX_CLK_CLK_DIV0_DIV10_REG = 0x0; //切到25M
+#endif
     /* CMD9 */
     ret = mmc_read_csd(mapbase);
     if (ret) {
