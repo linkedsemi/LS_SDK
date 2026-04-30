@@ -367,7 +367,7 @@ __attribute__((weak)) void LL_DWUART12_Handler() {}
 
 void LL_DWUART12_MSP_Init(void)
 {
-    rv_set_int_isr(CPU_DWUART2_IRQn, LL_DWUART12_Handler);
+    rv_set_int_isr(PERIPH_DWUART12_IRQn, LL_DWUART12_Handler);
     REG_FIELD_WR(CPU1_SYS_CFG->PERIPH_SYS_CFG_REG2, PERIPH_SYS_UART12_APB_CLK_CLK_CG0_3, 0x1);
 }
 
