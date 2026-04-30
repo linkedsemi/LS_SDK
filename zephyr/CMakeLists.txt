@@ -360,6 +360,7 @@ if(CONFIG_SOC_LSQSH)
   zephyr_compile_definitions(CONFIG_FSTACK_PROTECTOR)
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
 
+if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN)
   string(REPLACE "/" "_" CONFIG_BOARD_TARGET_MODIFIED "${CONFIG_BOARD_TARGET}")
   string(REPLACE "@" "_" CONFIG_BOARD_TARGET_MODIFIED_2 "${CONFIG_BOARD_TARGET_MODIFIED}")
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
@@ -368,6 +369,9 @@ if(CONFIG_SOC_LSQSH)
     -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
     -a ${CONFIG_FLASH_BASE_ADDRESS}
   )
+endif()
+
+if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
     -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
@@ -382,5 +386,6 @@ if(CONFIG_SOC_LSQSH)
     -a 0x10000
     -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
   )
+endif()
 
 endif()

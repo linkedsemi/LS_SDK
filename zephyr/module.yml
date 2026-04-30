@@ -1,4 +1,5 @@
 build:
   cmake: zephyr
+  kconfig: zephyr/Kconfig
   settings:
     dts_root: soc/rv32/qsh
