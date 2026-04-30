@@ -23,13 +23,13 @@ void emmc_txrx_clk_cfg(volatile uint32_t mode,volatile uint32_t rx_mode) {
   /** tx */
     if(mode == BOOT ) {
         PIPE_SYS_CFG -> EMMC_CCLK_TX_CLK_CLK_DEGLITCH_SW2_REG = 0x1;
-        PIPE_SYS_CFG -> EMMC_CCLK_TX_CLK_CLK_DIV0_DIV10_REG = 0x20; //32分频
+        PIPE_SYS_CFG -> EMMC_CCLK_TX_CLK_CLK_DIV0_DIV10_REG = 0x40; //25M 64分频
         // x/x 0x90928144
         REG_FIELD_WR(PIPE_SYS_CFG -> EMMC_REG0, PIPE_SYS_EMMC_TX_CLK_INV_SEL, 0x1);
     }
 
     //FPGA 一定要配，
-    PIPE_SYS_CFG -> EMMC_CCLK_TX_CLK_CLK_DIV0_DIV10_REG = 0x20; //32分频
+    PIPE_SYS_CFG -> EMMC_CCLK_TX_CLK_CLK_DIV0_DIV10_REG = 0x40; //25M 64分频
 
     /** rx */
     if(rx_mode == TX_RX_EQ)  {
