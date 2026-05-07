@@ -14,6 +14,11 @@ struct FlashDevice const FlashDevices  INDEVSECTION =  {
     .IsAccDirect = 0,                      // Access directly
     .rangeNumbers = 1,                      // RangeNumbers
 	// {start address, the flash size, sector size}
-    .Devs = {{FLASH_BASE_ADDR, 1*1024*1024*1024, FLASH_SECTOR_SIZE}},
+    .Devs = {
+        {FLASH_BASE_ADDR, 1*1024*1024*1024, FLASH_SECTOR_SIZE},
+#if defined(QSH)
+        {CACHE2_ADDR, 1*1024*1024*1024, FLASH_SECTOR_SIZE},
+#endif
+    },
     .VendorName = "LinkedSemi"
 };

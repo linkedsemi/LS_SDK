@@ -1,6 +1,7 @@
 /**
  * Driver for flash program.
  */
+#include "common.h"
 #include "ls_hal_flash.h"
 #include "ls_hal_cache.h"
 #include "reg_base_addr.h"
@@ -36,10 +37,6 @@ static void io_pull_up_cfg()
     io_pull_write(PD04, IO_PULL_UP);
     io_pull_write(PC13, IO_PULL_UP);
 }
-#elif defined(QSH)
-static void io_pull_up_cfg()
-{
-}
 #endif
 
 /**
@@ -52,55 +49,69 @@ static void io_pull_up_cfg()
 int  flashInit(){
     disable_global_irq();
 #if defined(QSH)
-    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK))
-        && (0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK))) {
-    } else {
-        app_cpu_reset();
-    }
+    app_cpu_reset();
+#endif
+
+#if !defined(NDEBUG)
+        log_en = true;
+        LOG_INIT();
 #endif
 
     lscache_cache_disable();
-    io_pull_up_cfg();
 #if defined(LEO)
-    pinmux_hal_flash_init();
-#else
-    pinmux_hal_flash_quad_init();
+    io_pull_up_cfg();
 #endif
-    flash1.reg = (void *)LSQSPIV2;
-    flash1.dual_mode_only = false;
-    flash1.continuous_mode_enable = false;
-    flash1.writing = false;
-    flash1.suspend_count = 0;
-    flash1.continuous_mode_on = false;
-    flash1.addr4b = false;
-    hal_flashx_init(&flash1);
-    clk_flash_init();
 
-    hal_flashx_software_reset(&flash1);
-    DELAY_US(500);
-    hal_flashx_release_from_deep_power_down(&flash1);
-    DELAY_US(100);
-
-    hal_flashx_qe_status_read_and_set(&flash1);
-
-#if !defined(NDEBUG)
-    log_en = true;
-    LOG_INIT();
-#endif
+    struct hal_flash_env *flash[] = {
+        &flash1,
 #if defined(QSH)
-    uint8_t jedec_id[3] = {};
-    hal_flashx_read_id(&flash1, jedec_id);
-    if ((jedec_id[0] != 0) && (jedec_id[1] != 0) && (jedec_id[2] != 0)) {
-        if ((2 << (jedec_id[2] - 1)) > (16 << 20)) {
-            flash1.addr4b = true;
+        &flash2,
+#endif
+    };
+
+    flash1.reg = (void *)LSQSPIV2;
+#if defined(QSH)
+    flash2.reg = (void *)LSQSPIV2_2;
+#endif
+
+    for (int i = 0; i < sizeof(flash) / sizeof(flash[0]); i++) {
+        flash[i]->dual_mode_only = false;
+        flash[i]->continuous_mode_enable = false;
+        flash[i]->writing = false;
+        flash[i]->suspend_count = 0;
+        flash[i]->continuous_mode_on = false;
+        flash[i]->addr4b = false;
+
+#if defined(LEO)
+        pinmux_hal_flash_init();
+#else
+        pinmux_hal_flashx_quad_init(flash[i]->reg);
+#endif
+        hal_flashx_init(flash[i]);
+        clk_flashx_init(flash[i]->reg);
+
+        hal_flashx_software_reset(flash[i]);
+        DELAY_US(500);
+        hal_flashx_release_from_deep_power_down(flash[i]);
+        DELAY_US(100);
+
+        hal_flashx_qe_status_read_and_set(flash[i]);
+
+        uint8_t jedec_id[3] = {};
+        uint32_t size;
+        hal_flashx_read_id(flash[i], jedec_id);
+        if ((jedec_id[0] != 0) && (jedec_id[1] != 0) && (jedec_id[2] != 0)) {
+            size = (2 << (jedec_id[2] - 1));
+            if (size > (16 << 20)) {
+                flash1.addr4b = true;
+            }
+        } else {
+            return ERROR_INIT;
         }
-    } else {
-        return ERROR_INIT;
-    }
 #if !defined(NDEBUG)
-    LOG_I("jedec-id = [%02x %02x %02x];", jedec_id[0], jedec_id[1], jedec_id[2]);
+        LOG_I("0x%x: jedec-id=[%02x %02x %02x]: size=%d", (uint32_t)flash[i]->reg, jedec_id[0], jedec_id[1], jedec_id[2], size);
 #endif
-#endif
+    }
 
     return 0;
 }
@@ -148,12 +159,28 @@ int  flashID(unsigned int* flashID){
  * Otherwise return 0.
  */
 int flashProgram(char* dst, char *src, int size){
-#if !defined(NDEBUG)
-    LOG_I("%s: dst:0x%x src:0x%x size:0x%x", __func__, dst, src, size);
+    uint32_t flash_base_addr;
+    struct hal_flash_env *flash;
+#if defined(QSH)
+    if ((uintptr_t)dst >= CACHE2_ADDR) {
+        flash_base_addr = CACHE2_ADDR;
+        flash = &flash2;
+    } else {
+        flash_base_addr = FLASH_BASE_ADDR;
+        flash = &flash1;
+    }
+#else
+    flash_base_addr = FLASH_BASE_ADDR;
+    flash = &flash1;
 #endif
+
     uint32_t current = (uint32_t)dst;
     uint8_t *data = (uint8_t *)src;
     uint16_t length;
+#if !defined(NDEBUG)
+    LOG_I("%s: dst:0x%x src:0x%x size:0x%x", __func__, dst, src, size);
+#endif
+
     if(current % 256)
     {
         length = size > 256 - current % 256 ? 256 - current % 256 : size;
@@ -163,10 +190,12 @@ int flashProgram(char* dst, char *src, int size){
     }
     if(length)
     {
+#if 0
 #if !defined(NDEBUG)
-        LOG_I("%s: dst:0x%x size:0x%x", __func__, current - FLASH_BASE_ADDR, length);
+        LOG_I("%s: dst:0x%x size:0x%x", __func__, current - flash_base_addr, length);
 #endif
-        hal_flashx_multi_io_page_program(&flash1, current - FLASH_BASE_ADDR,(void *)data,length);
+#endif
+        hal_flashx_multi_io_page_program(flash, current - flash_base_addr,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -174,10 +203,12 @@ int flashProgram(char* dst, char *src, int size){
     while(size)
     {
         length = size > 256 ? 256 : size;
+#if 0
 #if !defined(NDEBUG)
-        LOG_I("%s: dst:0x%x size:0x%x", __func__, current - FLASH_BASE_ADDR, length);
+        LOG_I("%s: dst:0x%x size:0x%x", __func__, current - flash_base_addr, length);
 #endif
-        hal_flashx_multi_io_page_program(&flash1, current - FLASH_BASE_ADDR,(void *)data,length);
+#endif
+        hal_flashx_multi_io_page_program(flash, current - flash_base_addr,(void *)data,length);
         size -= length;
         current += length;
         data = (uint8_t *)data + length; 
@@ -197,10 +228,25 @@ int flashProgram(char* dst, char *src, int size){
  * Otherwise return 0.
  */
 int flashRead(char* dst, char *src, int length){
+    uint32_t flash_base_addr;
+    struct hal_flash_env *flash;
+#if defined(QSH)
+    if ((uintptr_t)src >= CACHE2_ADDR) {
+        flash_base_addr = CACHE2_ADDR;
+        flash = &flash2;
+    } else {
+        flash_base_addr = FLASH_BASE_ADDR;
+        flash = &flash1;
+    }
+#else
+    flash_base_addr = FLASH_BASE_ADDR;
+    flash = &flash1;
+#endif
+
 #if !defined(NDEBUG)
     LOG_I("%s: dst:0x%x src:0x%x size:0x%x", __func__, dst, src, length);
 #endif
-    hal_flashx_multi_io_read(&flash1, (uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
+    hal_flashx_multi_io_read(flash, (uint32_t)src - flash_base_addr,(uint8_t *)dst,length);
     return 0;
 }
 
@@ -216,25 +262,43 @@ int flashRead(char* dst, char *src, int length){
  * Otherwise return 0
  */
 int flashErase(char *dst, int size){
+    uint32_t flash_base_addr;
+    struct hal_flash_env *flash;
+#if defined(QSH)
+    if ((uintptr_t)dst >= CACHE2_ADDR) {
+        flash_base_addr = CACHE2_ADDR;
+        flash = &flash2;
+    } else {
+        flash_base_addr = FLASH_BASE_ADDR;
+        flash = &flash1;
+    }
+#else
+    flash_base_addr = FLASH_BASE_ADDR;
+    flash = &flash1;
+#endif
+
 #if !defined(NDEBUG)
     LOG_I("%s: data:0x%x size:0x%x", __func__, dst, size);
 #endif
-    uint32_t offset = (uint32_t)dst;
-    while(size)
-    {
+    uint32_t offset = (uint32_t)dst - flash_base_addr;
+    for (uint32_t addr = offset; addr < (offset + size);) {
+#if 0
 #if !defined(NDEBUG)
-        LOG_I("%s: data:0x%x", __func__, offset);
+        LOG_I("%s: offset:0x%x", __func__, offset);
 #endif
-        hal_flashx_sector_erase(&flash1, offset);
-        if(size > FLASH_SECTOR_SIZE)
-        {
-            size -= FLASH_SECTOR_SIZE;
-            offset += FLASH_SECTOR_SIZE;
-        }else
-        {
-            break;
+#endif
+        if (((addr % KB(64)) == 0) && ((offset + size - addr) >= KB(64))) {
+            hal_flashx_block_64K_erase(flash, addr);
+            addr += KB(64);
+        } else if (((addr % KB(32)) == 0) && ((offset + size - addr) >= KB(32))) {
+            hal_flashx_block_32K_erase(flash, addr);
+            addr += KB(32);
+        } else if ((offset + size - addr) >= KB(4)) {
+            hal_flashx_sector_erase(flash, addr);
+            addr += KB(4);
         }
     }
+
     return 0;
 }
 
@@ -249,6 +313,7 @@ int flashChipErase( ){
     LOG_I("%s", __func__);
 #endif
     hal_flashx_chip_erase(&flash1);
+    hal_flashx_chip_erase(&flash2);
     return 0;
 }
 
@@ -298,7 +363,7 @@ int flashChecksum(char*dst, int length, int checksum) {
     }
 
 #if !defined(NDEBUG)
-    LOG_I("%s sum:0x%x " "%s" "checksum:0x%x", __func__, sum, sum == checksum ? "==" : "!=", checksum);
+    LOG_I("%s sum:0x%x " "%s" " checksum:0x%x", __func__, sum, sum == checksum ? "==" : "!=", checksum);
 #endif
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
