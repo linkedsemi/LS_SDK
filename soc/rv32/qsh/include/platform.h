@@ -20,6 +20,9 @@
 #include <ls_soc_gpio.h>
 #include <ls_soc_gpio_def.h>
 #include <per_func_mux.h>
+#include "csi_rv32_gcc.h"
+#include "core_rv_pmu.h"
+#include "perf_event_list.h"
 
 
 #ifndef __ASM

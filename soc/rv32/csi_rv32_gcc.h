@@ -490,6 +490,26 @@ __ALWAYS_STATIC_INLINE uint32_t __get_MCYCLEH(void)
 }
 
 /**
+  \brief         Set MCYCLE
+  \details       Write MCYCLE Register
+  \param [in]    value  MCYCLE Register value to set
+  */
+__ALWAYS_STATIC_INLINE void __set_MCYCLE(unsigned long value)
+{
+    __ASM volatile("csrw mcycle, %0" : : "r"(value));
+}
+
+/**
+  \brief         Set MCYCLEH
+  \details       Write MCYCLEH Register
+  \param [in]    value  MCYCLEH Register value to set
+  */
+__ALWAYS_STATIC_INLINE void __set_MCYCLEH(unsigned long value)
+{
+    __ASM volatile("csrw mcycleh, %0" : : "r"(value));
+}
+
+/**
   \brief   Get MINSTRET Register
   \details Returns the content of the MINSTRET Register.
   \return               MINSTRET Register value
@@ -3108,6 +3128,96 @@ __ALWAYS_STATIC_INLINE void __disable_hw_watch_point(uint32_t index)
     __set_TDATA2(0);
     __set_TDATA3(0);
     __set_TCONTROL(0);
+}
+
+/**
+  \brief   Get MTIME
+  \details Returns the content of the MTIME Register.
+  \return               MTIME Register value
+  */
+__ALWAYS_STATIC_INLINE unsigned long __get_MTIME(void)
+{
+    unsigned long result;
+    __ASM volatile("rdtime %0" : "=r"(result));
+    return (result);
+}
+
+/**
+  \brief   Get MTIMEH
+  \details Returns the content of the MTIME Register.
+  \return               MTIME Register value
+  */
+__ALWAYS_STATIC_INLINE unsigned long __get_MTIMEH(void)
+{
+    unsigned long result;
+    __ASM volatile("rdtimeh %0" : "=r"(result));
+    return (result);
+}
+
+/**
+  \brief   Set MINSTRET
+  \details Write MINSTRET Register
+  \param [in]    value  MINSTRET Register value to set
+  */
+__ALWAYS_STATIC_INLINE void __set_MINSTRET(unsigned long value)
+{
+    __ASM volatile("csrw minstret, %0" : : "r"(value));
+}
+
+/**
+  \brief   Set MINSTRETH
+  \details Write MINSTRETH Register
+  \param [in]    value  MINSTRETH Register value to set
+  */
+__ALWAYS_STATIC_INLINE void __set_MINSTRETH(unsigned long value)
+{
+    __ASM volatile("csrw minstreth, %0" : : "r"(value));
+}
+
+/**
+  \brief   Get MCOUNTEREN
+  \details Returns the content of the MCOUNTEREN Register.
+  \return               MCOUNTEREN Register value
+ */
+__ALWAYS_STATIC_INLINE unsigned long __get_MCOUNTEREN(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, mcounteren" : "=r"(result));
+    return (result);
+}
+
+/**
+  \brief   Set MCOUNTEREN
+  \details Writes the given value to the MCOUNTEREN Register.
+  \param [in]    mcounteren  MCOUNTEREN Register value to set
+ */
+__ALWAYS_STATIC_INLINE void __set_MCOUNTEREN(uint32_t mcounteren)
+{
+    __ASM volatile("csrw mcounteren, %0" : : "r"(mcounteren));
+}
+
+/**
+  \brief   Get MCOUNTERWEN
+  \details Returns the content of the MCOUNTERWEN Register.
+  \return               MCOUNTERWEN Register value
+ */
+__ALWAYS_STATIC_INLINE unsigned long __get_MCOUNTERWEN(void)
+{
+    uint32_t result;
+
+    __ASM volatile("csrr %0, mcounterwen" : "=r"(result));
+    return (result);
+}
+
+/**
+  \brief   Set MCOUNTERWEN
+  \details Writes the given value to the MCOUNTERWEN Register.
+  \param [in]    mcounterwen  MCOUNTERWEN Register value to set
+ */
+__ALWAYS_STATIC_INLINE void __set_MCOUNTERWEN(uint32_t mcounterwen)
+{
+    __ASM volatile("csrw mcounterwen, %0" : : "r"(mcounterwen));
 }
 
 #endif /* _CSI_RV32_GCC_H_ */
