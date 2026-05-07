@@ -60,6 +60,8 @@ void flash_swint_init();
 
 void clk_flash_init();
 
+void clk_flashx_init(void *reg);
+
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler
 #else

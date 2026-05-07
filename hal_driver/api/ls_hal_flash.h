@@ -27,6 +27,9 @@ struct hal_flash_env
 };
 
 extern struct hal_flash_env flash1;
+#if defined(QSH)
+extern struct hal_flash_env flash2;
+#endif
 
 /// Flash Page Size
 #define FLASH_PAGE_SIZE (256)

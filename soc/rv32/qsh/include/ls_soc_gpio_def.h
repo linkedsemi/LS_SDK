@@ -262,6 +262,11 @@
 #define QSPI1_IO1_SO_PIN   (0xf3)
 #define QSPI1_IO2_WP_PIN   (0xf4)
 #define QSPI1_IO3_HOLD_PIN (0xf5)
-
+#define QSPI2_CSN_PIN      (PC05)
+#define QSPI2_CLK_PIN      (PC10)
+#define QSPI2_IO0_SI_PIN   (PC06)
+#define QSPI2_IO1_SO_PIN   (PC07)
+#define QSPI2_IO2_WP_PIN   (PC08)
+#define QSPI2_IO3_HOLD_PIN (PC09)
 
 #endif /* LS_SOC_GPIO_DEF_H_ */

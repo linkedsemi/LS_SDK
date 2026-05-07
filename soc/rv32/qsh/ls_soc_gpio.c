@@ -11,6 +11,8 @@
 #include "reg_sysc_app_awo.h"
 #include "reg_sec_pmu_rg.h"
 #include "reg_app_pmu_rg.h"
+#include "ls_hal_flash.h"
+#include "ls_msp_qspiv2.h"
 #include "compile_flag.h"
 #include "log.h"
 #include "stdio.h"
@@ -1351,6 +1353,61 @@ ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flash_quad_deinit,)
     per_func_disable(QSPI1_IO3_HOLD_PIN, PINMUX_FUNC2);
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flashx_quad_init,void *reg)
+{
+    if ((void *)LSQSPIV2 == reg) {
+        per_func_enable(QSPI1_CLK_PIN, PINMUX_FUNC2);
+        per_func_enable(QSPI1_CSN_PIN, PINMUX_FUNC2);
+        per_func_enable(QSPI1_IO0_SI_PIN, PINMUX_FUNC2);
+        per_func_enable(QSPI1_IO1_SO_PIN, PINMUX_FUNC2);
+        per_func_enable(QSPI1_IO2_WP_PIN, PINMUX_FUNC2);
+        per_func_enable(QSPI1_IO3_HOLD_PIN, PINMUX_FUNC2);
+        APP_PMU->QSPI1_PAD_CFG.PU1_PU0 |= 0x30;
+        APP_PMU->QSPI1_PAD_CFG.PD_PU2 &= ~(0x30<<16);
+        APP_PMU->QSPI1_PAD_CFG.IEN1_IEN0 = 0x0;
+        APP_PMU->QSPI1_PAD_CFG.DS1_DS0 = (0x3f << 16) | 0x3f;
+    } else if ((void *)LSQSPIV2_2 == reg) {
+        per_func_enable(QSPI2_CLK_PIN, PINMUX_FUNC4);
+        per_func_enable(QSPI2_CSN_PIN, PINMUX_FUNC4);
+        per_func_enable(QSPI2_IO0_SI_PIN, PINMUX_FUNC4);
+        per_func_enable(QSPI2_IO1_SO_PIN, PINMUX_FUNC4);
+        per_func_enable(QSPI2_IO2_WP_PIN, PINMUX_FUNC4);
+        per_func_enable(QSPI2_IO3_HOLD_PIN, PINMUX_FUNC4);
+        io_pull_write(QSPI2_IO2_WP_PIN, IO_PULL_UP);
+        io_pull_write(QSPI2_IO3_HOLD_PIN, IO_PULL_UP);
+        io_cfg_input(QSPI2_CLK_PIN);
+        io_cfg_input(QSPI2_CSN_PIN);
+        io_cfg_input(QSPI2_IO0_SI_PIN);
+        io_cfg_input(QSPI2_IO1_SO_PIN);
+        io_cfg_input(QSPI2_IO2_WP_PIN);
+        io_cfg_input(QSPI2_IO3_HOLD_PIN);
+        io_drive_capacity_write(QSPI2_CLK_PIN, 3);
+        io_drive_capacity_write(QSPI2_CSN_PIN, 3);
+        io_drive_capacity_write(QSPI2_IO0_SI_PIN, 3);
+        io_drive_capacity_write(QSPI2_IO1_SO_PIN, 3);
+        io_drive_capacity_write(QSPI2_IO2_WP_PIN, 3);
+        io_drive_capacity_write(QSPI2_IO3_HOLD_PIN, 3);
+    }
+}
+
+ROM_SYMBOL void XIP_BANNED_FUNC(pinmux_hal_flashx_quad_deinit,void *reg)
+{
+    if ((void *)LSQSPIV2 == reg) {
+        per_func_disable(QSPI1_CLK_PIN, PINMUX_FUNC2);
+        per_func_disable(QSPI1_CSN_PIN, PINMUX_FUNC2);
+        per_func_disable(QSPI1_IO0_SI_PIN, PINMUX_FUNC2);
+        per_func_disable(QSPI1_IO1_SO_PIN, PINMUX_FUNC2);
+        per_func_disable(QSPI1_IO2_WP_PIN, PINMUX_FUNC2);
+        per_func_disable(QSPI1_IO3_HOLD_PIN, PINMUX_FUNC2);
+    } else if ((void *)LSQSPIV2_2 == reg) {
+        per_func_disable(QSPI2_CLK_PIN, PINMUX_FUNC4);
+        per_func_disable(QSPI2_CSN_PIN, PINMUX_FUNC4);
+        per_func_disable(QSPI2_IO0_SI_PIN, PINMUX_FUNC4);
+        per_func_disable(QSPI2_IO1_SO_PIN, PINMUX_FUNC4);
+        per_func_disable(QSPI2_IO2_WP_PIN, PINMUX_FUNC4);
+        per_func_disable(QSPI2_IO3_HOLD_PIN, PINMUX_FUNC4);
+    }
+}
 // void pinmux_iic1_init(uint8_t scl,uint8_t sda)
 // {
 //     *(uint8_t *)&iic1_scl = scl;

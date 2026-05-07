@@ -66,6 +66,35 @@ extern const unsigned char one_bits[];
 	(((unsigned long)(x) / (unsigned long)(align)) * (unsigned long)(align))
 #endif
 
+#if !defined(KB)
+#ifdef _LINKER
+/* This is used in linker scripts so need to avoid type casting there */
+#define KB(x) ((x) << 10)
+#else
+#define KB(x) (((size_t)(x)) << 10)
+#endif
+#endif
+
+#if !defined(MB)
+/** @brief Number of bytes in @p x mebibytes */
+#define MB(x) (KB(x) << 10)
+#endif
+
+#if !defined(GB)
+/** @brief Number of bytes in @p x gibibytes */
+#define GB(x) (MB(x) << 10)
+#endif
+
+#if !defined(KHZ)
+/** @brief Number of Hz in @p x kHz */
+#define KHZ(x) ((x) * 1000)
+#endif
+
+#if !defined(MHZ)
+/** @brief Number of Hz in @p x MHz */
+#define MHZ(x) (KHZ(x) * 1000)
+#endif
+
 __attribute__((always_inline)) static inline int32_t time_diff(uint32_t time0,uint32_t time1)
 {
     int32_t diff = time0 - time1;

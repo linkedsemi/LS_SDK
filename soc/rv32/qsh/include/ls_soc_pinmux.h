@@ -38,6 +38,16 @@ void pinmux_hal_flash_quad_init(void);
 void pinmux_hal_flash_quad_deinit(void);
 
 /**
+  * @brief Init IO for QSPI Flash (CS CLK DQ0 DQ1 DQ2 DQ3)
+  */
+void pinmux_hal_flashx_quad_init(void *reg);
+
+/**
+  * @brief DeInit QSPI Flash IO
+  */
+void pinmux_hal_flashx_quad_deinit(void *reg);
+
+/**
   * @brief  GPIO initilization
   * @param  clk  Specific GPIO pin
   * @param  cpol  Clock polarity state

@@ -20,6 +20,10 @@ void lscache_msp_init(void);
 
 void lscache_msp_deinit(void);
 
+void lscache_cachex_msp_init(void *reg);
+
+void lscache_cachex_msp_deinit(void *reg);
+
 #ifdef __cplusplus
 }
 #endif

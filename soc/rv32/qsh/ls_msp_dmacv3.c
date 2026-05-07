@@ -23,20 +23,20 @@ void HAL_DMA_Controller_MSP_Init(struct __DMA_Controller_HandleTypeDef *hdma)
     switch((uint32_t)hdma->Instance)
     {
     case (uint32_t)DMAC1:
-        SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_CLR_DMAC1_MASK;
-        SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_CLR_DMAC1_MASK;
-        SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_SET_DMAC1_MASK;
-        SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_SET_DMAC1_MASK;
+        SYSC_APP_CPU->PD_CPU_CLKG[0] = SYSC_APP_CPU_CLKG_CLR_DMAC1_MASK;
+        SYSC_APP_CPU->PD_CPU_SRST[0]  = SYSC_APP_CPU_SRST_CLR_DMAC1_MASK;
+        SYSC_APP_CPU->PD_CPU_SRST[0]  = SYSC_APP_CPU_SRST_SET_DMAC1_MASK;
+        SYSC_APP_CPU->PD_CPU_CLKG[0] = SYSC_APP_CPU_CLKG_SET_DMAC1_MASK;
         rv_set_int_isr(DMAC1_IRQN, DMAC1_Handler);
         dma_inst[0] = hdma;
         csi_vic_clear_pending_irq(DMAC1_IRQN);
         csi_vic_enable_irq(DMAC1_IRQN);
         break;
     case (uint32_t)DMAC2:
-        SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_CLR_DMAC2_MASK;
-        SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_CLR_DMAC2_MASK;
-        SYSC_APP_CPU->PD_CPU_SRST  = SYSC_APP_CPU_SRST_SET_DMAC2_MASK;
-        SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_SET_DMAC2_MASK;
+        SYSC_APP_CPU->PD_CPU_CLKG[0] = SYSC_APP_CPU_CLKG_CLR_DMAC2_MASK;
+        SYSC_APP_CPU->PD_CPU_SRST[0]  = SYSC_APP_CPU_SRST_CLR_DMAC2_MASK;
+        SYSC_APP_CPU->PD_CPU_SRST[0]  = SYSC_APP_CPU_SRST_SET_DMAC2_MASK;
+        SYSC_APP_CPU->PD_CPU_CLKG[0] = SYSC_APP_CPU_CLKG_SET_DMAC2_MASK;
         rv_set_int_isr(DMAC2_IRQN, DMAC2_Handler);
         dma_inst[1] = hdma;
         csi_vic_clear_pending_irq(DMAC2_IRQN);
@@ -51,11 +51,11 @@ void HAL_DMA_Controller_MSP_DeInit(struct __DMA_Controller_HandleTypeDef *hdma)
     {
     case (uint32_t)DMAC1:
         csi_vic_disable_irq(DMAC1_IRQN);
-        SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_CLR_DMAC1_MASK;
+        SYSC_APP_CPU->PD_CPU_CLKG[0] = SYSC_APP_CPU_CLKG_CLR_DMAC1_MASK;
         break;
     case (uint32_t)DMAC2:
         csi_vic_disable_irq(DMAC2_IRQN);
-        SYSC_APP_CPU->PD_CPU_CLKG0 = SYSC_APP_CPU_CLKG_CLR_DMAC2_MASK;
+        SYSC_APP_CPU->PD_CPU_CLKG[0] = SYSC_APP_CPU_CLKG_CLR_DMAC2_MASK;
         break;
     }
 }

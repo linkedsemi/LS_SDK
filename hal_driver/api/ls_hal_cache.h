@@ -11,6 +11,10 @@ void lscache_cache_enable(uint8_t prefetch);
 
 void lscache_cache_disable(void);
 
+void lscache_cachex_enable(reg_lscache_t *reg, uint8_t prefetch);
+
+void lscache_cachex_disable(reg_lscache_t *reg);
+
 #ifdef __cplusplus
 }
 #endif

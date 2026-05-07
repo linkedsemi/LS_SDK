@@ -19,6 +19,7 @@
 
 __attribute__((aligned(64))) void (*interrupt_vector[IRQN_MAX])();
 struct hal_flash_env flash1;
+struct hal_flash_env flash2;
 
 __attribute__((weak)) void SystemInit(){
     e906_init();
@@ -101,6 +102,19 @@ NOINLINE void XIP_BANNED_FUNC(clk_flash_init,)
     dpll_qspi_clk_config_and_clk_switch();
     MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
                 1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+}
+
+NOINLINE void XIP_BANNED_FUNC(clk_flashx_init,void *reg)
+{
+    if ((void *)LSQSPIV2 == reg) {
+        dpll_qspi_clk_config_and_clk_switch();
+        MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
+                    1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+    } else if ((void *)LSQSPIV2_2 == reg) {
+        dpll_qspi_clk_config_and_clk_switch();
+        MODIFY_REG(LSQSPIV2_2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
+            1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+    }
 }
 
 // static void set_all_irq_priority_to_lowest_level()

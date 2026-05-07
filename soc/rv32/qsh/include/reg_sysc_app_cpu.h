@@ -10,10 +10,15 @@ typedef struct
     volatile uint32_t APP_CPU_SYSC; //0x0
     volatile uint32_t SYS_CLK; //0x4
     volatile uint32_t RESERVED0[2];
+#if 1
+    volatile uint32_t PD_CPU_CLKG[2]; //0x10
+    volatile uint32_t PD_CPU_SRST[2]; //0x18
+#else
     volatile uint32_t PD_CPU_CLKG0; //0x10
     volatile uint32_t PD_CPU_CLKG1; //0x14
     volatile uint32_t PD_CPU_SRST; //0x18
     volatile uint32_t PD_CPU_SRST1; //0x1c
+#endif
     volatile uint32_t APP_CPU_INTR; //0x20
     volatile uint32_t APP_CPU_IMSK; //0x24
     volatile uint32_t RESERVED1[2];
