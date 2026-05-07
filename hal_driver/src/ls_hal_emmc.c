@@ -581,7 +581,7 @@ uint32_t mmc_card_init(uint32_t mapbase)
     /* Modern SDHC always at least supports 512 byte block sizes,
      * which is enough to support sectors
      */
-    ocr_arg |= MMC_OCR_SECTOR_MODE | MMC_OCR_VDD27_36FLAG;
+    ocr_arg |= MMC_OCR_SECTOR_MODE | MMC_OCR_PWR_BUSY_FLAG | MMC_OCR_VDD27_36FLAG;
 
     /* CMD1 */
     ret = mmc_send_op_cond(mapbase, ocr_arg);
