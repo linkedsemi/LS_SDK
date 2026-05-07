@@ -55,13 +55,6 @@ typedef union {
     };
 } iopmp_cfg_t;
 
-#if !defined(KERNEL)
-static ALWAYS_INLINE void sys_write32(uint32_t data, mem_addr_t addr)
-{
-    *(volatile uint32_t *)addr = data;
-}
-#endif
-
 inline static uint32_t addr2napot(uint32_t addr, uint64_t size)
 {
     return (addr >> 2) | ((size - 1) >> 3);
@@ -92,47 +85,47 @@ inline static void iopmp_config_enable(uint32_t dev, bool enable)
     md_cfg_t md_cfg;
     md_cfg.IOPMP_EN = 1;
     md_cfg.MD_EN = 1;
-    sys_write32(md_cfg.value, dev + IOPMP_MD_CFG);
+    *(volatile uint32_t *)(dev + IOPMP_MD_CFG) = md_cfg.value;
 }
 
 inline static void iopmp_set_pmpaddrx(uint32_t dev, uint8_t idx, uint32_t addr)
 {
     uint32_t reg = dev + IOPMP_ADDR0 + (idx * sizeof(uint32_t));
-    sys_write32(addr, reg);
+    *(volatile uint32_t *)reg = addr;
 }
 
 inline static uint32_t iopmp_get_pmpaddrx(uint32_t dev, uint8_t idx)
 {
     uint32_t reg = dev + IOPMP_ADDR0 + (idx * sizeof(uint32_t));
-    return sys_read32(reg);
+    return *(volatile uint32_t *)reg;
 }
 
 inline static void iopmp_set_pmpxcfg(uint32_t dev, uint8_t idx, uint32_t val)
 {
     uint32_t reg = dev + IOPMP_CFG0 + (idx * sizeof(uint32_t));
-    sys_write32(val, reg);
+    *(volatile uint32_t *)reg = val;
 }
 
 inline static uint32_t iopmp_get_pmpxcfg(uint32_t dev, uint8_t idx)
 {
     uint32_t reg = dev + IOPMP_CFG0 + (idx * sizeof(uint32_t));
-    return sys_read32(reg);
+    return *(volatile uint32_t *)reg;
 }
 
 inline static void iopmp_set_pmpxcfg_by_idx(uint32_t dev, uint8_t idx, iopmp_cfg_attr_t attr)
 {
     uint32_t reg = dev + IOPMP_CFG0 + ROUND_DOWN(idx, PMPCFG_STRIDE);
     iopmp_cfg_t iopmp_cfg;
-    iopmp_cfg.value = sys_read32(reg);
+    iopmp_cfg.value = *(volatile uint32_t *)reg;
     iopmp_cfg.arr[idx % PMPCFG_STRIDE].value = attr.value;
-    sys_write32(iopmp_cfg.value, reg);
+    *(volatile uint32_t *)reg = iopmp_cfg.value;
 }
 
 inline static uint32_t iopmp_get_pmpxcfg_by_idx(uint32_t dev, uint8_t idx)
 {
     uint32_t reg = dev + IOPMP_CFG0 + ROUND_DOWN(idx, PMPCFG_STRIDE);
     iopmp_cfg_t iopmp_cfg;
-    iopmp_cfg.value = sys_read32(reg);
+    iopmp_cfg.value = *(volatile uint32_t *)reg;
     return iopmp_cfg.arr[idx % PMPCFG_STRIDE].value;
 }
 
