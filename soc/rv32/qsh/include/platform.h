@@ -277,6 +277,11 @@ error:
     return ret;
 }
 
+__ALWAYS_STATIC_INLINE bool ls_clock_control_is_on(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    return (*(volatile uint32_t *)(base + reg) & (1 << set_pos)) > 0;
+}
+
 __ALWAYS_STATIC_INLINE void ls_clock_control_on(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
 {
     (void)clr_pos;
@@ -287,6 +292,11 @@ __ALWAYS_STATIC_INLINE void ls_clock_control_off(uint32_t base, uint32_t reg, ui
 {
     (void)set_pos;
     *(volatile uint32_t *)(base + reg) = 1 << clr_pos;
+}
+
+__ALWAYS_STATIC_INLINE bool ls_reset_line_is_assert(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
+{
+    return (*(volatile uint32_t *)(base + reg) & (1 << clr_pos)) == 0;
 }
 
 __ALWAYS_STATIC_INLINE void ls_reset_line_assert(uint32_t base, uint32_t reg, uint8_t set_pos, uint8_t clr_pos)
