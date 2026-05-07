@@ -87,17 +87,6 @@ static void set_runtime_cfg()
         log_hex_output_fn = log_hex_output;
     }
 
-    // qspiv2_global_int_disable_fn = enter_critical;
-    // qspiv2_global_int_restore_fn = exit_critical;
-
-    flash1.reg = (void *)LSQSPIV2;
-    flash1.dual_mode_only = false;
-    flash1.continuous_mode_enable = false;
-    flash1.writing = false;
-    flash1.suspend_count = 0;
-    flash1.continuous_mode_on = false;
-    flash1.addr4b = false;
-
 //    pinmux_hal_flash_quad_init();
 }
 
@@ -174,17 +163,48 @@ void platform_init()
 
     LOG_INIT();
 
-    hal_flashx_init(&flash1);
+    struct hal_flash_env *flash[] = {
+        &flash1,
+#if defined(QSH)
+        &flash2,
+#endif
+    };
 
-    boot_flash_swint_init();
-    uint8_t jedec_id[3] = {};
-    hal_flashx_read_id(&flash1, jedec_id);
-    if ((jedec_id[0] != 0) && (jedec_id[1] != 0) && (jedec_id[2] != 0)) {
-        if ((2 << (jedec_id[2] - 1)) > (16 << 20)) {
-            flash1.addr4b = true;
+    flash1.reg = (void *)LSQSPIV2;
+#if defined(QSH)
+    flash2.reg = (void *)LSQSPIV2_2;
+#endif
+
+    for (int i = 0; i < sizeof(flash) / sizeof(flash[0]); i++) {
+        flash[i]->dual_mode_only = false;
+        flash[i]->continuous_mode_enable = false;
+        flash[i]->writing = false;
+        flash[i]->suspend_count = 0;
+        flash[i]->continuous_mode_on = false;
+        flash[i]->addr4b = false;
+
+        pinmux_hal_flashx_quad_init(flash[i]->reg);
+
+        hal_flashx_init(flash[i]);
+        clk_flashx_init(flash[i]->reg);
+
+        hal_flashx_software_reset(flash[i]);
+        DELAY_US(500);
+        hal_flashx_release_from_deep_power_down(flash[i]);
+        DELAY_US(100);
+
+        boot_flash_swint_init();
+        uint8_t jedec_id[3] = {};
+        uint32_t size;
+        hal_flashx_read_id(&flash1, jedec_id);
+        if ((jedec_id[0] != 0) && (jedec_id[1] != 0) && (jedec_id[2] != 0)) {
+            size = (2 << (jedec_id[2] - 1));
+            if (size > (16 << 20)) {
+                flash1.addr4b = true;
+            }
+        } else {
+            while(1);
         }
-    } else {
-        while(1);
     }
     // hal_flash_qe_status_read_and_set();
     HAL_LSCRC_Init();
