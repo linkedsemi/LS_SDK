@@ -49,6 +49,7 @@ struct lsqspiv2_stg_cfg
 };
 
 void lsqspiv2_init(reg_lsqspiv2_t *reg);
+void lsqspiv2_noreset_init(reg_lsqspiv2_t *reg);
 
 void lsqspiv2_direct_quad_read_config(reg_lsqspiv2_t *reg,bool continuous_mode);
 

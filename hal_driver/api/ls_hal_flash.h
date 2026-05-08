@@ -42,6 +42,7 @@ extern struct hal_flash_env flash2;
 
 /** \brief Initialize SPI Flash driver */
 void hal_flashx_init(struct hal_flash_env *env);
+void hal_flashx_noreset_init(struct hal_flash_env *env);
 
 bool hal_flashx_inited(struct hal_flash_env *env);
 

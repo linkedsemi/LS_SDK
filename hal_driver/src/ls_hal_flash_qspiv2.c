@@ -19,6 +19,20 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_init,struct hal_flash_env *env)
     }
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_noreset_init,struct hal_flash_env *env)
+{
+    uint32_t offset = lsqspiv2_backup_offset_get(env->reg,0);
+    lsqspiv2_noreset_init(env->reg);
+    lsqspiv2_backup_offset_set(env->reg,offset);
+    if(env->dual_mode_only)
+    {
+        lsqspiv2_direct_dual_read_config(env->reg,env->continuous_mode_enable);
+    }else
+    {
+        lsqspiv2_direct_quad_read_config(env->reg,env->continuous_mode_enable);
+    }
+}
+
 bool hal_flashx_inited(struct hal_flash_env *env)
 {
     return lsqspiv2_direct_read_mode(env->reg);
