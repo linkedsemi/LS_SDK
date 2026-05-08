@@ -317,4 +317,32 @@ __ALWAYS_STATIC_INLINE void ls_reset_line_toggle(uint32_t base, uint32_t reg, ui
     ls_reset_line_deassert(base, reg, set_pos, clr_pos);
 }
 
+__ALWAYS_STATIC_INLINE void ls_clock_control_on_reset_line_toggle(uint32_t clk_base,
+                                                                  uint32_t clk_reg,
+                                                                  uint8_t clk_set_pos,
+                                                                  uint8_t clk_clr_pos,
+                                                                  uint32_t rst_base,
+                                                                  uint32_t rst_reg,
+                                                                  uint8_t rst_set_pos,
+                                                                  uint8_t rst_clr_pos)
+{
+    ls_clock_control_off(clk_base, clk_reg, clk_set_pos, clk_clr_pos);
+    ls_reset_line_toggle(rst_base, rst_reg, rst_set_pos, rst_clr_pos);
+    ls_clock_control_on(clk_base, clk_reg, clk_set_pos, clk_clr_pos);
+}
+
+__ALWAYS_STATIC_INLINE void ls_clock_control_on_reset_line_toggle_once(uint32_t clk_base,
+                                                                       uint32_t clk_reg,
+                                                                       uint8_t clk_set_pos,
+                                                                       uint8_t clk_clr_pos,
+                                                                       uint32_t rst_base,
+                                                                       uint32_t rst_reg,
+                                                                       uint8_t rst_set_pos,
+                                                                       uint8_t rst_clr_pos)
+{
+    if (!ls_clock_control_is_on(clk_base, clk_reg, clk_set_pos, clk_clr_pos)) {
+        ls_clock_control_on_reset_line_toggle(clk_base, clk_reg, clk_set_pos, clk_clr_pos, rst_base, rst_reg, rst_set_pos, rst_clr_pos);
+    }
+}
+
 #endif
