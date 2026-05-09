@@ -513,6 +513,15 @@ HAL_StatusTypeDef HAL_AES_CBC_Crypt_Blocks(uint8_t mode, unsigned char iv[16], c
     return HAL_OK;
 }
 
+static void increment_counter(uint8_t *inOutCtr)
+{
+    for(uint8_t i = AES_BLOCK_SIZE -1; i >= 0; i--)
+    {
+        if(++inOutCtr[i]) /* we're done unless we overflow */
+            return;
+    }
+}
+
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t *input, uint32_t inlen, uint8_t *output)
 {
     const unsigned char * end_addr = input + inlen;
@@ -535,6 +544,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t
         LSCRYPT->DATA1 = __builtin_bswap32(*in++);
         LSCRYPT->DATA0 = __builtin_bswap32(*in++);
         REG_FIELD_WR(LSCRYPT->CR,CRYPT_GO,1);
+        increment_counter(counter);
         while (REG_FIELD_RD(LSCRYPT->SR, CRYPT_AESRIF) == 0);
         LSCRYPT->ICFR = CRYPT_AESIF_MASK;
         *out++ = __builtin_bswap32(LSCRYPT->RES3);

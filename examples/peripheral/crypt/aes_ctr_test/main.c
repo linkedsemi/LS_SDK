@@ -12,6 +12,7 @@ void crypt_init(void)
 }
 
 uint8_t cnt[0x10] = {0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff};
+uint8_t g_cnt [0x10] = {0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff};
 
 uint8_t ctr_plaintext[] = {
     //Block #1
@@ -84,7 +85,7 @@ void crypt_ctr_128(void)
     {
         LOG_I("CRYPT_CTR_ENCRYPT_128_TEST_FAIL!");
     }
-
+    memcpy(cnt, g_cnt, sizeof(g_cnt));
     HAL_LSCRYPT_AES_CTR_Crypt(cnt, ctr_ciphertext_128, sizeof(ctr_ciphertext_128), plaintext_buff);
     if (!(memcmp(ctr_plaintext, plaintext_buff, sizeof(ctr_plaintext))))
     {
@@ -99,6 +100,7 @@ void crypt_ctr_192(void)
 {
     HAL_LSCRYPT_AES_Key_Config(ctr_key_192, AES_KEY_192);
 
+    memcpy(cnt, g_cnt, sizeof(g_cnt));
     HAL_LSCRYPT_AES_CTR_Crypt(cnt, ctr_plaintext, sizeof(ctr_plaintext), ciphertext_buff);
     if (!(memcmp(ctr_ciphertext_192, ciphertext_buff, sizeof(ctr_ciphertext_192))))
     {
@@ -108,6 +110,7 @@ void crypt_ctr_192(void)
         LOG_I("CRYPT_CTR_ENCRYPT_192_TEST_FAIL!");
     }
 
+    memcpy(cnt, g_cnt, sizeof(g_cnt));
     HAL_LSCRYPT_AES_CTR_Crypt(cnt, ctr_ciphertext_192, sizeof(ctr_ciphertext_192), plaintext_buff);
     if (!(memcmp(ctr_plaintext, plaintext_buff, sizeof(ctr_plaintext))))
     {
@@ -122,6 +125,7 @@ void crypt_ctr_256(void)
 {
     HAL_LSCRYPT_AES_Key_Config(ctr_key_256, AES_KEY_256);
 
+    memcpy(cnt, g_cnt, sizeof(g_cnt));
     HAL_LSCRYPT_AES_CTR_Crypt(cnt, ctr_plaintext, sizeof(ctr_plaintext), ciphertext_buff);
     if (!(memcmp(ctr_ciphertext_256, ciphertext_buff, sizeof(ctr_ciphertext_256))))
     {
@@ -131,6 +135,7 @@ void crypt_ctr_256(void)
         LOG_I("CRYPT_CTR_ENCRYPT_256_TEST_FAIL!");
     }
 
+    memcpy(cnt, g_cnt, sizeof(g_cnt));
     HAL_LSCRYPT_AES_CTR_Crypt(cnt, ctr_ciphertext_256, sizeof(ctr_ciphertext_256), plaintext_buff);
     if (!(memcmp(ctr_plaintext, plaintext_buff, sizeof(ctr_plaintext))))
     {
