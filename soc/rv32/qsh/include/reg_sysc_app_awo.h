@@ -1,7 +1,12 @@
 #ifndef REG_SYSC_APP_AWO_TYPE_H_
 #define REG_SYSC_APP_AWO_TYPE_H_
+
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SYSC_APP_AWO ((reg_sysc_app_awo_t *)APP_SYSC_AWO_APP_ADDR)
 
@@ -445,5 +450,9 @@ enum SYSC_APP_AWO_REG_IOT_FUNC4_EN_FIELD {
     SYSC_APP_AWO_FUNC4_IOT_EN_MASK = (int)0xffff,
     SYSC_APP_AWO_FUNC4_IOT_EN_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

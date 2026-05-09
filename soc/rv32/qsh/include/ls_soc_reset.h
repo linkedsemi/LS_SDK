@@ -10,6 +10,10 @@
 #include <stdint.h>
 #include "reg_base_addr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LS_FUNC_RST_REG_POS  0
 #define LS_FUNC_RST_SET_POS  22
 #define LS_FUNC_RST_CLR_POS  27
@@ -948,5 +952,9 @@
 #define LTPI_PHY_RST_SET_POS    28
 #define LTPI_PHY_RST_CLR_MASK   0x20000000
 #define LTPI_PHY_RST_CLR_POS    29
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

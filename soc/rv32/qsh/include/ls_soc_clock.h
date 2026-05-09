@@ -10,6 +10,10 @@
 #include <stdint.h>
 #include "reg_base_addr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define GEN_CLOCK(FUNC)  FUNC##_CLK_BASE, FUNC##_CLK_REG, FUNC##_CLK_SET_POS, FUNC##_CLK_CLR_POS
 
 #define TIM_CLOCK        GEN_CLOCK(TIM)
@@ -970,5 +974,9 @@
 #define SMB_FLT4_CLK_SET_POS    6
 #define SMB_FLT4_CLK_CLR_MASK   0x80
 #define SMB_FLT4_CLK_CLR_POS    7
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ZEPHYR_INCLUDE_DT_BINDINGS_CLOCK_LSQSH_CLOCK_H_ */

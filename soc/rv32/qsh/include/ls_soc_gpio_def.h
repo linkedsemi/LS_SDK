@@ -1,6 +1,10 @@
 #ifndef LS_SOC_GPIO_DEF_H_
 #define LS_SOC_GPIO_DEF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //GPIOA
 #define PA00 (0x00)   /*!< GPIOA00 selected */
 #define PA01 (0x01)   /*!< GPIOA01 selected */
@@ -268,5 +272,9 @@
 #define QSPI2_IO1_SO_PIN   (PC07)
 #define QSPI2_IO2_WP_PIN   (PC08)
 #define QSPI2_IO3_HOLD_PIN (PC09)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LS_SOC_GPIO_DEF_H_ */

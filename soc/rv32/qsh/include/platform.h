@@ -1,5 +1,6 @@
 #ifndef PLATFORM_H_
 #define PLATFORM_H_
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -31,6 +32,10 @@
 #include "reg_sysc_sec_per.h"
 #include "sdk_default_config.h"
 #include "sys_stat.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef __ASM
 #define __ASM                   __asm     /*!< asm keyword for GNU Compiler */
@@ -323,5 +328,9 @@ __ALWAYS_STATIC_INLINE void ls_clock_control_on_reset_line_toggle_once(uint32_t 
         ls_clock_control_on_reset_line_toggle(clk_base, clk_reg, clk_set_pos, clk_clr_pos, rst_base, rst_reg, rst_set_pos, rst_clr_pos);
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

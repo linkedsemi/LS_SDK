@@ -1,7 +1,13 @@
 #ifndef _IOPMP_H
 #define _IOPMP_H
 
+#include <stdint.h>
+#include <stdbool.h>
 #include <errno.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define IOPMP_MD_CFG      0x00
 #define IOPMP_CFG0        0x04
@@ -176,5 +182,9 @@ inline static void iopmp_config_region_tor(uint32_t dev, uint8_t idx, uint32_t a
     };
     iopmp_config_region(dev, idx, addr, iopmp_cfg_attr);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IOPMP_H */

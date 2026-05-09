@@ -1,7 +1,12 @@
 #ifndef LS_MSP_ADC_H_
 #define LS_MSP_ADC_H_
+
 #include "reg_adcv2_type.h" 
 #include "ls_hal_adcv2.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define ADC_REG_SEQ0_RK(_CHANNELNB_, _RANKNB_)  \
     ((_CHANNELNB_) << (ADC_REG_SEQ01_POS * ((_RANKNB_)-1)))
@@ -27,5 +32,9 @@
                                   ((ALIGN) == ADC_DATAALIGN_LEFT))
 
 #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LS_MSP_ADC_H_ */

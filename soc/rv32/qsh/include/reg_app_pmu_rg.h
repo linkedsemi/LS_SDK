@@ -1,7 +1,12 @@
 #ifndef REG_APP_PMU_RG_TYPE_H_
 #define REG_APP_PMU_RG_TYPE_H_
+
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define APP_PMU ((reg_app_pmu_rg_t *)APP_PMU_RG_APP_ADDR)
 
@@ -1260,5 +1265,9 @@ enum APP_PMU_RG_REG_MODE_PAD_DS1_FIR_FIELD {
     APP_PMU_RG_MODE_PAD_FIR_MASK = (int)0xffff0000,
     APP_PMU_RG_MODE_PAD_FIR_POS = 16,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

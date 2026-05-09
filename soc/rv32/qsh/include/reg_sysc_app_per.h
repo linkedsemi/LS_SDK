@@ -1,7 +1,12 @@
 #ifndef REG_SYSC_APP_PER_TYPE_H_
 #define REG_SYSC_APP_PER_TYPE_H_
+
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SYSC_APP_PER ((reg_sysc_app_per_t *)APP_SYSC_APP_PER_ADDR)
 
@@ -1463,5 +1468,9 @@ enum SYSC_APP_PER_REG_FUNC_SEL_IOT4_FIELD {
     SYSC_APP_PER_FUNC_IOT15_SEL_MASK = (int)0x1f000000,
     SYSC_APP_PER_FUNC_IOT15_SEL_POS = 24,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

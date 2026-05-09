@@ -1,7 +1,12 @@
 #ifndef REG_SYSC_APP_CPU_TYPE_H_
 #define REG_SYSC_APP_CPU_TYPE_H_
+
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SYSC_APP_CPU ((reg_sysc_app_cpu_t *)APP_SYSC_CPU_APP_ADDR)
 
@@ -590,5 +595,9 @@ enum SYSC_APP_CPU_REG_PSRAM_CTRL_FIELD {
     SYSC_APP_CPU_PSRAM_SLEEP_MASK = (int)0x40,
     SYSC_APP_CPU_PSRAM_SLEEP_POS = 6,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

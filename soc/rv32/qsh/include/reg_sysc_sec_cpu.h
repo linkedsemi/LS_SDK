@@ -1,7 +1,12 @@
 #ifndef REG_SYSC_SEC_CPU_TYPE_H_
 #define REG_SYSC_SEC_CPU_TYPE_H_
+
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SYSC_SEC_CPU ((reg_sysc_sec_cpu_t *)SEC_SYSC_CPU_SEC_ADDR)
 
@@ -548,5 +553,9 @@ enum SYSC_SEC_CPU_REG_TPM_SPIS_RX_ALERT_FIELD {
     SYSC_SEC_CPU_TPM_SPIS2_MODE_MASK = (int)0x700000,
     SYSC_SEC_CPU_TPM_SPIS2_MODE_POS = 20,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

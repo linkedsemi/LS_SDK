@@ -1,7 +1,13 @@
 #ifndef REG_SEC_PMU_RG_TYPE_H_
 #define REG_SEC_PMU_RG_TYPE_H_
+
+#include <stddef.h>
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SEC_PMU ((reg_sec_pmu_rg_t *)SEC_PMU_RG_SEC_ADDR)
 
@@ -165,8 +171,8 @@ typedef struct
 #endif
 }reg_sec_pmu_rg_t;
 _Static_assert(sizeof(reg_sec_pmu_rg_t) == 0x3f8, "reg_sec_pmu_rg_t size error.");
-_Static_assert((uint32_t)(&((reg_sec_pmu_rg_t *)0)->QSPI_PAD_LOCK) == 0x344, "reg_sec_pmu_rg_t QSPI_PAD_LOCK offset error.");
-_Static_assert((uint32_t)(((reg_sec_pmu_rg_t *)0)->IO_VAL) == 0x360, "reg_sec_pmu_rg_t IO_VAL offset error.");
+_Static_assert(offsetof(reg_sec_pmu_rg_t, QSPI_PAD_LOCK) == 0x344, "reg_sec_pmu_rg_t QSPI_PAD_LOCK offset error.");
+_Static_assert(offsetof(reg_sec_pmu_rg_t, IO_VAL) == 0x360, "reg_sec_pmu_rg_t IO_VAL offset error.");
 
 enum SEC_PMU_RG_REG_SFT_CTRL00_FIELD
 {
@@ -487,5 +493,9 @@ enum SEC_PMU_RG_REG_MODE_PAD_DOT_FIELD
     SEC_PMU_RG_MODE_PAD_DOT_MASK = (int)0xf,
     SEC_PMU_RG_MODE_PAD_DOT_POS = 0,
 };
+
+#ifdef __cplusplus
+}
 #endif
 
+#endif

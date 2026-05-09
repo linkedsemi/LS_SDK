@@ -1,7 +1,12 @@
 #ifndef REG_SYSC_SEC_AWO_TYPE_H_
 #define REG_SYSC_SEC_AWO_TYPE_H_
+
 #include <stdint.h>
 #include "reg_base_addr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SYSC_SEC_AWO ((reg_sysc_sec_awo_t *)SEC_SYSC_AWO_SEC_ADDR)
 
@@ -262,5 +267,9 @@ enum SYSC_SEC_AWO_REG_FUNC_IOT_LOCK_FIELD {
     SYSC_SEC_AWO_FUNC_IOT_LOCK_MASK = (int)0xffff,
     SYSC_SEC_AWO_FUNC_IOT_LOCK_POS = 0,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -4,6 +4,9 @@
 #include "reg_base_addr.h"
 #include "reg_i3c.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define I3C10 ((I3C_TypeDef *)0x40095400)
 #define I3C9   ((I3C_TypeDef *)0x40095000)   
@@ -13,6 +16,8 @@ uint8_t HAL_I3C_TX_DMA_Handshake_Get(I3C_TypeDef *inst);
 
 void HAL_I3C_MspInit(I3C_HandleTypeDef *i3cx);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__LS_I3C_MSP__
