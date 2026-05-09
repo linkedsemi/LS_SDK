@@ -1,8 +1,16 @@
 #include "ls_msp_iwdg.h"
 #include "reg_cpu0_sys.h"
+#include "reg_top_dig.h"
 #include "field_manipulate.h"
 void HAL_IWDG_MSP_Init(reg_iwdg_t *iwdg)
 {
+    CPU0_SYS_CFG->CPU0_DUMMY2 = 0x0;
+    CPU0_SYS_CFG->CTRL_WDT_CPU0_SYS_I_RSTN_EN = 0x1;
+    CPU0_SYS_CFG->CTRL_WDT_CPU1_SYS_I_RSTN_EN = 0x1;
+    CPU0_SYS_CFG->CTRL_WDT_DDR_SYS_I_RSTN_EN = 0x1;
+    CPU0_SYS_CFG->CTRL_WDT_PIPE_SYS_I_RSTN_EN = 0x1;
+    CPU0_SYS_CFG->CTRL_WDT_PERIPH_SYS_I_RSTN_EN = 0x1;
+    TOP_DIG_CFG->ANA_SYS_ADJUST_ADB400_EN = 0x1;
     switch ((uint32_t)iwdg)
     {
     case (uint32_t)IWDT0:
