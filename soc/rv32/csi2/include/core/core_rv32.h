@@ -351,6 +351,7 @@ typedef struct {
 #define APLIC_BASE                  (CONFIG_APLIC_BASE)
 #endif
 
+#if !defined(CLINT_BASE)
 #if defined(CONFIG_CLINT_BASE)
 #define CLINT_BASE                  (CONFIG_CLINT_BASE)                            /*!< CLINT Base Address */
 #else
@@ -360,6 +361,7 @@ typedef struct {
 #define CLINT_BASE                  (CONFIG_TCIP_BASE)                             /*!< CLINT Base Address */
 #endif /* CONFIG_PLIC_BASE */
 #endif
+#endif /* !defined(CLINT_BASE) */
 
 #ifdef CONFIG_ACLINT_BASE
 #define ACLINT_BASE                 (CONFIG_ACLINT_BASE)
@@ -1374,6 +1376,8 @@ __STATIC_INLINE int csi_vlenb_get_value(void)
     __ASM volatile("csrr %0, vlenb" : "=r"(result) : : "memory");
     return result;
 }
+
+#include "csi_port.h"
 
 #ifdef __cplusplus
 }

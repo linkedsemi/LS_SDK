@@ -33,6 +33,10 @@
 #define __ASM                   __asm    /*!< asm keyword for GNU Compiler */
 #endif
 
+#ifndef asm
+#define asm                   __asm    /*!< asm keyword for GNU Compiler */
+#endif
+
 #ifndef __INLINE
 #define __INLINE                inline   /*!< inline keyword for GNU Compiler */
 #endif

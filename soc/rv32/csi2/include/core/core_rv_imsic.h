@@ -24,7 +24,9 @@
 #include <stdbool.h>
 #include <core/csi_rv_common.h>
 #include <core/csi_rv_encoding.h>
+#if 0
 #include <drv/common.h>
+#endif
 #endif
 
 #if CONFIG_INTC_IMSIC_APLIC
