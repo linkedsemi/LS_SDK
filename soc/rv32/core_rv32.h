@@ -1060,14 +1060,12 @@ __STATIC_INLINE void csi_dcache_enable (void)
 #if (__DCACHE_PRESENT == 1U)
     uint32_t cache;
     __DSB();
-    __ISB();
     __DCACHE_IALL();                        /* invalidate all dcache */
     cache = __get_MHCR();
     cache |= (CACHE_MHCR_DE_Msk | CACHE_MHCR_WB_Msk | CACHE_MHCR_WA_Msk | CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);      /* enable all Cache */
     __set_MHCR(cache);
 
     __DSB();
-    __ISB();
 #endif
 }
 
@@ -1082,13 +1080,11 @@ __STATIC_INLINE void csi_dcache_disable (void)
 #if (__DCACHE_PRESENT == 1U)
     uint32_t cache;
     __DSB();
-    __ISB();
     cache = __get_MHCR();
     cache &= ~(uint32_t)CACHE_MHCR_DE_Msk; /* disable all Cache */
     __set_MHCR(cache);
     __DCACHE_IALL();                             /* invalidate all Cache */
     __DSB();
-    __ISB();
 #endif
 }
 
@@ -1102,10 +1098,8 @@ __STATIC_INLINE void csi_dcache_invalid (void)
 {
 #if (__DCACHE_PRESENT == 1U)
     __DSB();
-    __ISB();
     __DCACHE_IALL();                            /* invalidate all Cache */
     __DSB();
-    __ISB();
 #endif
 }
 
@@ -1119,10 +1113,8 @@ __STATIC_INLINE void csi_dcache_clean (void)
 {
 #if (__DCACHE_PRESENT == 1U)
     __DSB();
-    __ISB();
     __DCACHE_CALL();                                     /* clean all Cache */
     __DSB();
-    __ISB();
 #endif
 }
 
@@ -1136,10 +1128,8 @@ __STATIC_INLINE void csi_dcache_clean_invalid (void)
 {
 #if (__DCACHE_PRESENT == 1U)
     __DSB();
-    __ISB();
     __DCACHE_CIALL();                                   /* clean and inv all Cache */
     __DSB();
-    __ISB();
 #endif
 }
 
@@ -1166,7 +1156,6 @@ __STATIC_INLINE void csi_dcache_invalid_range (uint32_t *addr, int32_t dsize)
     }
 
     __DSB();
-    __ISB();
 #endif
 }
 
@@ -1194,7 +1183,6 @@ __STATIC_INLINE void csi_dcache_clean_range (uint32_t *addr, int32_t dsize)
     }
 
     __DSB();
-    __ISB();
 #endif
 
 }
@@ -1222,7 +1210,6 @@ __STATIC_INLINE void csi_dcache_clean_invalid_range (uint32_t *addr, int32_t dsi
     }
 
     __DSB();
-    __ISB();
 #endif
 }
 
