@@ -441,7 +441,6 @@ __ALWAYS_STATIC_INLINE void csi_clic_enable_irq(uint32_t IRQn)
 #else
     CLIC->CLICINT[IRQn].IE |= CLIC_INTIE_IE_Msk;
 #endif
-    __DSB();
 }
 
 /**
@@ -458,7 +457,6 @@ __ALWAYS_STATIC_INLINE void csi_clic_disable_irq(uint32_t IRQn)
 #else
     CLIC->CLICINT[IRQn].IE &= ~CLIC_INTIE_IE_Msk;
 #endif
-    __DSB();
 }
 
 /**
@@ -506,7 +504,6 @@ __ALWAYS_STATIC_INLINE void csi_clic_set_pending_irq(uint32_t IRQn)
 #else
     CLIC->CLICINT[IRQn].IP |= CLIC_INTIP_IP_Msk;
 #endif
-    __DSB();
 }
 
 /**
@@ -524,7 +521,6 @@ __ALWAYS_STATIC_INLINE void csi_clic_clear_pending_irq(uint32_t IRQn)
 #else
     CLIC->CLICINT[IRQn].IP &= ~CLIC_INTIP_IP_Msk;
 #endif
-    __DSB();
 }
 
 /**
@@ -556,7 +552,6 @@ __ALWAYS_STATIC_INLINE void csi_clic_set_prio(uint32_t IRQn, uint32_t priority)
     ctl >>= nlbits;
     CLIC->CLICINT[IRQn].CTL = ctl | (priority << (8 - nlbits));
 #endif
-    __DSB();
 }
 
 /**
@@ -629,7 +624,6 @@ __ALWAYS_STATIC_INLINE void csi_clic_set_intattr(uint32_t IRQn, uint8_t attr)
 #else
     CLIC->CLICINT[IRQn].ATTR = attr;
 #endif
-    __DSB();
 }
 
 /**

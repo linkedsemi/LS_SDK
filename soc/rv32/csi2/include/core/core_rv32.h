@@ -733,7 +733,6 @@ __STATIC_INLINE uint32_t csi_vic_set_thresh(uint32_t thresh)
 
     CLIC->MINTTHRESH = thresh << 24;
 #endif
-    __DSB();
     return temp;
 }
 
