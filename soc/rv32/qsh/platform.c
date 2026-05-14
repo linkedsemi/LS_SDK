@@ -35,26 +35,57 @@ __attribute__((weak)) void SystemInit(){
     enable_global_irq();
 }
 
-__ALWAYS_STATIC_INLINE void set_trim_params()
+NOINLINE void XIP_BANNED_FUNC(rom_delay, uint32_t us)
 {
-    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_CLK_LDO1_VSEL, 0);
-    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_CLK_LDO2_VSEL, 0);
+    uint32_t CLK_MHZ = 0;
+    switch (REG_FIELD_RD(SYSC_SEC_AWO->PD_AWO_CLK_CTRL0, SYSC_SEC_AWO_CLK_SEL_HBUS))
+    {
+    case SEC_AWO_REG_CLK_SEL_HSI:
+    case SEC_AWO_REG_CLK_SEL_HSE:
+    case SEC_AWO_REG_CLK_SEL_CLIKIN:
+        CLK_MHZ = 25;
+        break;
+    case SEC_AWO_REG_CLK_SEL_DPLL_DIV:
+        CLK_MHZ = 600 / (REG_FIELD_RD(SYSC_SEC_AWO->PD_AWO_CLK_CTRL0, SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1) + 1);
+        break;
+    case SEC_AWO_REG_CLK_SEL_DPLL_600M:
+        CLK_MHZ = 600;
+        break;
+    default:
+        while(1);
+        break;
+    }
+#ifdef FPGA_TEST
+    CLK_MHZ = SDK_HCLK_MHZ;
+#endif
+    rv32_delay_asm((us) * (CLK_MHZ) / 8, 1);
 }
 
-__ALWAYS_STATIC_INLINE void enable_dpll()
+NOINLINE void XIP_BANNED_FUNC(enable_dpll,)
 {
     CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_CLKREF_SEL_MASK); /* clkin */
     SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr reset */
+    rom_delay(10);
     SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_RSTN_MASK); /* enable pll1 */
     while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK));
 
     CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_CLKREF_SEL_MASK); /* clkin */
     SET_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_EN_MASK); /* clr reset */
+    rom_delay(10);
     SET_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_RSTN_MASK); /* enable pll2 */
     while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK));
 }
 
-__ALWAYS_STATIC_INLINE void cpu_600M_ahb_300M_qspi_200M_init()
+NOINLINE void XIP_BANNED_FUNC(disable_dpll,)
+{
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_RSTN_MASK); /* disable pll1 */
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr dereset */
+
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_RSTN_MASK); /* disable pll2 */
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_EN_MASK); /* clr dereset */
+}
+
+NOINLINE void XIP_BANNED_FUNC(cpu_600M_ahb_300M_qspi_200M_init,)
 {
     SYSC_SEC_AWO->PD_AWO_CLK_CTRL1 = FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS0, 0x0)
                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS1, 0x0)
@@ -82,16 +113,38 @@ __ALWAYS_STATIC_INLINE void cpu_600M_ahb_300M_qspi_200M_init()
                                  //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
                                    | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
                                    | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
-                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x10) /* dpll 200M */
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x10)
                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
 }
 
+NOINLINE void XIP_BANNED_FUNC(cpu_25M_ahb_25M_qspi_25M_init,)
+{
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL0 =
+                                  // FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1, 0x1)
+                                     FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS, 0x1) /* hsi */
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_M1, 0x0)
+                                 //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL1 = FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS0, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS1, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS2, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS3, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS4, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_HBUS, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_OTP, 0x4);
+}
+
 void XIP_BANNED_FUNC(dpll_qspi_clk_config_and_clk_switch,)
 {
-    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK))
-        && (0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK))) {
-        set_trim_params();
+    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, BIT(16)))
+        || (0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, BIT(16)))) {
+        cpu_25M_ahb_25M_qspi_25M_init();
+        disable_dpll();
         enable_dpll();
         cpu_600M_ahb_300M_qspi_200M_init();
     }
