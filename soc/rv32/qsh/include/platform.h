@@ -76,6 +76,14 @@ void clk_flash_init();
 
 void clk_flashx_init(void *reg);
 
+void rom_delay(uint32_t us);
+
+void enable_dpll();
+
+void disable_dpll();
+
+void dpll_qspi_clk_config_and_clk_switch();
+
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler
 #else
