@@ -1,6 +1,6 @@
 MEMORY
 {
-    RAM (wx) 	: ORIGIN = 0x10000000, LENGTH = 0x100000
+    RAM (wx) 	: ORIGIN = 0x10000000, LENGTH = 0x140000
 }
 ENTRY(Reset_Handler)
 SECTIONS
