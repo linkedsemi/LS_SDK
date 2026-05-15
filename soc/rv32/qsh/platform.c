@@ -63,6 +63,8 @@ NOINLINE void XIP_BANNED_FUNC(rom_delay, uint32_t us)
 
 NOINLINE void XIP_BANNED_FUNC(enable_dpll,)
 {
+    SYSC_SEC_AWO->DPLL1_CTRL2 |= 1<<16;
+    SYSC_SEC_AWO->DPLL2_CTRL2 |= 1<<16;
     CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_CLKREF_SEL_MASK); /* clkin */
     SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr reset */
     rom_delay(10);
@@ -141,8 +143,8 @@ NOINLINE void XIP_BANNED_FUNC(cpu_25M_ahb_25M_qspi_25M_init,)
 
 void XIP_BANNED_FUNC(dpll_qspi_clk_config_and_clk_switch,)
 {
-    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, BIT(16)))
-        || (0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, BIT(16)))) {
+    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL1_CTRL2, 1 << 16))
+        || (0 == READ_BIT(SYSC_SEC_AWO->DPLL1_CTRL2, 1 << 16))) {
         cpu_25M_ahb_25M_qspi_25M_init();
         disable_dpll();
         enable_dpll();
