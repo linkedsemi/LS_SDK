@@ -260,6 +260,26 @@ void per_func5_disable(uint16_t pin)
     SYSC_AWO_CFG->IO_FUNC5_EN[x->port/4] &= ~(1<<x->num<<((x->port % 4)*8));
 }
 
+void io_drive_capacity_write(uint16_t pin, io_drive_type_t drive)
+{
+    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    switch(drive)
+    {
+    case ds0:
+        SYSC_AWO_CFG->IO_DS0[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
+    break;
+    case ds1:
+        SYSC_AWO_CFG->IO_DS1[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
+    break;
+    case ds2:
+        SYSC_AWO_CFG->IO_DS2[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
+    break;
+    case ds3:
+        SYSC_AWO_CFG->IO_DS3[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
+    break;
+    }
+}
+
 void pinmux_ssiv2_init()
 {
     per_func1_enable(PBB00); //clk
