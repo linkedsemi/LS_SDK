@@ -80,7 +80,6 @@ typedef union {
 } hw_fifo_t;
 
 typedef enum {
-    USB_EP0_STAGE_IDLE,         /* idle, waiting for SETUP */
     USB_EP0_STAGE_SETUP,        /* received SETUP */
     USB_EP0_STAGE_PRE_TX,       /* Pre IN data */
     USB_EP0_STAGE_TX,           /* IN data */
