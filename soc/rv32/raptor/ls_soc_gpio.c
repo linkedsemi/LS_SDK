@@ -263,20 +263,29 @@ void per_func5_disable(uint16_t pin)
 void io_drive_capacity_write(uint16_t pin, io_drive_type_t drive)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    switch(drive)
-    {
-    case ds0:
+
+    if(drive&DS0){
         SYSC_AWO_CFG->IO_DS0[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
-    break;
-    case ds1:
+    }else{
+        SYSC_AWO_CFG->IO_DS0[x->port/4] &= ~(1<<x->num<<((x->port % 4)*8));
+    }
+        
+    if(drive&DS1){
         SYSC_AWO_CFG->IO_DS1[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
-    break;
-    case ds2:
+    }else{
+        SYSC_AWO_CFG->IO_DS1[x->port/4] &= ~(1<<x->num<<((x->port % 4)*8));
+    }
+
+    if(drive&DS2){
         SYSC_AWO_CFG->IO_DS2[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
-    break;
-    case ds3:
+    }else{
+        SYSC_AWO_CFG->IO_DS2[x->port/4] &= ~(1<<x->num<<((x->port % 4)*8));
+    }
+
+    if(drive&DS3){
         SYSC_AWO_CFG->IO_DS3[x->port/4] |= 1<<x->num<<((x->port % 4)*8);
-    break;
+    }else{
+        SYSC_AWO_CFG->IO_DS3[x->port/4] &= ~(1<<x->num<<((x->port % 4)*8));
     }
 }
 
@@ -290,6 +299,41 @@ void pinmux_ssiv2_init()
     per_func1_enable(PBB05); //dat1
     io_cfg_input(PBB04);
     io_cfg_input(PBB05);
+    io_pull_write(PU06, IO_PULL_UP); //dat2
+    io_pull_write(PU07, IO_PULL_UP); //dat3
+    io_pull_write(PN03, IO_PULL_UP); //dat2
+    io_pull_write(PN04, IO_PULL_UP); //dat3
+    io_pull_write(PO03, IO_PULL_UP); //dat2
+    io_pull_write(PO04, IO_PULL_UP); //dat3
+    io_drive_capacity_write(PBB00, DS3);
+    io_drive_capacity_write(PBB01, DS3);
+    io_drive_capacity_write(PBB02, DS3);
+    io_drive_capacity_write(PBB03, DS3);
+    io_drive_capacity_write(PBB04, DS3);
+    io_drive_capacity_write(PBB05, DS3);
+    io_drive_capacity_write(PBB06, DS3);
+    io_drive_capacity_write(PBB07, DS3);
+    io_drive_capacity_write(PP07, DS3);
+    io_drive_capacity_write(PQ07, DS3);
+    io_drive_capacity_write(PU06, DS3);
+    io_drive_capacity_write(PU07, DS3);
+    io_drive_capacity_write(PU07, DS3);
+    io_drive_capacity_write(PO00, DS3);
+    io_drive_capacity_write(PO01, DS3);
+    io_drive_capacity_write(PO02, DS3);
+    io_drive_capacity_write(PO03, DS3);
+    io_drive_capacity_write(PO04, DS3);
+    io_drive_capacity_write(PO05, DS3);
+    io_drive_capacity_write(PO06, DS3);
+    io_drive_capacity_write(PO07, DS3);
+    io_drive_capacity_write(PN00, DS3);
+    io_drive_capacity_write(PN01, DS3);
+    io_drive_capacity_write(PN02, DS3);
+    io_drive_capacity_write(PN03, DS3);
+    io_drive_capacity_write(PN04, DS3);
+    io_drive_capacity_write(PN05, DS3);
+    io_drive_capacity_write(PN06, DS3);
+    io_drive_capacity_write(PN07, DS3);
 }
 
 void pinmux_emmc_init()
@@ -312,12 +356,34 @@ void pinmux_emmc_init()
     io_cfg_input(PEE03); //dat[1]
     io_cfg_input(PEE04); //dat[2]
     io_cfg_input(PEE05); //dat[3]
-    // io_cfg_input(PEE06);
-    // io_cfg_input(PEE07);
     io_cfg_input(PFF00); //dat[4]
     io_cfg_input(PFF01); //dat[5]
     io_cfg_input(PFF02); //dat[6]
     io_cfg_input(PFF03); //dat[7]
+    io_pull_write(PEE00, IO_PULL_DOWN);
+    io_pull_write(PEE01, IO_PULL_UP);
+    io_pull_write(PEE02, IO_PULL_UP);
+    io_pull_write(PEE03, IO_PULL_UP);
+    io_pull_write(PEE04, IO_PULL_UP);
+    io_pull_write(PEE05, IO_PULL_UP);
+    io_pull_write(PEE06, IO_PULL_UP);
+    io_pull_write(PEE07, IO_PULL_UP);
+    io_pull_write(PFF00, IO_PULL_UP);
+    io_pull_write(PFF01, IO_PULL_UP);
+    io_pull_write(PFF02, IO_PULL_UP);
+    io_pull_write(PFF03, IO_PULL_UP);
+    io_drive_capacity_write(PEE00, DS3);
+    io_drive_capacity_write(PEE01, DS3);
+    io_drive_capacity_write(PEE02, DS3);
+    io_drive_capacity_write(PEE03, DS3);
+    io_drive_capacity_write(PEE04, DS3);
+    io_drive_capacity_write(PEE05, DS3);
+    io_drive_capacity_write(PEE06, DS3);
+    io_drive_capacity_write(PEE07, DS3);
+    io_drive_capacity_write(PFF00, DS3);
+    io_drive_capacity_write(PFF01, DS3);
+    io_drive_capacity_write(PFF02, DS3);
+    io_drive_capacity_write(PFF03, DS3);
 }
 
 void pinmux_dwuart0_init(uint16_t txd,uint16_t rxd)

@@ -20,10 +20,10 @@ extern "C" {
 /**@brief IO output drive capability type */
 typedef enum
 {
-    ds0 = 0,
-    ds1 = 1,
-    ds2 = 2,
-    ds3 = 3,
+    DS0 = 1,
+    DS1 = 2,
+    DS2 = 4,
+    DS3 = 8,
 }io_drive_type_t;
 
 /**@brief IO pull type */
