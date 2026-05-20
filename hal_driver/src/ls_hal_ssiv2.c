@@ -46,34 +46,81 @@ void lsssiv2_stg_send_command(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t 
 
 void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint8_t dummy_cycles, uint32_t length)
 {
+    uint32_t offset = 0;
+    uint32_t read_addr = 0;
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
     MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK, EEPROM_READ<<CTRLR0_TMOD_POS);
-    //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "length" bytes
-    WRITE_REG(reg->ddress_block.CTRLR1, length-1);
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
-    reg->ddress_block.DR0 = opcode;
-    if(is_addr)
+    uint32_t max_read_32B_num = length / TX_RX_FIFO_LEVEL;
+    uint32_t remaining_length = length % TX_RX_FIFO_LEVEL;
+    if(max_read_32B_num)
     {
-        reg->ddress_block.DR0 = addr>>24;
-        reg->ddress_block.DR0 = (addr>>16) & 0xFF;
-        reg->ddress_block.DR0 = (addr>>8) & 0xFF;
-        reg->ddress_block.DR0 = addr&0xFF;
-        while(dummy_cycles--)
+        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
+        //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "TX_RX_FIFO_LEVEL" bytes
+        WRITE_REG(reg->ddress_block.CTRLR1, TX_RX_FIFO_LEVEL - 1);
+        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
+        while(max_read_32B_num--)
         {
-            reg->ddress_block.DR0 = 0x00;
+            reg->ddress_block.DR0 = opcode;
+            if(is_addr)
+            {
+                read_addr = addr + offset;
+                reg->ddress_block.DR0 = (read_addr>>24) & 0xFF;
+                reg->ddress_block.DR0 = (read_addr>>16) & 0xFF;
+                reg->ddress_block.DR0 = (read_addr>>8) & 0xFF;
+                reg->ddress_block.DR0 = read_addr&0xFF;
+                if(dummy_cycles)
+                {
+                    reg->ddress_block.DR0 = 0x00;
+                }
+            }
+            REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
+            uint32_t to_read = TX_RX_FIFO_LEVEL;
+            while(to_read)
+            {
+                if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
+                {
+                    *data++ = reg->ddress_block.DR0;
+                    to_read--;
+                }
+            }
+            while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
+            REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
+            offset += TX_RX_FIFO_LEVEL;
         }
     }
-    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
-    while(length)
+    if(remaining_length)
     {
-        if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
+        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
+        //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "remaining_length" bytes
+        WRITE_REG(reg->ddress_block.CTRLR1, remaining_length - 1);
+        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
+        reg->ddress_block.DR0 = opcode;
+        if(is_addr)        
         {
-            *data++ = reg->ddress_block.DR0;
-            length--;
+            read_addr = addr + offset;
+            reg->ddress_block.DR0 = (read_addr>>24) & 0xFF;
+            reg->ddress_block.DR0 = (read_addr>>16) & 0xFF;
+            reg->ddress_block.DR0 = (read_addr>>8) & 0xFF;
+            reg->ddress_block.DR0 = read_addr&0xFF;
+            if(dummy_cycles)
+            {
+                reg->ddress_block.DR0 = 0x00;
+            }
         }
+        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
+        uint32_t to_read = remaining_length;
+        while(to_read)
+        {
+            if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
+            {
+                *data++ = reg->ddress_block.DR0;
+                to_read--;
+            }
+        }
+        while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
+        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
     }
-    while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
-    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
 }
 
 void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint16_t length)
