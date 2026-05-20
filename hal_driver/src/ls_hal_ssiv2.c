@@ -6,16 +6,10 @@
 #include "reg_sysc_awo.h"
 #include "ls_soc_gpio.h"
 
-static void fwqspi_pin_enable(){
-    // REG_FIELD_WR(SYSC_AWO_CFG->FUNC1_AABBCCDD_EN, SYSC_AWO_FUNC1_IOBB_EN, 0x3f);//sclk/ss_0/1/2/dat[0]/[1]
-    // REG_FIELD_WR(SYSC_AWO_CFG->GPAABBCCDD_IE, SYSC_AWO_GPIOBB_IE, 0x30);//dat0/1 ie
-    pinmux_ssiv2_init();
-}
-
 HAL_StatusTypeDef HAL_SSIV2_Init(reg_axi_ssi_t *reg, uint32_t div_para, uint8_t clk_edg_sel)
 {
     HAL_LSSSIV2_MSP_Init();
-    fwqspi_pin_enable();
+    pinmux_ssiv2_init();
     CPU1_SYS_CFG->SOFT_FWSPI_SS_IN_N = 1; //软件配置片选是否有效位，低有效(此处硬件CS)
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
     MODIFY_REG(reg->ddress_block.CTRLR0, 
