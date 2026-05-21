@@ -17,12 +17,13 @@
 HAL_StatusTypeDef HAL_EMMC_Init(uint32_t mapbase)
 {
     HAL_LSEMMC_MSP_Init(mapbase);
-    sdhci_writeb(mapbase, SDHCI_POWER_ON | SDHCI_POWER_330, SDHCI_POWER_CONTROL);
+    sdhci_writeb(mapbase, SDHCI_POWER_ON | SDHCI_POWER_300, SDHCI_POWER_CONTROL);
     sdhci_writew(mapbase, 0x25, SDHCI_CLOCK_CONTROL);
     sdhci_writeb(mapbase, 0x7, SDHCI_TIMEOUT_CONTROL);
     sdhci_writel(mapbase, SDHCI_INT_DATA_MASK | SDHCI_INT_CMD_MASK, SDHCI_INT_ENABLE);
-    sdhci_writeb(mapbase, SDHCI_POWER_ON | SDHCI_POWER_330, SDHCI_POWER_CONTROL);
+    sdhci_writeb(mapbase, SDHCI_POWER_ON | SDHCI_POWER_300, SDHCI_POWER_CONTROL);
     sdhci_writel(mapbase, SDHCI_INT_CARD_INT, SDHCI_SIGNAL_ENABLE);
+    sdhci_writew(mapbase, 0x8, SDHCI_HOST_CONTROL2);
 #ifdef QSH
     if(READ_REG(SYSC_SEC_CPU->APP_CPU_SRST) > 0)
     {
@@ -309,7 +310,7 @@ uint32_t linkedsemi_sdhci_request(uint32_t mapbase, struct sdhc_command *cmd, st
     sdhci_command.timeout_ms = cmd->timeout_ms;
 
     do {
-        LOG_I("cmd->retries = %d \n", cmd->retries);
+        // LOG_I("cmd->retries = %d \n", cmd->retries);
         ret = linkedsemi_sdhci_transfer_blocking(mapbase, &sdhci_command, sdhci_data_ptr);
 
         if (data && ret) {
@@ -581,7 +582,7 @@ uint32_t mmc_card_init(uint32_t mapbase)
     /* Modern SDHC always at least supports 512 byte block sizes,
      * which is enough to support sectors
      */
-    ocr_arg |= MMC_OCR_SECTOR_MODE | MMC_OCR_PWR_BUSY_FLAG | MMC_OCR_VDD27_36FLAG;
+    ocr_arg |= MMC_OCR_SECTOR_MODE | MMC_OCR_PWR_BUSY_FLAG | MMC_OCR_VDD27_36FLAG | MMC_OCR_VDD170_195FLAG;
 
     /* CMD1 */
     ret = mmc_send_op_cond(mapbase, ocr_arg);
