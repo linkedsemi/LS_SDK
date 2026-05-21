@@ -372,18 +372,18 @@ void pinmux_emmc_init()
     io_pull_write(PFF01, IO_PULL_UP);
     io_pull_write(PFF02, IO_PULL_UP);
     io_pull_write(PFF03, IO_PULL_UP);
-    io_drive_capacity_write(PEE00, DS3);
-    io_drive_capacity_write(PEE01, DS3);
-    io_drive_capacity_write(PEE02, DS3);
-    io_drive_capacity_write(PEE03, DS3);
-    io_drive_capacity_write(PEE04, DS3);
-    io_drive_capacity_write(PEE05, DS3);
-    io_drive_capacity_write(PEE06, DS3);
-    io_drive_capacity_write(PEE07, DS3);
-    io_drive_capacity_write(PFF00, DS3);
-    io_drive_capacity_write(PFF01, DS3);
-    io_drive_capacity_write(PFF02, DS3);
-    io_drive_capacity_write(PFF03, DS3);
+    io_drive_capacity_write(PEE00, DS2);
+    io_drive_capacity_write(PEE01, DS2);
+    io_drive_capacity_write(PEE02, DS2);
+    io_drive_capacity_write(PEE03, DS2);
+    io_drive_capacity_write(PEE04, DS2);
+    io_drive_capacity_write(PEE05, DS2);
+    io_drive_capacity_write(PEE06, DS2);
+    io_drive_capacity_write(PEE07, DS2);
+    io_drive_capacity_write(PFF00, DS2);
+    io_drive_capacity_write(PFF01, DS2);
+    io_drive_capacity_write(PFF02, DS2);
+    io_drive_capacity_write(PFF03, DS2);
 }
 
 void pinmux_dwuart0_init(uint16_t txd,uint16_t rxd)
