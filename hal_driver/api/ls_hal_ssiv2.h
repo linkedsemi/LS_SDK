@@ -53,10 +53,10 @@ extern struct SSIV2_HandleTypeDef flash;
 
 HAL_StatusTypeDef HAL_SSIV2_Init(reg_axi_ssi_t *reg, uint32_t div_para, uint8_t clk_edg_sel);
 HAL_StatusTypeDef HAL_SSIV2_DeInit(void);
-void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint8_t dummy_cycles, uint32_t length);
+void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t opcode, uint8_t *data, uint32_t length);
 void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint16_t length);
 void lsssiv2_stg_send_command(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t opcode);
-void hal_flashx_fast_read_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint8_t *data, uint32_t length);
+void hal_flashx_fast_read_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint16_t *data, uint32_t length);
 void hal_flashx_page_program_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint8_t *data, uint16_t length);
 void hal_flashx_read_status_register_0_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t *status_reg_0);
 void hal_flashx_read_status_register_1_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t *status_reg_1);

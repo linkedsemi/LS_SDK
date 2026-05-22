@@ -30,7 +30,7 @@ HAL_StatusTypeDef HAL_SSIV2_DeInit(void)
 void lsssiv2_stg_send_command(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t opcode){
     // CTRLR0 can be configured only when it is turned off
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
-    MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK, TX_ONLY<<CTRLR0_TMOD_POS);
+    MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK |CTRLR0_DFS_MASK, TX_ONLY<<CTRLR0_TMOD_POS | DFS_8_BIT << CTRLR0_DFS_POS);
     REG_FIELD_WR(reg->ddress_block.SSIENR,SSIENR_SSIC_EN, SSIC_ENABLE);
     reg->ddress_block.DR0 = opcode;
     REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
@@ -38,83 +38,25 @@ void lsssiv2_stg_send_command(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t 
     REG_FIELD_WR(reg->ddress_block.SER,SER_SER, 0);
 }
 
-void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint8_t dummy_cycles, uint32_t length)
+void lsssiv2_stg_read_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t opcode, uint8_t *data, uint32_t length)
 {
-    uint32_t offset = 0;
-    uint32_t read_addr = 0;
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
-    MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK, EEPROM_READ<<CTRLR0_TMOD_POS);
+    MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK | CTRLR0_DFS_MASK, EEPROM_READ<<CTRLR0_TMOD_POS | DFS_8_BIT << CTRLR0_DFS_POS);
+    //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "remaining_length" bytes
+    WRITE_REG(reg->ddress_block.CTRLR1, 0);
     REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
-    uint32_t max_read_32B_num = length / TX_RX_FIFO_LEVEL;
-    uint32_t remaining_length = length % TX_RX_FIFO_LEVEL;
-    if(max_read_32B_num)
+    reg->ddress_block.DR0 = opcode;
+    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
+    while(length)
     {
-        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
-        //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "TX_RX_FIFO_LEVEL" bytes
-        WRITE_REG(reg->ddress_block.CTRLR1, TX_RX_FIFO_LEVEL - 1);
-        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
-        while(max_read_32B_num--)
+        if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
         {
-            reg->ddress_block.DR0 = opcode;
-            if(is_addr)
-            {
-                read_addr = addr + offset;
-                reg->ddress_block.DR0 = (read_addr>>24) & 0xFF;
-                reg->ddress_block.DR0 = (read_addr>>16) & 0xFF;
-                reg->ddress_block.DR0 = (read_addr>>8) & 0xFF;
-                reg->ddress_block.DR0 = read_addr&0xFF;
-                if(dummy_cycles)
-                {
-                    reg->ddress_block.DR0 = 0x00;
-                }
-            }
-            REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
-            uint32_t to_read = TX_RX_FIFO_LEVEL;
-            while(to_read)
-            {
-                if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
-                {
-                    *data++ = reg->ddress_block.DR0;
-                    to_read--;
-                }
-            }
-            while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
-            REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
-            offset += TX_RX_FIFO_LEVEL;
+            *data++ = reg->ddress_block.DR0;
+            length--;
         }
     }
-    if(remaining_length)
-    {
-        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
-        //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "remaining_length" bytes
-        WRITE_REG(reg->ddress_block.CTRLR1, remaining_length - 1);
-        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
-        reg->ddress_block.DR0 = opcode;
-        if(is_addr)        
-        {
-            read_addr = addr + offset;
-            reg->ddress_block.DR0 = (read_addr>>24) & 0xFF;
-            reg->ddress_block.DR0 = (read_addr>>16) & 0xFF;
-            reg->ddress_block.DR0 = (read_addr>>8) & 0xFF;
-            reg->ddress_block.DR0 = read_addr&0xFF;
-            if(dummy_cycles)
-            {
-                reg->ddress_block.DR0 = 0x00;
-            }
-        }
-        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
-        uint32_t to_read = remaining_length;
-        while(to_read)
-        {
-            if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
-            {
-                *data++ = reg->ddress_block.DR0;
-                to_read--;
-            }
-        }
-        while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
-        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
-    }
+    while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
+    REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
 }
 
 void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t addr, bool is_addr, uint8_t opcode, uint8_t *data, uint16_t length)
@@ -146,11 +88,68 @@ void lsssiv2_stg_write_register(reg_axi_ssi_t *reg, uint8_t slave_select, uint32
     }while(status_reg_0 & 0x01);
 }
 
-void hal_flashx_fast_read_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint8_t *data, uint32_t length)
+void hal_flashx_fast_read_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32_t offset, uint16_t *data, uint32_t length)
 {
     // Turn off the global interrupt when reading
     uint32_t flash_read_stat = enter_critical();
-    lsssiv2_stg_read_register(reg, slave_select, offset, true, FAST_READ4B_OPCODE, data, 1, length);
+
+    uint32_t addr_incr = 0;
+    uint32_t read_addr = 0;
+    REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
+    MODIFY_REG(reg->ddress_block.CTRLR0, CTRLR0_TMOD_MASK | CTRLR0_DFS_MASK, EEPROM_READ<<CTRLR0_TMOD_POS | DFS_16_BIT << CTRLR0_DFS_POS);
+    //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "TX_RX_FIFO_LEVEL*2" bytes
+    WRITE_REG(reg->ddress_block.CTRLR1, TX_RX_FIFO_LEVEL - 1);
+    REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
+    uint32_t max_read_64B_num = length / TX_RX_FIFO_LEVEL;
+    uint32_t remaining_length = length % TX_RX_FIFO_LEVEL;
+
+    while(max_read_64B_num--)
+    {
+        read_addr = offset + addr_incr;
+        reg->ddress_block.DR0 = (FAST_READ4B_OPCODE<<8) | ((read_addr>>24) & 0xFF);
+        reg->ddress_block.DR0 = (((read_addr>>16) & 0xFF)<<8) | ((read_addr>>8) & 0xFF);
+        reg->ddress_block.DR0 = ((read_addr&0xFF)<<8) | 0x00;
+
+        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
+        uint32_t to_read = TX_RX_FIFO_LEVEL;
+        while(to_read)
+        {
+            if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
+            {
+                *data++ = __builtin_bswap16(reg->ddress_block.DR0);
+                to_read--;
+            }
+        }
+        while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
+        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
+        addr_incr += TX_RX_FIFO_LEVEL*2;
+    }
+
+    if(remaining_length)
+    {
+        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_DISABLE);
+        //The number of continuously received data frames, in units of CTRLR0 DFS, here represents "remaining_length*2" bytes
+        WRITE_REG(reg->ddress_block.CTRLR1, remaining_length - 1);
+        REG_FIELD_WR(reg->ddress_block.SSIENR, SSIENR_SSIC_EN, SSIC_ENABLE);
+        read_addr = offset + addr_incr;
+        reg->ddress_block.DR0 = (FAST_READ4B_OPCODE<<8) | ((read_addr>>24) & 0xFF);
+        reg->ddress_block.DR0 = (((read_addr>>16) & 0xFF)<<8) | ((read_addr>>8) & 0xFF);
+        reg->ddress_block.DR0 = ((read_addr&0xFF)<<8) | 0x00;
+
+        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, slave_select);
+        uint32_t to_read = remaining_length;
+        while(to_read)
+        {
+            if(READ_BIT(reg->ddress_block.SR, SR_RFNE_MASK))
+            {
+                *data++ = __builtin_bswap16(reg->ddress_block.DR0);
+                to_read--;
+            }
+        }
+        while(REG_FIELD_RD(reg->ddress_block.SR, SR_BUSY));
+        REG_FIELD_WR(reg->ddress_block.SER, SER_SER, 0);
+    }
+
     exit_critical(flash_read_stat);
 }
 
@@ -161,12 +160,12 @@ void hal_flashx_page_program_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint32
 
 void hal_flashx_read_status_register_0_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t *status_reg_0)
 {
-    lsssiv2_stg_read_register(reg, slave_select, 0, false, READ_STATUS_REGISTER_0_OPCODE, status_reg_0, 0, 1);
+    lsssiv2_stg_read_register(reg, slave_select, READ_STATUS_REGISTER_0_OPCODE, status_reg_0, 1);
 }
 
 void hal_flashx_read_status_register_1_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t *status_reg_1)
 {
-    lsssiv2_stg_read_register(reg, slave_select, 0, false, READ_STATUS_REGISTER_1_OPCODE, status_reg_1, 0, 1);
+    lsssiv2_stg_read_register(reg, slave_select, READ_STATUS_REGISTER_1_OPCODE, status_reg_1, 1);
 }
 
 void hal_flashx_write_status_register_0_v2(reg_axi_ssi_t *reg, uint8_t slave_select, uint8_t status_0)

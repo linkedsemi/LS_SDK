@@ -4,9 +4,9 @@
 struct SSIV2_HandleTypeDef flash;
 #define TEMP_BUF_SIZE  256 //page max size 256 Bytes
 
-__attribute__((aligned(4))) uint8_t temp_buf[TEMP_BUF_SIZE];
+__attribute__((aligned(4))) uint16_t temp_buf[TEMP_BUF_SIZE / 2];
 uint8_t status_reg_0[1];
-uint32_t div_para =4 ;
+uint32_t div_para = 4;
 static uint8_t data[TEMP_BUF_SIZE] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
@@ -41,11 +41,11 @@ int main()
 
     hal_flashx_block_32K_erase_v2(flash.reg, flash.slave_select, offset);
     
-    hal_flashx_fast_read_v2(flash.reg, flash.slave_select, offset, temp_buf, sizeof(temp_buf));
+    hal_flashx_fast_read_v2(flash.reg, flash.slave_select, offset, temp_buf, sizeof(temp_buf)/2);
 
     hal_flashx_page_program_v2(flash.reg, flash.slave_select, offset, data, sizeof(data));
 
-    hal_flashx_fast_read_v2(flash.reg, flash.slave_select, offset, temp_buf, sizeof(temp_buf));
+    hal_flashx_fast_read_v2(flash.reg, flash.slave_select, offset, temp_buf, sizeof(temp_buf)/2);
 
     while (1);
 }
