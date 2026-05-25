@@ -8,6 +8,7 @@
 #include "reg_sysc_awo.h"
 #include "reg_pipe_sys.h"
 #include "ls_soc_gpio.h"
+#include "platform.h"
 
 #define BOOT             0
 #define TX_RX_EQ         1
@@ -77,7 +78,7 @@ void HAL_LSEMMC_MSP_Init(uint32_t mapbase)
     CPU1_SYS_CFG -> PIPE_SYS_CRG_AXI_CLK_TOP_RST_N_REG0 = 0x20;
     CPU1_SYS_CFG -> PIPE_SYS_CRG_AHB_CLK_TOP_RST_N_REG0_CLR = 0x2;
     CPU1_SYS_CFG -> PIPE_SYS_CRG_AHB_CLK_TOP_RST_N_REG0 = 0x2;
-
+    DELAY_US(10);
     MODIFY_REG(PIPE_SYS_CFG -> SOFT_RST_N_REG0_CLR,
       PIPE_SYS_EMMC_CORE_CLK_SOFT_RST_N_REG0_CLR_MASK|
       PIPE_SYS_EMMC_CCLK_TX_CLK_SOFT_RST_N_REG0_CLR_MASK|
