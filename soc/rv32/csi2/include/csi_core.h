@@ -79,9 +79,11 @@
 extern "C" {
 #endif
 
+#if 0
 #if CONFIG_CPU_XUANTIE_E9XX || CONFIG_CPU_XUANTIE_C906 || CONFIG_CPU_XUANTIE_C906FD || CONFIG_CPU_XUANTIE_C906FDV
 #if CONFIG_SMP
 #error "This CPU does not support SMP."
+#endif
 #endif
 #endif
 
