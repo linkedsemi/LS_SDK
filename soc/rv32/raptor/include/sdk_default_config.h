@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #ifndef SDK_HCLK_MHZ
-#define SDK_HCLK_MHZ (3)
+#define SDK_HCLK_MHZ (25)
 #endif
 
 #ifndef SDK_PCLK_DIV
