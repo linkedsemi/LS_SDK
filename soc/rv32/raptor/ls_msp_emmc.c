@@ -15,7 +15,7 @@
 void emmc_interal_clk_cfg(void) {
     PIPE_SYS_CFG -> EMMC_CORE_CLK_CLK_DEGLITCH_SW3_REG = 0x1; //25M
     PIPE_SYS_CFG -> EMMC_CORE_CLK_CLK_DIV0_DIV2_REG = 0x0;
-    PIPE_SYS_CFG -> EMMC_TM_CLK_CLK_DEGLITCH_SW3_REG = 0x4;
+    PIPE_SYS_CFG -> EMMC_TM_CLK_CLK_DEGLITCH_SW3_REG = 0x2; //25M
     PIPE_SYS_CFG -> EMMC_TM_CLK_CLK_DIV0_DIV8_REG = 0x0;
 }
 
@@ -66,12 +66,13 @@ void emmc_clk_stable(void) {
 
 void HAL_LSEMMC_MSP_Init(uint32_t mapbase)
 {
+    emmc_interal_clk_cfg();
+    emmc_txrx_clk_cfg(BOOT,TX_RX_EQ);  //tx  clk 配置
     //总线clk
     REG_FIELD_WR(CPU1_SYS_CFG -> PIPE_SYS_CFG_REG1, PIPE_SYS_EMMC_AXI_CLK_CLK_CG0_5, 0x1); 
     REG_FIELD_WR(CPU1_SYS_CFG -> PIPE_SYS_CFG_REG3, PIPE_SYS_EMMC_AHB_CLK_CLK_CG0_1, 0x1);
     emmc_interal_clk_en();
     emmc_txrx_clk_en();
-
     CPU1_SYS_CFG -> PIPE_SYS_CRG_AXI_CLK_TOP_RST_N_REG0_CLR = 0x20;
     CPU1_SYS_CFG -> PIPE_SYS_CRG_AXI_CLK_TOP_RST_N_REG0 = 020;
     CPU1_SYS_CFG -> PIPE_SYS_CRG_AHB_CLK_TOP_RST_N_REG0_CLR = 0x2;
@@ -103,8 +104,7 @@ void HAL_LSEMMC_MSP_Init(uint32_t mapbase)
     /** <DONE> card_detect_n/card_write_prot config by software 软件告知emmc 卡起来了， 有实卡可选软件或者硬件pad告知*/
     REG_FIELD_WR(PIPE_SYS_CFG -> EMMC_CTL0, PIPE_SYS_EMMC_SOFT_CARD_DETECT_N, 0x1);
     REG_FIELD_WR(PIPE_SYS_CFG -> EMMC_CTL0, PIPE_SYS_EMMC_SOFT_CARD_WRITE_PROT, 0x1);
-    emmc_interal_clk_cfg();
-    emmc_txrx_clk_cfg(BOOT,TX_RX_EQ);  //tx  clk 配置
+    
     emmc_clk_stable();
 }
 
