@@ -7,9 +7,9 @@
 #define TX_RX_FIFO_LEVEL 32
 
 enum slave_select{
-    slave1 = 0x1,
-    slave2 = 0x2,
-    slave3 = 0x4
+    SLAVE1 = 0x1,
+    SLAVE2 = 0x2,
+    SLAVE3 = 0x4
 };
 
 enum transfer_mode{
