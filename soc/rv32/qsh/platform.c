@@ -144,7 +144,7 @@ NOINLINE void XIP_BANNED_FUNC(cpu_25M_ahb_25M_qspi_25M_init,)
 void XIP_BANNED_FUNC(dpll_qspi_clk_config_and_clk_switch,)
 {
     if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL1_CTRL2, 1 << 16))
-        || (0 == READ_BIT(SYSC_SEC_AWO->DPLL1_CTRL2, 1 << 16))) {
+        || (0 == READ_BIT(SYSC_SEC_AWO->DPLL2_CTRL2, 1 << 16))) {
         cpu_25M_ahb_25M_qspi_25M_init();
         disable_dpll();
         enable_dpll();
