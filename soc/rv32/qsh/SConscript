@@ -183,6 +183,9 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'soc/rv32',
         'soc/rv32/qsh',
         'soc/rv32/qsh/include',
+        'soc/rv32/csi2',
+        'soc/rv32/csi2/include',
+        'soc/rv32/csi2/include/core',
     ]))
     
     if usb:
@@ -233,6 +236,9 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
     self.Append(CPPPATH = self.inc_dirs(inc_list))
     target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src),OBJPREFIX = objprefix)
     self.Depends(target,[self['LINKSCRIPT']])
+    self.Append(CPPDEFINES = ['CONFIG_CPU_XUANTIE_E9XX'])
+    self.Append(CPPDEFINES = ['CONFIG_CPU_XUANTIE_E906FDP'])
+    self.Append(CPPDEFINES = ['CONFIG_INTC_CLIC'])
     return target
 
 env.AddMethod(plf_postaction)

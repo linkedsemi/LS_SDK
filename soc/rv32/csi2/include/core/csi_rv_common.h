@@ -26,6 +26,10 @@
 #define __ASM                   __asm     /*!< asm keyword for GNU Compiler */
 #endif
 
+#ifndef asm
+#define asm                   __asm    /*!< asm keyword for GNU Compiler */
+#endif
+
 #ifndef __INLINE
 #define __INLINE                inline    /*!< inline keyword for GNU Compiler */
 #endif
@@ -386,6 +390,8 @@ __ALWAYS_STATIC_INLINE uint8_t is_power_of_two(uint32_t x)
 {
     return x && !(x & (x - 1));
 }
+#else
+#include <zephyr/sys/util.h>
 #endif
 
 __ALWAYS_STATIC_INLINE uint32_t log2_ulong(unsigned long x)

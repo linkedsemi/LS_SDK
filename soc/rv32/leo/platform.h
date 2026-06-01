@@ -35,7 +35,7 @@ __attribute__((always_inline)) static inline void e906_init()
     MODIFY_REG(value,0x6000,0x2000); 
     __set_MSTATUS(value);//enable fpu
     value = __get_MHCR();
-    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);
+    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_BTB_Msk);
     __set_MHCR(value);
 }
 

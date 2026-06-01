@@ -19,6 +19,7 @@ void lscache_cache_disable()
     lscache_msp_deinit();
 }
 
+#if defined(QSH)
 void XIP_BANNED_FUNC(lscache_cachex_enable,reg_lscache_t *reg,uint8_t prefetch)
 {
     lscache_cachex_msp_init((void *)reg);
@@ -37,3 +38,4 @@ void lscache_cachex_disable(reg_lscache_t *reg)
     reg->CCR = FIELD_BUILD(LSCACHE_EN, 0);
     lscache_cachex_msp_deinit((void *)reg);
 }
+#endif

@@ -133,9 +133,9 @@ HAL_StatusTypeDef HAL_AD_LoopChannelC_Stop_DMA(ADC_HandleTypeDef* hadc)
 
 __attribute__((weak)) void HAL_ADC_DMA_CpltCallback(ADC_HandleTypeDef *hadc,uint8_t ch_idx,uint8_t buf_idx){}
 
-static void ADC_DMA_PingPong_Callback(DMA_Controller_HandleTypeDef *hadc,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void ADC_DMA_PingPong_Callback(DMA_Controller_HandleTypeDef *hadc,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         ADC_HandleTypeDef *adc = (ADC_HandleTypeDef *)param;
         HAL_ADC_DMA_CpltCallback(adc,ch_idx,lli==(void *)&adc->Env.DMA.LLI[1]);

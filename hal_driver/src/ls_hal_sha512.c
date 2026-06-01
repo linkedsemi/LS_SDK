@@ -37,7 +37,7 @@ static void block_calculate(uint32_t addr, uint32_t block_number)
     REG_FIELD_WR(LS_SHA512->CTRL, SHA512_CTRL_BLOCK_NUM, (block_number - 1));
     LS_SHA512->ADDR = addr;
     LS_ASSERT(((uint32_t)addr % 32) == 0);
-    csi_dcache_clean_range((uint32_t *)addr, block_number*LS_SHA512_BLOCK_SIZE);
+    csi_dcache_clean_range((void *)addr, block_number*LS_SHA512_BLOCK_SIZE);
 
     if (isFirst)
     {

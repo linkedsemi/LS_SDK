@@ -106,7 +106,6 @@ if(CONFIG_SOC_LS1010)
   )
 
   zephyr_library_sources(
-    ../soc/rv32/startup.c
     ../module/common/common.c
     ../module/common/circular_doubly_linked_list.c
     ../module/common/linked_async_framework.c
@@ -262,6 +261,9 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32
     ../soc/rv32/qsh
     ../soc/rv32/qsh/include
+    ../soc/rv32/csi2/
+    ../soc/rv32/csi2/include
+    ../soc/rv32/csi2/include/core
     ../hal_driver/inc
     ../hal_driver/api
     ../hal_driver/api/otbn
@@ -282,7 +284,6 @@ if(CONFIG_SOC_LSQSH)
   )
 
   zephyr_library_sources(
-    ../soc/rv32/startup.c
     ../module/debug/ls_dbg.c
     ../module/common/common.c
     ../module/common/circular_doubly_linked_list.c
@@ -358,7 +359,6 @@ if(CONFIG_SOC_LSQSH)
   )
 
   zephyr_compile_definitions(QSH)
-  zephyr_compile_definitions(CONFIG_FSTACK_PROTECTOR)
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
 
 if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN)
@@ -389,4 +389,7 @@ if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
   )
 endif()
 
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
+  zephyr_compile_definitions(CONFIG_INTC_CLIC)
 endif()

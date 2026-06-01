@@ -7,9 +7,8 @@
 #include "common.h"
 #include "field_manipulate.h"
 #include "sdk_config.h"
-#include "core_rv32.h"
+#include "csi_core.h"
 #include "qsh.h"
-#include "core_rv_pmu.h"
 #include "perf_event_list.h"
 #include "dmac_config.h"
 #include "iopmp.h"
@@ -59,7 +58,7 @@ __ALWAYS_STATIC_INLINE void e906_init()
     MODIFY_REG(value,0x6000,0x2000); 
     __set_MSTATUS(value);//enable fpu
     value = __get_MHCR();
-    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);
+    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_BTB_Msk);
     __set_MHCR(value);
 }
 
@@ -76,6 +75,14 @@ void flash_swint_init();
 void clk_flash_init();
 
 void clk_flashx_init(void *reg);
+
+void rom_delay(uint32_t us);
+
+void enable_dpll();
+
+void disable_dpll();
+
+void dpll_qspi_clk_config_and_clk_switch();
 
 #ifdef FREERTOS
 #define FLASH_SWINT_HANDLER OS_SWINT_Handler

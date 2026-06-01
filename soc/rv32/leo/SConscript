@@ -151,6 +151,9 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         'soc',
         'soc/rv32',
         'soc/rv32/leo',
+        'soc/rv32/csi2',
+        'soc/rv32/csi2/include',
+        'soc/rv32/csi2/include/core',
     ]))
     if usb:
         sdk_src += list(map(lambda x:os.path.join('$SDK_ROOT/soc/',x),[
@@ -238,6 +241,9 @@ def plf_build(self,name,app_src,rtos,with_startup,ble,mesh,usb,objprefix):
         self.Append(LINKFLAGS = '-T $SDK_ROOT/soc/rv32/leo/rom_sym.txt')
     target = self.Program('build/$IC/'+name,self.variant_dir_source(sdk_src + start_src + app_src + rtos_src),OBJPREFIX = objprefix)
     self.Depends(target,[self['LINKSCRIPT']])
+    self.Append(CPPDEFINES = ['CONFIG_CPU_XUANTIE_E9XX'])
+    self.Append(CPPDEFINES = ['CONFIG_CPU_XUANTIE_E906FDP'])
+    self.Append(CPPDEFINES = ['CONFIG_INTC_CLIC'])
     return target
 
 env.AddMethod(plf_postaction)
