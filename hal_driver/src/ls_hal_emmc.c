@@ -39,6 +39,23 @@ HAL_StatusTypeDef HAL_EMMC_DeInit(uint32_t mapbase)
     return HAL_OK;
 }
 
+void emmc_rst_n(uint32_t mapbase)
+{
+    uint16_t val;
+    val = sdhci_readw(mapbase, EMMC_CTRL_R);
+    val |= EMMC_RST_N_OE_MASK | EMMC_RST_N_MASK;
+    sdhci_writew(mapbase, val, EMMC_CTRL_R);
+    val &= ~EMMC_RST_N_MASK;
+    sdhci_writew(mapbase, val, EMMC_CTRL_R);
+
+    DELAY_US(10);
+
+    val |= EMMC_RST_N_MASK;
+    sdhci_writew(mapbase, val, EMMC_CTRL_R);
+    val &= ~EMMC_RST_N_OE_MASK;
+    sdhci_writew(mapbase, val, EMMC_CTRL_R);
+}
+
 static uint32_t sdhci_get_present_status_flag(uint32_t mapbase)
 {
     return sdhci_readl(mapbase, SDHCI_PRESENT_STATE);

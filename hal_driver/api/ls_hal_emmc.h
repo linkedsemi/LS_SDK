@@ -291,6 +291,7 @@ static inline uint32_t sdhci_readl(uint32_t mapbase, uint32_t reg)
 
 HAL_StatusTypeDef HAL_EMMC_Init(uint32_t mapbase);
 HAL_StatusTypeDef HAL_EMMC_DeInit(uint32_t mapbase);
+void emmc_rst_n(uint32_t mapbase);
 uint32_t linkedsemi_sdhci_request(uint32_t mapbase, struct sdhc_command *cmd, struct sdhc_data *data);
 uint32_t sdhci_card_busy(uint32_t mapbase);
 
