@@ -351,17 +351,6 @@ void pinmux_emmc_init()
     per_func1_enable(PFF02);
     per_func1_enable(PFF03);
     per_func2_enable(PQ07);
-    io_cfg_input(PEE00); //clk
-    io_cfg_input(PEE01); //cmd
-    io_cfg_input(PEE02); //dat[0]
-    io_cfg_input(PEE03); //dat[1]
-    io_cfg_input(PEE04); //dat[2]
-    io_cfg_input(PEE05); //dat[3]
-    io_cfg_input(PFF00); //dat[4]
-    io_cfg_input(PFF01); //dat[5]
-    io_cfg_input(PFF02); //dat[6]
-    io_cfg_input(PFF03); //dat[7]
-    io_cfg_output(PQ07); //emmc reset
     io_pull_write(PEE00, IO_PULL_DOWN);
     io_pull_write(PEE01, IO_PULL_UP);
     io_pull_write(PEE02, IO_PULL_UP);
@@ -375,6 +364,17 @@ void pinmux_emmc_init()
     io_pull_write(PFF02, IO_PULL_UP);
     io_pull_write(PFF03, IO_PULL_UP);
     io_pull_write(PQ07, IO_PULL_UP);
+    io_cfg_input(PEE00); //clk
+    io_cfg_input(PEE01); //cmd
+    io_cfg_input(PEE02); //dat[0]
+    io_cfg_input(PEE03); //dat[1]
+    io_cfg_input(PEE04); //dat[2]
+    io_cfg_input(PEE05); //dat[3]
+    io_cfg_input(PFF00); //dat[4]
+    io_cfg_input(PFF01); //dat[5]
+    io_cfg_input(PFF02); //dat[6]
+    io_cfg_input(PFF03); //dat[7]
+    io_cfg_output(PQ07); //emmc reset
     io_drive_capacity_write(PEE00, DS2);
     io_drive_capacity_write(PEE01, DS2);
     io_drive_capacity_write(PEE02, DS2);
