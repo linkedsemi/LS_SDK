@@ -832,7 +832,7 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
                                         uint8_t *in, uint32_t in_size,
                                         uint8_t *aad, uint32_t aad_size)
 {
-    uint8_t c[AES_BLOCK_SIZE];
+    uint8_t c[AES_BLOCK_SIZE] = {0};
     uint32_t partial = in_size % AES_BLOCK_SIZE;
     const uint8_t *_in = in;
     uint32_t blocks;
