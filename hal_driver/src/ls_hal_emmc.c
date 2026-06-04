@@ -24,6 +24,7 @@ HAL_StatusTypeDef HAL_EMMC_Init(uint32_t mapbase)
     sdhci_writeb(mapbase, SDHCI_POWER_ON | SDHCI_POWER_300, SDHCI_POWER_CONTROL);
     sdhci_writel(mapbase, SDHCI_INT_CARD_INT, SDHCI_SIGNAL_ENABLE);
     sdhci_writew(mapbase, 0x8, SDHCI_HOST_CONTROL2);
+    sdhci_writew(mapbase, (sdhci_readw(mapbase, EMMC_CTRL_R) | CARD_IS_EMMC_MASK), EMMC_CTRL_R);
 #ifdef QSH
     if(READ_REG(SYSC_SEC_CPU->APP_CPU_SRST) > 0)
     {
@@ -41,19 +42,9 @@ HAL_StatusTypeDef HAL_EMMC_DeInit(uint32_t mapbase)
 
 void emmc_rst_n(uint32_t mapbase)
 {
-    uint16_t val;
-    val = sdhci_readw(mapbase, EMMC_CTRL_R);
-    val |= EMMC_RST_N_OE_MASK | EMMC_RST_N_MASK;
-    sdhci_writew(mapbase, val, EMMC_CTRL_R);
-    val &= ~EMMC_RST_N_MASK;
-    sdhci_writew(mapbase, val, EMMC_CTRL_R);
-
-    DELAY_US(10);
-
-    val |= EMMC_RST_N_MASK;
-    sdhci_writew(mapbase, val, EMMC_CTRL_R);
-    val &= ~EMMC_RST_N_OE_MASK;
-    sdhci_writew(mapbase, val, EMMC_CTRL_R);
+    sdhci_writew(mapbase, (sdhci_readw(mapbase, EMMC_CTRL_R) & (~EMMC_RST_N_MASK)), EMMC_CTRL_R);
+    DELAY_US(13);
+    sdhci_writew(mapbase, (sdhci_readw(mapbase, EMMC_CTRL_R) | EMMC_RST_N_MASK), EMMC_CTRL_R);
 }
 
 static uint32_t sdhci_get_present_status_flag(uint32_t mapbase)
