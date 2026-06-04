@@ -165,13 +165,13 @@ void platform_init()
 
     struct hal_flash_env *flash[] = {
         &flash1,
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
         &flash2,
 #endif
     };
 
     flash1.reg = (void *)LSQSPIV2;
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
     flash2.reg = (void *)LSQSPIV2_2;
 #endif
 
