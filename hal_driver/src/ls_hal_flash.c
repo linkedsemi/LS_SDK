@@ -1,4 +1,5 @@
 #include "hal_flash_int.h"
+#include "platform.h"
 #if !defined(HAL_FLASH_C_MERGED) || defined(HAL_FLASH_C_DESTINATION)
 
 ROM_SYMBOL bool XIP_BANNED_FUNC(hal_flashx_write_in_process,struct hal_flash_env *env)
@@ -266,32 +267,40 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_read_sfdp,struct hal_flash_env *env
 
 void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend_isr,struct hal_flash_env *env)
 {
-    if(env->writing)
+    if(env->writing&&env->xip)
     {
-        if(env->suspend_count==0)
+        if(atomic_cas(&env->suspend_count,0,1))
         {
+            if(env->suspend_after_resume)
+            {
+                while(env->resume_time + flash_time_us2ticks(MIN_RESUME_SUSPEND_LOOP_US)> flash_get_current_time());
+            }
             hal_flashx_prog_erase_suspend(env);
             uint8_t status_reg1;
             do{
                 hal_flashx_read_status_register_1_ram(env,&status_reg1);
             }while(hal_flashx_write_in_process(env)&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
             hal_flashx_continuous_mode_start(env);
+            env->suspended = true;
+        }else{
+            atomic_inc(&env->suspend_count);
+            while(!env->suspended);
         }
-        env->suspend_count++;
     }
 }
 
 void XIP_BANNED_FUNC(hal_flashx_prog_erase_resume_isr,struct hal_flash_env *env)
 {
-    if(env->writing)
+    if(env->writing&&env->xip)
     {
-        env->suspend_count--;
-        if(env->suspend_count==0)
+        if(atomic_dec(&env->suspend_count)==1)
         {
             sync_for_xip_stop(env);
             hal_flashx_continuous_mode_stop(env);
             hal_flashx_prog_erase_resume(env);
-            DELAY_US(20);
+            env->resume_time = flash_get_current_time();
+            env->suspend_after_resume = true;
+            env->suspended = false;
         }
     }
 }

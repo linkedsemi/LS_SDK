@@ -70,6 +70,8 @@ extern "C" {
 
 #define DUMMY_BYTE_VAL 0x3c
 
+#define MIN_RESUME_SUSPEND_LOOP_US 100
+
 enum mw_wid_type
 {
     SINGLE_WIRE = 0,

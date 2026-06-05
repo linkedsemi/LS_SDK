@@ -180,6 +180,40 @@ __ALWAYS_STATIC_INLINE bool is_app_cpu_running(void)
     return (SYSC_SEC_CPU->APP_CPU_SRST > 0);
 }
 
+static inline uint32_t flash_get_current_time(void)
+{
+    return __get_MTIME();
+}
+
+static inline uint32_t flash_time_us2ticks(uint32_t us)
+{
+    return 600*us;
+}
+
+#if defined(__ZEPHYR__)
+#include <zephyr/sys/atomic.h>
+#else
+static inline bool atomic_cas(long *ptr, long oldval, long newval)
+{
+    if(*ptr == oldval) {
+        *ptr = newval;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline long atomic_inc(long *ptr)
+{
+    return ++(*ptr);
+}
+
+static inline long atomic_dec(long *ptr)
+{
+    return --(*ptr);
+}
+#endif
+
 static inline int soc_eth_tx_delay_set(uint32_t addr, uint8_t delay)
 {
     int ret = 0;

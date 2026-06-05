@@ -18,10 +18,14 @@ extern "C" {
 struct hal_flash_env
 {
     void *reg;
+    uint32_t resume_time;
+    long suspend_count;
+    bool suspended;
+    bool suspend_after_resume;
+    bool xip;
     bool dual_mode_only;
     bool continuous_mode_enable;
     bool writing;
-    uint8_t suspend_count;
     bool continuous_mode_on;
     bool addr4b;
 };
