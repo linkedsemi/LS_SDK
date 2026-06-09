@@ -370,6 +370,11 @@ __ALWAYS_STATIC_INLINE void ls_clock_control_on_reset_line_toggle_once(uint32_t 
     }
 }
 
+/* LVD33 (Low Voltage Detection) simplified API */
+void lvd_init(uint8_t threshold_level);
+void lvd_set_callback(void (*callback)(void));
+void lvd_isr(void);   /* Public ISR symbol; caller must wire it to PMU_LVD_IRQN */
+
 #ifdef __cplusplus
 }
 #endif

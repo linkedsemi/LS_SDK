@@ -15,6 +15,7 @@
 #include "reg_sysc_sec_awo.h"
 #include "qsh.h"
 
+
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
 __attribute__((aligned(64))) void (*interrupt_vector[IRQN_MAX])();
@@ -242,4 +243,45 @@ void XIP_BANNED_FUNC(sync_for_xip_stop,)
 {
     /* wait for CS_N release */
     while ((SEC_PMU->QSPI_PAD_DIN & 0x1) == 0);
+}
+
+#define LSQSH_LVD_ENABLE_BIT     (1U << 4)
+
+
+static void (*lvd_user_callback)(void);
+
+void lvd_isr(void)
+{
+    if (!READ_BIT(SEC_PMU->PMU_STATUS, SEC_PMU_RG_LVD33_INTR_MASK)) {
+        return;
+    }
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 1);
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 0);
+
+    if (lvd_user_callback != NULL) {
+        lvd_user_callback();
+    }
+}
+
+void lvd_init(uint8_t threshold_level)
+{
+    if (threshold_level > 0x0fU) {
+        threshold_level = 0x0fU;
+    }
+
+    REG_FIELD_WR(SEC_PMU->ANA_PMU_CTRL, SEC_PMU_RG_LVD33_CTRL,
+                 LSQSH_LVD_ENABLE_BIT | threshold_level);
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_POL, 0);
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 1);
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 0);
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_EN, 1);
+}
+
+void lvd_set_callback(void (*callback)(void))
+{
+    lvd_user_callback = callback;
 }
