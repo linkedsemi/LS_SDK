@@ -271,9 +271,10 @@ void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend_isr,struct hal_flash_env *env
     {
         if(atomic_cas(&env->suspend_count,0,1))
         {
+            while(env->suspended);
             if(env->suspend_after_resume)
             {
-                while(env->resume_time + flash_time_us2ticks(MIN_RESUME_SUSPEND_LOOP_US)> flash_get_current_time());
+                while(time_diff(flash_get_current_time(),env->resume_time) < flash_time_us2ticks(MIN_RESUME_SUSPEND_LOOP_US));
             }
             hal_flashx_prog_erase_suspend(env);
             uint8_t status_reg1;
