@@ -16,7 +16,7 @@ struct FlashDevice const FlashDevices  INDEVSECTION =  {
 	// {start address, the flash size, sector size}
     .Devs = {
         {FLASH_BASE_ADDR, 1*1024*1024*1024, FLASH_SECTOR_SIZE},
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
         {CACHE2_ADDR, 1*1024*1024*1024, FLASH_SECTOR_SIZE},
 #endif
     },

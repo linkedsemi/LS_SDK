@@ -64,13 +64,13 @@ int  flashInit(){
 
     struct hal_flash_env *flash[] = {
         &flash1,
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
         &flash2,
 #endif
     };
 
     flash1.reg = (void *)LSQSPIV2;
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
     flash2.reg = (void *)LSQSPIV2_2;
 #endif
 
@@ -176,7 +176,7 @@ int  flashID(unsigned int* flashID){
 int flashProgram(char* dst, char *src, int size){
     uint32_t flash_base_addr;
     struct hal_flash_env *flash;
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
     if ((uintptr_t)dst >= CACHE2_ADDR) {
         flash_base_addr = CACHE2_ADDR;
         flash = &flash2;
@@ -245,7 +245,7 @@ int flashProgram(char* dst, char *src, int size){
 int flashRead(char* dst, char *src, int length){
     uint32_t flash_base_addr;
     struct hal_flash_env *flash;
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
     if ((uintptr_t)src >= CACHE2_ADDR) {
         flash_base_addr = CACHE2_ADDR;
         flash = &flash2;
@@ -279,7 +279,7 @@ int flashRead(char* dst, char *src, int length){
 int flashErase(char *dst, int size){
     uint32_t flash_base_addr;
     struct hal_flash_env *flash;
-#if defined(QSH)
+#if defined(LSQSPIV2_2_ENABLED)
     if ((uintptr_t)dst >= CACHE2_ADDR) {
         flash_base_addr = CACHE2_ADDR;
         flash = &flash2;
