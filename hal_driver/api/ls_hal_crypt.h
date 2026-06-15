@@ -59,17 +59,17 @@ enum padding_mode
 
 enum data_type
 {
-    not_swapped,
-    halfword_exchange,
-    byte_swap,
-    bit_string_exchange,
+    NOT_SWAPPED,
+    HALFWORD_EXCHANGE,
+    BYTE_SWAP,
+    BIT_STRING_EXCHANGE,
 };
 
 enum mode_select
 {
-    ecb,
-    cbc,
-    ctr,
+    ECB,
+    CBC,
+    CTR,
 };
 
 void HAL_LSCRYPT_SetRandFunc(void *func);
