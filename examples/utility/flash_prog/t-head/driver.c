@@ -328,7 +328,9 @@ int flashChipErase( ){
     LOG_RAW("%s\r\n", __func__);
 #endif
     hal_flashx_chip_erase(&flash1);
+#if defined(LSQSPIV2_2_ENABLED)
     hal_flashx_chip_erase(&flash2);
+#endif
     return 0;
 }
 
