@@ -1,0 +1,16 @@
+import os
+env = Environment(ENV = os.environ)
+env['SDK_ROOT'] = Dir('../../../')
+env.SConscript(env['SDK_ROOT'].File('soc/SConscript'),exports=['env'])
+
+test_unified_dir = '../../test_unified'
+
+src = [
+    'main.c',
+]
+
+inc = [
+    '.',
+]
+
+env.app_build('otbn_unified_test',src,inc,ble = False)
