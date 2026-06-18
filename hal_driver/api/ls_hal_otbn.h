@@ -31,16 +31,15 @@ enum HAL_OTBN_CMD
 };
 
 /* The encryption algorithm library supported by otbn*/
-typedef enum{
-    OTBN_UNUSED = 0,
-    OTBN_SHA256,
-    OBTN_SHA384,
-    OTBN_SHA512,
-    OTBN_SM3,
-    OTBN_ECDSA_P256,
-    OTBN_ECDSA_P384,
-    OTBN_SM2,
-}ls_otbn_fireware_t;
+#define OTBN_FIRMWARE_UNUSED         0
+#define OTBN_FIRMWARE_SHA256         1
+#define OTBN_FIRMWARE_SHA384         2
+#define OTBN_FIRMWARE_SHA512         3
+#define OTBN_FIRMWARE_SM3            4
+#define OTBN_FIRMWARE_ECDSA_P256     5
+#define OTBN_FIRMWARE_ECDSA_P384     6
+#define OTBN_FIRMWARE_SM2            7
+
 
 void HAL_OTBN_Init(void);
 
