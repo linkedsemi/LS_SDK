@@ -11,9 +11,9 @@ extern "C" {
 #define QSPI_CLK_CYCLE 1
 #endif
 
-#define QSPI_CS_INTERVAL 4
-#define QSPI_CS_HOLD 2
-#define QSPI_CS_SETUP 2
+#define QSPI_CS_INTERVAL 2
+#define QSPI_CS_HOLD 1
+#define QSPI_CS_SETUP 1
 
 //(neg,delay) = (0,0), (1,1),(0,1), (1,2),(0,2), (1,3),(0,3)
 #if defined(BOOT_ROM) && !defined(BOOT_RAM)
