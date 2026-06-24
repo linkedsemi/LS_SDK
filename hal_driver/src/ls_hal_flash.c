@@ -1,4 +1,5 @@
 #include "hal_flash_int.h"
+#include "ls_hal_flash.h"
 #include "platform.h"
 #if !defined(HAL_FLASH_C_MERGED) || defined(HAL_FLASH_C_DESTINATION)
 
@@ -11,34 +12,49 @@ ROM_SYMBOL bool XIP_BANNED_FUNC(hal_flashx_write_in_process,struct hal_flash_env
 
 static void XIP_BANNED_FUNC(hal_flashx_write_status_check,struct hal_flash_env *env)
 {
-    while(hal_flashx_write_in_process(env));
+    bool wip = true;
+    do{
+        flash_critical_key_t cpu_stat = FLASH_ENTER_CRITICAL(env);
+        if(!env->suspended)
+        {
+            wip = hal_flashx_write_in_process(env);
+        }
+        FLASH_EXIT_CRITICAL(env,cpu_stat);
+    }while(wip);
 }
 
 NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flashx_reading_critical,void (*func)(struct hal_flash_env *,void *),struct hal_flash_env *env,void *param)
 {
+	lsqsh_xip_lock_broadcast_ipi(false);
+    flash_critical_enter_sync();
+    flash_critical_key_t cpu_stat = FLASH_ENTER_CRITICAL(env);
     sync_for_xip_stop(env);
-    uint32_t cpu_stat = ENTER_CRITICAL();
     hal_flashx_continuous_mode_stop(env);
     func(env,param);
     hal_flashx_continuous_mode_start(env);
-    EXIT_CRITICAL(cpu_stat);
+    FLASH_EXIT_CRITICAL(env,cpu_stat);
+    flash_critical_exit_sync();
 }
 
 NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flashx_writing_critical,void (*func)(struct hal_flash_env *,void *),struct hal_flash_env *env,void *param)
 {
+    lsqsh_xip_lock_broadcast_ipi(true);
+    flash_critical_enter_sync();
+    flash_critical_key_t cpu_stat = FLASH_ENTER_CRITICAL(env);
     sync_for_xip_stop(env);
-    uint32_t cpu_stat = ENTER_CRITICAL();
     hal_flashx_continuous_mode_stop(env);
     hal_flashx_write_enable(env);
     func(env,param);
     env->writing = true;
-    EXIT_CRITICAL(cpu_stat);
+    FLASH_EXIT_CRITICAL(env,cpu_stat);
+    flash_critical_exit_sync();
     hal_flashx_write_status_check(env);
-    cpu_stat = ENTER_CRITICAL();
+    flash_critical_enter_sync();
+    cpu_stat = FLASH_ENTER_CRITICAL(env);
     env->writing = false;
     hal_flashx_continuous_mode_start(env);
-    EXIT_CRITICAL(cpu_stat);
-
+    FLASH_EXIT_CRITICAL(env,cpu_stat);
+    flash_critical_exit_sync();
 }
 
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_multi_io_read,struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint32_t length)
@@ -267,15 +283,20 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_read_sfdp,struct hal_flash_env *env
 
 void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend_isr,struct hal_flash_env *env)
 {
-    if(env->writing&&env->xip)
+    bool writing;
+    flash_critical_key_t key = FLASH_ENTER_CRITICAL(env);
+    writing = env->writing;
+    FLASH_EXIT_CRITICAL(env,key);
+    if(writing&&env->xip)
     {
-        if(atomic_cas(&env->suspend_count,0,1))
+        if(atomic_cas_ram(&env->suspend_count,0,1))
         {
             while(env->suspended);
             if(env->suspend_after_resume)
             {
                 while(time_diff(flash_get_current_time(),env->resume_time) < flash_time_us2ticks(MIN_RESUME_SUSPEND_LOOP_US));
             }
+            key = FLASH_ENTER_CRITICAL(env);
             hal_flashx_prog_erase_suspend(env);
             uint8_t status_reg1;
             do{
@@ -283,6 +304,7 @@ void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend_isr,struct hal_flash_env *env
             }while(hal_flashx_write_in_process(env)&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
             hal_flashx_continuous_mode_start(env);
             env->suspended = true;
+            FLASH_EXIT_CRITICAL(env,key);
         }else{
             atomic_inc(&env->suspend_count);
             while(!env->suspended);
@@ -292,16 +314,22 @@ void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend_isr,struct hal_flash_env *env
 
 void XIP_BANNED_FUNC(hal_flashx_prog_erase_resume_isr,struct hal_flash_env *env)
 {
-    if(env->writing&&env->xip)
+    bool writing;
+    flash_critical_key_t key = FLASH_ENTER_CRITICAL(env);
+    writing = env->writing;
+    FLASH_EXIT_CRITICAL(env,key);
+    if(writing&&env->xip)
     {
         if(atomic_dec(&env->suspend_count)==1)
         {
+            key = FLASH_ENTER_CRITICAL(env);
             sync_for_xip_stop(env);
             hal_flashx_continuous_mode_stop(env);
             hal_flashx_prog_erase_resume(env);
+            env->suspended = false;
+            FLASH_EXIT_CRITICAL(env,key);
             env->resume_time = flash_get_current_time();
             env->suspend_after_resume = true;
-            env->suspended = false;
         }
     }
 }

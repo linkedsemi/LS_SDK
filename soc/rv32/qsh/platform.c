@@ -239,7 +239,7 @@ __attribute__((weak)) int _read (int file,char *ptr,int len){  return -1;}
 
 __attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
 
-void XIP_BANNED_FUNC(sync_for_xip_stop,)
+void XIP_BANNED_FUNC(sync_for_xip_stop,struct hal_flash_env *env)
 {
     /* wait for CS_N release */
     while ((SEC_PMU->QSPI_PAD_DIN & 0x1) == 0);
