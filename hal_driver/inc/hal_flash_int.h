@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "sdk_config.h"
-#include "ls_hal_flash.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"
@@ -84,6 +83,39 @@ struct flash_wr_rd_reg_param
     uint8_t *buf;
     uint8_t opcode;
     uint8_t length;
+};
+
+#if defined(__ZEPHYR__)&&defined(CONFIG_SMP)
+#include <zephyr/spinlock.h>
+#include "smp/lsqsh_smp.h"
+#define FLASH_ENTER_CRITICAL(env) e906_smp_spin_lock(&env->flash_lock)
+#define FLASH_EXIT_CRITICAL(env, cpu_stat) e906_smp_spin_unlock(&env->flash_lock, cpu_stat)
+typedef k_spinlock_key_t flash_critical_key_t;
+#else
+#define FLASH_ENTER_CRITICAL(env) ENTER_CRITICAL()
+#define FLASH_EXIT_CRITICAL(env, cpu_stat) EXIT_CRITICAL(cpu_stat)
+typedef uint32_t flash_critical_key_t;
+static inline void flash_critical_enter_sync(){}
+static inline void flash_critical_exit_sync(){}
+static inline void lsqsh_xip_lock_broadcast_ipi(bool is_write){}
+#endif
+
+struct hal_flash_env
+{
+    void *reg;
+    #if defined(__ZEPHYR__)&&defined(CONFIG_SMP)
+    struct k_spinlock flash_lock;
+    #endif
+    uint32_t resume_time;
+    long suspend_count;
+    bool suspended;
+    bool suspend_after_resume;
+    bool xip;
+    bool dual_mode_only;
+    bool continuous_mode_enable;
+    bool writing;
+    bool continuous_mode_on;
+    bool addr4b;
 };
 
 void hal_flashx_program_operation(struct hal_flash_env *env,void *param);

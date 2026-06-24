@@ -193,7 +193,7 @@ static inline uint32_t flash_time_us2ticks(uint32_t us)
 #if defined(__ZEPHYR__)
 #include <zephyr/sys/atomic.h>
 #else
-static inline bool atomic_cas(long *ptr, long oldval, long newval)
+static inline bool atomic_cas_ram(long *ptr, long oldval, long newval)
 {
     if(*ptr == oldval) {
         *ptr = newval;

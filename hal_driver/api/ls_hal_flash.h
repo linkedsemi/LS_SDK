@@ -1,7 +1,6 @@
 #ifndef LS_HAL_FLASH_H_
 #define LS_HAL_FLASH_H_
-#include <stdint.h>
-#include <stdbool.h>
+#include "hal_flash_int.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,21 +13,6 @@ extern "C" {
 /** \addtogroup SPI_FLASH
  *  @{
  */
-
-struct hal_flash_env
-{
-    void *reg;
-    uint32_t resume_time;
-    long suspend_count;
-    bool suspended;
-    bool suspend_after_resume;
-    bool xip;
-    bool dual_mode_only;
-    bool continuous_mode_enable;
-    bool writing;
-    bool continuous_mode_on;
-    bool addr4b;
-};
 
 extern struct hal_flash_env flash1;
 #if defined(QSH)
