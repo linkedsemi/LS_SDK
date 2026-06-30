@@ -31,7 +31,7 @@
 #include "reg_sysc_sec_per.h"
 #include "sdk_default_config.h"
 #include "sys_stat.h"
-
+#include <time.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -374,6 +374,10 @@ __ALWAYS_STATIC_INLINE void ls_clock_control_on_reset_line_toggle_once(uint32_t 
 void lvd_init(uint8_t threshold_level);
 void lvd_set_callback(void (*callback)(void));
 void lvd_isr(void);   /* Public ISR symbol; caller must wire it to PMU_LVD_IRQN */
+
+void rtc_timer_init(void);
+void rtc_timer_set_time(struct tm *timeptr);
+void rtc_timer_get_time(struct tm *timeptr);
 
 #ifdef __cplusplus
 }
