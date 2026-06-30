@@ -288,6 +288,7 @@ void lvd_set_callback(void (*callback)(void))
 #include <time.h>
 #include "ls_msp_timer.h"
 #include "reg_sysc_app_per.h"
+#include "reg_sec_pmu_rg.h"
 
 #define LSPIS_CH0 (*(volatile uint32_t *)(APP_PIS_ADDR + 0x00U))
 #define LSPIS_OER  (*(volatile uint32_t *)(APP_PIS_ADDR + 0x40U))
@@ -342,18 +343,15 @@ void rtc_timer_init()
     REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_CEN,1);
     REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,1);
 }
-static uint32_t timer_count;
-static time_t time_base;
 
 void rtc_timer_set_time(struct tm *timeptr)
 {
-    time_base = mktime(timeptr);
-    timer_count = LSGPTIMA->CNT;
+    SEC_PMU->SFT_CTRL[4] = mktime(timeptr) - LSGPTIMA->CNT;
 }
 
 void rtc_timer_get_time(struct tm *timeptr)
 {
-    time_t current_time = time_base + LSGPTIMA->CNT - timer_count;
+    time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
     struct tm *tm_info = localtime(&current_time);
     *timeptr = *tm_info;
 }
