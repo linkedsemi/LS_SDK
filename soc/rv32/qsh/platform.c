@@ -285,3 +285,75 @@ void lvd_set_callback(void (*callback)(void))
 {
     lvd_user_callback = callback;
 }
+#include <time.h>
+#include "ls_msp_timer.h"
+#include "reg_sysc_app_per.h"
+
+#define LSPIS_CH0 (*(volatile uint32_t *)(APP_PIS_ADDR + 0x00U))
+#define LSPIS_OER  (*(volatile uint32_t *)(APP_PIS_ADDR + 0x40U))
+
+static void rtc_timer_periph_clk_init(void)
+{
+    /* BSTIM1*/
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_CLR_BSTIM1_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_BSTIM1_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_BSTIM1_N_MASK;
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_SET_BSTIM1_MASK;
+
+    /* GPTIMA1 */
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_CLR_GPTIMA1_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_CLR_GPTIMA1_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_GPTIMA1_N_MASK;
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_SET_GPTIMA1_MASK;
+
+    /* PIS */
+    SYSC_APP_PER->PD_PER_CLKG4 = SYSC_APP_PER_CLKG_CLR_PIS_MASK;
+    SYSC_APP_PER->PD_PER_SRST4 = SYSC_APP_PER_SRST_CLR_PIS_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST4 = SYSC_APP_PER_SRST_SET_PIS_N_MASK;
+    SYSC_APP_PER->PD_PER_CLKG4 = SYSC_APP_PER_CLKG_SET_PIS_MASK;
+}
+
+void rtc_timer_init()
+{
+    rtc_timer_periph_clk_init();
+    /* BSTIM1 */
+    LSBSTIM->PSC = 10000;//16bit 预分频
+    LSBSTIM->ARR = 7500 - 1;//16bit 计数值
+    REG_FIELD_WR(LSBSTIM->CR2,TIMER_CR2_MMS,0x2);//触发输出选择更新事件
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,0);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_ARPE,1);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_URS,1);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_UDIS,0);
+    REG_FIELD_WR(LSBSTIM->ICR,TIMER_ICR_UIE,1);
+    REG_FIELD_WR(LSBSTIM->EGR,TIMER_EGR_UG,1);
+    /* PIS */
+    LSPIS_CH0 = 12|(28 << 8)|(1 << 18)|(0<<26);//pis 通道0
+    LSPIS_OER = 1;
+    /* GPTIMA1 */
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_CEN,0);
+    REG_FIELD_WR(LSGPTIMA->SMCR,TIMER_SMCR_SMS,7);//从模式选择
+    REG_FIELD_WR(LSGPTIMA->SMCR,TIMER_SMCR_TS,0);//触发源选择 ITR0
+    LSGPTIMA->ARR = 0xffffffff;//32bit计数值
+    LSGPTIMA->CNT = 0;
+    REG_FIELD_WR(LSGPTIMA->CCMR1,TIMER_CCMR1_CC1S,3);
+    REG_FIELD_WR(LSGPTIMA->CCER,TIMER_CCER_CC1E,1);
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_ARPE,1);
+    /* EN */
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_CEN,1);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,1);
+}
+static uint32_t timer_count;
+static time_t time_base;
+
+void rtc_timer_set_time(struct tm *timeptr)
+{
+    time_base = mktime(timeptr);
+    timer_count = LSGPTIMA->CNT;
+}
+
+void rtc_timer_get_time(struct tm *timeptr)
+{
+    time_t current_time = time_base + LSGPTIMA->CNT - timer_count;
+    struct tm *tm_info = localtime(&current_time);
+    *timeptr = *tm_info;
+}
