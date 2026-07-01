@@ -316,6 +316,10 @@ static void rtc_timer_periph_clk_init(void)
 
 void rtc_timer_init()
 {
+    if(SYSC_APP_PER->PD_PER_CLKG0&SYSC_APP_PER_CLKG_SET_GPTIMA1_MASK)
+    {
+        return;
+    }
     rtc_timer_periph_clk_init();
     /* BSTIM1 */
     LSBSTIM->PSC = 10000;//16bit 预分频
