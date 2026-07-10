@@ -136,11 +136,11 @@ __ALWAYS_STATIC_INLINE void __enable_irq(void)
 #else
     __ASM volatile(
         "csrs mstatus, 8\n\t" /* Set mstatus.MIE to enable global interrupts */
-        "li a0, 0x888\n\t"    /* Load interrupt enable mask to temporary register */
-        "csrs mie, a0"        /* Set mie register to enable three types of interrupts */
-        :                     /* No output */
-        :                     /* No input */
-        : "a0"                /* Declare that a0 register is modified */
+        // "li a0, 0x888\n\t"    /* Load interrupt enable mask to temporary register */
+        // "csrs mie, a0"        /* Set mie register to enable three types of interrupts */
+        // :                     /* No output */
+        // :                     /* No input */
+        // : "a0"                /* Declare that a0 register is modified */
     );
 #endif
 }
