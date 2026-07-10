@@ -46,7 +46,6 @@ _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
 #include "ls_dbg.h"
 #include "log.h"
 
-#include "ls_soc_gpio.h"
 #include "compile_flag.h"
 
 #define USB_TX_BUF_ADDR         (8)
@@ -57,7 +56,6 @@ _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"");
 /*------------------------------------------------------------------
  * MACRO TYPEDEF CONSTANT ENUM DECLARATION
  *------------------------------------------------------------------*/
-#define REQUEST_TYPE_INVALID  (0xFFu)
 
 typedef struct {
     uint_fast16_t beg; /* offset of including first element */
@@ -81,6 +79,17 @@ typedef union {
     uint32_t  u32;
 } hw_fifo_t;
 
+typedef enum {
+    USB_EP0_STAGE_SETUP,        /* received SETUP */
+    USB_EP0_STAGE_PRE_TX,       /* Pre IN data */
+    USB_EP0_STAGE_TX,           /* IN data */
+    USB_EP0_STAGE_PRE_RX,       /* Pre OUT data */
+    USB_EP0_STAGE_RX,           /* OUT data */
+    USB_EP0_STAGE_PRE_STATUSIN,     /* (after OUT data) */
+    USB_EP0_STAGE_STATUSIN,     /* (after OUT data) */
+    USB_EP0_STAGE_STATUSOUT     /* (after IN data) */
+} ep0_state_t;
+
 typedef struct 
 {
     struct co_list_hdr list_hdr;
@@ -93,16 +102,15 @@ typedef struct
 {
     tusb_control_request_t setup_packet;
     uint16_t     remaining_ctrl; /* The number of bytes remaining in data stage of control transfer. */
-    int8_t       status_out;
     uint8_t      rx_buf_addr;
     pipe_state_t pipe0;
+    ep0_state_t  ep0_state;
+    bool         is_set_addr;
+    uint8_t      addr;
     pipe_state_t pipe[2][7];   /* pipe[direction][endpoint number - 1] */
     uint16_t     pipe_buf_is_fifo[2]; /* Bitmap. Each bit means whether 1:TU_FIFO or 0:POD. */
 } dcd_data_t;
 
-/*------------------------------------------------------------------
- * INTERNAL OBJECT & FUNCTION DECLARATION
- *------------------------------------------------------------------*/
 static dcd_data_t _dcd;
 
 static linked_async_inst_t dcd_async_inst;
@@ -126,121 +134,6 @@ static bool dcd_linked_async_callback(struct linked_async_inst_s *inst, struct c
     return false;
 }
 
-#if 0
-static inline free_block_t *find_containing_block(free_block_t *beg, free_block_t *end, uint_fast16_t addr)
-{
-  free_block_t *cur = beg;
-  for (; cur < end && ((addr < cur->beg) || (cur->end <= addr)); ++cur) ;
-  return cur;
-}
-
-static inline int update_free_block_list(free_block_t *blks, unsigned num, uint_fast16_t addr, uint_fast16_t size)
-{
-  free_block_t *p = find_containing_block(blks, blks + num, addr);
-  TU_ASSERT(p != blks + num, -2);
-  if (p->beg == addr) {
-    /* Shrink block */
-    p->beg = addr + size;
-    if (p->beg != p->end) return 0;
-    /* remove block */
-    free_block_t *end = blks + num;
-    while (p + 1 < end) {
-      *p = *(p + 1);
-      ++p;
-    }
-    return -1;
-  } else {
-    /* Split into 2 blocks */
-    free_block_t tmp = {
-      .beg = addr + size,
-      .end = p->end
-    };
-    p->end = addr;
-    if (p->beg == p->end) {
-      if (tmp.beg != tmp.end) {
-        *p = tmp;
-        return 0;
-      }
-      /* remove block */
-      free_block_t *end = blks + num;
-      while (p + 1 < end) {
-        *p = *(p + 1);
-        ++p;
-      }
-      return -1;
-    }
-    if (tmp.beg == tmp.end) return 0;
-    blks[num] = tmp;
-    return 1;
-  }
-}
-
-static inline unsigned free_block_size(free_block_t const *blk)
-{
-  return blk->end - blk->beg;
-}
-
-#if 0
-static inline void print_block_list(free_block_t const *blk, unsigned num)
-{
-  TU_LOG1("*************\n");
-  for (unsigned i = 0; i < num; ++i) {
-    TU_LOG1(" Blk%u %u %u\n", i, blk->beg, blk->end);
-    ++blk;
-  }
-}
-#else
-#define print_block_list(a,b)
-#endif
-
-static unsigned find_free_memory(uint_fast16_t size_in_log2_minus3)
-{
-  free_block_t free_blocks[2 * (TUP_DCD_ENDPOINT_MAX - 1)];
-  unsigned num_blocks = 1;
-
-  /* Initialize free memory block list */
-  free_blocks[0].beg = 64 / 8;
-  free_blocks[0].end = (4 << 10) / 8; /* 4KiB / 8 bytes */
-  for (int i = 1; i < TUP_DCD_ENDPOINT_MAX; ++i) {
-    uint_fast16_t addr;
-    int num;
-    USB0->EPIDX = i;
-    addr = USB0->TXFIFOADD;
-    if (addr) {
-      unsigned sz  = USB0->TXFIFOSZ;
-      unsigned sft = (sz & USB_TXFIFOSZ_SIZE_M) + ((sz & USB_TXFIFOSZ_DPB) ? 1: 0);
-      num = update_free_block_list(free_blocks, num_blocks, addr, 1 << sft);
-      TU_ASSERT(-2 < num, 0);
-      num_blocks += num;
-      print_block_list(free_blocks, num_blocks);
-    }
-    addr = USB0->RXFIFOADD;
-    if (addr) {
-      unsigned sz  = USB0->RXFIFOSZ;
-      unsigned sft = (sz & USB_RXFIFOSZ_SIZE_M) + ((sz & USB_RXFIFOSZ_DPB) ? 1: 0);
-      num = update_free_block_list(free_blocks, num_blocks, addr, 1 << sft);
-      TU_ASSERT(-2 < num, 0);
-      num_blocks += num;
-      print_block_list(free_blocks, num_blocks);
-    }
-  }
-  print_block_list(free_blocks, num_blocks);
-
-  /* Find the best fit memory block */
-  uint_fast16_t size_in_8byte_unit = 1 << size_in_log2_minus3;
-  free_block_t const *min = NULL;
-  uint_fast16_t    min_sz = 0xFFFFu;
-  free_block_t const *end = &free_blocks[num_blocks];
-  for (free_block_t const *cur = &free_blocks[0]; cur < end; ++cur) {
-    uint_fast16_t sz = free_block_size(cur);
-    if (sz < size_in_8byte_unit) continue;
-    if (size_in_8byte_unit == sz) return cur->beg;
-    if (sz < min_sz) min = cur;
-  }
-  TU_ASSERT(min, 0);
-  return min->beg;
-}
-#endif
 static inline volatile hw_endpoint_t* edpt_regs(unsigned epnum_minus1)
 {
     USB0->EPIDX = epnum_minus1 + 1;
@@ -309,33 +202,6 @@ static void pipe_read_write_packet_ff(tu_fifo_t *f, volatile void *fifo, unsigne
     ops[dir].tu_fifo_advance(f, total_len - rem);
 }
 
-static void process_setup_packet(uint8_t rhport)
-{
-#if 0
-    uint32_t *p = (void*)&_dcd.setup_packet;
-    p[0]        = USB0->FIFO0_WORD;
-    p[1]        = USB0->FIFO0_WORD;
-#else
-    /* Remove unaligned access warning for GCC. By mzhou. */
-    void *pkt = (void*)&_dcd.setup_packet;
-    uint8_t *p = pkt;
-    uint32_t data_word = USB0->FIFO0_WORD;
-    memcpy(p, (void*)&data_word, sizeof(uint32_t));
-    data_word = USB0->FIFO0_WORD;
-    memcpy(p + 4, (void*)&data_word, sizeof(uint32_t));
-#endif
-    _dcd.pipe0.buf       = NULL;
-    _dcd.pipe0.length    = 0;
-    _dcd.pipe0.remaining = 0;
-    dcd_event_setup_received(rhport, (const uint8_t*)(uintptr_t)&_dcd.setup_packet, true);
-
-    const unsigned len    = _dcd.setup_packet.wLength;
-    _dcd.remaining_ctrl   = len;
-    const unsigned dir_in = tu_edpt_dir(_dcd.setup_packet.bmRequestType);
-    /* Clear RX FIFO and reverse the transaction direction */
-    if (len && dir_in) USB0->CSRL0 = USB_CSRL0_RXRDYC;
-}
-
 static void handle_xfer_in(uint_fast8_t ep_addr)
 {
     unsigned epnum_minus1 = tu_edpt_number(ep_addr) - 1;
@@ -359,7 +225,6 @@ static void handle_xfer_in(uint_fast8_t ep_addr)
         pipe->remaining = rem - len;
     }
     regs->TXCSRL = USB_TXCSRL1_TXRDY;
-    // TU_LOG1(" TXCSRL%d = %x %d\n", epnum_minus1 + 1, regs->TXCSRL, rem - len);
 }
 
 static void handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
@@ -374,7 +239,7 @@ static void handle_xfer_out(uint8_t rhport, uint8_t ep_addr, bool isr)
     const unsigned vld = regs->RXCOUNT;
     const unsigned len = TU_MIN(TU_MIN(rem, mps), vld);
     uint8_t       *buf = pipe->buf;
-    
+
     if(!buf)
     {
         return;
@@ -427,152 +292,204 @@ static bool edpt_n_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16
 
 static bool edpt0_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t total_bytes)
 {
-    (void)rhport;
-    TU_ASSERT(total_bytes <= 64); /* Current implementation supports for only up to 64 bytes. */
+    dcd_data_t *usb_data = &_dcd;
+    TU_ASSERT(total_bytes <= 64);
 
-    const unsigned req = _dcd.setup_packet.bmRequestType;
-    TU_ASSERT(req != REQUEST_TYPE_INVALID || total_bytes == 0);
-
-    if (req == REQUEST_TYPE_INVALID || _dcd.status_out) {
-    /* STATUS OUT stage.
-        * MUSB controller automatically handles STATUS OUT packets without
-        * software helps. We do not have to do anything. And STATUS stage
-        * may have already finished and received the next setup packet
-        * without calling this function, so we have no choice but to
-        * invoke the callback function of status packet here. */
-    // TU_LOG1(" STATUS OUT USB0->CSRL0 = %x\n", USB0->CSRL0);
-    _dcd.status_out = 0;
-    if (req == REQUEST_TYPE_INVALID) {
-        dcd_event_xfer_complete(rhport, ep_addr, total_bytes, XFER_RESULT_SUCCESS, false);
-    } else {
-        /* The next setup packet has already been received, it aborts
-        * invoking callback function to avoid confusing TUSB stack. */
-        TU_LOG1("Drop CONTROL_STAGE_ACK\n");
-    }
-    return true;
-    }
-    const unsigned dir_in = tu_edpt_dir(ep_addr);
-    // LOG_I("ep_addr:%d, req:%d", ep_addr, req);
     USB0->EPIDX = 0;
-    if (tu_edpt_dir(req) == dir_in) { /* DATA stage */
+
+    if (usb_data->ep0_state == USB_EP0_STAGE_PRE_TX || usb_data->ep0_state == USB_EP0_STAGE_TX)
+    {
         TU_ASSERT(total_bytes <= _dcd.remaining_ctrl);
         const unsigned rem = _dcd.remaining_ctrl;
         const unsigned len = TU_MIN(TU_MIN(rem, 64), total_bytes);
-        if (dir_in) {
-            pipe_write_packet(buffer, &USB0->FIFO0_WORD, len);
+        pipe_write_packet(buffer, &USB0->FIFO0_WORD, len);
 
-            _dcd.pipe0.buf       = buffer + len;
-            _dcd.pipe0.length    = len;
-            _dcd.pipe0.remaining = 0;
+        _dcd.pipe0.buf       = buffer + len;
+        _dcd.pipe0.length    = len;
+        _dcd.pipe0.remaining = 0;
 
-            _dcd.remaining_ctrl  = rem - len;
-            if ((len < 64) || (rem == len)) {
-                // LOG_I("1");
-                _dcd.setup_packet.bmRequestType = REQUEST_TYPE_INVALID; /* Change to STATUS/SETUP stage */
-                _dcd.status_out = 1;
-                /* Flush TX FIFO and reverse the transaction direction. */
-                USB0->CSRL0 = USB_CSRL0_TXRDY | USB_CSRL0_DATAEND;
-            } else {
-                USB0->CSRL0 = USB_CSRL0_TXRDY; /* Flush TX FIFO to return ACK. */
-            }
-            // TU_LOG1(" IN USB0->CSRL0 = %x\n", USB0->CSRL0);
+        _dcd.remaining_ctrl  = rem - len;
+        if ((len < 64) || (rem == len)) {
+            _dcd.ep0_state = USB_EP0_STAGE_STATUSOUT;
+            USB0->CSRL0 = USB_CSRL0_TXRDY | USB_CSRL0_DATAEND;
         } else {
-            // TU_LOG1(" OUT USB0->CSRL0 = %x\n", USB0->CSRL0);
-            _dcd.pipe0.buf       = buffer;
-            _dcd.pipe0.length    = len;
-            _dcd.pipe0.remaining = len;
-            USB0->CSRL0 = USB_CSRL0_RXRDYC; /* Clear RX FIFO to return ACK. */
+            _dcd.ep0_state = USB_EP0_STAGE_TX;
+            USB0->CSRL0 = USB_CSRL0_TXRDY;
         }
-    } else if (dir_in) {
-        // TU_LOG1(" STATUS IN USB0->CSRL0 = %x\n", USB0->CSRL0);
+    }
+    else if (usb_data->ep0_state == USB_EP0_STAGE_PRE_RX || usb_data->ep0_state == USB_EP0_STAGE_RX)
+    {
+        const unsigned rem = _dcd.remaining_ctrl;
+        const unsigned len = TU_MIN(TU_MIN(rem, 64), total_bytes);
+        _dcd.pipe0.buf       = buffer;
+        _dcd.pipe0.length    = len;
+        _dcd.pipe0.remaining = len;
+        usb_data->ep0_state = USB_EP0_STAGE_RX;
+
+        USB0->CSRL0 = USB_CSRL0_RXRDYC;
+    }
+    else if (usb_data->ep0_state == USB_EP0_STAGE_PRE_STATUSIN || usb_data->ep0_state == USB_EP0_STAGE_STATUSIN)
+    {
         _dcd.pipe0.buf = NULL;
         _dcd.pipe0.length    = 0;
         _dcd.pipe0.remaining = 0;
+        usb_data->ep0_state = USB_EP0_STAGE_STATUSIN;
         /* Clear RX FIFO and reverse the transaction direction */
-        USB0->CSRL0 = USB_CSRL0_RXRDYC | USB_CSRL0_DATAEND;
+        USB0->CSRL0 = USB_CSRL0_RXRDYC | USB_CSRL0_DATAEND | USB_CSRL0_TXRDY;
     }
+
     return true;
+}
+
+static void ep0_setup(uint8_t rhport)
+{
+    volatile reg_usb_t *usb_instance = USB0;
+    dcd_data_t *usb_data = &_dcd;
+
+    while (usb_instance->COUNT0 != 8);
+    usb_data->is_set_addr = false;
+    pipe_read_packet(&usb_data->setup_packet, (void *)&usb_instance->FIFO0_WORD, sizeof(usb_data->setup_packet));
+
+    _dcd.pipe0.buf       = NULL;
+    _dcd.pipe0.length    = 0;
+    _dcd.pipe0.remaining = 0;
+    _dcd.remaining_ctrl   = _dcd.setup_packet.wLength;
+
+    dcd_event_setup_received(rhport, (const uint8_t*)(uintptr_t)&_dcd.setup_packet, true);
+
+    if (usb_data->setup_packet.wLength == 0) {
+        /* No data stage, must send zlp to host */
+        usb_data->ep0_state = USB_EP0_STAGE_PRE_STATUSIN;
+        if (usb_data->setup_packet.bRequest == 5) {
+            usb_data->is_set_addr = true;
+        }
+    } else if (usb_data->setup_packet.bmRequestType & 0x80) {
+        /* IN stage, send data to host */
+        usb_data->ep0_state = USB_EP0_STAGE_PRE_TX;
+        usb_instance->CSRL0 = USB_CSRL0_RXRDYC;
+        while ((usb_instance->CSRL0 & USB_CSRL0_RXRDY) != 0);
+    } else {
+        /* OUT stage, recive data from host */
+        usb_data->ep0_state = USB_EP0_STAGE_PRE_RX;
+    }
 }
 
 static void process_ep0(uint8_t rhport)
 {
     USB0->EPIDX = 0;
-    uint_fast8_t csrl = USB0->CSRL0;
 
-    // TU_LOG1(" EP0 USB0->CSRL0 = %x\n", csrl);
+    volatile reg_usb_t *usb_instance = USB0;
+    uint16_t csr = usb_instance->CSRL0;
 
-    if (csrl & USB_CSRL0_STALLED) {
+    dcd_data_t *usb_data = &_dcd;
+
+    if (csr & USB_CSRL0_DATAEND) {
+        return;
+    }
+
+    if (csr & USB_CSRL0_STALLED) {
         /* Returned STALL packet to HOST. */
-        USB0->CSRL0 = 0; /* Clear STALL */
-        return;
+        usb_instance->CSRL0 = csr & ~USB_CSRL0_STALLED;
+        _dcd.ep0_state = USB_EP0_STAGE_SETUP;
+        csr = usb_instance->CSRL0;
     }
 
-    unsigned req = _dcd.setup_packet.bmRequestType;
-    if (csrl & USB_CSRL0_SETEND) {
-        TU_LOG1("   ABORT by the next packets\n");
-        USB0->CSRL0 = USB_CSRL0_SETENDC;
-        if (req != REQUEST_TYPE_INVALID && _dcd.pipe0.buf) {
-            /* DATA stage was aborted by receiving STATUS or SETUP packet. */
-            _dcd.pipe0.buf = NULL;
-            _dcd.setup_packet.bmRequestType = REQUEST_TYPE_INVALID;
-            dcd_event_xfer_complete(rhport,
-                                    req & TUSB_DIR_IN_MASK,
-                                    _dcd.pipe0.length - _dcd.pipe0.remaining,
-                                    XFER_RESULT_SUCCESS, true);
+    if (csr & USB_CSRL0_SETEND) {
+        usb_instance->CSRL0 = USB_CSRL0_SETENDC;
+        switch (usb_data->ep0_state) {
+        case USB_EP0_STAGE_TX:
+            usb_data->ep0_state = USB_EP0_STAGE_STATUSOUT;
+            break;
+        case USB_EP0_STAGE_RX:
+            usb_data->ep0_state = USB_EP0_STAGE_STATUSIN;
+            break;
+        default:
+            log_output(false, "SetupEnd came in a wrong ep0stage %s\n", usb_data->ep0_state);
         }
-        req = REQUEST_TYPE_INVALID;
-        if (!(csrl & USB_CSRL0_RXRDY)) return; /* Received SETUP packet */
+        csr = usb_instance->CSRL0;
     }
 
-    if (csrl & USB_CSRL0_RXRDY) {
-        /* Received SETUP or DATA OUT packet */
-        if (req == REQUEST_TYPE_INVALID) {
-            /* SETUP */
-            TU_ASSERT(sizeof(tusb_control_request_t) == USB0->COUNT0,);
-            process_setup_packet(rhport);
-            return;
+    switch (usb_data->ep0_state) {
+    case USB_EP0_STAGE_PRE_TX:
+        break;
+    case USB_EP0_STAGE_PRE_STATUSIN:
+        break;
+    case USB_EP0_STAGE_PRE_RX:
+        break;
+    case USB_EP0_STAGE_TX:
+        /* irq on clearing txpktrdy */
+        if ((csr & USB_CSRL0_TXRDY) == 0) {
+            if (_dcd.remaining_ctrl) {
+                dcd_event_xfer_complete(rhport,
+                                        tu_edpt_addr(0, TUSB_DIR_IN),
+                                        _dcd.pipe0.length - _dcd.pipe0.remaining,
+                                        XFER_RESULT_SUCCESS, true);
+            }
         }
-        if (_dcd.pipe0.buf) {
-            /* DATA OUT */
-            const unsigned vld = USB0->COUNT0;
-            const unsigned rem = _dcd.pipe0.remaining;
-            const unsigned len = TU_MIN(TU_MIN(rem, 64), vld);
-            pipe_read_packet(_dcd.pipe0.buf, &USB0->FIFO0_WORD, len);
+        break;
 
-            _dcd.pipe0.remaining = rem - len;
-            _dcd.remaining_ctrl -= len;
+    case USB_EP0_STAGE_RX:
+        /* irq on set rxpktrdy */
+        if (csr & USB_CSRL0_RXRDY) {
+            if (_dcd.pipe0.buf) {
+                /* DATA OUT */
+                const unsigned vld = USB0->COUNT0;
+                const unsigned rem = _dcd.pipe0.remaining;
+                const unsigned len = TU_MIN(TU_MIN(rem, 64), vld);
+                pipe_read_packet(_dcd.pipe0.buf, &USB0->FIFO0_WORD, len);
 
-            _dcd.pipe0.buf = NULL;
-            dcd_event_xfer_complete(rhport,
-                                    tu_edpt_addr(0, TUSB_DIR_OUT),
-                                    _dcd.pipe0.length - _dcd.pipe0.remaining,
-                                    XFER_RESULT_SUCCESS, true);
+                _dcd.pipe0.remaining = rem - len;
+                _dcd.remaining_ctrl -= len;
+                _dcd.pipe0.buf = NULL;
+
+                if (_dcd.remaining_ctrl == 0) {
+                    /* rx ok, move status in */
+                    _dcd.ep0_state = USB_EP0_STAGE_STATUSIN;
+                }
+
+                dcd_event_xfer_complete(rhport,
+                                        tu_edpt_addr(0, TUSB_DIR_OUT),
+                                        _dcd.pipe0.length - _dcd.pipe0.remaining,
+                                        XFER_RESULT_SUCCESS, true);
+            }
         }
-        return;
-    }
-
-    /* When CSRL0 is zero, it means that completion of sending a any length packet
-    * or receiving a zero length packet. */
-    if (req != REQUEST_TYPE_INVALID && !tu_edpt_dir(req)) {
-        /* STATUS IN */
-        if (*(const uint16_t*)(uintptr_t)&_dcd.setup_packet == 0x0500) {
-            /* The address must be changed on completion of the control transfer. */
-            USB0->FADDR = (uint8_t)_dcd.setup_packet.wValue;
+        break;
+    case USB_EP0_STAGE_STATUSIN:
+        /* end of sequence #2 or #3 (no data), host move status stage, another Endpoint 0 interrupt will be generated to indicate that the
+            request has completed */
+        if (usb_data->is_set_addr) {
+            usb_data->is_set_addr = false;
+            usb_instance->FADDR = usb_data->addr;
         }
-        _dcd.setup_packet.bmRequestType = REQUEST_TYPE_INVALID;
         dcd_event_xfer_complete(rhport,
-                                tu_edpt_addr(0, TUSB_DIR_IN),
-                                _dcd.pipe0.length - _dcd.pipe0.remaining,
-                                XFER_RESULT_SUCCESS, true);
-        return;
-    }
-    if (_dcd.pipe0.buf) {
-        /* DATA IN */
-        _dcd.pipe0.buf = NULL;
+                        tu_edpt_addr(0, TUSB_DIR_IN),
+                        0,
+                        XFER_RESULT_SUCCESS, true);
+        if (csr & USB_CSRL0_RXRDY) {
+            ep0_setup(rhport);
+        } else {
+            usb_data->ep0_state = USB_EP0_STAGE_SETUP;
+        }
+        break;
+    case USB_EP0_STAGE_STATUSOUT:
+        /* end of sequence #1, host move status stage, the interrupt is just a confirmation that the request
+            completed successfully.*/
         dcd_event_xfer_complete(rhport,
-                                tu_edpt_addr(0, TUSB_DIR_IN),
-                                _dcd.pipe0.length - _dcd.pipe0.remaining,
-                                XFER_RESULT_SUCCESS, true);
+                        0,
+                        0,
+                        XFER_RESULT_SUCCESS, true);
+        if (csr & USB_CSRL0_RXRDY) {
+            ep0_setup(rhport);
+        } else {
+            usb_data->ep0_state = USB_EP0_STAGE_SETUP;
+        }
+        break;
+    case USB_EP0_STAGE_SETUP:
+        // setup begin
+        if (csr & USB_CSRL0_RXRDY) {
+            ep0_setup(rhport);
+        }
+        break;
     }
 }
 
@@ -614,11 +531,10 @@ static void process_bus_reset(uint8_t rhport)
 {
     /* When bmRequestType is REQUEST_TYPE_INVALID(0xFF),
     * a control transfer state is SETUP or STATUS stage. */
-    _dcd.setup_packet.bmRequestType = REQUEST_TYPE_INVALID;
-    _dcd.status_out = 0;
     /* When pipe0.buf has not NULL, DATA stage works in progress. */
     _dcd.pipe0.buf = NULL;
     _dcd.rx_buf_addr = USB_RX_BUF_ADDR;
+    _dcd.ep0_state = USB_EP0_STAGE_SETUP;
 
     USB0->TXIE = 1; /* Enable only EP0 */
     USB0->RXIE = 0; 
@@ -651,6 +567,7 @@ void dcd_init(uint8_t rhport)
     HAL_USB_MSP_Busy_Set();
     USB0->IE |= USB_IE_SUSPND;
     _dcd.rx_buf_addr = USB_RX_BUF_ADDR;
+    _dcd.ep0_state = USB_EP0_STAGE_SETUP;
     dcd_connect(rhport);
 }
 
@@ -674,8 +591,11 @@ void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
     _dcd.pipe0.buf       = NULL;
     _dcd.pipe0.length    = 0;
     _dcd.pipe0.remaining = 0;
+    _dcd.addr = dev_addr;
+    _dcd.ep0_state = USB_EP0_STAGE_STATUSIN;
+
     /* Clear RX FIFO to return ACK. */
-    USB0->CSRL0 = USB_CSRL0_RXRDYC | USB_CSRL0_DATAEND;
+    USB0->CSRL0 = USB_CSRL0_RXRDYC | USB_CSRL0_DATAEND | USB_CSRL0_TXRDY;
 }
 
 // Wake up host
@@ -902,7 +822,7 @@ void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr)
     HAL_USB_MSP_DisableIRQ();
     if (0 == epn) {
         if (!ep_addr) { /* Ignore EP80 */
-            _dcd.setup_packet.bmRequestType = REQUEST_TYPE_INVALID;
+            _dcd.ep0_state = USB_EP0_STAGE_SETUP;
             _dcd.pipe0.buf = NULL;
             USB0->EPIDX = 0;
             USB0->CSRL0 = USB_CSRL0_STALL;
@@ -945,7 +865,6 @@ void dcd_int_handler(uint8_t rhport)
     is   = USB0->IS;   /* read and clear interrupt status */
     txis = USB0->TXIS; /* read and clear interrupt status */
     rxis = USB0->RXIS; /* read and clear interrupt status */
-    // TU_LOG1("D%2x T%2x R%2x\n", is, txis, rxis);
 
     is &= USB0->IE; /* Clear disabled interrupts */
     if (is & USB_IS_DISCON) {

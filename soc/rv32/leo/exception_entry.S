@@ -35,14 +35,14 @@ exception_entry:
     bgtz    t1, trap_handler
     jal     ra, hal_flash_prog_erase_suspend_isr
 int_call:
-    csrrsi  t0, mnxti, 8
+    csrr    t0, mnxti
     beqz    t0, exception_exit
     lw      t0, 0(t0)
+    csrs    mstatus, 8  # enable global irq
     jalr    t0   
     csrc    mstatus, 8  # disable global irq to fetch mnxti correctly
     j       int_call
 exception_exit:
-    csrc    mstatus, 8  # disable global irq
     jal     ra, hal_flash_prog_erase_resume_isr
     lw      ra, 0x00(sp)
     .cfi_restore ra

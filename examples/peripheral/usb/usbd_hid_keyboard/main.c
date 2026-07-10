@@ -13,6 +13,7 @@
 #include "bsp/board.h"
 #include "keyscan.h"
 #include "tusb.h"
+#include "log.h"
 
 #include "usb_descriptors.h"
 
@@ -67,8 +68,57 @@ int main(void)
   tud_init(BOARD_TUD_RHPORT);
   keyscan_Create_Keyboard(hid_task);//The hid_task function is called when a press is detected
   keyscan_Start(true);
+
+  uint32_t blink_ms = 0;
+
+uint32_t connect_flag = 0;
+uint32_t connect_flag_bk = 0;
+
+uint32_t mount_flag = 0;
+uint32_t mount_flag_bk = 0;
+
+uint32_t suspend_flag = 0;
+uint32_t suspend_flag_bk = 0;
+
+uint32_t stall_flag = 0;
+uint32_t stall_flag_bk = 0;
+
   while (1)
   {
+
+    if(++blink_ms > 1000)
+    {
+      blink_ms = 0;
+      connect_flag = tud_connected();
+      if(connect_flag != connect_flag_bk)
+      {
+        connect_flag_bk = connect_flag;
+        LOG_I("tud_connect: %d\n", connect_flag_bk);
+      }
+
+      mount_flag = tud_mounted();
+      if(mount_flag != mount_flag_bk)
+      {
+        mount_flag_bk = mount_flag;
+        LOG_I("tud_mount: %d\n", mount_flag_bk);
+      }
+
+      suspend_flag = tud_suspended();
+      if(suspend_flag != suspend_flag_bk)
+      {
+        suspend_flag_bk = suspend_flag;
+        LOG_I("tud_suspend: %d\n", suspend_flag_bk);
+      }
+
+      stall_flag = tud_suspended();
+      if(stall_flag != stall_flag_bk)
+      {
+        stall_flag_bk = stall_flag;
+        LOG_I("tud_stall: %d\n", stall_flag_bk);
+      }
+      DELAY_MS(1);
+    } 
+
     tud_task(); // tinyusb device task
   }
 
@@ -206,12 +256,14 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
       {
         // Capslock On: disable blink, turn led on
         blink_interval_ms = 0;
+        log_output(false, "led on\n");
         // board_led_write(true);
       }else
       {
         // Caplocks Off: back to normal blink
         // board_led_write(false);
         blink_interval_ms = BLINK_MOUNTED;
+        log_output(false, "led off\n");
       }
     }
   }
