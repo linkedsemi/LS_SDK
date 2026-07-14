@@ -322,7 +322,7 @@ void rtc_timer_init()
     }
     rtc_timer_periph_clk_init();
     /* BSTIM1 */
-    LSBSTIM->PSC = 10000;//16bit 预分频
+    LSBSTIM->PSC = 10000 - 1;//16bit 预分频
     LSBSTIM->ARR = 7500 - 1;//16bit 计数值
     REG_FIELD_WR(LSBSTIM->CR2,TIMER_CR2_MMS,0x2);//触发输出选择更新事件
     REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,0);
