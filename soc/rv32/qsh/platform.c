@@ -297,7 +297,7 @@ static void rtc_timer_periph_clk_init(void)
 {
     /* BSTIM1*/
     SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_CLR_BSTIM1_MASK;
-    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_BSTIM1_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_CLR_BSTIM1_N_MASK;
     SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_BSTIM1_N_MASK;
     SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_SET_BSTIM1_MASK;
 
@@ -356,6 +356,6 @@ void rtc_timer_set_time(struct tm *timeptr)
 void rtc_timer_get_time(struct tm *timeptr)
 {
     time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
-    struct tm *tm_info = localtime(&current_time);
-    *timeptr = *tm_info;
+
+    localtime_r(&current_time, timeptr);
 }
