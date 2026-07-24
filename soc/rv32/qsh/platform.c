@@ -14,7 +14,7 @@
 #include "reg_sec_pmu_rg.h"
 #include "reg_sysc_sec_awo.h"
 #include "qsh.h"
-
+#include "ls_msp_timer.h"
 
 #define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
 
@@ -204,7 +204,7 @@ void sys_init_none()
     // flash_swint_init();
     // hal_flash_drv_var_init(false, false);
     // hal_flash_xip_func_ptr_init();
-    
+
     // hal_flash_init();
     // hal_flash_xip_mode_reset();
     // hal_flash_software_reset();
@@ -285,10 +285,6 @@ void lvd_set_callback(void (*callback)(void))
 {
     lvd_user_callback = callback;
 }
-#include <time.h>
-#include "ls_msp_timer.h"
-#include "reg_sysc_app_per.h"
-#include "reg_sec_pmu_rg.h"
 
 #define LSPIS_CH0 (*(volatile uint32_t *)(APP_PIS_ADDR + 0x00U))
 #define LSPIS_OER  (*(volatile uint32_t *)(APP_PIS_ADDR + 0x40U))
@@ -314,7 +310,7 @@ static void rtc_timer_periph_clk_init(void)
     SYSC_APP_PER->PD_PER_CLKG4 = SYSC_APP_PER_CLKG_SET_PIS_MASK;
 }
 
-void rtc_timer_init()
+void rtc_timer_init(void)
 {
     if(SYSC_APP_PER->PD_PER_CLKG0&SYSC_APP_PER_CLKG_SET_GPTIMA1_MASK)
     {
@@ -348,14 +344,21 @@ void rtc_timer_init()
     REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,1);
 }
 
-void rtc_timer_set_time(struct tm *timeptr)
+int rtc_timer_set_time(struct tm *timeptr)
 {
-    SEC_PMU->SFT_CTRL[4] = mktime(timeptr) - LSGPTIMA->CNT;
+    time_t t = mktime(timeptr);
+    if (t == (time_t)-1) {SEC_PMU->SFT_CTRL[4] = -1;return -1;}
+    SEC_PMU->SFT_CTRL[4] = t - LSGPTIMA->CNT;
+    return 0;
 }
 
-void rtc_timer_get_time(struct tm *timeptr)
+int rtc_timer_get_time(struct tm *timeptr)
 {
+    if (SEC_PMU->SFT_CTRL[4] == (uint32_t)-1) {
+        return -1;
+    }
     time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
 
     localtime_r(&current_time, timeptr);
+    return 0;
 }

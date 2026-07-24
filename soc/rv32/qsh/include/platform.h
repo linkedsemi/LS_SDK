@@ -376,8 +376,8 @@ void lvd_set_callback(void (*callback)(void));
 void lvd_isr(void);   /* Public ISR symbol; caller must wire it to PMU_LVD_IRQN */
 
 void rtc_timer_init(void);
-void rtc_timer_set_time(struct tm *timeptr);
-void rtc_timer_get_time(struct tm *timeptr);
+int rtc_timer_set_time(struct tm *timeptr);
+int rtc_timer_get_time(struct tm *timeptr);
 
 #ifdef __cplusplus
 }
