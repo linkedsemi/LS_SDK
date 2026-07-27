@@ -347,14 +347,14 @@ void rtc_timer_init(void)
 int rtc_timer_set_time(struct tm *timeptr)
 {
     time_t t = mktime(timeptr);
-    if (t == (time_t)-1) {SEC_PMU->SFT_CTRL[4] = -1;return -1;}
+    if (t == (time_t)-1) {SEC_PMU->SFT_CTRL[4] = 0;return -1;}
     SEC_PMU->SFT_CTRL[4] = t - LSGPTIMA->CNT;
     return 0;
 }
 
 int rtc_timer_get_time(struct tm *timeptr)
 {
-    if (SEC_PMU->SFT_CTRL[4] == (uint32_t)-1) {
+    if (SEC_PMU->SFT_CTRL[4] == 0) {
         return -1;
     }
     time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
