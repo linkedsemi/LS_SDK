@@ -354,9 +354,6 @@ int rtc_timer_set_time(struct tm *timeptr)
 
 int rtc_timer_get_time(struct tm *timeptr)
 {
-    if (SEC_PMU->SFT_CTRL[4] == 0) {
-        return -1;
-    }
     time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
 
     if (localtime_r(&current_time, timeptr) == NULL) { return -1; }
