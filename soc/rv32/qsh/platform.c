@@ -347,7 +347,7 @@ void rtc_timer_init(void)
 int rtc_timer_set_time(struct tm *timeptr)
 {
     time_t t = mktime(timeptr);
-    if (t == (time_t)-1) {SEC_PMU->SFT_CTRL[4] = 0;return -1;}
+    if (t == (time_t)-1) {return -1;}
     SEC_PMU->SFT_CTRL[4] = t - LSGPTIMA->CNT;
     return 0;
 }
