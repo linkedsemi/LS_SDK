@@ -26,15 +26,27 @@ extern const uint32_t rsa_imem_size;
 #define RSA_IMEM_SIZE             rsa_imem_size
 #define RSA_DMEM_SIZE             0
 
-#define MODE_RSA_KEYGEN_2048      0x137
-#define MODE_RSA_KEYGEN_3072      0x4e5
-#define MODE_RSA_KEYGEN_4096      0x63a
+#define MODE_RSA_KEYGEN_2048                0x137
+#define MODE_RSA_KEYGEN_3072                0x4e5
+#define MODE_RSA_KEYGEN_4096                0x63a
 
-#define RSA_KEYGEN_OFFSET_MODE    0x00000720
-#define RSA_KEYGEN_OFFSET_N       0x00000000
-#define RSA_KEYGEN_OFFSET_D       0x00000200
+#define MODE_RSA_KEYGEN_CHECK_PRIME_2048    0x48e
+#define MODE_RSA_KEYGEN_CHECK_PRIME_3072    0x018
+#define MODE_RSA_KEYGEN_CHECK_PRIME_4096    0x442
 
-#define RSA_KEYGEN_DMEM_SIZE      0x00000724
+#define MODE_RSA_KEYGEN_KEY_FROM_PQ_2048    0x3aa
+#define MODE_RSA_KEYGEN_KEY_FROM_PQ_3072    0x005
+#define MODE_RSA_KEYGEN_KEY_FROM_PQ_4096    0x3fd
+
+#define RSA_KEYGEN_OFFSET_MODE              0x00000720
+#define RSA_KEYGEN_OFFSET_STATUS            0x00000740
+#define RSA_KEYGEN_OFFSET_N                 0x00000000
+#define RSA_KEYGEN_OFFSET_D                 0x00000200
+#define RSA_KEYGEN_OFFSET_P                 0x00000000
+#define RSA_KEYGEN_OFFSET_Q                 0x00000200
+#define RSA_KEYGEN_OFFSET_COFACTOR          0x00000400
+
+#define RSA_KEYGEN_DMEM_SIZE                0x00000760
 
 extern const uint8_t rsa_keygen_imem[];
 extern const uint32_t rsa_keygen_imem_size;
