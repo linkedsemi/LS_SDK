@@ -26,6 +26,20 @@ extern const uint32_t rsa_imem_size;
 #define RSA_IMEM_SIZE             rsa_imem_size
 #define RSA_DMEM_SIZE             0
 
+#define MODE_RSA_KEYGEN_2048      0x137
+#define MODE_RSA_KEYGEN_3072      0x4e5
+#define MODE_RSA_KEYGEN_4096      0x63a
+
+#define RSA_KEYGEN_OFFSET_MODE    0x00000720
+#define RSA_KEYGEN_OFFSET_N       0x00000000
+#define RSA_KEYGEN_OFFSET_D       0x00000200
+
+#define RSA_KEYGEN_DMEM_SIZE      0x00000724
+
+extern const uint8_t rsa_keygen_imem[];
+extern const uint32_t rsa_keygen_imem_size;
+#define RSA_KEYGEN_IMEM_SIZE      rsa_keygen_imem_size
+
 enum {
   /* Length of the RSA-2048 modulus and private exponent in bits. */
   kRsa2048NumBits = 2048,
