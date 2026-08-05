@@ -94,7 +94,7 @@ void dpll_qspi_clk_config_and_clk_switch();
 void rom_delay(uint32_t us);
 #define DELAY_US(a) rom_delay(a)
 #else
-#define DELAY_US(a) rv32_delay_asm((a)*SDK_HCLK_MHZ/5,1)
+#define DELAY_US(a) rv32_delay_asm((a)*600/3,1)//qsh cpu600M
 #endif
 #define DELAY_MS(a) DELAY_US((a)*1000)
 
