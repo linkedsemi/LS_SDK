@@ -317,6 +317,7 @@ void rtc_timer_init(void)
         return;
     }
     rtc_timer_periph_clk_init();
+    SEC_PMU->SFT_CTRL[4] = 0xFFFFFFFF;
     /* BSTIM1 */
     LSBSTIM->PSC = 10000 - 1;//16bit 预分频
     LSBSTIM->ARR = 7500 - 1;//16bit 计数值
@@ -354,6 +355,10 @@ int rtc_timer_set_time(struct tm *timeptr)
 
 int rtc_timer_get_time(struct tm *timeptr)
 {
+    if(SEC_PMU->SFT_CTRL[4] == 0xFFFFFFFF)
+    {
+        return -1;
+    }
     time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
 
     if (localtime_r(&current_time, timeptr) == NULL) { return -1; }
