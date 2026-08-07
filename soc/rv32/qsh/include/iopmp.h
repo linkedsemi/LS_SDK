@@ -94,6 +94,13 @@ inline static void iopmp_config_enable(uint32_t dev, bool enable)
     *(volatile uint32_t *)(dev + IOPMP_MD_CFG) = md_cfg.value;
 }
 
+inline static bool iopmp_is_enable(uint32_t dev)
+{
+    md_cfg_t md_cfg;
+    md_cfg.value = *(volatile uint32_t *)(dev + IOPMP_MD_CFG);
+    return md_cfg.IOPMP_EN;
+}
+
 inline static void iopmp_set_pmpaddrx(uint32_t dev, uint8_t idx, uint32_t addr)
 {
     uint32_t reg = dev + IOPMP_ADDR0 + (idx * sizeof(uint32_t));
