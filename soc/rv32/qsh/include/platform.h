@@ -76,6 +76,8 @@ void clk_flash_init();
 
 void clk_flashx_init(void *reg);
 
+void cpu_600M_ahb_300M_qspi_200M_init(void);
+
 void rom_delay(uint32_t us);
 
 void enable_dpll();
