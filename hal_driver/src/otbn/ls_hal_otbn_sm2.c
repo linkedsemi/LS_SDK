@@ -1,4 +1,4 @@
-#include "ls_hal_otbn_sm2.h"
+#include "ls_hal_otbn_ecc.h"
 #include "ls_otbn_ecc.h"
 #include "ls_hal_otbn.h"
 
@@ -39,6 +39,18 @@
 #define SM2_DMEM_BSS_SIZE               (0x60)
 
 extern const char sm2_text[1924];
+extern const char ecc256_scalar_mult_text[1880];
+
+/* DMEM layout of the shared ECC-256 scalar-mult firmware
+ * (ecc256_scalar_mult_text); same offsets as ls_hal_otbn_ecc256.c */
+#define SM2_SCALARMULT_DMEM_SCALAR_OFFSET    (0x0)
+#define SM2_SCALARMULT_DMEM_POINT_X_OFFSET   (0x80)
+#define SM2_SCALARMULT_DMEM_POINT_Y_OFFSET   (0xA0)
+#define SM2_SCALARMULT_DMEM_RESULT_X_OFFSET  (0xC0)
+#define SM2_SCALARMULT_DMEM_RESULT_Y_OFFSET  (0xE0)
+#define SM2_SCALARMULT_DMEM_CURVE_OFFSET     (0x100)
+#define SM2_SCALARMULT_DMEM_BSS_START        (0x1E0)
+#define SM2_SCALARMULT_DMEM_BSS_SIZE         (0x1C0)
 
 struct OTBN_SM2_CURVE {
     const uint32_t b[8];
@@ -66,6 +78,14 @@ static const struct OTBN_SM2_CURVE SM2 = {
 
 bool HAL_OTBN_SM2_Verify_Polling(struct HAL_OTBN_SM2_Verify_Param *param)
 {
+    if (!param) return false;
+    /* Reject out-of-range r/s (wc_ecc_check_r_s_range) and off-curve
+     * public keys before programming OTBN */
+    if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_SM2, param->r, param->s))
+        return false;
+    if (!ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_SM2, param->x, param->y))
+        return false;
+
     uint32_t func = SM2_FUNC_VERIFY;
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
     HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
@@ -77,53 +97,12 @@ bool HAL_OTBN_SM2_Verify_Polling(struct HAL_OTBN_SM2_Verify_Param *param)
     HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, param->y, SM2_DMEM_Y_SIZE);
     HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &func, sizeof(uint32_t));
     
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-    
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+        return false;
+
     uint8_t x_r[SM2_DMEM_X_R_SIZE];
     HAL_OTBN_DMEM_Read(SM2_DMEM_X_R_OFFSET, (uint32_t *)x_r, SM2_DMEM_X_R_SIZE);
     return !memcmp(param->r, x_r, SM2_DMEM_X_R_SIZE);
-}
-
-bool HAL_OTBN_SM2_ValidPoint_Polling(uint8_t *x, uint8_t *y)
-{
-    uint32_t data = SM2_FUNC_VALIDPOINT;
-    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
-    HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_CURVE_P_OFFSET, (uint32_t *)&SM2, SM2_DMEM_CURVE_P_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, (uint32_t *)x, SM2_DMEM_X_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, (uint32_t *)y, SM2_DMEM_Y_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &data, sizeof(uint32_t));
-    
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-    
-    HAL_OTBN_DMEM_Read(SM2_DMEM_X_R_OFFSET, &data, sizeof(uint32_t));
-    return data;
-}
-
-bool HAL_OTBN_SM2_ValidPoint_Polling_v2(uint8_t *x, uint8_t *y)
-{
-    uint32_t data = 0;
-    uint32_t mode = LS_OTBN_SM2_MODE_VALID_POINT;
-    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_imem, LS_OTBN_SM2_IMEM_SIZE);
-    HAL_OTBN_DMEM_Set(0, 0, LS_OTBN_SM2_DMEM_END);
-    HAL_OTBN_DMEM_Write(0, (uint32_t *)sm2_dmem, LS_OTBN_SM2_DMEM_SIZE);
-
-    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_MODE_OFFSET, &mode, sizeof(uint32_t));
-    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_X_OFFSET, (uint32_t *)x, SM2_DMEM_X_SIZE);
-    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_Y_OFFSET, (uint32_t *)y, SM2_DMEM_Y_SIZE);
-    HAL_OTBN_DMEM_Write(LS_OTBN_SM2_OK, &data, sizeof(uint32_t));
-    
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-    
-    HAL_OTBN_DMEM_Read(LS_OTBN_SM2_OK, &data, sizeof(uint32_t));
-    if(data == LS_OTBN_TRUE)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
 
 __attribute__((weak)) void HAL_OTBN_SM2_ScalarMult_CallBack() {}
@@ -141,6 +120,23 @@ void SM2_Verify_Cb(void *param)
 
 void HAL_OTBN_SM2_Verify_IT(struct HAL_OTBN_SM2_Verify_Param *param)
 {
+    if (!param) return;
+    if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_SM2, param->r, param->s) ||
+        !ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_SM2, param->x, param->y))
+    {
+        /* Reject before starting OTBN; complete synchronously */
+        HAL_OTBN_SM2_Verify_CallBack(false);
+        return;
+    }
+    /* OTBN is a single engine: refuse a second submit while a job is
+     * running; complete synchronously with "invalid" (no DMEM read --
+     * the engine's result belongs to the other job). */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+    {
+        HAL_OTBN_SM2_Verify_CallBack(false);
+        return;
+    }
+
     uint32_t func = SM2_FUNC_VERIFY;
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
     HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
@@ -151,8 +147,14 @@ void HAL_OTBN_SM2_Verify_IT(struct HAL_OTBN_SM2_Verify_Param *param)
     HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, param->x, SM2_DMEM_X_SIZE);
     HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, param->y, SM2_DMEM_Y_SIZE);
     HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &func, sizeof(uint32_t));
-    
-    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_Verify_Cb, param);
+
+    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_Verify_Cb, param) != HAL_OK)
+    {
+        /* Engine went busy between the idle check and the submit;
+         * complete synchronously. */
+        HAL_OTBN_SM2_Verify_CallBack(false);
+        return;
+    }
 }
 
 void SM2_ValidPoint_Cb(void *param)
@@ -162,8 +164,10 @@ void SM2_ValidPoint_Cb(void *param)
     HAL_OTBN_SM2_ValidPoint_CallBack(data);
 }
 
-void HAL_OTBN_SM2_ValidPoint_IT(uint32_t *x, uint32_t *y)
+bool HAL_OTBN_SM2_ValidPoint_Polling(uint32_t *x, uint32_t *y)
 {
+    if (!x || !y) return false;
+
     uint32_t func = SM2_FUNC_VALIDPOINT;
     HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
     HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
@@ -171,29 +175,116 @@ void HAL_OTBN_SM2_ValidPoint_IT(uint32_t *x, uint32_t *y)
     HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, x, SM2_DMEM_X_SIZE);
     HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, y, SM2_DMEM_Y_SIZE);
     HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &func, sizeof(uint32_t));
-    
-    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_ValidPoint_Cb, NULL);
+
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+        return false;
+
+    uint32_t data = 0;
+    HAL_OTBN_DMEM_Read(SM2_DMEM_X_R_OFFSET, &data, sizeof(uint32_t));
+    return (data != 0);
 }
 
+void HAL_OTBN_SM2_ValidPoint_IT(uint32_t *x, uint32_t *y)
+{
+    if (!x || !y) return;
+    /* OTBN is a single engine: refuse a second submit while a job is
+     * running; complete synchronously with "not on curve". */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+    {
+        HAL_OTBN_SM2_ValidPoint_CallBack(false);
+        return;
+    }
+
+    uint32_t func = SM2_FUNC_VALIDPOINT;
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
+    HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_CURVE_P_OFFSET, (uint32_t *)&SM2, SM2_DMEM_CURVE_P_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, x, SM2_DMEM_X_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, y, SM2_DMEM_Y_SIZE);
+    HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &func, sizeof(uint32_t));
+
+    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_ValidPoint_Cb, NULL) != HAL_OK)
+    {
+        /* Engine went busy between the idle check and the submit;
+         * complete synchronously. */
+        HAL_OTBN_SM2_ValidPoint_CallBack(false);
+        return;
+    }
+}
+
+/* Completion routine of the shared ECC-256 scalar-mult firmware:
+ * copy the result out and notify the SM2-layer callback. */
 void SM2_ScalarMult_Cb(void *param)
 {
     struct HAL_OTBN_SM2_ScalarMult_Param *p = param;
-    HAL_OTBN_DMEM_Read(SM2_DMEM_RESULT_X_OFFSET, p->result_x, SM2_DMEM_RESULT_X_SIZE);
-    HAL_OTBN_DMEM_Read(SM2_DMEM_RESULT_Y_OFFSET, p->result_y, SM2_DMEM_RESULT_Y_SIZE);
+    HAL_OTBN_DMEM_Read(SM2_SCALARMULT_DMEM_RESULT_X_OFFSET, p->result_x, 0x20);
+    HAL_OTBN_DMEM_Read(SM2_SCALARMULT_DMEM_RESULT_Y_OFFSET, p->result_y, 0x20);
+    HAL_OTBN_SM2_ScalarMult_CallBack();
+}
+
+/* SM2 scalar multiplication runs on the shared ECC-256 engine with
+ * the SM2 curve parameters -- the same path P-256 uses, so SM2 needs
+ * no dedicated scalar-mult firmware.  Named *_Engine_* to avoid
+ * clashing with the pointops primitive of the same stem
+ * (HAL_OTBN_SM2_ScalarMult_Polling in ls_hal_otbn_sm2_pointops.h,
+ * byte-array parameters, g_ecc_sm2 firmware). */
+HAL_StatusTypeDef HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_ScalarMult_Param *param)
+{
+    if (!param) return HAL_ERROR;
+    /* Layout-identical param structs; forward to the shared engine */
+    struct HAL_OTBN_ECC256_ScalarMult_Param p256 = {
+        .scalar = param->scalar,
+        .point_x = param->point_x,
+        .point_y = param->point_y,
+        .result_x = param->result_x,
+        .result_y = param->result_y,
+    };
+    return HAL_OTBN_ECC256_ScalarMult_Polling(HAL_OTBN_ECC256_CURVE_SM2, &p256);
 }
 
 void HAL_OTBN_SM2_ScalarMult_IT(struct HAL_OTBN_SM2_ScalarMult_Param *param)
 {
-    uint32_t func = SM2_FUNC_SCALARMULT;
-    HAL_OTBN_IMEM_Write(0, (uint32_t *)sm2_text, sizeof(sm2_text));
-    HAL_OTBN_DMEM_Set(0, 0, SM2_DMEM_BSS_END);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_CURVE_P_OFFSET, (uint32_t *)&SM2, SM2_DMEM_CURVE_P_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_K0_OFFSET, param->scalar, SM2_DMEM_K0_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_X_OFFSET, param->point_x, SM2_DMEM_X_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_Y_OFFSET, param->point_y, SM2_DMEM_Y_SIZE);
-    HAL_OTBN_DMEM_Write(SM2_DMEM_FUNC_OFFSET, &func, sizeof(uint32_t));
-    
-    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_ScalarMult_Cb, param);
+    if (!param) return;
+    if (!ls_otbn_ecc_scalar_in_range_u32(LS_OTBN_ECC_CURVE_SM2, param->scalar) ||
+        !ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_SM2, param->point_x, param->point_y))
+    {
+        /* Reject before starting OTBN; result stays zeroed, complete
+         * synchronously so the caller is always notified exactly once. */
+        memset(param->result_x, 0, 0x20);
+        memset(param->result_y, 0, 0x20);
+        HAL_OTBN_SM2_ScalarMult_CallBack();
+        return;
+    }
+    /* OTBN is a single engine: refuse a second submit while a job is
+     * running; result stays zeroed, complete synchronously. */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+    {
+        memset(param->result_x, 0, 0x20);
+        memset(param->result_y, 0, 0x20);
+        HAL_OTBN_SM2_ScalarMult_CallBack();
+        return;
+    }
 
+    /* Program the shared ECC-256 scalar-mult firmware with the SM2
+     * curve parameters (same DMEM layout as ls_hal_otbn_ecc256.c). */
+    HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_scalar_mult_text, sizeof(ecc256_scalar_mult_text));
+    HAL_OTBN_DMEM_Write(SM2_SCALARMULT_DMEM_SCALAR_OFFSET, param->scalar, 0x20);
+    HAL_OTBN_DMEM_Set(0x20, 0x0, 0x60);
+    HAL_OTBN_DMEM_Write(SM2_SCALARMULT_DMEM_POINT_X_OFFSET, param->point_x, 0x20);
+    HAL_OTBN_DMEM_Write(SM2_SCALARMULT_DMEM_POINT_Y_OFFSET, param->point_y, 0x20);
+    HAL_OTBN_DMEM_Set(SM2_SCALARMULT_DMEM_RESULT_X_OFFSET, 0x0, 0x20);
+    HAL_OTBN_DMEM_Set(SM2_SCALARMULT_DMEM_RESULT_Y_OFFSET, 0x0, 0x20);
+    HAL_OTBN_DMEM_Write(SM2_SCALARMULT_DMEM_CURVE_OFFSET, (uint32_t *)&SM2, sizeof(SM2));
+    HAL_OTBN_DMEM_Set(SM2_SCALARMULT_DMEM_BSS_START, 0x0, SM2_SCALARMULT_DMEM_BSS_SIZE);
+
+    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, SM2_ScalarMult_Cb, param) != HAL_OK)
+    {
+        /* Engine went busy between the idle check and the submit;
+         * result stays zeroed. */
+        memset(param->result_x, 0, 0x20);
+        memset(param->result_y, 0, 0x20);
+        return;
+    }
 }
+
 

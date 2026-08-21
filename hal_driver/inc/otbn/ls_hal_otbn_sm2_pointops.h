@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "ls_hal_otbn.h"
 
 /* Operation modes */
 #define ECC_SM2_MODE_SCALAR_MULT    (1)
@@ -36,12 +37,12 @@ extern const uint32_t g_ecc_sm2_dmem_size;
 
 
 /* APIs */
-void HAL_OTBN_SM2_ScalarMult_Polling(const uint8_t *scalar_d,
+HAL_StatusTypeDef HAL_OTBN_SM2_ScalarMult_Polling(const uint8_t *scalar_d,
                                                      const uint8_t *px, const uint8_t *py,
                                                      uint8_t *rx, uint8_t *ry);
-void HAL_OTBN_SM2_BaseMult_Polling(const uint8_t *scalar_d,
+HAL_StatusTypeDef HAL_OTBN_SM2_BaseMult_Polling(const uint8_t *scalar_d,
                                                    uint8_t *rx, uint8_t *ry);
-void HAL_OTBN_SM2_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
+HAL_StatusTypeDef HAL_OTBN_SM2_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
                                                    const uint8_t *qx, const uint8_t *qy,
                                                    uint8_t *rx, uint8_t *ry);
 

@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "ls_hal_otbn.h"
 
 /* Operation modes */
 #define ECC_P521_MODE_FIELD_ADD    (0x100)
@@ -32,12 +33,12 @@ extern const uint32_t g_ecc_p521_dmem_size;
 
 
 /* APIs */
-void HAL_OTBN_P521_ScalarMult_Polling(const uint8_t *k,
+HAL_StatusTypeDef HAL_OTBN_P521_ScalarMult_Polling(const uint8_t *k,
                                       const uint8_t *px, const uint8_t *py,
                                       uint8_t *rx, uint8_t *ry);
-void HAL_OTBN_P521_BaseMult_Polling(const uint8_t *k,
+HAL_StatusTypeDef HAL_OTBN_P521_BaseMult_Polling(const uint8_t *k,
                                     uint8_t *rx, uint8_t *ry);
-void HAL_OTBN_P521_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
+HAL_StatusTypeDef HAL_OTBN_P521_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
                                     const uint8_t *qx, const uint8_t *qy,
                                     uint8_t *rx, uint8_t *ry);
 

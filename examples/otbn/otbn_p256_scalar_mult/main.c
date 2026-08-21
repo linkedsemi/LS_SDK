@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "platform.h"
-#include "ls_hal_otbn_ecc256.h"
+#include "ls_hal_otbn_ecc.h"
 #include "log.h"
 
 static struct HAL_OTBN_ECC256_ScalarMult_Param param;

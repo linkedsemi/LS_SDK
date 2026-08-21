@@ -1,4 +1,4 @@
-#include "ls_hal_otbn_ecc384.h"
+#include "ls_hal_otbn_ecc.h"
 
 #define ECC384_DMEM_MSG_OFFSET         (0x0)
 #define ECC384_DMEM_MSG_SIZE               (0x40)
@@ -59,19 +59,28 @@ static uint32_t *ecc384_curve_get(enum HAL_OTBN_ECC384_CURVES curve)
 
 bool HAL_OTBN_ECC384_ECDSA_Verify_Polling(enum HAL_OTBN_ECC384_CURVES curve, struct HAL_OTBN_ECC384_Verify_Param *verify_param)
 {
+    if (!verify_param || curve != HAL_OTBN_ECC384_CURVE_P384) return false;
+    /* Reject out-of-range r/s (wc_ecc_check_r_s_range) and off-curve
+     * public keys before programming OTBN */
+    if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_P384, verify_param->r, verify_param->s))
+        return false;
+    if (!ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_P384, verify_param->x, verify_param->y))
+        return false;
+
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc384_ecdsa_verify_text, sizeof(ecc384_ecdsa_verify_text));
     HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
     HAL_OTBN_DMEM_Write(ECC384_DMEM_CURVE_P_OFFSET, ecc384_curve_get(curve), ECC384_DMEM_CURVE_P_SIZE);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_MSG_OFFSET, verify_param->message, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_R_OFFSET, verify_param->sign_r, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_S_OFFSET, verify_param->sign_s, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_X_OFFSET, verify_param->pubkey_x, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_Y_OFFSET, verify_param->pubkey_y, 0x30);
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
-    
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_MSG_OFFSET, verify_param->msg, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_R_OFFSET, verify_param->r, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_S_OFFSET, verify_param->s, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_X_OFFSET, verify_param->x, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_Y_OFFSET, verify_param->y, 0x30);
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+        return false;
+
     uint8_t x_r[ECC384_DMEM_X_R_SIZE];
     HAL_OTBN_DMEM_Read(ECC384_DMEM_X_R_OFFSET, (uint32_t *)x_r, ECC384_DMEM_X_R_SIZE);
-    return !memcmp(verify_param->sign_r, x_r, 0x30);
+    return !memcmp(verify_param->r, x_r, 0x30);
 }
 
 void ECC384_ecdsa_verify_cb(void *param)
@@ -79,19 +88,48 @@ void ECC384_ecdsa_verify_cb(void *param)
     struct HAL_OTBN_ECC384_Verify_Param *verify_param = param;
     uint8_t x_r[ECC384_DMEM_X_R_SIZE];
     HAL_OTBN_DMEM_Read(ECC384_DMEM_X_R_OFFSET, (uint32_t *)x_r, ECC384_DMEM_X_R_SIZE);
-    HAL_OTBN_ECC384_ECDSA_Verify_CallBack(!memcmp(verify_param->sign_r, x_r, ECC384_DMEM_X_R_SIZE));
+    HAL_OTBN_ECC384_ECDSA_Verify_CallBack(!memcmp(verify_param->r, x_r, 0x30));
 }
 
 void HAL_OTBN_ECC384_ECDSA_Verify_IT(enum HAL_OTBN_ECC384_CURVES curve, struct HAL_OTBN_ECC384_Verify_Param *verify_param)
 {
+    /* Only P-384 is supported; reject any other curve id (the curve
+     * lookup below returns NULL for unknown ids). */
+    if (!verify_param || curve != HAL_OTBN_ECC384_CURVE_P384)
+    {
+        HAL_OTBN_ECC384_ECDSA_Verify_CallBack(false);
+        return;
+    }
+    if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_P384, verify_param->r, verify_param->s) ||
+        !ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_P384, verify_param->x, verify_param->y))
+    {
+        /* Reject before starting OTBN; complete synchronously */
+        HAL_OTBN_ECC384_ECDSA_Verify_CallBack(false);
+        return;
+    }
+    /* OTBN is a single engine: refuse a second submit while a job is
+     * running; complete synchronously with "invalid" (no DMEM read --
+     * the engine's result belongs to the other job). */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+    {
+        HAL_OTBN_ECC384_ECDSA_Verify_CallBack(false);
+        return;
+    }
+
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc384_ecdsa_verify_text, sizeof(ecc384_ecdsa_verify_text));
     HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
     HAL_OTBN_DMEM_Write(ECC384_DMEM_CURVE_P_OFFSET, ecc384_curve_get(curve), ECC384_DMEM_CURVE_P_SIZE);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_MSG_OFFSET, verify_param->message, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_R_OFFSET, verify_param->sign_r, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_S_OFFSET, verify_param->sign_s, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_X_OFFSET, verify_param->pubkey_x, 0x30);
-    HAL_OTBN_DMEM_Write(ECC384_DMEM_Y_OFFSET, verify_param->pubkey_y, 0x30);
-    
-    HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC384_ecdsa_verify_cb, verify_param);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_MSG_OFFSET, verify_param->msg, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_R_OFFSET, verify_param->r, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_S_OFFSET, verify_param->s, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_X_OFFSET, verify_param->x, 0x30);
+    HAL_OTBN_DMEM_Write(ECC384_DMEM_Y_OFFSET, verify_param->y, 0x30);
+
+    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC384_ecdsa_verify_cb, verify_param) != HAL_OK)
+    {
+        /* Engine went busy between the idle check and the submit;
+         * complete synchronously. */
+        HAL_OTBN_ECC384_ECDSA_Verify_CallBack(false);
+        return;
+    }
 }

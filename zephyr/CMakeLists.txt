@@ -266,7 +266,6 @@ if(CONFIG_SOC_LSQSH)
     ../soc/rv32/csi2/include/core
     ../hal_driver/inc
     ../hal_driver/api
-    ../hal_driver/api/otbn
     ../module/common
     ../module/debug
     ../module/debug/semihosting/riscv
@@ -302,23 +301,24 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/ls_hal_crypt.c
     ../hal_driver/src/ls_hal_otbn.c
     ../hal_driver/src/ls_hal_crc.c
-    ../hal_driver/src/otbn/text_array/otbn_text.c
+    ../hal_driver/src/otbn/text_array/otbn_ecc_unified.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha256.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha384.c
     ../hal_driver/src/otbn/ls_hal_otbn_sha512.c
     ../hal_driver/src/otbn/ls_hal_otbn_ecc256.c
     ../hal_driver/src/otbn/ls_hal_otbn_ecc384.c
+    ../hal_driver/src/otbn/ls_hal_otbn_ecc_param.c
     ../hal_driver/src/otbn/ls_hal_otbn_sm2.c
     ../hal_driver/src/otbn/ls_hal_otbn_sm3.c
-    ../hal_driver/src/otbn/text_array/sm3_text.c
-    ../hal_driver/src/otbn/text_array/ecc256_base_mult_text.c
-    ../hal_driver/src/otbn/text_array/ecc256_ecdsa_verify_text.c
-    ../hal_driver/src/otbn/text_array/ecc256_scalar_mult_text.c
-    ../hal_driver/src/otbn/text_array/ecc384_ecdsa_verify_text.c
-    ../hal_driver/src/otbn/text_array/sha256_text.c
-    ../hal_driver/src/otbn/text_array/sha512_text.c
-    ../hal_driver/src/otbn/text_array/sm2_text.c
-    ../hal_driver/src/otbn/text_array/rsa_text.c
+    ../hal_driver/src/otbn/text_array/otbn_sm3.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_basemult.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_verify.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_scalarmult.c
+    ../hal_driver/src/otbn/text_array/otbn_p384_verify.c
+    ../hal_driver/src/otbn/text_array/otbn_sha256.c
+    ../hal_driver/src/otbn/text_array/otbn_sha512.c
+    ../hal_driver/src/otbn/text_array/otbn_sm2_ops.c
+    ../hal_driver/src/otbn/text_array/otbn_rsa.c
     ../soc/rv32/qsh/ls_msp_otbn.c
     ../soc/rv32/systick.c
     # ../soc/rv32/int_call_asm.S

@@ -1,7 +1,6 @@
 /* Auto-generated HAL implementation for ecc_p521 atomic operations */
-#include "ecc_p521_hal.h"
+#include "ls_hal_otbn_p521_pointops.h"
 #include "ls_hal_otbn.h"
-#include "ecc_p521_firmware.h"
 #include "ls_hal_otbn.h"
 #include <string.h>
 #include "ls_hal_otbn.h"
@@ -227,19 +226,23 @@ static void p521_read_coord(uint32_t offset, uint8_t *dst)
 }
 
 /* Run a single OTBN atomic operation */
-static void otbn_run_mode(uint32_t mode)
+static HAL_StatusTypeDef otbn_run_mode(uint32_t mode)
 {
     HAL_OTBN_DMEM_Write(ECC_P521_MODE_OFFSET, &mode, sizeof(uint32_t));
-    HAL_OTBN_CMD_Write_Polling(1);
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+        return HAL_TIMEOUT;
+    return HAL_OK;
 }
 
 /* Field multiplication via OTBN */
-static void otbn_field_mul(const uint8_t *a, const uint8_t *b, uint8_t *c)
+static HAL_StatusTypeDef otbn_field_mul(const uint8_t *a, const uint8_t *b, uint8_t *c)
 {
     p521_write_coord(ECC_P521_P_OFFSET, a);
     p521_write_coord(ECC_P521_Q_OFFSET, b);
-    otbn_run_mode(ECC_P521_MODE_FIELD_MUL);
+    if (otbn_run_mode(ECC_P521_MODE_FIELD_MUL) != HAL_OK)
+        return HAL_TIMEOUT;
     p521_read_coord(ECC_P521_R_OFFSET, c);
+    return HAL_OK;
 }
 
 /* Check if a coordinate (66 bytes) is all zeros */
@@ -261,7 +264,7 @@ static int p521_coord_eq(const uint8_t *a, const uint8_t *b)
 }
 
 /* Point doubling via OTBN */
-static void otbn_point_dbl(const uint8_t *px, const uint8_t *py, const uint8_t *pz,
+static HAL_StatusTypeDef otbn_point_dbl(const uint8_t *px, const uint8_t *py, const uint8_t *pz,
                            uint8_t *rx, uint8_t *ry, uint8_t *rz)
 {
     /* Identity point: Z=0 -> double is identity */
@@ -270,20 +273,22 @@ static void otbn_point_dbl(const uint8_t *px, const uint8_t *py, const uint8_t *
         memset(ry, 0, 66);
         ry[0] = 1;
         memset(rz, 0, 66);
-        return;
+        return HAL_OK;
     }
 
     p521_write_coord(ECC_P521_P_OFFSET, px);
     p521_write_coord(ECC_P521_P_OFFSET + 96, py);
     p521_write_coord(ECC_P521_P_OFFSET + 192, pz);
-    otbn_run_mode(ECC_P521_MODE_POINT_DBL);
+    if (otbn_run_mode(ECC_P521_MODE_POINT_DBL) != HAL_OK)
+        return HAL_TIMEOUT;
     p521_read_coord(ECC_P521_R_OFFSET, rx);
     p521_read_coord(ECC_P521_R_OFFSET + 96, ry);
     p521_read_coord(ECC_P521_R_OFFSET + 192, rz);
+    return HAL_OK;
 }
 
 /* Point addition via OTBN */
-static void otbn_point_add(const uint8_t *px, const uint8_t *py, const uint8_t *pz,
+static HAL_StatusTypeDef otbn_point_add(const uint8_t *px, const uint8_t *py, const uint8_t *pz,
                            const uint8_t *qx, const uint8_t *qy, const uint8_t *qz,
                            uint8_t *rx, uint8_t *ry, uint8_t *rz)
 {
@@ -295,7 +300,7 @@ static void otbn_point_add(const uint8_t *px, const uint8_t *py, const uint8_t *
         memcpy(rx, qx, 66);
         memcpy(ry, qy, 66);
         memcpy(rz, qz, 66);
-        return;
+        return HAL_OK;
     }
 
     /* O + Q = Q */
@@ -303,13 +308,12 @@ static void otbn_point_add(const uint8_t *px, const uint8_t *py, const uint8_t *
         memcpy(rx, px, 66);
         memcpy(ry, py, 66);
         memcpy(rz, pz, 66);
-        return;
+        return HAL_OK;
     }
 
     /* P == Q -> use point doubling */
     if (p521_coord_eq(px, qx) && p521_coord_eq(py, qy) && p521_coord_eq(pz, qz)) {
-        otbn_point_dbl(px, py, pz, rx, ry, rz);
-        return;
+        return otbn_point_dbl(px, py, pz, rx, ry, rz);
     }
 
     p521_write_coord(ECC_P521_P_OFFSET, px);
@@ -318,17 +322,19 @@ static void otbn_point_add(const uint8_t *px, const uint8_t *py, const uint8_t *
     p521_write_coord(ECC_P521_Q_OFFSET, qx);
     p521_write_coord(ECC_P521_Q_OFFSET + 96, qy);
     p521_write_coord(ECC_P521_Q_OFFSET + 192, qz);
-    otbn_run_mode(ECC_P521_MODE_POINT_ADD);
+    if (otbn_run_mode(ECC_P521_MODE_POINT_ADD) != HAL_OK)
+        return HAL_TIMEOUT;
     p521_read_coord(ECC_P521_R_OFFSET, rx);
     p521_read_coord(ECC_P521_R_OFFSET + 96, ry);
     p521_read_coord(ECC_P521_R_OFFSET + 192, rz);
+    return HAL_OK;
 }
 
 /* ========================================================================== */
 /* Montgomery Ladder (scalar multiplication)                                  */
 /* ========================================================================== */
 
-static void p521_scalar_mult(const uint8_t *k,
+static HAL_StatusTypeDef p521_scalar_mult(const uint8_t *k,
                              const uint8_t *px, const uint8_t *py,
                              uint8_t *rx, uint8_t *ry)
 {
@@ -369,13 +375,15 @@ static void p521_scalar_mult(const uint8_t *k,
         }
 
         /* R0 = R0 + R1 */
-        otbn_point_add(p0x, p0y, p0z, p1x, p1y, p1z, t_x, t_y, t_z);
+        if (otbn_point_add(p0x, p0y, p0z, p1x, p1y, p1z, t_x, t_y, t_z) != HAL_OK)
+            return HAL_TIMEOUT;
         memcpy(p0x, t_x, 66);
         memcpy(p0y, t_y, 66);
         memcpy(p0z, t_z, 66);
 
         /* R1 = 2 * R1 */
-        otbn_point_dbl(p1x, p1y, p1z, t_x, t_y, t_z);
+        if (otbn_point_dbl(p1x, p1y, p1z, t_x, t_y, t_z) != HAL_OK)
+            return HAL_TIMEOUT;
         memcpy(p1x, t_x, 66);
         memcpy(p1y, t_y, 66);
         memcpy(p1z, t_z, 66);
@@ -390,28 +398,29 @@ static void p521_scalar_mult(const uint8_t *k,
 
     /* Convert R0 to affine */
     p521_jacobian_to_affine(rx, ry, p0x, p0y, p0z);
+    return HAL_OK;
 }
 
 /* ========================================================================== */
 /* Public APIs                                                                */
 /* ========================================================================== */
 
-void HAL_OTBN_P521_ScalarMult_Polling(const uint8_t *k,
+HAL_StatusTypeDef HAL_OTBN_P521_ScalarMult_Polling(const uint8_t *k,
                                       const uint8_t *px, const uint8_t *py,
                                       uint8_t *rx, uint8_t *ry)
 {
     otbn_load_firmware();
-    p521_scalar_mult(k, px, py, rx, ry);
+    return p521_scalar_mult(k, px, py, rx, ry);
 }
 
-void HAL_OTBN_P521_BaseMult_Polling(const uint8_t *k,
+HAL_StatusTypeDef HAL_OTBN_P521_BaseMult_Polling(const uint8_t *k,
                                     uint8_t *rx, uint8_t *ry)
 {
     otbn_load_firmware();
-    p521_scalar_mult(k, p521_gx, p521_gy, rx, ry);
+    return p521_scalar_mult(k, p521_gx, p521_gy, rx, ry);
 }
 
-void HAL_OTBN_P521_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
+HAL_StatusTypeDef HAL_OTBN_P521_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
                                     const uint8_t *qx, const uint8_t *qy,
                                     uint8_t *rx, uint8_t *ry)
 {
@@ -420,6 +429,8 @@ void HAL_OTBN_P521_PointAdd_Polling(const uint8_t *px, const uint8_t *py,
     otbn_load_firmware();
 
     /* P + Q (both affine Z=1) */
-    otbn_point_add(px, py, p521_one, qx, qy, p521_one, jx, jy, jz);
+    if (otbn_point_add(px, py, p521_one, qx, qy, p521_one, jx, jy, jz) != HAL_OK)
+        return HAL_TIMEOUT;
     p521_jacobian_to_affine(rx, ry, jx, jy, jz);
+    return HAL_OK;
 }

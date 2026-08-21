@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdint.h>
-#include "ls_hal_otbn_sm2.h"
+#include "ls_hal_otbn_ecc.h"
 #include "platform.h"
 #include "log.h"
 
@@ -28,19 +28,23 @@ struct HAL_OTBN_SM2_Verify_Param Param = {
     .y = pubk_y,
 };
 
+/* [0]=Polling result, [1]=IT callback result (GDB-readable) */
+volatile uint32_t g_result[2] = {0, 0};
+
 int main(void)
 {
     sys_init_none();
     HAL_OTBN_Init();
-    bool result = HAL_OTBN_SM2_Verify_Polling(&Param);
-    LOG_I("OTBN SM2 Verify result : %d ", result);
+    g_result[0] = HAL_OTBN_SM2_Verify_Polling(&Param);
+    LOG_I("OTBN SM2 Verify: %s", g_result[0] ? "PASS" : "FAIL");
     HAL_OTBN_SM2_Verify_IT(&Param);
-    
+
     while (1) ;
 }
 
 
 void HAL_OTBN_SM2_Verify_CallBack(bool result)
 {
-    LOG_I("OTBN SM2 Verify result : %d ", result);
+    g_result[1] = result;
+    LOG_I("OTBN SM2 Verify: %s", result ? "PASS" : "FAIL");
 }

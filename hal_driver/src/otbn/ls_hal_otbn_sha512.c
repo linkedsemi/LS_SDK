@@ -61,23 +61,32 @@ static void SHA512_BlockNumber_Update(uint32_t number)
     HAL_OTBN_DMEM_Write(SHA512_DMEM_N_CHUNKS_OFFSET, &n_checks, sizeof(uint32_t));
 }
 
-void HAL_OTBN_SHA512_Init()
+HAL_StatusTypeDef HAL_OTBN_SHA512_Init()
 {
+    /* Refuse to re-program the engine mid-job: overwriting IMEM/DMEM
+     * while a previous job is running would silently corrupt it. */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+        return HAL_BUSY;
+
     total_cnt = 0;
     remain_len = 0;
     sha_idx = SHA512_DMEM_MSG_OFFSET;
     uint32_t state_ptr = SHA512_DMEM_STATE_OFFSET;
     uint32_t msg_ptr = SHA512_DMEM_MSG_OFFSET;
-    HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE);
-    HAL_OTBN_IMEM_Write(0, (uint32_t *)sha512_text, SHA512_TEXT_LENTH);
-    HAL_OTBN_DMEM_Write(SHA512_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA512_DMEM_STATE_SIZE);
-    HAL_OTBN_DMEM_Write(SHA512_DMEM_K_OFFSET, (uint32_t *)K, SHA512_DMEM_K_SIZE);
-    HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_STATE_OFFSET, &state_ptr, sizeof(uint32_t));
-    HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_MSG_OFFSET, &msg_ptr, sizeof(uint32_t));
+    if (HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE) != HAL_OK)
+        return HAL_BUSY;
+    if (HAL_OTBN_IMEM_Write(0, (uint32_t *)sha512_text, SHA512_TEXT_LENTH) != HAL_OK)
+        return HAL_BUSY;
+    if (HAL_OTBN_DMEM_Write(SHA512_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA512_DMEM_STATE_SIZE) != HAL_OK ||
+        HAL_OTBN_DMEM_Write(SHA512_DMEM_K_OFFSET, (uint32_t *)K, SHA512_DMEM_K_SIZE) != HAL_OK ||
+        HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_STATE_OFFSET, &state_ptr, sizeof(uint32_t)) != HAL_OK ||
+        HAL_OTBN_DMEM_Write(SHA512_DMEM_PTR_MSG_OFFSET, &msg_ptr, sizeof(uint32_t)) != HAL_OK)
+        return HAL_BUSY;
     SHA512_BlockNumber_Update(0x10);
+    return HAL_OK;
 }
 
-static void msg_write(uint8_t *msg)
+static HAL_StatusTypeDef msg_write(uint8_t *msg)
 {
     uint8_t dword[8];
     uint64_t sha512_buffer[0x10];
@@ -97,13 +106,15 @@ static void msg_write(uint8_t *msg)
     sha_idx += SHA512_BLOCK_SIZE;
     if (sha_idx == (SHA512_DMEM_MSG_SIZE + SHA512_DMEM_MSG_OFFSET))
     {
-        HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
+        if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+            return HAL_TIMEOUT;
         sha_idx = SHA512_DMEM_MSG_OFFSET;
     }
+    return HAL_OK;
 }
 
-void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length)
-{   
+HAL_StatusTypeDef HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length)
+{
     total_cnt += length;
     if (remain_len)
     {
@@ -111,11 +122,12 @@ void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length)
         {
             memcpy(&remain_data[remain_len], msg, length);
             remain_len += length;
-            return;
+            return HAL_OK;
         }
         uint32_t wr_len = SHA512_BLOCK_SIZE - remain_len;
         memcpy(&remain_data[remain_len], msg, wr_len);
-        msg_write(remain_data);
+        if (msg_write(remain_data) != HAL_OK)
+            return HAL_TIMEOUT;
         remain_len = 0;
         length -= wr_len;
         msg += wr_len;
@@ -123,25 +135,28 @@ void HAL_OTBN_SHA512_Update(uint8_t *msg, uint32_t length)
 
     for (uint32_t i = 0; i < (length / SHA512_BLOCK_SIZE); i++)
     {
-        msg_write(msg);
+        if (msg_write(msg) != HAL_OK)
+            return HAL_TIMEOUT;
         msg += SHA512_BLOCK_SIZE;
     }
-    
+
     if (length % SHA512_BLOCK_SIZE)
     {
         memcpy(&remain_data[remain_len], msg, length % SHA512_BLOCK_SIZE);
         remain_len = length % SHA512_BLOCK_SIZE;
     }
+    return HAL_OK;
 }
 
-void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE])
+HAL_StatusTypeDef HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE])
 {
     uint64_t bit_cnt = total_cnt * 8;
 
     remain_data[remain_len++] = 0x80;
     if (remain_len == SHA512_BLOCK_SIZE)
     {
-        msg_write(remain_data);
+        if (msg_write(remain_data) != HAL_OK)
+            return HAL_TIMEOUT;
         remain_len = 0;
     }
 
@@ -150,7 +165,8 @@ void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE])
         remain_data[remain_len++] = 0x0;
         if (remain_len == SHA512_BLOCK_SIZE)
         {
-            msg_write(remain_data);
+            if (msg_write(remain_data) != HAL_OK)
+                return HAL_TIMEOUT;
             remain_len = 0;
         }
     }
@@ -161,9 +177,13 @@ void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE])
     {
         remain_data[SHA512_BLOCK_SIZE - 1 - i] = (uint8_t)(bit_cnt >> (8 * i));
     }
-    msg_write((uint8_t *)remain_data);
+    if (msg_write((uint8_t *)remain_data) != HAL_OK)
+        return HAL_TIMEOUT;
     SHA512_BlockNumber_Update((sha_idx - SHA512_DMEM_MSG_OFFSET) / SHA512_BLOCK_SIZE);
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_EXECUTE);
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK) {
+        memset(result, 0, SHA512_RESULT_SIZE);
+        return HAL_TIMEOUT;
+    }
 
     uint64_t rs;
     for (uint8_t i = 0; i < 8; i++)
@@ -178,18 +198,23 @@ void HAL_OTBN_SHA512_Final(uint8_t result[SHA512_RESULT_SIZE])
         *result++ = (uint8_t)(rs >> 8);
         *result++ = (uint8_t)(rs >> 0);
     }
-    HAL_OTBN_CMD_Write_Polling(HAL_OTBN_CMD_SEC_WIPE_DMEM);
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_SEC_WIPE_DMEM, 20000) != HAL_OK)
+        return HAL_TIMEOUT;
+    return HAL_OK;
 }
 
-void HAL_OTBN_SHA512_HMAC_SetKey(uint8_t *key, uint32_t key_size)
+HAL_StatusTypeDef HAL_OTBN_SHA512_HMAC_SetKey(uint8_t *key, uint32_t key_size)
 {
     sha512_hmac_key_size = key_size;
     sha512_hmac_key = key;
     if (sha512_hmac_key_size > SHA512_BLOCK_SIZE)
     {
-        HAL_OTBN_SHA512_Init();
-        HAL_OTBN_SHA512_Update(sha512_hmac_key, sha512_hmac_key_size);
-        HAL_OTBN_SHA512_Final(sha512_hmac_kh);
+        if (HAL_OTBN_SHA512_Init() != HAL_OK)
+            return HAL_TIMEOUT;
+        if (HAL_OTBN_SHA512_Update(sha512_hmac_key, sha512_hmac_key_size) != HAL_OK)
+            return HAL_TIMEOUT;
+        if (HAL_OTBN_SHA512_Final(sha512_hmac_kh) != HAL_OK)
+            return HAL_TIMEOUT;
 
         sha512_hmac_key = sha512_hmac_kh;
         sha512_hmac_key_size = SHA512_RESULT_SIZE;
@@ -200,31 +225,36 @@ void HAL_OTBN_SHA512_HMAC_SetKey(uint8_t *key, uint32_t key_size)
     for (uint8_t i = sha512_hmac_key_size; i < SHA512_BLOCK_SIZE; i++)
         sha512_hmac_kx[i] = HMAC_I_PAD ^ 0;
 
-    HAL_OTBN_SHA512_Init();
-    HAL_OTBN_SHA512_Update(sha512_hmac_kx, SHA512_BLOCK_SIZE);
+    if (HAL_OTBN_SHA512_Init() != HAL_OK)
+        return HAL_TIMEOUT;
+    return HAL_OTBN_SHA512_Update(sha512_hmac_kx, SHA512_BLOCK_SIZE);
 }
 
-void HAL_OTBN_SHA512_HMAC_Update(uint8_t *msg, uint32_t msg_size)
+HAL_StatusTypeDef HAL_OTBN_SHA512_HMAC_Update(uint8_t *msg, uint32_t msg_size)
 {
-    HAL_OTBN_SHA512_Update(msg, msg_size);
+    return HAL_OTBN_SHA512_Update(msg, msg_size);
 }
 
-void HAL_OTBN_SHA512_HMAC_Final(uint8_t *out)
+HAL_StatusTypeDef HAL_OTBN_SHA512_HMAC_Final(uint8_t *out)
 {
-    HAL_OTBN_SHA512_Final(out);
+    if (HAL_OTBN_SHA512_Final(out) != HAL_OK)
+        return HAL_TIMEOUT;
 
     for (uint8_t i = 0; i < sha512_hmac_key_size; i++)
         sha512_hmac_kx[i] = HMAC_O_PAD ^ sha512_hmac_key[i];
     for (uint8_t i = sha512_hmac_key_size; i < SHA512_BLOCK_SIZE; i++)
         sha512_hmac_kx[i] = HMAC_O_PAD ^ 0;
 
-    HAL_OTBN_SHA512_Init();
-    HAL_OTBN_SHA512_Update(sha512_hmac_kx, SHA512_BLOCK_SIZE);
-    HAL_OTBN_SHA512_Update(out, SHA512_RESULT_SIZE);
-    HAL_OTBN_SHA512_Final(out);
+    if (HAL_OTBN_SHA512_Init() != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Update(sha512_hmac_kx, SHA512_BLOCK_SIZE) != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Update(out, SHA512_RESULT_SIZE) != HAL_OK)
+        return HAL_TIMEOUT;
+    return HAL_OTBN_SHA512_Final(out);
 }
 
-void HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+HAL_StatusTypeDef HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
 {
     uint8_t kh[SHA512_RESULT_SIZE];
     uint8_t kx[SHA512_BLOCK_SIZE];
@@ -232,9 +262,12 @@ void HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32
 
     if (key_len > SHA512_BLOCK_SIZE)
     {
-        HAL_OTBN_SHA512_Init();
-        HAL_OTBN_SHA512_Update(key, key_len);
-        HAL_OTBN_SHA512_Final(kh);
+        if (HAL_OTBN_SHA512_Init() != HAL_OK)
+            return HAL_TIMEOUT;
+        if (HAL_OTBN_SHA512_Update(key, key_len) != HAL_OK)
+            return HAL_TIMEOUT;
+        if (HAL_OTBN_SHA512_Final(kh) != HAL_OK)
+            return HAL_TIMEOUT;
         key_len = SHA512_RESULT_SIZE;
         key = kh;
     }
@@ -244,23 +277,30 @@ void HAL_OTBN_SHA512_HMAC(uint8_t out[SHA512_RESULT_SIZE], uint8_t *data, uint32
     for (i = key_len; i < SHA512_BLOCK_SIZE; i++)
         kx[i] = HMAC_I_PAD ^ 0;
 
-    HAL_OTBN_SHA512_Init();
-    HAL_OTBN_SHA512_Update(kx, SHA512_BLOCK_SIZE);
-    HAL_OTBN_SHA512_Update(data, data_len);
-    HAL_OTBN_SHA512_Final(out);
+    if (HAL_OTBN_SHA512_Init() != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Update(kx, SHA512_BLOCK_SIZE) != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Update(data, data_len) != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Final(out) != HAL_OK)
+        return HAL_TIMEOUT;
 
-    for (uint8_t i = 0; i < key_len; i++)
+    for (i = 0; i < key_len; i++)
         kx[i] = HMAC_O_PAD ^ key[i];
-    for (uint8_t i = key_len; i < SHA512_BLOCK_SIZE; i++)
+    for (i = key_len; i < SHA512_BLOCK_SIZE; i++)
         kx[i] = HMAC_O_PAD ^ 0;
 
-    HAL_OTBN_SHA512_Init();
-    HAL_OTBN_SHA512_Update(kx, SHA512_BLOCK_SIZE);
-    HAL_OTBN_SHA512_Update(out, SHA512_RESULT_SIZE);
-    HAL_OTBN_SHA512_Final(out);
+    if (HAL_OTBN_SHA512_Init() != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Update(kx, SHA512_BLOCK_SIZE) != HAL_OK)
+        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA512_Update(out, SHA512_RESULT_SIZE) != HAL_OK)
+        return HAL_TIMEOUT;
+    return HAL_OTBN_SHA512_Final(out);
 }
 
-bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
+HAL_StatusTypeDef HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
                           uint8_t *info, uint32_t info_len,
                           uint8_t *okm, uint32_t okm_len)
@@ -276,7 +316,8 @@ bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
         salt_len = SHA512_RESULT_SIZE;
         memset(salt, 0, salt_len);
     }
-    HAL_OTBN_SHA512_HMAC(prk, ikm, ikm_len, salt, salt_len);
+    if (HAL_OTBN_SHA512_HMAC(prk, ikm, ikm_len, salt, salt_len) != HAL_OK)
+        return HAL_ERROR;
 
     if (info == NULL)
     {
@@ -284,25 +325,31 @@ bool HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
         info_len = 0;
     }
     if (okm == NULL)
-        return false;
+        return HAL_ERROR;
     N = okm_len / SHA512_RESULT_SIZE;
     if ((okm_len % SHA512_RESULT_SIZE) != 0)
         N++;
     if (N > 0xff)
-        return false;
+        return HAL_ERROR;
     T_len = 0;
     where = 0;
     for (uint8_t i = 1; i <= N; i++)
     {
-        HAL_OTBN_SHA512_HMAC_SetKey(prk, SHA512_RESULT_SIZE);
-        if (T_len != 0x0)
-            HAL_OTBN_SHA512_HMAC_Update(T, T_len);
-        HAL_OTBN_SHA512_HMAC_Update(info, info_len);
-        HAL_OTBN_SHA512_HMAC_Update(&i, 1);
-        HAL_OTBN_SHA512_HMAC_Final(T);
+        if (HAL_OTBN_SHA512_HMAC_SetKey(prk, SHA512_RESULT_SIZE) != HAL_OK)
+            return HAL_ERROR;
+        if (T_len != 0x0) {
+            if (HAL_OTBN_SHA512_HMAC_Update(T, T_len) != HAL_OK)
+                return HAL_ERROR;
+        }
+        if (HAL_OTBN_SHA512_HMAC_Update(info, info_len) != HAL_OK)
+            return HAL_ERROR;
+        if (HAL_OTBN_SHA512_HMAC_Update(&i, 1) != HAL_OK)
+            return HAL_ERROR;
+        if (HAL_OTBN_SHA512_HMAC_Final(T) != HAL_OK)
+            return HAL_ERROR;
         memcpy(okm + where, T, (i != N) ? SHA512_RESULT_SIZE : (okm_len - where));
         where += SHA512_RESULT_SIZE;
         T_len = SHA512_RESULT_SIZE;
     }
-    return true;
+    return HAL_OK;
 }
