@@ -363,30 +363,147 @@ if(CONFIG_SOC_LSQSH)
 if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN)
   string(REPLACE "/" "_" CONFIG_BOARD_TARGET_MODIFIED "${CONFIG_BOARD_TARGET}")
   string(REPLACE "@" "_" CONFIG_BOARD_TARGET_MODIFIED_2 "${CONFIG_BOARD_TARGET_MODIFIED}")
-  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
-    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
-    -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
-    -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
-    -a ${CONFIG_FLASH_BASE_ADDRESS}
-  )
+  # SRAM1_ADDR is 0x10000000, see soc/rv32/qsh/include/reg_base_addr.h
+  if(CONFIG_FLASH_BASE_ADDRESS LESS 0x10000000)
+    add_custom_command(
+      OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+      -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      -a 0x0
+      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      VERBATIM
+    )
+  else()
+    add_custom_command(
+      OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+      -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      -a ${CONFIG_FLASH_BASE_ADDRESS}
+      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      VERBATIM
+    )
+  endif()
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD)
+    # Compress the flash binary with zstd if the tool is available on the system
+    find_program(ZSTD_EXECUTABLE zstd)
+    if(ZSTD_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst
+        COMMAND ${ZSTD_EXECUTABLE} -f -22 --ultra --zstd=windowLog=19 --check -k
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "zstd not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP)
+    # Compress the flash binary with gzip if the tool is available on the system
+    # (-k keeps the original .bin, which is still needed by the BRAM merge below)
+    find_program(GZIP_EXECUTABLE gzip)
+    if(GZIP_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz
+        COMMAND ${GZIP_EXECUTABLE} -f -9 -k
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "gzip not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
 endif()
 
 if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
-  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+  add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/bram_header.bin
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
     -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
     -o ${PROJECT_BINARY_DIR}/bram_header.bin
     -a 0x10124000
+    DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
+    VERBATIM
   )
-  set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
+  add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/file_merge.py
     -i ${PROJECT_BINARY_DIR}/bram_header.bin
     -a 0x0
     -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
     -a 0x10000
     -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    DEPENDS ${PROJECT_BINARY_DIR}/bram_header.bin
+            ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    VERBATIM
   )
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP)
+    # Compress the bram xip binary with gzip if the tool is available on the system
+    find_program(GZIP_EXECUTABLE gzip)
+    if(GZIP_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz
+        COMMAND ${GZIP_EXECUTABLE} -f -k
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "gzip not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD)
+    # Compress the bram xip binary with zstd if the tool is available on the system
+    find_program(ZSTD_EXECUTABLE zstd)
+    if(ZSTD_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst
+        COMMAND ${ZSTD_EXECUTABLE} -f -k -22 --ultra --zstd=windowLog=19 --check
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "zstd not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
 endif()
+
+  # Drive the OUTPUT-based merge/compression rules above; the .bin/.zst/.gz
+  # are only rebuilt when their inputs change
+  set(QSH_COMPRESS_DEPS
+    ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin)
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
+    list(APPEND QSH_COMPRESS_DEPS
+      ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin)
+  endif()
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD AND ZSTD_EXECUTABLE)
+    list(APPEND QSH_COMPRESS_DEPS
+      ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst)
+  endif()
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP AND GZIP_EXECUTABLE)
+    list(APPEND QSH_COMPRESS_DEPS
+      ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz)
+  endif()
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
+    if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP AND GZIP_EXECUTABLE)
+      list(APPEND QSH_COMPRESS_DEPS
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz)
+    endif()
+    if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD AND ZSTD_EXECUTABLE)
+      list(APPEND QSH_COMPRESS_DEPS
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst)
+    endif()
+  endif()
+  add_custom_target(qsh_bin_compress ALL DEPENDS ${QSH_COMPRESS_DEPS})
 
   zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
   zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
