@@ -56,9 +56,9 @@ static bool boot_nonsecure(uint32_t *exe_addr, uint32_t offset)
     if (crc != header.header_crc)
         return false;
 
-    if (SRAM1_ADDR > header.exe_addr) {
+    if (header.exe_addr == 0x0) {
         // *exe_addr = header.exe_addr;
-        *exe_addr = FLASH_BASE_ADDRESS + offset + sizeof(imageHeader_t); //0x100 : header size
+        *exe_addr = FLASH_BASE_ADDRESS + offset + header.offset; //0x100 : header size
         // boot_flash_start_xip(offset);
     } else {
         if ((uint32_t)&__next_ram_size < header.length) {
@@ -73,6 +73,7 @@ static bool boot_nonsecure(uint32_t *exe_addr, uint32_t offset)
 void goto_next(void *exe_addr)
 {
     LOG_I("GoTo Next Addr : 0x%x", exe_addr);
+    DELAY_US(1000);
     void (*goto_sbl)();
     goto_sbl = (void *)exe_addr;
     __set_MTVT((uint32_t)0);
