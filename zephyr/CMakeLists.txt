@@ -313,6 +313,7 @@ if(CONFIG_SOC_LSQSH)
     ../hal_driver/src/otbn/text_array/otbn_p256_pointops.c
     ../hal_driver/src/otbn/text_array/otbn_p384_pointops.c
     ../hal_driver/src/otbn/text_array/otbn_p521_pointops.c
+    ../hal_driver/src/otbn/text_array/otbn_sm2_pointops.c
     ../hal_driver/src/otbn/text_array/otbn_sm3.c
     ../hal_driver/src/otbn/text_array/otbn_p256_basemult.c
     ../hal_driver/src/otbn/text_array/otbn_p256_verify.c
