@@ -561,13 +561,18 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 uint8_t io_pull_read(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+    uint32_t pu1_pu0 = APP_PMU->IO_CFG[x->port].PU1_PU0;
+    uint32_t pd_pu2 = APP_PMU->IO_CFG[x->port].PD_PU2;
 
-    uint8_t bit0 = APP_PMU->IO_CFG[x->port].PU1_PU0 & (1<<x->num);
-    uint8_t bit1 = APP_PMU->IO_CFG[x->port].PU1_PU0 & (1<<x->num<<16);
-    uint8_t bit2 = APP_PMU->IO_CFG[x->port].PD_PU2 & (1<<x->num);
-    uint8_t bit3 = APP_PMU->IO_CFG[x->port].PD_PU2 & (1<<x->num<<16);
+    uint32_t pull = (((pd_pu2 >> x->num) & 0x1) << 2)
+                  | (((pu1_pu0 >> (x->num + 16)) & 0x1) << 1)
+                  | ((pu1_pu0 >> x->num) & 0x1);
 
-    return bit0 | (bit1 << 1) | (bit2 << 2) | (bit3 << 3);
+    if ((pd_pu2 >> (x->num + 16)) & 0x1)
+    {
+        return (pull == 7) ? IO_PULL_UP_DOWN : IO_PULL_DOWN;
+    }
+    return pull;
 }
 
 void io_drive_capacity_write(uint8_t pin, io_drive_type_t drive)
