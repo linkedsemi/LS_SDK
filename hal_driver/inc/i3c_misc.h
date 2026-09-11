@@ -83,6 +83,7 @@ extern "C" {
 #define I3C_EVR_FCF                         I3C_EVR_FCF_MASK                      /*!< Frame Complete Flag */
 #define I3C_EVR_ERRF                        I3C_EVR_ERRF_MASK                     /*!< Error Flag */
 #define I3C_EVR_IBIF                        I3C_EVR_IBIF_MASK                     /*!< IBI Flag */
+#define I3C_EVR_BUSY                        I3C_EVR_BUSY_MASK                     /*!< Bus Busy Flag */
 #define I3C_EVR_CRF                         I3C_EVR_CRF_MASK                      /*!< Controller-role Request Flag */
 #define I3C_EVR_HJF                         I3C_EVR_HJF_MASK                      /*!< Hot Join Flag */
 #define I3C_EVR_RXTGTENDF                   I3C_EVR_RXTGTENDF_MASK                     /*!< Reception Target End Flag */
