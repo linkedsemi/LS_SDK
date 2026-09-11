@@ -18,14 +18,16 @@ int main(void)
 {
     sys_init_none();
     HAL_OTBN_Init();
-    HAL_OTBN_SM2_ValidPoint_IT(x, y);
+    g_result[0] = HAL_OTBN_SM2_ValidPoint_IT(x, y);   /* submit status */
+    LOG_I("OTBN SM2 ValidPoint IT submit: %s (status=%d)",
+          g_result[0] == LS_OTBN_OK ? "OK" : "REJECT", (int)g_result[0]);
 
     while (1) ;
 }
 
 
-void HAL_OTBN_SM2_ValidPoint_CallBack(bool result)
+void HAL_OTBN_SM2_ValidPoint_CallBack(ls_otbn_status_t status)
 {
-    g_result[1] = result;
-    LOG_I("OTBN SM2 ValidPoint: %s", result ? "PASS" : "FAIL");
+    g_result[1] = status;
+    LOG_I("OTBN SM2 ValidPoint: %s (status=%d)", status == LS_OTBN_OK ? "PASS" : "FAIL", (int)status);
 }

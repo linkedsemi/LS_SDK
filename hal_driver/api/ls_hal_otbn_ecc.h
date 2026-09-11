@@ -10,15 +10,25 @@ extern "C" {
 /* ============================================================
  * Return-value conventions for this header
  *
- *   - Verify / ValidPoint predicates return bool: true = signature
- *     valid / point on curve (the "positive result"); a failed OTBN
- *     execution also yields false, so on false callers can read
- *     HAL_OTBN_Error_Bit_Get() to tell "verify rejected" (no error
- *     bits) from "execution failed" (error bits set).
- *   - Everything else returns HAL_StatusTypeDef: 0 == HAL_OK on
- *     success, non-zero = execution error.
- *   - The application-level crypto API returns uint32_t: 0 on
- *     success, non-zero on error (mbedTLS style).
+ *   - All OTBN operation interfaces return ls_otbn_status_t
+ *     (defined in ls_hal_otbn.h): LS_OTBN_OK == 0 on success,
+ *     a specific non-zero code on every failure path so the caller
+ *     knows WHY the function returned (input validation / engine
+ *     busy / timeout / ERR_BITS).  See ls_hal_otbn.h for the code
+ *     list and the category encoding.
+ *   - Verify / ValidPoint are no longer bare booleans: success is
+ *     LS_OTBN_OK (signature valid / point on curve); a legitimate
+ *     negative answer is LS_OTBN_VERIFY_INVALID / LS_OTBN_POINT_NOT_ON_CURVE
+ *     (a RESULT, not an execution error); every other non-zero code is
+ *     an actual failure.
+ *   - The IT flavours return the submit status: LS_OTBN_OK means the
+ *     operation was accepted and its completion is delivered to
+ *     CallBack(ls_otbn_status_t); a synchronous rejection (bad param /
+ *     out-of-range input / engine busy) returns the specific code
+ *     immediately and does NOT fire the callback.
+ *   - The pure validation predicates below (ls_otbn_ecc_*_in_range /
+ *     point_on_curve) keep returning bool: they answer a yes/no
+ *     question and have no failure modes to report.
  *
  * Byte-order conventions:
  *   - SDK interfaces (below) take u32 word arrays, least-significant
@@ -119,12 +129,12 @@ struct HAL_OTBN_ECC256_ScalarMult_Param
  * Verify firmware is P-256 specific.  ScalarMult takes a curve
  * selector, so it also serves SM2 (see the SM2 section note). */
 
-bool HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_ECC256_Verify_Param *verify_param);
-void HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_ECC256_Verify_Param *verify_param);
-void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(bool result);
+ls_otbn_status_t HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_ECC256_Verify_Param *verify_param);
+ls_otbn_status_t HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_ECC256_Verify_Param *verify_param);
+void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ls_otbn_status_t status);
 
 void HAL_OTBN_ECC256_ScalarMult_Cb(void);
-void HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
+ls_otbn_status_t HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
 HAL_StatusTypeDef HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
 
 /* ---------------- Application level ---------------- */
@@ -138,13 +148,14 @@ HAL_StatusTypeDef HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES
  * @brief Derive P-256 public key from private key.
  * @param priv_key  32-byte private key (big-endian)
  * @param pub_key   64-byte output: X (32 bytes) || Y (32 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_DerivePubkey(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                        uint8_t pub_key[ECDSA_P256_PUBLIC_KEY_SIZE]);
-uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                           uint8_t pub_key[ECDSA_P256_PUBLIC_KEY_SIZE]);
-void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(uint32_t status);
+void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(ls_otbn_status_t status);
 
 /**
  * @brief ECDSA P-256 signature.
@@ -152,32 +163,34 @@ void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(uint32_t status);
  * @param rand_k    32-byte random nonce (k)
  * @param priv_key  32-byte private key
  * @param signature 64-byte output: r (32 bytes) || s (32 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_ECDSA_P256_Sign(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_Sign(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
                               const uint8_t rand_k[ECDSA_P256_COMPONENT_LENGTH],
                               const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                               uint8_t signature[ECDSA_P256_SIGNATURE_SIZE]);
-uint32_t HAL_OTBN_ECDSA_P256_Sign_IT(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_Sign_IT(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
                                  const uint8_t rand_k[ECDSA_P256_COMPONENT_LENGTH],
                                  const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                  uint8_t signature[ECDSA_P256_SIGNATURE_SIZE]);
-void HAL_OTBN_ECDSA_P256_Sign_CallBack(uint32_t status);
+void HAL_OTBN_ECDSA_P256_Sign_CallBack(ls_otbn_status_t status);
 
 /**
  * @brief Compute P-256 ECDH shared secret.
  * @param priv_key      32-byte private key
  * @param peer_pub_key  64-byte peer public key: X (32 bytes) || Y (32 bytes)
  * @param shared_secret 64-byte output: X (32 bytes) || Y (32 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_ECDSA_P256_SharedSecret(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_SharedSecret(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                        const uint8_t peer_pub_key[ECDSA_P256_PUBLIC_KEY_SIZE],
                                        uint8_t shared_secret[ECDSA_P256_PUBLIC_KEY_SIZE]);
-uint32_t HAL_OTBN_ECDSA_P256_SharedSecret_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_SharedSecret_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                           const uint8_t peer_pub_key[ECDSA_P256_PUBLIC_KEY_SIZE],
                                           uint8_t shared_secret[ECDSA_P256_PUBLIC_KEY_SIZE]);
-void HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(uint32_t status);
+void HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(ls_otbn_status_t status);
 
 /* ============================================================
  * SM2 (sm2p256v1)
@@ -215,16 +228,16 @@ struct HAL_OTBN_SM2_ScalarMult_Param
     uint32_t *result_y;
 };
 
-void HAL_OTBN_SM2_Verify_CallBack(bool result);
-void HAL_OTBN_SM2_Verify_IT(struct HAL_OTBN_SM2_Verify_Param *param);
-bool HAL_OTBN_SM2_Verify_Polling(struct HAL_OTBN_SM2_Verify_Param *param);
+void HAL_OTBN_SM2_Verify_CallBack(ls_otbn_status_t status);
+ls_otbn_status_t HAL_OTBN_SM2_Verify_IT(struct HAL_OTBN_SM2_Verify_Param *param);
+ls_otbn_status_t HAL_OTBN_SM2_Verify_Polling(struct HAL_OTBN_SM2_Verify_Param *param);
 
-void HAL_OTBN_SM2_ValidPoint_CallBack(bool result);
-void HAL_OTBN_SM2_ValidPoint_IT(uint32_t *x, uint32_t *y);
-bool HAL_OTBN_SM2_ValidPoint_Polling(uint32_t *x, uint32_t *y);
+void HAL_OTBN_SM2_ValidPoint_CallBack(ls_otbn_status_t status);
+ls_otbn_status_t HAL_OTBN_SM2_ValidPoint_IT(uint32_t *x, uint32_t *y);
+ls_otbn_status_t HAL_OTBN_SM2_ValidPoint_Polling(uint32_t *x, uint32_t *y);
 
 void HAL_OTBN_SM2_ScalarMult_CallBack();
-void HAL_OTBN_SM2_ScalarMult_IT(struct HAL_OTBN_SM2_ScalarMult_Param *param);
+ls_otbn_status_t HAL_OTBN_SM2_ScalarMult_IT(struct HAL_OTBN_SM2_ScalarMult_Param *param);
 HAL_StatusTypeDef HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_ScalarMult_Param *param);
 
 /* ---------------- Application level ---------------- */
@@ -239,13 +252,14 @@ HAL_StatusTypeDef HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_Sca
  *        Computes pub_key = priv_key * G  (SM2 generator point).
  * @param priv_key  32-byte private key (big-endian)
  * @param pub_key   64-byte output: X (32 bytes) || Y (32 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_SM2_DerivePubkey(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_SM2_DerivePubkey(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
                                 uint8_t pub_key[SM2_PUBLIC_KEY_SIZE]);
-uint32_t HAL_OTBN_SM2_DerivePubkey_IT(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_SM2_DerivePubkey_IT(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
                                    uint8_t pub_key[SM2_PUBLIC_KEY_SIZE]);
-void HAL_OTBN_SM2_DerivePubkey_CallBack(uint32_t status);
+void HAL_OTBN_SM2_DerivePubkey_CallBack(ls_otbn_status_t status);
 
 /**
  * @brief SM2 signature.
@@ -253,32 +267,34 @@ void HAL_OTBN_SM2_DerivePubkey_CallBack(uint32_t status);
  * @param rand_k    32-byte random nonce (k)
  * @param priv_key  32-byte private key
  * @param signature 64-byte output: r (32 bytes) || s (32 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_SM2_Sign(const uint8_t sm2_e[SM2_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_SM2_Sign(const uint8_t sm2_e[SM2_COMPONENT_LENGTH],
                        const uint8_t rand_k[SM2_COMPONENT_LENGTH],
                        const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
                        uint8_t signature[SM2_SIGNATURE_SIZE]);
-uint32_t HAL_OTBN_SM2_Sign_IT(const uint8_t sm2_e[SM2_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_SM2_Sign_IT(const uint8_t sm2_e[SM2_COMPONENT_LENGTH],
                           const uint8_t rand_k[SM2_COMPONENT_LENGTH],
                           const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
                           uint8_t signature[SM2_SIGNATURE_SIZE]);
-void HAL_OTBN_SM2_Sign_CallBack(uint32_t status);
+void HAL_OTBN_SM2_Sign_CallBack(ls_otbn_status_t status);
 
 /**
  * @brief Compute SM2 ECDH shared secret.
  * @param priv_key      32-byte private key
  * @param peer_pub_key  64-byte peer public key: X (32 bytes) || Y (32 bytes)
  * @param shared_secret 64-byte output: X (32 bytes) || Y (32 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_SM2_SharedSecret(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_SM2_SharedSecret(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
                                 const uint8_t peer_pub_key[SM2_PUBLIC_KEY_SIZE],
                                 uint8_t shared_secret[SM2_PUBLIC_KEY_SIZE]);
-uint32_t HAL_OTBN_SM2_SharedSecret_IT(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_SM2_SharedSecret_IT(const uint8_t priv_key[SM2_PRIVATE_KEY_SIZE],
                                    const uint8_t peer_pub_key[SM2_PUBLIC_KEY_SIZE],
                                    uint8_t shared_secret[SM2_PUBLIC_KEY_SIZE]);
-void HAL_OTBN_SM2_SharedSecret_CallBack(uint32_t status);
+void HAL_OTBN_SM2_SharedSecret_CallBack(ls_otbn_status_t status);
 
 /* ============================================================
  * P-384 (secp384r1)
@@ -301,9 +317,9 @@ struct HAL_OTBN_ECC384_Verify_Param
     uint32_t *y;    /* public key y-coordinate */
 };
 
-void HAL_OTBN_ECC384_ECDSA_Verify_CallBack(bool result);
-bool HAL_OTBN_ECC384_ECDSA_Verify_Polling(enum HAL_OTBN_ECC384_CURVES curve, struct HAL_OTBN_ECC384_Verify_Param *verify_param);
-void HAL_OTBN_ECC384_ECDSA_Verify_IT(enum HAL_OTBN_ECC384_CURVES curve, struct HAL_OTBN_ECC384_Verify_Param *verify_param);
+void HAL_OTBN_ECC384_ECDSA_Verify_CallBack(ls_otbn_status_t status);
+ls_otbn_status_t HAL_OTBN_ECC384_ECDSA_Verify_Polling(enum HAL_OTBN_ECC384_CURVES curve, struct HAL_OTBN_ECC384_Verify_Param *verify_param);
+ls_otbn_status_t HAL_OTBN_ECC384_ECDSA_Verify_IT(enum HAL_OTBN_ECC384_CURVES curve, struct HAL_OTBN_ECC384_Verify_Param *verify_param);
 
 /* ---------------- Application level ---------------- */
 
@@ -317,13 +333,14 @@ void HAL_OTBN_ECC384_ECDSA_Verify_IT(enum HAL_OTBN_ECC384_CURVES curve, struct H
  *        Computes pub_key = priv_key * G  (generator point).
  * @param priv_key  48-byte private key (big-endian)
  * @param pub_key   96-byte output: X (48 bytes) || Y (48 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_ECDSA_P384_DerivePubkey(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P384_DerivePubkey(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
                                        uint8_t pub_key[ECDSA_P384_PUBLIC_KEY_SIZE]);
-uint32_t HAL_OTBN_ECDSA_P384_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P384_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
                                           uint8_t pub_key[ECDSA_P384_PUBLIC_KEY_SIZE]);
-void HAL_OTBN_ECDSA_P384_DerivePubkey_CallBack(uint32_t status);
+void HAL_OTBN_ECDSA_P384_DerivePubkey_CallBack(ls_otbn_status_t status);
 
 /**
  * @brief ECDSA P-384 signature.
@@ -331,17 +348,18 @@ void HAL_OTBN_ECDSA_P384_DerivePubkey_CallBack(uint32_t status);
  * @param rand_k    48-byte random nonce (k)
  * @param priv_key  48-byte private key
  * @param signature 96-byte output: r (48 bytes) || s (48 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_ECDSA_P384_Sign(const uint8_t digest[ECDSA_P384_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_ECDSA_P384_Sign(const uint8_t digest[ECDSA_P384_COMPONENT_LENGTH],
                               const uint8_t rand_k[ECDSA_P384_COMPONENT_LENGTH],
                               const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
                               uint8_t signature[ECDSA_P384_SIGNATURE_SIZE]);
-uint32_t HAL_OTBN_ECDSA_P384_Sign_IT(const uint8_t digest[ECDSA_P384_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_ECDSA_P384_Sign_IT(const uint8_t digest[ECDSA_P384_COMPONENT_LENGTH],
                                  const uint8_t rand_k[ECDSA_P384_COMPONENT_LENGTH],
                                  const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
                                  uint8_t signature[ECDSA_P384_SIGNATURE_SIZE]);
-void HAL_OTBN_ECDSA_P384_Sign_CallBack(uint32_t status);
+void HAL_OTBN_ECDSA_P384_Sign_CallBack(ls_otbn_status_t status);
 
 /**
  * @brief Compute P-384 ECDH shared secret.
@@ -349,15 +367,16 @@ void HAL_OTBN_ECDSA_P384_Sign_CallBack(uint32_t status);
  * @param priv_key      48-byte private key
  * @param peer_pub_key  96-byte peer public key: X (48 bytes) || Y (48 bytes)
  * @param shared_secret 96-byte output: X (48 bytes) || Y (48 bytes)
- * @return 0 on success, non-zero on error
+ * @return ls_otbn_status_t: LS_OTBN_OK on success, otherwise a specific
+ *         LS_OTBN_* code identifying the failure reason
  */
-uint32_t HAL_OTBN_ECDSA_P384_SharedSecret(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P384_SharedSecret(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
                                        const uint8_t peer_pub_key[ECDSA_P384_PUBLIC_KEY_SIZE],
                                        uint8_t shared_secret[ECDSA_P384_PUBLIC_KEY_SIZE]);
-uint32_t HAL_OTBN_ECDSA_P384_SharedSecret_IT(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P384_SharedSecret_IT(const uint8_t priv_key[ECDSA_P384_PRIVATE_KEY_SIZE],
                                           const uint8_t peer_pub_key[ECDSA_P384_PUBLIC_KEY_SIZE],
                                           uint8_t shared_secret[ECDSA_P384_PUBLIC_KEY_SIZE]);
-void HAL_OTBN_ECDSA_P384_SharedSecret_CallBack(uint32_t status);
+void HAL_OTBN_ECDSA_P384_SharedSecret_CallBack(ls_otbn_status_t status);
 
 /* ============================================================
  * Application-level IT flavour notes
@@ -365,10 +384,11 @@ void HAL_OTBN_ECDSA_P384_SharedSecret_CallBack(uint32_t status);
  * Every application operation above comes in two flavours:
  *   - Polling:  blocks until OTBN finishes; the result is written
  *     into the caller's output array before returning.
- *   - IT:       submits the operation and returns 0 immediately;
- *     the OTBN completion interrupt writes the result into the
- *     caller's output array and then invokes the matching weak
- *     CallBack(status) with status == 0 on success.  The output
+ *   - IT:       submits the operation and returns LS_OTBN_OK
+ *     immediately; the OTBN completion interrupt writes the result
+ *     into the caller's output array and then invokes the matching
+ *     weak CallBack(status) with status == LS_OTBN_OK on success.  The
+ *     output
  *     array must stay valid until the callback fires (inputs are
  *     consumed at submit time).  OTBN is a single engine, so IT
  *     operations must not overlap each other.

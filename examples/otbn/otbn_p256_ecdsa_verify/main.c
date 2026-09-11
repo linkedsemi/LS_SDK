@@ -40,18 +40,19 @@ int main(void)
     HAL_OTBN_Init();
 
     g_result[0] = HAL_OTBN_ECC256_ECDSA_Verify_Polling(&p256_param);
-    if (g_result[0])
+    if (g_result[0] == LS_OTBN_OK) {
         LOG_I("HAL_OTBN_P256_Verify pass!");
-    else
-        LOG_I("HAL_OTBN_P256_Verify fail!");
+    } else {
+        LOG_I("HAL_OTBN_P256_Verify fail! (status=%d)", (int)g_result[0]);
+    }
 
     HAL_OTBN_ECC256_ECDSA_Verify_IT(&p256_param);
 
     while (1) ;
 }
 
-void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(bool result)
+void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ls_otbn_status_t status)
 {
-    g_result[1] = result;
-    LOG_I("ecdsa Verify IT: %s", result ? "PASS" : "FAIL");
+    g_result[1] = status;
+    LOG_I("ecdsa Verify IT: %s (status=%d)", status == LS_OTBN_OK ? "PASS" : "FAIL", (int)status);
 }

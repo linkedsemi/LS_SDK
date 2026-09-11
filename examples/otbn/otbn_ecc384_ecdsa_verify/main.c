@@ -45,18 +45,19 @@ int main(void)
 
     LOG_I(" OTBN P384_ECDSA_Verify_Test Start...");
     g_result[0] = HAL_OTBN_ECC384_ECDSA_Verify_Polling(HAL_OTBN_ECC384_CURVE_P384, &p384_param);
-    if (g_result[0])
+    if (g_result[0] == LS_OTBN_OK) {
         LOG_I("HAL_OTBN_P384_Verify pass!");
-    else
-        LOG_I("HAL_OTBN_P384_Verify fail!");
+    } else {
+        LOG_I("HAL_OTBN_P384_Verify fail! (status=%d)", (int)g_result[0]);
+    }
 
     HAL_OTBN_ECC384_ECDSA_Verify_IT(HAL_OTBN_ECC384_CURVE_P384, &p384_param);
 
     while (1) ;
 }
 
-void HAL_OTBN_ECC384_ECDSA_Verify_CallBack(bool result)
+void HAL_OTBN_ECC384_ECDSA_Verify_CallBack(ls_otbn_status_t status)
 {
-    g_result[1] = result;
-    LOG_I("ecdsa Verify IT: %s", result ? "PASS" : "FAIL");
+    g_result[1] = status;
+    LOG_I("ecdsa Verify IT: %s (status=%d)", status == LS_OTBN_OK ? "PASS" : "FAIL", (int)status);
 }

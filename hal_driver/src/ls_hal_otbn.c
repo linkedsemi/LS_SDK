@@ -151,6 +151,9 @@ HAL_StatusTypeDef HAL_OTBN_CMD_Write_Polling_Timeout(enum HAL_OTBN_CMD cmd, uint
 
     if (LSOTBN->INTR_STATE)
         LSOTBN->INTR_STATE = OTBN_INTR_STATE_DONE_MASK;
+    /* Clear any stale ERR_BITS so the completion check below reports only
+     * this job's engine errors, never a leftover from a previous job. */
+    LSOTBN->ERR_BITS = 0;
     REG_FIELD_WR(LSOTBN->INTR_ENABLE, OTBN_INTR_ENABLE_EN, 0);
     LSOTBN->CMD = cmd;
 
@@ -185,6 +188,14 @@ HAL_StatusTypeDef HAL_OTBN_CMD_Write_Polling_Timeout(enum HAL_OTBN_CMD cmd, uint
 
     LSOTBN->INTR_STATE = OTBN_INTR_STATE_DONE_MASK;
     s_engine_busy = false;
+    /* The engine finished (DONE + IDLE).  Surface a hardware/software
+     * error it flagged via ERR_BITS instead of reporting success -- the
+     * DMEM result is not trustworthy then.  Read-and-clear so the next
+     * job starts from a clean register. */
+    if (LSOTBN->ERR_BITS != 0) {
+        LSOTBN->ERR_BITS = 0;
+        return HAL_ERROR;
+    }
     return HAL_OK;
 }
 
@@ -235,6 +246,9 @@ HAL_StatusTypeDef HAL_OTBN_CMD_Write_IT(enum HAL_OTBN_CMD cmd, void(* func)(void
 
     if (LSOTBN->INTR_STATE)
         LSOTBN->INTR_STATE = OTBN_INTR_STATE_DONE_MASK;
+    /* Clear any stale ERR_BITS so the completion callback reads only this
+     * job's engine errors, never a leftover from a previous job. */
+    LSOTBN->ERR_BITS = 0;
     callback_func = func;
     callback_param = param;
     LSOTBN->INTR_ENABLE = OTBN_INTR_ENABLE_EN_MASK;

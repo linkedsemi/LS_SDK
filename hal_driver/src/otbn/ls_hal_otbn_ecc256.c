@@ -114,24 +114,25 @@ static bool ECC256_Verify_CheckResult(struct HAL_OTBN_ECC256_Verify_Param *verif
     return false;
 }
 
-bool HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_ECC256_Verify_Param *verify_param)
+ls_otbn_status_t HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_ECC256_Verify_Param *verify_param)
 {
     if (!verify_param || !verify_param->msg || !verify_param->r || !verify_param->s ||
-        !verify_param->x || !verify_param->y) return false;
+        !verify_param->x || !verify_param->y) return LS_OTBN_INVALID_PARAM;
     /* Reject out-of-range r/s (wc_ecc_check_r_s_range) and off-curve
      * public keys before programming OTBN */
     if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_P256, verify_param->r, verify_param->s))
-        return false;
+        return LS_OTBN_RS_RANGE;
     if (!ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_P256, verify_param->x, verify_param->y))
-        return false;
+        return LS_OTBN_POINT_NOT_ON_CURVE;
 
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_ecdsa_verify_text, sizeof(ecc256_ecdsa_verify_text));
     ECC256_Verify_WriteParam(verify_param);
 
-    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
-        return false;
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
 
-    bool result = ECC256_Verify_CheckResult(verify_param);
+    ls_otbn_status_t result = ECC256_Verify_CheckResult(verify_param) ? LS_OTBN_OK : LS_OTBN_VERIFY_INVALID;
     HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_SEC_WIPE_DMEM, 20000);
     return result;
 }
@@ -141,7 +142,7 @@ bool HAL_OTBN_ECC256_ECDSA_Verify_Polling(struct HAL_OTBN_ECC256_Verify_Param *v
 // #define ECC256_DMEM_VERIFY_BSS_SECTION_START       (0x1A0)
 // #define ECC256_DMEM_VERIFY_BSS_SECTION_SIZE        (0x280)
 
-__attribute__((weak)) void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(bool result);
+__attribute__((weak)) void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ls_otbn_status_t status);
 void ECC256_Verify_Cb(void *p)
 {
     if (flag)
@@ -149,46 +150,47 @@ void ECC256_Verify_Cb(void *p)
 
     struct HAL_OTBN_ECC256_Verify_Param *verify_param = p;
     flag = true;
-    HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ECC256_Verify_CheckResult(verify_param));
+    /* Engine flagged an error: the DMEM result is untrustworthy, report
+     * ENGINE rather than a (meaningless) valid/invalid answer. */
+    if (HAL_OTBN_Error_Bit_Get() != 0)
+    {
+        HAL_OTBN_ECC256_ECDSA_Verify_CallBack(LS_OTBN_ENGINE);
+        return;
+    }
+    HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ECC256_Verify_CheckResult(verify_param) ? LS_OTBN_OK : LS_OTBN_VERIFY_INVALID);
     /* Note: no SEC_WIPE_DMEM submit here -- we are in ISR context and a
      * submit (or the busy flag it sets) would race the IRQHandler's
      * busy-flag clear and the following job.  The polling path above
      * still wipes DMEM after each verification. */
 }
 
-void HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_ECC256_Verify_Param *verify_param)
+ls_otbn_status_t HAL_OTBN_ECC256_ECDSA_Verify_IT(struct HAL_OTBN_ECC256_Verify_Param *verify_param)
 {
+    /* Rejections are reported via the return value; only an accepted
+     * submit delivers its completion through the callback. */
     if (!verify_param || !verify_param->msg || !verify_param->r || !verify_param->s ||
-        !verify_param->x || !verify_param->y) return;
-    if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_P256, verify_param->r, verify_param->s) ||
-        !ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_P256, verify_param->x, verify_param->y))
-    {
-        /* Reject before starting OTBN; complete synchronously */
-        HAL_OTBN_ECC256_ECDSA_Verify_CallBack(false);
-        return;
-    }
+        !verify_param->x || !verify_param->y) return LS_OTBN_INVALID_PARAM;
+    if (!ls_otbn_ecc_rs_in_range_u32(LS_OTBN_ECC_CURVE_P256, verify_param->r, verify_param->s))
+        return LS_OTBN_RS_RANGE;
+    if (!ls_otbn_ecc_point_on_curve_u32(LS_OTBN_ECC_CURVE_P256, verify_param->x, verify_param->y))
+        return LS_OTBN_POINT_NOT_ON_CURVE;
     /* OTBN is a single engine: a second submit while a job is running
      * would corrupt it.  Check both the software busy flag (set at
-     * submit time, no window) and the STATUS register (engine state).
-     * Complete synchronously with "invalid" (no DMEM read -- the
-     * engine's result belongs to the other job). */
+     * submit time, no window) and the STATUS register (engine state);
+     * reject without touching DMEM (the active job's result is not ours). */
     if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
-    {
-        HAL_OTBN_ECC256_ECDSA_Verify_CallBack(false);
-        return;
-    }
+        return LS_OTBN_BUSY;
 
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_ecdsa_verify_text, sizeof(ecc256_ecdsa_verify_text));
     ECC256_Verify_WriteParam(verify_param);
 
     flag = false;
-    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_Verify_Cb, verify_param) != HAL_OK)
-    {
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_Verify_Cb, verify_param);
+    if (st != HAL_OK)
         /* Engine went busy between the idle check and the submit
-         * (should not happen on a single core); complete synchronously. */
-        HAL_OTBN_ECC256_ECDSA_Verify_CallBack(false);
-        return;
-    }
+         * (should not happen on a single core). */
+        return ls_otbn_status_from_hal(st);
+    return LS_OTBN_OK;
 }
 
 #define ECC256_DMEM_SCALARMULT_SCALAR_OFFSET           (0x0)
@@ -204,33 +206,45 @@ __attribute__((weak)) void HAL_OTBN_ECC256_ScalarMult_Cb(void) {}
 static void ECC256_ScalarMult_Callback(void *param)
 {
     struct HAL_OTBN_ECC256_ScalarMult_Param *p = param;
+    /* Engine flagged an error: the DMEM result is untrustworthy; zero it
+     * (the void(void) callback carries no status). */
+    if (HAL_OTBN_Error_Bit_Get() != 0) {
+        memset(p->result_x, 0, 0x20);
+        memset(p->result_y, 0, 0x20);
+        HAL_OTBN_ECC256_ScalarMult_Cb();
+        return;
+    }
     HAL_OTBN_DMEM_Read(ECC256_DMEM_SCALARMULT_RESULT_X_OFFSET, p->result_x, 0x20);
     HAL_OTBN_DMEM_Read(ECC256_DMEM_SCALARMULT_RESULT_Y_OFFSET, p->result_y, 0x20);
     HAL_OTBN_ECC256_ScalarMult_Cb();
 }
 
-void HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param)
+ls_otbn_status_t HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param)
 {
-    if (!param) return;
+    if (!param) return LS_OTBN_INVALID_PARAM;
     int pc = ECC256_curve_to_param(Curve);
-    if (pc < 0 ||
-        !ls_otbn_ecc_scalar_in_range_u32(pc, param->scalar) ||
-        !ls_otbn_ecc_point_on_curve_u32(pc, param->point_x, param->point_y))
+    if (pc < 0) return LS_OTBN_INVALID_PARAM;
+    /* Reject scalar outside [1, n-1] and off-curve points before OTBN;
+     * results stay zeroed on every rejection path. */
+    if (!ls_otbn_ecc_scalar_in_range_u32(pc, param->scalar))
     {
-        /* Reject before starting OTBN; complete synchronously */
         memset(param->result_x, 0, 0x20);
         memset(param->result_y, 0, 0x20);
-        HAL_OTBN_ECC256_ScalarMult_Cb();
-        return;
+        return LS_OTBN_SCALAR_RANGE;
+    }
+    if (!ls_otbn_ecc_point_on_curve_u32(pc, param->point_x, param->point_y))
+    {
+        memset(param->result_x, 0, 0x20);
+        memset(param->result_y, 0, 0x20);
+        return LS_OTBN_POINT_NOT_ON_CURVE;
     }
     /* OTBN is a single engine: refuse a second submit while a job is
-     * running; complete synchronously with zeroed results. */
+     * running; results stay zeroed. */
     if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
     {
         memset(param->result_x, 0, 0x20);
         memset(param->result_y, 0, 0x20);
-        HAL_OTBN_ECC256_ScalarMult_Cb();
-        return;
+        return LS_OTBN_BUSY;
     }
 
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_scalar_mult_text, sizeof(ecc256_scalar_mult_text));
@@ -244,15 +258,16 @@ void HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL
     HAL_OTBN_DMEM_Set(ECC256_DMEM_SCALARMULT_BSS_SECTION_START, 0x0, ECC256_DMEM_SCALARMULT_BSS_SECTION_SIZE);
 
     flag = false;
-    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_ScalarMult_Callback, param) != HAL_OK)
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, ECC256_ScalarMult_Callback, param);
+    if (st != HAL_OK)
     {
         /* Engine went busy between the idle check and the submit;
-         * complete synchronously with zeroed results. */
+         * results stay zeroed. */
         memset(param->result_x, 0, 0x20);
         memset(param->result_y, 0, 0x20);
-        HAL_OTBN_ECC256_ScalarMult_Cb();
-        return;
+        return ls_otbn_status_from_hal(st);
     }
+    return LS_OTBN_OK;
 }
 
 HAL_StatusTypeDef HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param)

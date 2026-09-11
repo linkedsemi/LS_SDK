@@ -25,12 +25,12 @@ static void reverse_bytes(uint8_t *buf, uint32_t len)
  * ==================================================================== */
 #include "ls_hal_otbn_p256_pointops.h"
 
-uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_DerivePubkey(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                        uint8_t pub_key[ECDSA_P256_PUBLIC_KEY_SIZE])
 {
-    if (!priv_key || !pub_key) return 1;
+    if (!priv_key || !pub_key) return LS_OTBN_INVALID_PARAM;
     /* Reject d outside [1, n-1] (mbedtls_ecp_check_privkey) */
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return 1;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return LS_OTBN_SCALAR_RANGE;
 
     uint8_t priv_buf[ECDSA_P256_COMPONENT_LENGTH];
     memcpy(priv_buf, priv_key, ECDSA_P256_COMPONENT_LENGTH);
@@ -45,14 +45,15 @@ uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey(const uint8_t priv_key[ECDSA_P256_PRIV
     HAL_OTBN_DMEM_Write(ECC_P256_MODE_OFFSET, &mode, sizeof(uint32_t));
     HAL_OTBN_DMEM_Write(ECC_P256_SCALAR_D_OFFSET, (const uint32_t *)priv_buf, ECDSA_P256_COMPONENT_LENGTH);
 
-    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
-        return 1;
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
 
     HAL_OTBN_DMEM_Read(ECC_P256_X_OFFSET, (uint32_t *)pub_key, ECDSA_P256_COMPONENT_LENGTH);
     HAL_OTBN_DMEM_Read(ECC_P256_Y_OFFSET, (uint32_t *)(pub_key + ECDSA_P256_COMPONENT_LENGTH), ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(pub_key, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(pub_key + ECDSA_P256_COMPONENT_LENGTH, ECDSA_P256_COMPONENT_LENGTH);
-    return 0;
+    return LS_OTBN_OK;
 }
 
 /* ====================================================================
@@ -60,16 +61,16 @@ uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey(const uint8_t priv_key[ECDSA_P256_PRIV
  * ==================================================================== */
 #define P256_SIGN_MODE 0x0000015b
 
-uint32_t HAL_OTBN_ECDSA_P256_Sign(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_Sign(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
                               const uint8_t rand_k[ECDSA_P256_COMPONENT_LENGTH],
                               const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                               uint8_t signature[ECDSA_P256_SIGNATURE_SIZE])
 {
-    if (!digest || !rand_k || !priv_key || !signature) return 1;
+    if (!digest || !rand_k || !priv_key || !signature) return LS_OTBN_INVALID_PARAM;
     /* Reject d / k outside [1, n-1]: an out-of-range ephemeral key
      * produces a degenerate signature (r or s == 0) */
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return 1;
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, rand_k)) return 1;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return LS_OTBN_SCALAR_RANGE;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, rand_k)) return LS_OTBN_SCALAR_RANGE;
 
     uint8_t digest_buf[ECDSA_P256_COMPONENT_LENGTH];
     uint8_t rand_buf[ECDSA_P256_COMPONENT_LENGTH];
@@ -93,14 +94,15 @@ uint32_t HAL_OTBN_ECDSA_P256_Sign(const uint8_t digest[ECDSA_P256_COMPONENT_LENG
     HAL_OTBN_DMEM_Write(LS_OTBN_ECDSA_P256_D0_OFFSET, (const uint32_t *)priv_buf, ECDSA_P256_COMPONENT_LENGTH);
     HAL_OTBN_DMEM_Write(LS_OTBN_ECDSA_P256_MSG_OFFSET, (const uint32_t *)digest_buf, ECDSA_P256_COMPONENT_LENGTH);
 
-    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
-        return 1;
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
 
     HAL_OTBN_DMEM_Read(LS_OTBN_ECDSA_P256_R_OFFSET, (uint32_t *)signature, ECDSA_P256_COMPONENT_LENGTH);
     HAL_OTBN_DMEM_Read(LS_OTBN_ECDSA_P256_S_OFFSET, (uint32_t *)(signature + ECDSA_P256_COMPONENT_LENGTH), ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(signature, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(signature + ECDSA_P256_COMPONENT_LENGTH, ECDSA_P256_COMPONENT_LENGTH);
-    return 0;
+    return LS_OTBN_OK;
 }
 
 /* ====================================================================
@@ -125,14 +127,14 @@ static void u32_le_to_be(const uint32_t le[8], uint8_t be[ECDSA_P256_COMPONENT_L
     reverse_bytes(be, ECDSA_P256_COMPONENT_LENGTH);
 }
 
-uint32_t HAL_OTBN_ECDSA_P256_SharedSecret(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_SharedSecret(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                        const uint8_t pub_key[ECDSA_P256_PUBLIC_KEY_SIZE],
                                        uint8_t shared[ECDSA_P256_PUBLIC_KEY_SIZE])
 {
-    if (!priv_key || !pub_key || !shared) return 1;
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return 1;
+    if (!priv_key || !pub_key || !shared) return LS_OTBN_INVALID_PARAM;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return LS_OTBN_SCALAR_RANGE;
     if (!ls_otbn_ecc_point_on_curve(LS_OTBN_ECC_CURVE_P256,
-                                    pub_key, pub_key + ECDSA_P256_COMPONENT_LENGTH)) return 1;
+                                    pub_key, pub_key + ECDSA_P256_COMPONENT_LENGTH)) return LS_OTBN_POINT_NOT_ON_CURVE;
 
     uint32_t scalar[8], point_x[8], point_y[8];
     uint32_t result_x[8], result_y[8];
@@ -147,12 +149,13 @@ uint32_t HAL_OTBN_ECDSA_P256_SharedSecret(const uint8_t priv_key[ECDSA_P256_PRIV
         .result_x = result_x,
         .result_y = result_y,
     };
-    if (HAL_OTBN_ECC256_ScalarMult_Polling(HAL_OTBN_ECC256_CURVE_P256, &param) != HAL_OK)
-        return 1;
+    HAL_StatusTypeDef st = HAL_OTBN_ECC256_ScalarMult_Polling(HAL_OTBN_ECC256_CURVE_P256, &param);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
 
     u32_le_to_be(result_x, shared);
     u32_le_to_be(result_y, shared + ECDSA_P256_COMPONENT_LENGTH);
-    return 0;
+    return LS_OTBN_OK;
 }
 
 /* ====================================================================
@@ -166,36 +169,41 @@ uint32_t HAL_OTBN_ECDSA_P256_SharedSecret(const uint8_t priv_key[ECDSA_P256_PRIV
  * must not reach into ls_hal_otbn_ecc256.c's static curve tables.
  * ==================================================================== */
 
-__attribute__((weak)) void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(uint32_t status) {}
-__attribute__((weak)) void HAL_OTBN_ECDSA_P256_Sign_CallBack(uint32_t status) {}
-__attribute__((weak)) void HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(uint32_t status) {}
+__attribute__((weak)) void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(ls_otbn_status_t status) {}
+__attribute__((weak)) void HAL_OTBN_ECDSA_P256_Sign_CallBack(ls_otbn_status_t status) {}
+__attribute__((weak)) void HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(ls_otbn_status_t status) {}
 
 static void p256_derive_it_cb(void *param)
 {
     uint8_t *pub = (uint8_t *)param;
     uint8_t x[ECDSA_P256_COMPONENT_LENGTH];
     uint8_t y[ECDSA_P256_COMPONENT_LENGTH];
+    /* Engine flagged an error: the DMEM result is untrustworthy. */
+    if (HAL_OTBN_Error_Bit_Get() != 0) {
+        HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(LS_OTBN_ENGINE);
+        return;
+    }
     HAL_OTBN_DMEM_Read(ECC_P256_X_OFFSET, (uint32_t *)x, ECDSA_P256_COMPONENT_LENGTH);
     HAL_OTBN_DMEM_Read(ECC_P256_Y_OFFSET, (uint32_t *)y, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(x, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(y, ECDSA_P256_COMPONENT_LENGTH);
     memcpy(pub, x, ECDSA_P256_COMPONENT_LENGTH);
     memcpy(pub + ECDSA_P256_COMPONENT_LENGTH, y, ECDSA_P256_COMPONENT_LENGTH);
-    HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(0);
+    HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(LS_OTBN_OK);
 }
 
-uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                           uint8_t pub_key[ECDSA_P256_PUBLIC_KEY_SIZE])
 {
-    if (!priv_key || !pub_key) return 1;
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return 1;
+    if (!priv_key || !pub_key) return LS_OTBN_INVALID_PARAM;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return LS_OTBN_SCALAR_RANGE;
 
     uint8_t priv_buf[ECDSA_P256_COMPONENT_LENGTH];
     memcpy(priv_buf, priv_key, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(priv_buf, ECDSA_P256_COMPONENT_LENGTH);
 
     /* OTBN is a single engine: refuse while a previous job is running */
-    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State()) return 1;
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State()) return LS_OTBN_BUSY;
 
     HAL_OTBN_Checksum_Clear();
     HAL_OTBN_DMEM_Set(0, 0, ECC_P256_DMEM_TOTAL);
@@ -206,9 +214,10 @@ uint32_t HAL_OTBN_ECDSA_P256_DerivePubkey_IT(const uint8_t priv_key[ECDSA_P256_P
     HAL_OTBN_DMEM_Write(ECC_P256_MODE_OFFSET, &mode, sizeof(uint32_t));
     HAL_OTBN_DMEM_Write(ECC_P256_SCALAR_D_OFFSET, (const uint32_t *)priv_buf, ECDSA_P256_COMPONENT_LENGTH);
 
-    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, p256_derive_it_cb, pub_key) != HAL_OK)
-        return 1;
-    return 0;
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, p256_derive_it_cb, pub_key);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
+    return LS_OTBN_OK;
 }
 
 static void p256_sign_it_cb(void *param)
@@ -216,23 +225,28 @@ static void p256_sign_it_cb(void *param)
     uint8_t *sig = (uint8_t *)param;
     uint8_t r[ECDSA_P256_COMPONENT_LENGTH];
     uint8_t s[ECDSA_P256_COMPONENT_LENGTH];
+    /* Engine flagged an error: the DMEM result is untrustworthy. */
+    if (HAL_OTBN_Error_Bit_Get() != 0) {
+        HAL_OTBN_ECDSA_P256_Sign_CallBack(LS_OTBN_ENGINE);
+        return;
+    }
     HAL_OTBN_DMEM_Read(LS_OTBN_ECDSA_P256_R_OFFSET, (uint32_t *)r, ECDSA_P256_COMPONENT_LENGTH);
     HAL_OTBN_DMEM_Read(LS_OTBN_ECDSA_P256_S_OFFSET, (uint32_t *)s, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(r, ECDSA_P256_COMPONENT_LENGTH);
     reverse_bytes(s, ECDSA_P256_COMPONENT_LENGTH);
     memcpy(sig, r, ECDSA_P256_COMPONENT_LENGTH);
     memcpy(sig + ECDSA_P256_COMPONENT_LENGTH, s, ECDSA_P256_COMPONENT_LENGTH);
-    HAL_OTBN_ECDSA_P256_Sign_CallBack(0);
+    HAL_OTBN_ECDSA_P256_Sign_CallBack(LS_OTBN_OK);
 }
 
-uint32_t HAL_OTBN_ECDSA_P256_Sign_IT(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_Sign_IT(const uint8_t digest[ECDSA_P256_COMPONENT_LENGTH],
                                  const uint8_t rand_k[ECDSA_P256_COMPONENT_LENGTH],
                                  const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                  uint8_t signature[ECDSA_P256_SIGNATURE_SIZE])
 {
-    if (!digest || !rand_k || !priv_key || !signature) return 1;
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return 1;
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, rand_k)) return 1;
+    if (!digest || !rand_k || !priv_key || !signature) return LS_OTBN_INVALID_PARAM;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return LS_OTBN_SCALAR_RANGE;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, rand_k)) return LS_OTBN_SCALAR_RANGE;
 
     uint8_t digest_buf[ECDSA_P256_COMPONENT_LENGTH];
     uint8_t rand_buf[ECDSA_P256_COMPONENT_LENGTH];
@@ -245,7 +259,7 @@ uint32_t HAL_OTBN_ECDSA_P256_Sign_IT(const uint8_t digest[ECDSA_P256_COMPONENT_L
     reverse_bytes(priv_buf, ECDSA_P256_COMPONENT_LENGTH);
 
     /* OTBN is a single engine: refuse while a previous job is running */
-    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State()) return 1;
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State()) return LS_OTBN_BUSY;
 
     HAL_OTBN_Checksum_Clear();
     HAL_OTBN_DMEM_Set(0, 0, LS_OTBN_ECDSA_P256_DMEM_END);
@@ -259,9 +273,10 @@ uint32_t HAL_OTBN_ECDSA_P256_Sign_IT(const uint8_t digest[ECDSA_P256_COMPONENT_L
     HAL_OTBN_DMEM_Write(LS_OTBN_ECDSA_P256_D0_OFFSET, (const uint32_t *)priv_buf, ECDSA_P256_COMPONENT_LENGTH);
     HAL_OTBN_DMEM_Write(LS_OTBN_ECDSA_P256_MSG_OFFSET, (const uint32_t *)digest_buf, ECDSA_P256_COMPONENT_LENGTH);
 
-    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, p256_sign_it_cb, signature) != HAL_OK)
-        return 1;
-    return 0;
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, p256_sign_it_cb, signature);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
+    return LS_OTBN_OK;
 }
 
 /* Local copy of the P-256 curve table the SDK scalar-mult firmware
@@ -302,21 +317,26 @@ static void p256_shared_it_cb(void *param)
 {
     uint8_t *shared = (uint8_t *)param;
     uint32_t rx[8], ry[8];
+    /* Engine flagged an error: the DMEM result is untrustworthy. */
+    if (HAL_OTBN_Error_Bit_Get() != 0) {
+        HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(LS_OTBN_ENGINE);
+        return;
+    }
     HAL_OTBN_DMEM_Read(ECC256_SM_RESULT_X_OFFSET, rx, sizeof(rx));
     HAL_OTBN_DMEM_Read(ECC256_SM_RESULT_Y_OFFSET, ry, sizeof(ry));
     u32_le_to_be(rx, shared);
     u32_le_to_be(ry, shared + ECDSA_P256_COMPONENT_LENGTH);
-    HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(0);
+    HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(LS_OTBN_OK);
 }
 
-uint32_t HAL_OTBN_ECDSA_P256_SharedSecret_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
+ls_otbn_status_t HAL_OTBN_ECDSA_P256_SharedSecret_IT(const uint8_t priv_key[ECDSA_P256_PRIVATE_KEY_SIZE],
                                           const uint8_t peer_pub_key[ECDSA_P256_PUBLIC_KEY_SIZE],
                                           uint8_t shared_secret[ECDSA_P256_PUBLIC_KEY_SIZE])
 {
-    if (!priv_key || !peer_pub_key || !shared_secret) return 1;
-    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return 1;
+    if (!priv_key || !peer_pub_key || !shared_secret) return LS_OTBN_INVALID_PARAM;
+    if (!ls_otbn_ecc_scalar_in_range(LS_OTBN_ECC_CURVE_P256, priv_key)) return LS_OTBN_SCALAR_RANGE;
     if (!ls_otbn_ecc_point_on_curve(LS_OTBN_ECC_CURVE_P256,
-                                    peer_pub_key, peer_pub_key + ECDSA_P256_COMPONENT_LENGTH)) return 1;
+                                    peer_pub_key, peer_pub_key + ECDSA_P256_COMPONENT_LENGTH)) return LS_OTBN_POINT_NOT_ON_CURVE;
 
     uint32_t scalar[8], point_x[8], point_y[8];
     be_to_u32_le(priv_key, scalar);
@@ -324,7 +344,7 @@ uint32_t HAL_OTBN_ECDSA_P256_SharedSecret_IT(const uint8_t priv_key[ECDSA_P256_P
     be_to_u32_le(peer_pub_key + ECDSA_P256_COMPONENT_LENGTH, point_y);
 
     /* OTBN is a single engine: refuse while a previous job is running */
-    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State()) return 1;
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State()) return LS_OTBN_BUSY;
 
     /* Program the SDK scalar-mult firmware exactly as
      * HAL_OTBN_ECC256_ScalarMult_Polling/IT does (same DMEM layout,
@@ -340,7 +360,8 @@ uint32_t HAL_OTBN_ECDSA_P256_SharedSecret_IT(const uint8_t priv_key[ECDSA_P256_P
                         sizeof(struct otbn_ecc256_curve_param));
     HAL_OTBN_DMEM_Set(ECC256_SM_BSS_START, 0x0, ECC256_SM_BSS_SIZE);
 
-    if (HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, p256_shared_it_cb, shared_secret) != HAL_OK)
-        return 1;
-    return 0;
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_IT(HAL_OTBN_CMD_EXECUTE, p256_shared_it_cb, shared_secret);
+    if (st != HAL_OK)
+        return ls_otbn_status_from_hal(st);
+    return LS_OTBN_OK;
 }

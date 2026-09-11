@@ -36,15 +36,15 @@ int main(void)
     sys_init_none();
     HAL_OTBN_Init();
     g_result[0] = HAL_OTBN_SM2_Verify_Polling(&Param);
-    LOG_I("OTBN SM2 Verify: %s", g_result[0] ? "PASS" : "FAIL");
+    LOG_I("OTBN SM2 Verify: %s (status=%d)", g_result[0] == LS_OTBN_OK ? "PASS" : "FAIL", (int)g_result[0]);
     HAL_OTBN_SM2_Verify_IT(&Param);
 
     while (1) ;
 }
 
 
-void HAL_OTBN_SM2_Verify_CallBack(bool result)
+void HAL_OTBN_SM2_Verify_CallBack(ls_otbn_status_t status)
 {
-    g_result[1] = result;
-    LOG_I("OTBN SM2 Verify: %s", result ? "PASS" : "FAIL");
+    g_result[1] = status;
+    LOG_I("OTBN SM2 Verify: %s (status=%d)", status == LS_OTBN_OK ? "PASS" : "FAIL", (int)status);
 }

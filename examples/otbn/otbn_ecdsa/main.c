@@ -81,7 +81,7 @@ static const uint8_t p256_msg_hash[P256_BYTES] = {
 static uint8_t p256_priv_key[P256_BYTES];
 
 static volatile bool s_it_done = false;
-static bool s_it_result = false;
+static ls_otbn_status_t s_it_result = LS_OTBN_OK;
 
 /* Strict serialization: each IT test must wait for its own completion
  * callback (and the result it produced) before the next test starts.
@@ -144,12 +144,12 @@ static bool buffer_is_zero(const uint8_t *buf, uint32_t len)
     return acc == 0;
 }
 
-static void print_result(const char *name, HAL_StatusTypeDef status, bool pass)
+static void print_result(const char *name, uint32_t status, bool pass)
 {
     if (pass) {
         LOG_I("%s: PASS", name);
     } else {
-        LOG_I("%s: FAIL (status=%d)", name, status);
+        LOG_I("%s: FAIL (status=%d)", name, (int)status);
     }
 }
 
@@ -173,8 +173,9 @@ static void be_to_words(const uint8_t *be, uint32_t *out, uint32_t nbytes)
 }
 
 /* Signature verification via the SDK Verify interfaces (big-endian
- * byte inputs, app-style return: 0 = valid, 1 = invalid/error). */
-static uint32_t p256_verify_be(const uint8_t *digest, const uint8_t *sig, const uint8_t *pub)
+ * byte inputs).  Passes through ls_otbn_status_t: LS_OTBN_OK = valid,
+ * otherwise the specific rejection/failure code. */
+static ls_otbn_status_t p256_verify_be(const uint8_t *digest, const uint8_t *sig, const uint8_t *pub)
 {
     uint32_t msg[8], r[8], s[8], x[8], y[8];
     struct HAL_OTBN_ECC256_Verify_Param vp = { msg, r, s, x, y };
@@ -183,10 +184,10 @@ static uint32_t p256_verify_be(const uint8_t *digest, const uint8_t *sig, const 
     be_to_words(sig + P256_BYTES, s, P256_BYTES);
     be_to_words(pub, x, P256_BYTES);
     be_to_words(pub + P256_BYTES, y, P256_BYTES);
-    return HAL_OTBN_ECC256_ECDSA_Verify_Polling(&vp) ? 0 : 1;
+    return HAL_OTBN_ECC256_ECDSA_Verify_Polling(&vp);
 }
 
-static uint32_t p384_verify_be(const uint8_t *digest, const uint8_t *sig, const uint8_t *pub)
+static ls_otbn_status_t p384_verify_be(const uint8_t *digest, const uint8_t *sig, const uint8_t *pub)
 {
     uint32_t msg[12], r[12], s[12], x[12], y[12];
     struct HAL_OTBN_ECC384_Verify_Param vp = { msg, r, s, x, y };
@@ -195,10 +196,10 @@ static uint32_t p384_verify_be(const uint8_t *digest, const uint8_t *sig, const 
     be_to_words(sig + P384_BYTES, s, P384_BYTES);
     be_to_words(pub, x, P384_BYTES);
     be_to_words(pub + P384_BYTES, y, P384_BYTES);
-    return HAL_OTBN_ECC384_ECDSA_Verify_Polling(HAL_OTBN_ECC384_CURVE_P384, &vp) ? 0 : 1;
+    return HAL_OTBN_ECC384_ECDSA_Verify_Polling(HAL_OTBN_ECC384_CURVE_P384, &vp);
 }
 
-static uint32_t sm2_verify_be(const uint8_t *e, const uint8_t *sig, const uint8_t *pub)
+static ls_otbn_status_t sm2_verify_be(const uint8_t *e, const uint8_t *sig, const uint8_t *pub)
 {
     uint32_t msg[8], r[8], s[8], x[8], y[8];
     struct HAL_OTBN_SM2_Verify_Param vp = { msg, r, s, x, y };
@@ -207,7 +208,7 @@ static uint32_t sm2_verify_be(const uint8_t *e, const uint8_t *sig, const uint8_
     be_to_words(sig + SM2_BYTES, s, SM2_BYTES);
     be_to_words(pub, x, SM2_BYTES);
     be_to_words(pub + SM2_BYTES, y, SM2_BYTES);
-    return HAL_OTBN_SM2_Verify_Polling(&vp) ? 0 : 1;
+    return HAL_OTBN_SM2_Verify_Polling(&vp);
 }
 
 int main(void)
@@ -247,14 +248,14 @@ int main(void)
     /* --- P384 verify --- */
     uint8_t p384_verify_sig[ECDSA_P384_SIGNATURE_SIZE];
     ret = HAL_OTBN_ECDSA_P384_Sign(message_hash, random_seed_sign, priv_key_a, p384_verify_sig);
-    if (ret == 0) {
+    if (ret == LS_OTBN_OK) {
         ret = p384_verify_be(message_hash, p384_verify_sig, derived_pub);
-        REC(2, ret, ret == 0);
-        print_result("P384 verify (valid)", ret, ret == 0);
+        REC(2, ret, ret == LS_OTBN_OK);
+        print_result("P384 verify (valid)", ret, ret == LS_OTBN_OK);
         p384_verify_sig[0] ^= 0xFF;
         ret = p384_verify_be(message_hash, p384_verify_sig, derived_pub);
-        REC(3, ret, ret == 1);
-        print_result("P384 verify (bad sig)", ret, ret == 1);
+        REC(3, ret, ret == LS_OTBN_VERIFY_INVALID);
+        print_result("P384 verify (bad sig)", ret, ret == LS_OTBN_VERIFY_INVALID);
     } else {
         REC(2, ret, false);
         REC(3, ret, false);
@@ -320,14 +321,14 @@ int main(void)
     /* --- SM2 verify --- */
     uint8_t sm2_verify_sig[SM2_SIGNATURE_SIZE];
     ret = HAL_OTBN_SM2_Sign(sm2_msg_hash, sm2_sign_rand, sm2_priv_key, sm2_verify_sig);
-    if (ret == 0) {
+    if (ret == LS_OTBN_OK) {
         ret = sm2_verify_be(sm2_msg_hash, sm2_verify_sig, sm2_derived_pub);
-        REC(9, ret, ret == 0);
-        print_result("SM2 verify (valid)", ret, ret == 0);
+        REC(9, ret, ret == LS_OTBN_OK);
+        print_result("SM2 verify (valid)", ret, ret == LS_OTBN_OK);
         sm2_verify_sig[0] ^= 0xFF;
         ret = sm2_verify_be(sm2_msg_hash, sm2_verify_sig, sm2_derived_pub);
-        REC(10, ret, ret == 1);
-        print_result("SM2 verify (bad sig)", ret, ret == 1);
+        REC(10, ret, ret == LS_OTBN_VERIFY_INVALID);
+        print_result("SM2 verify (bad sig)", ret, ret == LS_OTBN_VERIFY_INVALID);
     } else {
         REC(9, ret, false);
         REC(10, ret, false);
@@ -399,14 +400,14 @@ int main(void)
     /* --- P256 verify --- */
     uint8_t p256_verify_sig[P256_BYTES * 2];
     ret = HAL_OTBN_ECDSA_P256_Sign(p256_msg_hash, p256_sign_rand, p256_priv_key, p256_verify_sig);
-    if (ret == 0) {
+    if (ret == LS_OTBN_OK) {
         ret = p256_verify_be(p256_msg_hash, p256_verify_sig, p256_derived_pub);
-        REC(16, ret, ret == 0);
-        print_result("P256 verify (valid)", ret, ret == 0);
+        REC(16, ret, ret == LS_OTBN_OK);
+        print_result("P256 verify (valid)", ret, ret == LS_OTBN_OK);
         p256_verify_sig[0] ^= 0xFF;
         ret = p256_verify_be(p256_msg_hash, p256_verify_sig, p256_derived_pub);
-        REC(17, ret, ret == 1);
-        print_result("P256 verify (bad sig)", ret, ret == 1);
+        REC(17, ret, ret == LS_OTBN_VERIFY_INVALID);
+        print_result("P256 verify (bad sig)", ret, ret == LS_OTBN_VERIFY_INVALID);
     } else {
         REC(16, ret, false);
         REC(17, ret, false);
@@ -454,19 +455,19 @@ int main(void)
 
     /* t19: derive with d = 0 */
     ret = HAL_OTBN_ECDSA_P256_DerivePubkey(zero_buf, neg_pub);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_SCALAR_RANGE);
     REC(19, ret, pass);
     print_result("P256 derive d=0 rejected", ret, pass);
 
     /* t20: derive with d = n */
     ret = HAL_OTBN_ECDSA_P256_DerivePubkey(p256_n_be, neg_pub);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_SCALAR_RANGE);
     REC(20, ret, pass);
     print_result("P256 derive d=n rejected", ret, pass);
 
     /* t21: sign with k = 0 */
     ret = HAL_OTBN_ECDSA_P256_Sign(p256_msg_hash, zero_buf, p256_priv_key, neg_sig);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_SCALAR_RANGE);
     REC(21, ret, pass);
     print_result("P256 sign k=0 rejected", ret, pass);
 
@@ -474,7 +475,7 @@ int main(void)
     memcpy(neg_sig, (void *)g_p256_sig, P256_BYTES * 2);
     memset(neg_sig, 0, P256_BYTES);
     ret = p256_verify_be(p256_msg_hash, neg_sig, (void *)g_p256_derived);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_RS_RANGE);
     REC(22, ret, pass);
     print_result("P256 verify r=0 rejected", ret, pass);
 
@@ -482,7 +483,7 @@ int main(void)
     memcpy(neg_sig, (void *)g_p256_sig, P256_BYTES * 2);
     memcpy(neg_sig, p256_n_be, P256_BYTES);
     ret = p256_verify_be(p256_msg_hash, neg_sig, (void *)g_p256_derived);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_RS_RANGE);
     REC(23, ret, pass);
     print_result("P256 verify r=n rejected", ret, pass);
 
@@ -491,7 +492,7 @@ int main(void)
     for (int i = P256_BYTES - 1; i >= 0 && ++neg_pub[P256_BYTES + i] == 0; i--) {
     }
     ret = p256_verify_be(p256_msg_hash, (void *)g_p256_sig, neg_pub);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_POINT_NOT_ON_CURVE);
     REC(24, ret, pass);
     print_result("P256 verify off-curve pub rejected", ret, pass);
 
@@ -501,7 +502,7 @@ int main(void)
     for (int i = SM2_BYTES - 1; i >= 0 && ++sm2_neg_pub[SM2_BYTES + i] == 0; i--) {
     }
     ret = sm2_verify_be(sm2_msg_hash, (void *)g_sm2_sig, sm2_neg_pub);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_POINT_NOT_ON_CURVE);
     REC(25, ret, pass);
     print_result("SM2 verify off-curve pub rejected", ret, pass);
 
@@ -511,7 +512,7 @@ int main(void)
     for (int i = P384_BYTES - 1; i >= 0 && ++p384_neg_pub[P384_BYTES + i] == 0; i--) {
     }
     ret = p384_verify_be(message_hash, (void *)g_p384_sig, p384_neg_pub);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_POINT_NOT_ON_CURVE);
     REC(26, ret, pass);
     print_result("P384 verify off-curve pub rejected", ret, pass);
 
@@ -626,7 +627,7 @@ int main(void)
     /* t31: verify with infinity public key (0,0) */
     memset(neg_pub, 0, P256_BYTES * 2);
     ret = p256_verify_be(p256_msg_hash, (void *)g_p256_sig, neg_pub);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_POINT_NOT_ON_CURVE);
     REC(31, ret, pass);
     print_result("P256 verify infinity pub rejected", ret, pass);
 
@@ -634,7 +635,7 @@ int main(void)
     memcpy(neg_sig, (void *)g_p256_sig, P256_BYTES * 2);
     memset(neg_sig, 0xFF, P256_BYTES);
     ret = p256_verify_be(p256_msg_hash, neg_sig, (void *)g_p256_derived);
-    pass = (ret != 0);
+    pass = (ret == LS_OTBN_RS_RANGE);
     REC(32, ret, pass);
     print_result("P256 verify r=0xFF..FF rejected", ret, pass);
 
@@ -646,9 +647,9 @@ int main(void)
         memcpy(gx, p256_gx_lsw, sizeof(gx));
         memcpy(gy, p256_gy_lsw, sizeof(gy));
         vp.msg = m0; vp.r = r0; vp.s = s0; vp.x = gx; vp.y = gy;
-        bool vres = HAL_OTBN_ECC256_ECDSA_Verify_Polling(&vp);
-        REC(33, vres, !vres);
-        print_result("SDK ECC256 verify r=0 rejected", vres, !vres);
+        ls_otbn_status_t vres = HAL_OTBN_ECC256_ECDSA_Verify_Polling(&vp);
+        REC(33, vres, vres == LS_OTBN_RS_RANGE);
+        print_result("SDK ECC256 verify r=0 rejected", vres, vres == LS_OTBN_RS_RANGE);
     }
 
     /* t34: SDK layer scalar mult with k=0 → HAL_ERROR */
@@ -760,10 +761,10 @@ int main(void)
         be_to_words((const uint8_t *)(void *)g_p256_derived, x, P256_BYTES);
         be_to_words((const uint8_t *)(void *)g_p256_derived + P256_BYTES, y, P256_BYTES);
         s_it_done = false;
-        HAL_OTBN_ECC256_ECDSA_Verify_IT(&vp);
-        pass = it_wait() && s_it_result;
-        REC(37, pass, pass);
-        print_result("P256 verify IT (valid)", 0, pass);
+        ls_otbn_status_t sub = HAL_OTBN_ECC256_ECDSA_Verify_IT(&vp);
+        pass = (sub == LS_OTBN_OK) && it_wait() && (s_it_result == LS_OTBN_OK);
+        REC(37, s_it_result, pass);
+        print_result("P256 verify IT (valid)", s_it_result, pass);
     }
 
     /* t38: P384 verify IT (valid signature) */
@@ -776,10 +777,10 @@ int main(void)
         be_to_words((const uint8_t *)(void *)g_p384_derived, x, P384_BYTES);
         be_to_words((const uint8_t *)(void *)g_p384_derived + P384_BYTES, y, P384_BYTES);
         s_it_done = false;
-        HAL_OTBN_ECC384_ECDSA_Verify_IT(HAL_OTBN_ECC384_CURVE_P384, &vp);
-        pass = it_wait() && s_it_result;
-        REC(38, pass, pass);
-        print_result("P384 verify IT (valid)", 0, pass);
+        ls_otbn_status_t sub = HAL_OTBN_ECC384_ECDSA_Verify_IT(HAL_OTBN_ECC384_CURVE_P384, &vp);
+        pass = (sub == LS_OTBN_OK) && it_wait() && (s_it_result == LS_OTBN_OK);
+        REC(38, s_it_result, pass);
+        print_result("P384 verify IT (valid)", s_it_result, pass);
     }
 
     /* t39: SM2 verify IT (valid signature) */
@@ -792,10 +793,10 @@ int main(void)
         be_to_words((const uint8_t *)(void *)g_sm2_derived, x, SM2_BYTES);
         be_to_words((const uint8_t *)(void *)g_sm2_derived + SM2_BYTES, y, SM2_BYTES);
         s_it_done = false;
-        HAL_OTBN_SM2_Verify_IT(&vp);
-        pass = it_wait() && s_it_result;
-        REC(39, pass, pass);
-        print_result("SM2 verify IT (valid)", 0, pass);
+        ls_otbn_status_t sub = HAL_OTBN_SM2_Verify_IT(&vp);
+        pass = (sub == LS_OTBN_OK) && it_wait() && (s_it_result == LS_OTBN_OK);
+        REC(39, s_it_result, pass);
+        print_result("SM2 verify IT (valid)", s_it_result, pass);
     }
 
     /* ================================================================
@@ -940,7 +941,7 @@ int main(void)
                                         poison, sizeof(poison));
         bool sig_match = bufs_eq((const uint8_t *)(void *)g_p384_sig,
                                  (const uint8_t *)(void *)g_p384_sig_it, P384_BYTES * 2);
-        pass = (r1 == 0) && (r2 == 1) && first_fired && (s_it_status == 0) &&
+        pass = (r1 == LS_OTBN_OK) && (r2 == LS_OTBN_BUSY) && first_fired && (s_it_status == LS_OTBN_OK) &&
                sig_match && second_no_result;
         REC(51, r2, pass);
         print_result("OTBN busy: 2nd submit rejected", r2, pass);
@@ -955,9 +956,9 @@ int main(void)
         be_to_words(sm2_gy_be, yw, SM2_BYTES);
         memcpy(yw_bad, yw, sizeof(yw_bad));
         yw_bad[0]++;   /* y+1: off the curve */
-        bool ok = HAL_OTBN_SM2_ValidPoint_Polling(xw, yw);
-        bool rej = !HAL_OTBN_SM2_ValidPoint_Polling(xw, yw_bad);
-        pass = ok && rej;
+        ls_otbn_status_t ok = HAL_OTBN_SM2_ValidPoint_Polling(xw, yw);
+        ls_otbn_status_t rej = HAL_OTBN_SM2_ValidPoint_Polling(xw, yw_bad);
+        pass = (ok == LS_OTBN_OK) && (rej == LS_OTBN_POINT_NOT_ON_CURVE);
         REC(52, ok, pass);
         print_result("SM2 ValidPoint polling: on-curve pass, off-curve reject", ok, pass);
     }
@@ -1043,74 +1044,74 @@ int main(void)
     while (1);
 }
 
-void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(bool result)
+void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
-    s_it_result = result;
+    s_it_result = status;
 }
 
-void HAL_OTBN_ECC384_ECDSA_Verify_CallBack(bool result)
+void HAL_OTBN_ECC384_ECDSA_Verify_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
-    s_it_result = result;
+    s_it_result = status;
 }
 
-void HAL_OTBN_SM2_Verify_CallBack(bool result)
+void HAL_OTBN_SM2_Verify_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
-    s_it_result = result;
+    s_it_result = status;
 }
 
 /* App-level crypto IT callbacks (override the weak defaults) */
-void HAL_OTBN_ECDSA_P384_DerivePubkey_CallBack(uint32_t status)
+void HAL_OTBN_ECDSA_P384_DerivePubkey_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_ECDSA_P384_Sign_CallBack(uint32_t status)
+void HAL_OTBN_ECDSA_P384_Sign_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_ECDSA_P384_SharedSecret_CallBack(uint32_t status)
+void HAL_OTBN_ECDSA_P384_SharedSecret_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_SM2_DerivePubkey_CallBack(uint32_t status)
+void HAL_OTBN_SM2_DerivePubkey_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_SM2_Sign_CallBack(uint32_t status)
+void HAL_OTBN_SM2_Sign_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_SM2_SharedSecret_CallBack(uint32_t status)
+void HAL_OTBN_SM2_SharedSecret_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(uint32_t status)
+void HAL_OTBN_ECDSA_P256_DerivePubkey_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_ECDSA_P256_Sign_CallBack(uint32_t status)
+void HAL_OTBN_ECDSA_P256_Sign_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;
 }
 
-void HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(uint32_t status)
+void HAL_OTBN_ECDSA_P256_SharedSecret_CallBack(ls_otbn_status_t status)
 {
     s_it_done = true;
     s_it_status = status;

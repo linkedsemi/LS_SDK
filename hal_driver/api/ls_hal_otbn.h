@@ -13,6 +13,62 @@ extern "C" {
 #define HARDENED_BOOL_TRUE 0x739
 #define HARDENED_BOOL_FALSE 0x1d4
 
+/* ============================================================
+ * Standard return code for the OTBN external interfaces.
+ *
+ * ls_otbn_status_t replaces the legacy bool verify/validpoint
+ * predicates and the application-level uint32_t 0/1 results: every
+ * failure path reports a specific code so the caller knows WHY the
+ * function returned.  The high nibble encodes the category, so
+ * ls_otbn_status_is_error() is a single bit test:
+ *   0x0_  result   -- the operation completed with a definite answer.
+ *        LS_OTBN_OK is success; LS_OTBN_VERIFY_INVALID /
+ *        LS_OTBN_POINT_NOT_ON_CURVE are legitimate negative RESULTS
+ *        (signature invalid / point off curve), not execution errors.
+ *   0x1_  input validation error  -- bad pointer/curve, scalar or
+ *        r/s outside [1, n-1].
+ *   0x2_  execution error  -- engine busy, polling timeout, or a
+ *        hardware error (ERR_BITS / IMEM/DMEM integrity).
+ *
+ * Distinct from enum HAL_OTBN_StatusTypeDef (HAL_OTBN_STATUS_IDLE/...),
+ * which is the OTBN engine's hardware state, not a return code.
+ * ============================================================ */
+typedef enum
+{
+    /* Result (operation completed with a definite answer, not an error) */
+    LS_OTBN_OK                 = 0x00U,  /* success: signature valid / point on curve / result written */
+    LS_OTBN_VERIFY_INVALID     = 0x01U,  /* signature verification failed (firmware returned FALSE) */
+    LS_OTBN_POINT_NOT_ON_CURVE = 0x02U,  /* point is not on the curve */
+
+    /* Input validation errors */
+    LS_OTBN_INVALID_PARAM      = 0x10U,  /* NULL pointer / invalid curve id */
+    LS_OTBN_SCALAR_RANGE       = 0x11U,  /* private key / nonce d,k outside [1, n-1] */
+    LS_OTBN_RS_RANGE           = 0x12U,  /* signature r,s outside [1, n-1] */
+
+    /* Execution errors */
+    LS_OTBN_BUSY               = 0x20U,  /* OTBN engine busy / reentrant submit */
+    LS_OTBN_TIMEOUT            = 0x21U,  /* polling timeout */
+    LS_OTBN_ENGINE             = 0x22U,  /* ERR_BITS / IMEM/DMEM integrity (single code, bits not expanded) */
+} ls_otbn_status_t;
+
+/* True for any error (input validation / execution), i.e. not a result code. */
+static inline bool ls_otbn_status_is_error(ls_otbn_status_t s)
+{
+    return ((unsigned)s & 0xF0U) != 0U;
+}
+
+/* Map the transport-layer HAL_StatusTypeDef to ls_otbn_status_t
+ * (used at the SDK / application-layer boundary). */
+static inline ls_otbn_status_t ls_otbn_status_from_hal(HAL_StatusTypeDef s)
+{
+    switch (s) {
+    case HAL_OK:      return LS_OTBN_OK;
+    case HAL_BUSY:    return LS_OTBN_BUSY;
+    case HAL_TIMEOUT: return LS_OTBN_TIMEOUT;
+    default:          return LS_OTBN_ENGINE;
+    }
+}
+
 enum HAL_OTBN_StatusTypeDef
 {  
     HAL_OTBN_STATUS_IDLE    = 0x0,
