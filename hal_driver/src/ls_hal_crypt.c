@@ -524,12 +524,18 @@ static void increment_counter(uint8_t *inOutCtr)
 
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t *input, uint32_t inlen, uint8_t *output)
 {
-    const unsigned char * end_addr = input + inlen;
+    const unsigned char * end_addr;
     uint32_t *in = (uint32_t *)input;
     uint32_t *out = (uint32_t *)output;
 
     uint32_t *u32_counter = (uint32_t *)counter;
 
+    if ((counter == NULL) || ((inlen != 0) && ((input == NULL) || (output == NULL))))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
+    end_addr = input + inlen;
     aes_config(false, true, false, false, false, NOT_SWAPPED, CTR);
 
     LSCRYPT->IVR3 = __builtin_bswap32(*u32_counter++);
@@ -791,7 +797,7 @@ static bool aes_gcm_dec(uint8_t *in, uint8_t *nonce, uint32_t nonce_size, uint8_
     return true;
 }
 
-bool HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                                               uint8_t *nonce, uint32_t nonce_size,
                                               uint8_t *tag, uint32_t tag_size,
                                               uint8_t *aad, uint32_t aad_size,
@@ -806,11 +812,18 @@ bool HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, true, false, false, false, NOT_SWAPPED, ECB);
     crypt_in_out_length_set(in, out, in_size);
-    return aes_gcm_dec(in, nonce, nonce_size, tag, tag_size, aad, aad_size);
+    /* aes_gcm_dec yields only the tag comparison; map it onto the HAL status:
+     * match -> HAL_OK, mismatch -> HAL_ERROR (plaintext not authentic). */
+    return aes_gcm_dec(in, nonce, nonce_size, tag, tag_size, aad, aad_size) ? HAL_OK : HAL_ERROR;
 }
 
-void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size)
 {
+    if ((gcm == NULL) || (nonce == NULL) || (nonce_size == 0) || (nonce_size > AES_BLOCK_SIZE))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     BLOCK_SIZE = AES_BLOCK_SIZE;
     aes_config(false, true, false, false, false, NOT_SWAPPED, ECB);
     memset((uint8_t *)gcm, 0x0, sizeof(aes_gcm_env));
@@ -826,9 +839,10 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t
     memcpy(gcm->big_h, gcm->h, AES_BLOCK_SIZE);
     gcm->big_h[0] = BSWAP_64(gcm->big_h[0]);
     gcm->big_h[1] = BSWAP_64(gcm->big_h[1]);
+    return HAL_OK;
 }
 
-void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
                                         uint8_t *in, uint32_t in_size,
                                         uint8_t *aad, uint32_t aad_size)
 {
@@ -836,6 +850,13 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
     uint32_t partial = in_size % AES_BLOCK_SIZE;
     const uint8_t *_in = in;
     uint32_t blocks;
+
+    if ((gcm == NULL) || ((aad == NULL) && (aad_size > 0)) ||
+        ((in_size != 0) && ((in == NULL) || (out == NULL))))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     gcm->data_size += in_size;
     gcm->aad_size += aad_size;
 
@@ -912,10 +933,16 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
             gmult(gcm->x, gcm->big_h);
         }
     }
+    return HAL_OK;
 }
 
-bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
 {
+    if ((gcm == NULL) || (tag == NULL) || (tag_size > AES_BLOCK_SIZE) || (tag_size < AES_MIN_AUTH_TAG_SIZE))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     /* Hash in the lengths in bits of A and C */
     {
         uint64_t len[2];
@@ -939,9 +966,9 @@ bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t 
 
     if (memcmp(gcm->prime, tag, tag_size) != 0)
     {
-        return false;
+        return HAL_ERROR;
     }
-    return true;
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(const uint8_t *plaintext,uint32_t plaintextlength,uint8_t *ciphertext,uint32_t ciphertextlength)

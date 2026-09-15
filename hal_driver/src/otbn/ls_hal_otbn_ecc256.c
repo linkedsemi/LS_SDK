@@ -270,18 +270,32 @@ ls_otbn_status_t HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve
     return LS_OTBN_OK;
 }
 
-HAL_StatusTypeDef HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param)
+ls_otbn_status_t HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param)
 {
+    if (!param) return LS_OTBN_INVALID_PARAM;
     int pc = ECC256_curve_to_param(Curve);
-    if (!param || pc < 0) return HAL_ERROR;
+    if (pc < 0) return LS_OTBN_INVALID_PARAM;
     /* Reject scalar outside [1, n-1] and off-curve points before OTBN;
-     * results stay zeroed on every failure path. */
-    if (!ls_otbn_ecc_scalar_in_range_u32(pc, param->scalar) ||
-        !ls_otbn_ecc_point_on_curve_u32(pc, param->point_x, param->point_y))
+     * results stay zeroed on every rejection path. */
+    if (!ls_otbn_ecc_scalar_in_range_u32(pc, param->scalar))
     {
         memset(param->result_x, 0, 0x20);
         memset(param->result_y, 0, 0x20);
-        return HAL_ERROR;
+        return LS_OTBN_SCALAR_RANGE;
+    }
+    if (!ls_otbn_ecc_point_on_curve_u32(pc, param->point_x, param->point_y))
+    {
+        memset(param->result_x, 0, 0x20);
+        memset(param->result_y, 0, 0x20);
+        return LS_OTBN_POINT_NOT_ON_CURVE;
+    }
+    /* OTBN is a single engine: refuse a second submit while a job is
+     * running; results stay zeroed. */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+    {
+        memset(param->result_x, 0, 0x20);
+        memset(param->result_y, 0, 0x20);
+        return LS_OTBN_BUSY;
     }
 
     HAL_OTBN_IMEM_Write(0, (uint32_t *)ecc256_scalar_mult_text, sizeof(ecc256_scalar_mult_text));
@@ -294,14 +308,15 @@ HAL_StatusTypeDef HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES
     HAL_OTBN_DMEM_Write(ECC256_DMEM_SCALARMULT_CURVE_P_OFFSET, ECC256_getCurve(Curve), sizeof(struct OTBN_ECC256_CURVE_PARAM));
     HAL_OTBN_DMEM_Set(ECC256_DMEM_SCALARMULT_BSS_SECTION_START, 0x0, ECC256_DMEM_SCALARMULT_BSS_SECTION_SIZE);
 
-    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+    HAL_StatusTypeDef st = HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000);
+    if (st != HAL_OK)
     {
         memset(param->result_x, 0, 0x20);
         memset(param->result_y, 0, 0x20);
-        return HAL_TIMEOUT;
+        return ls_otbn_status_from_hal(st);
     }
 
     HAL_OTBN_DMEM_Read(ECC256_DMEM_SCALARMULT_RESULT_X_OFFSET, param->result_x, 0x20);
     HAL_OTBN_DMEM_Read(ECC256_DMEM_SCALARMULT_RESULT_Y_OFFSET, param->result_y, 0x20);
-    return HAL_OK;
+    return LS_OTBN_OK;
 }

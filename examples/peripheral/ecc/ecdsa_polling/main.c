@@ -92,7 +92,7 @@ int main(void)
     HAL_LSSHA_SHA256(plaintext, sizeof(plaintext), cipherbuffer_sha256);
     HAL_LSECC_Sign(&secp256r1_param, pri_key1, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), (uint8_t*)&random32bit, sign);
     const static uint8_t *pubkey2[2] = {P2x, P2y};
-    volatile bool  value= HAL_LSECC_Verify(&secp256r1_param, pubkey2, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), sign);
+    volatile bool  value= (HAL_LSECC_Verify(&secp256r1_param, pubkey2, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), sign) == HAL_OK);
     if(value == 1)
     {
         LOG_I("ecdsa secp256r1 test success");
@@ -104,7 +104,7 @@ int main(void)
     HAL_LSSHA_SHA256(plaintext, sizeof(plaintext), cipherbuffer_sha256);
     HAL_LSECC_Sign(&secp256k1_param, pri_key1, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), (uint8_t*)&random32bit, sign);
     const static uint8_t *pubkey2[2] = {P2x, P2y};
-    volatile bool  value= HAL_LSECC_Verify(&secp256k1_param, pubkey2, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), sign);
+    volatile bool  value= (HAL_LSECC_Verify(&secp256k1_param, pubkey2, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), sign) == HAL_OK);
     if(value == 1)
     {
         LOG_I("ecdsa secp256k1 test success");
@@ -116,7 +116,7 @@ int main(void)
     HAL_LSSHA_SHA256(plaintext, sizeof(plaintext), cipherbuffer_sha256);
     HAL_LSECC_Sign(&sm2_param, pri_key1, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), (uint8_t*)&random32bit, sign);
     const static uint8_t *pubkey2[2] = {P2x, P2y};
-    volatile bool  value= HAL_LSECC_Verify(&sm2_param, pubkey2, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), sign);
+    volatile bool  value= (HAL_LSECC_Verify(&sm2_param, pubkey2, (uint8_t *)cipherbuffer_sha256, sizeof(cipherbuffer_sha256), sign) == HAL_OK);
     if(value == 1)
     {
         LOG_I("ecdsa sm2 test success");

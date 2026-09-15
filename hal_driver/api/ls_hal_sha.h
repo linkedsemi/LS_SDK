@@ -34,7 +34,14 @@ HAL_StatusTypeDef HAL_LSSHA_SHA224_HMAC(uint8_t out[SHA224_BYTES_NUM], uint8_t *
 
 HAL_StatusTypeDef HAL_LSSHA_SM3_HMAC(uint8_t out[SM3_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
-bool HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len);
+/** \brief LSSHA SM3 key derivation (KDF)
+ *  \param[in] Z Shared secret input
+ *  \param[in] Zlen Length of Z in bytes
+ *  \param[out] out Derived key output
+ *  \param[in] out_len Desired output length in bytes
+ *  \return HAL_OK on success, HAL_INVALIAD_PARAM on NULL pointer or zero length
+ */
+HAL_StatusTypeDef HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len);
 
 void LSSHA_IRQHandler(void);
 #endif

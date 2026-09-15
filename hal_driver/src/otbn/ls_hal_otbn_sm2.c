@@ -239,9 +239,9 @@ void SM2_ScalarMult_Cb(void *param)
  * clashing with the pointops primitive of the same stem
  * (HAL_OTBN_SM2_ScalarMult_Polling in ls_hal_otbn_sm2_pointops.h,
  * byte-array parameters, g_ecc_sm2 firmware). */
-HAL_StatusTypeDef HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_ScalarMult_Param *param)
+ls_otbn_status_t HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_ScalarMult_Param *param)
 {
-    if (!param) return HAL_ERROR;
+    if (!param) return LS_OTBN_INVALID_PARAM;
     /* Layout-identical param structs; forward to the shared engine */
     struct HAL_OTBN_ECC256_ScalarMult_Param p256 = {
         .scalar = param->scalar,

@@ -135,7 +135,7 @@ void HAL_OTBN_ECC256_ECDSA_Verify_CallBack(ls_otbn_status_t status);
 
 void HAL_OTBN_ECC256_ScalarMult_Cb(void);
 ls_otbn_status_t HAL_OTBN_ECC256_ScalarMult_IT(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
-HAL_StatusTypeDef HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
+ls_otbn_status_t HAL_OTBN_ECC256_ScalarMult_Polling(enum HAL_OTBN_ECC256_CURVES Curve, struct HAL_OTBN_ECC256_ScalarMult_Param *param);
 
 /* ---------------- Application level ---------------- */
 
@@ -238,7 +238,7 @@ ls_otbn_status_t HAL_OTBN_SM2_ValidPoint_Polling(uint32_t *x, uint32_t *y);
 
 void HAL_OTBN_SM2_ScalarMult_CallBack();
 ls_otbn_status_t HAL_OTBN_SM2_ScalarMult_IT(struct HAL_OTBN_SM2_ScalarMult_Param *param);
-HAL_StatusTypeDef HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_ScalarMult_Param *param);
+ls_otbn_status_t HAL_OTBN_SM2_ScalarMult_Engine_Polling(struct HAL_OTBN_SM2_ScalarMult_Param *param);
 
 /* ---------------- Application level ---------------- */
 

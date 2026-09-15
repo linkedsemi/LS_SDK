@@ -126,11 +126,16 @@ HAL_StatusTypeDef HAL_SM4_Decrypt(const uint8_t *data, uint8_t *result, uint32_t
     return HAL_OK;
 }
 
-void HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out)
+HAL_StatusTypeDef HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, uint8_t *out)
 {
     uint32_t i,length;
     uint8_t result[SM4_BLOCK_SIZE];
     uint8_t flag[SM4_BLOCK_SIZE];
+
+    if ((cnt == NULL) || ((in_len != 0) && ((in == NULL) || (out == NULL))))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
 
     REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_DEC, 0);
     do
@@ -157,6 +162,7 @@ void HAL_SM4_CTR_Crypt(uint8_t cnt[0x10], const uint8_t *in, uint32_t in_len, ui
         if (flag[0])
             cnt[0]++;
     } while (in_len);
+    return HAL_OK;
 }
 
 static void block_crypt(uint8_t *in, uint8_t *out)
@@ -355,7 +361,7 @@ static inline void xor_array(const uint8_t *a, const uint8_t *b, uint8_t *out,ui
     }
 }
 
-bool HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+HAL_StatusTypeDef HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                          uint8_t *nonce, uint32_t nonce_size,
                          uint8_t *tag, uint32_t tag_size,
                          uint8_t *aad, uint32_t aad_size,
@@ -364,9 +370,9 @@ bool HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
     if ((nonce == NULL) || (tag == NULL) || (tag_size > SM4_BLOCK_SIZE) || (tag_size < SM4_MIN_AUTH_TAG_SIZE) ||
         ((aad == NULL) && (aad_size > 0)) || (nonce_size == 0) || (((in_size != 0) && ((in == NULL) || (out == NULL)))))
     {
-        return false;
+        return HAL_INVALIAD_PARAM;
     }
-    
+
     REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,0);
 
     uint8_t gcm_h[SM4_BLOCK_SIZE] = {0};
@@ -408,13 +414,18 @@ bool HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
 
     if (memcmp(t_prime, tag, tag_size) != 0)
     {
-        return false;
+        return HAL_ERROR;
     }
-    return true;
+    return HAL_OK;
 }
 
-void HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size)
+HAL_StatusTypeDef HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size)
 {
+    if ((gcm == NULL) || (nonce == NULL) || (nonce_size == 0) || (nonce_size > SM4_BLOCK_SIZE))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     memset((uint8_t *)gcm, 0x0, sizeof(sm4_gcm_env));
     gcm->counter_size = nonce_size;
     REG_FIELD_WR(LSSM4->SM4_CTRL,SM4_CALC_DEC,0);
@@ -432,10 +443,10 @@ void HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_s
     memcpy(gcm->big_h, gcm->h, SM4_BLOCK_SIZE);
     gcm->big_h[0] = BSWAP_64(gcm->big_h[0]);
     gcm->big_h[1] = BSWAP_64(gcm->big_h[1]);
-
+    return HAL_OK;
 }
 
-void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
+HAL_StatusTypeDef HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
                                         uint8_t *in, uint32_t in_size,
                                         uint8_t *aad, uint32_t aad_size)
 {
@@ -443,6 +454,13 @@ void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
     uint32_t partial = in_size % SM4_BLOCK_SIZE;
     const uint8_t *_in = in;
     uint32_t blocks;
+
+    if ((gcm == NULL) || ((aad == NULL) && (aad_size > 0)) ||
+        ((in_size != 0) && ((in == NULL) || (out == NULL))))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     gcm->data_size += in_size;
     gcm->aad_size += aad_size;
 
@@ -517,10 +535,16 @@ void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
             gmult(gcm->x, gcm->big_h);
         }
     }
+    return HAL_OK;
 }
 
-bool HAL_SM4_GCM_Decrypt_Final(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
+HAL_StatusTypeDef HAL_SM4_GCM_Decrypt_Final(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
 {
+    if ((gcm == NULL) || (tag == NULL) || (tag_size > SM4_BLOCK_SIZE) || (tag_size < SM4_MIN_AUTH_TAG_SIZE))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     /* Hash in the lengths in bits of A and C */
     {
         uint64_t len[2];
@@ -544,9 +568,9 @@ bool HAL_SM4_GCM_Decrypt_Final(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size
 
     if (memcmp(gcm->prime, tag, tag_size) != 0)
     {
-        return false;
+        return HAL_ERROR;
     }
-    return true;
+    return HAL_OK;
 }
 
 

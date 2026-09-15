@@ -286,13 +286,57 @@ typedef struct
     uint32_t aad_size;
 } aes_gcm_env;
 
-void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size);
-void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
+/* GCM authenticated decryption reports HAL_StatusTypeDef like the rest of
+ * LSCRYPT: HAL_OK = authentication tag verified (plaintext valid);
+ * HAL_ERROR = tag mismatch (plaintext NOT authentic, discard it);
+ * HAL_INVALIAD_PARAM = bad pointer/size.  Only Final and the one-shot
+ * report the tag result; Init/Update report HAL_OK unless a parameter is
+ * invalid. */
+
+/** \brief LSCRYPT AES GCM Decrypt Initialize
+ *  \param[in] gcm GCM context (zeroed on success)
+ *  \param[in] nonce Initial vector
+ *  \param[in] nonce_size Nonce length in bytes
+ *  \return HAL_OK, or HAL_INVALIAD_PARAM on NULL gcm/nonce or bad nonce_size
+ */
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size);
+
+/** \brief LSCRYPT AES GCM Decrypt Update (streaming)
+ *  \param[in] gcm GCM context
+ *  \param[out] out Plaintext output
+ *  \param[in] in Ciphertext input
+ *  \param[in] in_size Ciphertext length in bytes
+ *  \param[in] aad Additional authenticated data
+ *  \param[in] aad_size AAD length in bytes
+ *  \return HAL_OK, or HAL_INVALIAD_PARAM on NULL gcm or bad in/out/aad
+ */
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
                                         uint8_t *in, uint32_t in_size,
                                         uint8_t *aad, uint32_t aad_size);
-bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
 
-bool HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
+/** \brief LSCRYPT AES GCM Decrypt Final: verify the authentication tag
+ *  \param[in] gcm GCM context
+ *  \param[in] tag Expected authentication tag
+ *  \param[in] tag_size Tag length in bytes
+ *  \return HAL_OK if the tag matches (plaintext authentic), HAL_ERROR on
+ *          tag mismatch, HAL_INVALIAD_PARAM on NULL gcm/tag
+ */
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
+
+/** \brief LSCRYPT AES GCM Decrypt (one-shot)
+ *  \param[in] in Ciphertext input
+ *  \param[in] in_size Ciphertext length in bytes
+ *  \param[in] nonce Initial vector
+ *  \param[in] nonce_size Nonce length in bytes
+ *  \param[in] tag Expected authentication tag
+ *  \param[in] tag_size Tag length in bytes
+ *  \param[in] aad Additional authenticated data
+ *  \param[in] aad_size AAD length in bytes
+ *  \param[out] out Plaintext output (valid only when the return is HAL_OK)
+ *  \return HAL_OK if the tag matches, HAL_ERROR on tag mismatch,
+ *          HAL_INVALIAD_PARAM on bad pointer/size
+ */
+HAL_StatusTypeDef HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                                               uint8_t *nonce, uint32_t nonce_size,
                                               uint8_t *tag, uint32_t tag_size,
                                               uint8_t *aad, uint32_t aad_size,

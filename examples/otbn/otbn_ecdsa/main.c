@@ -664,10 +664,10 @@ int main(void)
         sp.point_y = gy;
         sp.result_x = sx;
         sp.result_y = sy;
-        HAL_StatusTypeDef sres =
+        ls_otbn_status_t sres =
             HAL_OTBN_ECC256_ScalarMult_Polling(HAL_OTBN_ECC256_CURVE_P256, &sp);
-        REC(34, sres, sres != HAL_OK);
-        print_result("SDK ECC256 scalarmult k=0 rejected", sres, sres != HAL_OK);
+        REC(34, sres, sres != LS_OTBN_OK);
+        print_result("SDK ECC256 scalarmult k=0 rejected", sres, sres != LS_OTBN_OK);
     }
 
     /* t35: SM2 derive d=1 → pub == SM2 G */
@@ -984,20 +984,20 @@ int main(void)
         p.scalar = scalar1;
         p.result_x = rx;
         p.result_y = ry;
-        HAL_StatusTypeDef s1 = HAL_OTBN_SM2_ScalarMult_Engine_Polling(&p);
+        ls_otbn_status_t s1 = HAL_OTBN_SM2_ScalarMult_Engine_Polling(&p);
         /* d=1 -> G: firmware outputs LSW-first words, convert to BE */
         be_to_words((uint8_t *)rx, out32, SM2_BYTES);
         be_to_words((uint8_t *)ry, out32 + 8, SM2_BYTES);
-        bool one_g = (s1 == HAL_OK) &&
+        bool one_g = (s1 == LS_OTBN_OK) &&
                      bufs_eq((uint8_t *)out32, sm2_gx_be, SM2_BYTES) &&
                      bufs_eq((uint8_t *)out32 + SM2_BYTES, sm2_gy_be, SM2_BYTES);
         /* k*G == DerivePubkey(k) */
         p.scalar = scalark;
-        HAL_StatusTypeDef s2 = HAL_OTBN_SM2_ScalarMult_Engine_Polling(&p);
+        ls_otbn_status_t s2 = HAL_OTBN_SM2_ScalarMult_Engine_Polling(&p);
         uint32_t rref = HAL_OTBN_SM2_DerivePubkey(sm2_random_seed, ref_pub);
         be_to_words((uint8_t *)rx, out32, SM2_BYTES);
         be_to_words((uint8_t *)ry, out32 + 8, SM2_BYTES);
-        bool k_g = (s2 == HAL_OK) && (rref == 0) &&
+        bool k_g = (s2 == LS_OTBN_OK) && (rref == 0) &&
                    bufs_eq((uint8_t *)out32, ref_pub, SM2_BYTES * 2);
         pass = one_g && k_g;
         REC(53, s2, pass);
@@ -1030,10 +1030,10 @@ int main(void)
         sp.point_y = gy;
         sp.result_x = rx;
         sp.result_y = ry;
-        HAL_StatusTypeDef s = HAL_OTBN_ECC256_ScalarMult_Polling(HAL_OTBN_ECC256_CURVE_P256, &sp);
+        ls_otbn_status_t s = HAL_OTBN_ECC256_ScalarMult_Polling(HAL_OTBN_ECC256_CURVE_P256, &sp);
         be_to_words((uint8_t *)rx, out32, P256_BYTES);
         be_to_words((uint8_t *)ry, out32 + 8, P256_BYTES);
-        bool ok = (s == HAL_OK) &&
+        bool ok = (s == LS_OTBN_OK) &&
                   bufs_eq((uint8_t *)out32, gx_be, P256_BYTES) &&
                   bufs_eq((uint8_t *)out32 + P256_BYTES, gy_be, P256_BYTES);
         REC(54, s, ok);

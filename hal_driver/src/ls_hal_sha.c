@@ -291,7 +291,7 @@ HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint8_t
     return HAL_OK;
 }
 
-bool HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
+HAL_StatusTypeDef HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
 {
     uint32_t ct = 0x1;
     uint8_t Data[4];
@@ -300,7 +300,7 @@ bool HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len
 	uint32_t index = (out_len + 0x1f) / 0x20;
 
     if (Z == NULL || out_len == 0 || Zlen == 0 || out == NULL)
-        return false;
+        return HAL_INVALIAD_PARAM;
 
     for (uint32_t i = 0; i < index; i++)
     {
@@ -317,7 +317,7 @@ bool HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len
         memcpy(out + 0x20 * i, digest, digest_len);
         ct++;
     }
-    return true;
+    return HAL_OK;
 }
 
 void LSSHA_IRQHandler(void){}
