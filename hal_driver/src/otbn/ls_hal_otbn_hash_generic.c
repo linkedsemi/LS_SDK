@@ -30,9 +30,9 @@ static uint32_t get_hash_blockSize(otbn_hash_algo algo)
     }
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_Init(otbn_hash_algo algo)
+ls_otbn_status_t HAL_OTBN_HASH_Init(otbn_hash_algo algo)
 {
-    HAL_StatusTypeDef return_val = HAL_OK;
+    ls_otbn_status_t return_val = LS_OTBN_OK;
     switch (algo)
     {
     case OTBN_HASH_ALGO_SHA256:
@@ -45,15 +45,15 @@ HAL_StatusTypeDef HAL_OTBN_HASH_Init(otbn_hash_algo algo)
         return_val = HAL_OTBN_SHA512_Init();
         break;
     default:
-        return_val = HAL_ERROR;
+        return_val = LS_OTBN_ENGINE;
         break;
     }
     return return_val;
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_Update(otbn_hash_algo algo, uint8_t *msg, uint32_t msg_size)
+ls_otbn_status_t HAL_OTBN_HASH_Update(otbn_hash_algo algo, uint8_t *msg, uint32_t msg_size)
 {
-    HAL_StatusTypeDef return_val = HAL_OK;
+    ls_otbn_status_t return_val = LS_OTBN_OK;
     switch (algo)
     {
     case OTBN_HASH_ALGO_SHA256:
@@ -66,15 +66,15 @@ HAL_StatusTypeDef HAL_OTBN_HASH_Update(otbn_hash_algo algo, uint8_t *msg, uint32
         return_val = HAL_OTBN_SHA512_Update(msg, msg_size);
         break;
     default:
-        return_val = HAL_ERROR;
+        return_val = LS_OTBN_ENGINE;
         break;
     }
     return return_val;
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_Final(otbn_hash_algo algo, uint8_t *out)
+ls_otbn_status_t HAL_OTBN_HASH_Final(otbn_hash_algo algo, uint8_t *out)
 {
-    HAL_StatusTypeDef return_val = HAL_OK;
+    ls_otbn_status_t return_val = LS_OTBN_OK;
     switch (algo)
     {
     case OTBN_HASH_ALGO_SHA256:
@@ -87,23 +87,23 @@ HAL_StatusTypeDef HAL_OTBN_HASH_Final(otbn_hash_algo algo, uint8_t *out)
         return_val = HAL_OTBN_SHA512_Final(out);
         break;
     default:
-        return_val = HAL_ERROR;
+        return_val = LS_OTBN_ENGINE;
         break;
     }
     return return_val;
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH(otbn_hash_algo algo, uint8_t *msg, uint32_t msg_size, uint8_t *out)
+ls_otbn_status_t HAL_OTBN_HASH(otbn_hash_algo algo, uint8_t *msg, uint32_t msg_size, uint8_t *out)
 {
-    if (HAL_OTBN_HASH_Init(algo) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(algo, msg, msg_size) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_Init(algo) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(algo, msg, msg_size) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
     return HAL_OTBN_HASH_Final(algo, out);
 }
 
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HMAC_SetKey(otbn_hash_hamc_env *hmac, uint8_t *key, uint32_t key_size)
+ls_otbn_status_t HAL_OTBN_HASH_HMAC_SetKey(otbn_hash_hamc_env *hmac, uint8_t *key, uint32_t key_size)
 {
     hmac->key = key;
     hmac->key_size = key_size;
@@ -111,12 +111,12 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HMAC_SetKey(otbn_hash_hamc_env *hmac, uint8_t *k
 
     if (hmac->key_size > hmac->block_size)
     {
-        if (HAL_OTBN_HASH_Init(hmac->hash_algo) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_Update(hmac->hash_algo, hmac->key, hmac->key_size) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_Final(hmac->hash_algo, hmac->kh) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_HASH_Init(hmac->hash_algo) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_Update(hmac->hash_algo, hmac->key, hmac->key_size) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_Final(hmac->hash_algo, hmac->kh) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
 
         hmac->key = hmac->kh;
         hmac->key_size = get_hash_outLength(hmac->hash_algo);
@@ -127,36 +127,36 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HMAC_SetKey(otbn_hash_hamc_env *hmac, uint8_t *k
     for (uint8_t i = hmac->key_size; i < hmac->block_size; i++)
         hmac->kx[i] = HMAC_I_PAD ^ 0;
 
-    if (HAL_OTBN_HASH_Init(hmac->hash_algo) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_Init(hmac->hash_algo) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
     return HAL_OTBN_HASH_Update(hmac->hash_algo, hmac->kx, hmac->block_size);
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HMAC_Update(otbn_hash_hamc_env *hmac, uint8_t *msg, uint32_t msg_size)
+ls_otbn_status_t HAL_OTBN_HASH_HMAC_Update(otbn_hash_hamc_env *hmac, uint8_t *msg, uint32_t msg_size)
 {
     return HAL_OTBN_HASH_Update(hmac->hash_algo, msg, msg_size);
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HMAC_Final(otbn_hash_hamc_env *hmac, uint8_t *out)
+ls_otbn_status_t HAL_OTBN_HASH_HMAC_Final(otbn_hash_hamc_env *hmac, uint8_t *out)
 {
-    if (HAL_OTBN_HASH_Final(hmac->hash_algo, out) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_Final(hmac->hash_algo, out) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
 
     for (uint8_t i = 0; i < hmac->key_size; i++)
         hmac->kx[i] = HMAC_O_PAD ^ hmac->key[i];
     for (uint8_t i = hmac->key_size; i < hmac->block_size; i++)
         hmac->kx[i] = HMAC_O_PAD ^ 0;
 
-    if (HAL_OTBN_HASH_Init(hmac->hash_algo) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(hmac->hash_algo, hmac->kx, hmac->block_size) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(hmac->hash_algo, out, get_hash_outLength(hmac->hash_algo)) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_Init(hmac->hash_algo) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(hmac->hash_algo, hmac->kx, hmac->block_size) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(hmac->hash_algo, out, get_hash_outLength(hmac->hash_algo)) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
     return HAL_OTBN_HASH_Final(hmac->hash_algo, out);
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HMAC(otbn_hash_algo algo, uint8_t *out,
+ls_otbn_status_t HAL_OTBN_HASH_HMAC(otbn_hash_algo algo, uint8_t *out,
                         uint8_t *key, uint32_t key_size,
                         uint8_t *msg, uint32_t msg_size)
 {
@@ -167,12 +167,12 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HMAC(otbn_hash_algo algo, uint8_t *out,
 
     if (key_size > blockSize)
     {
-        if (HAL_OTBN_HASH_Init(algo) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_Update(algo, key, key_size) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_Final(algo, kh) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_HASH_Init(algo) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_Update(algo, key, key_size) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_Final(algo, kh) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         key_size = get_hash_outLength(algo);
         key = kh;
     }
@@ -182,29 +182,29 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HMAC(otbn_hash_algo algo, uint8_t *out,
     for (uint32_t i = key_size; i < blockSize; i++)
         kx[i] = HMAC_I_PAD ^ 0;
 
-    if (HAL_OTBN_HASH_Init(algo) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(algo, kx, blockSize) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(algo, msg, msg_size) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Final(algo, out) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_Init(algo) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(algo, kx, blockSize) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(algo, msg, msg_size) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Final(algo, out) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
     for (i = 0; i < key_size; i++)
         kx[i] = HMAC_O_PAD ^ key[i];
     for (i = key_size; i < blockSize; i++)
         kx[i] = HMAC_O_PAD ^ 0;
 
-    if (HAL_OTBN_HASH_Init(algo) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(algo, kx, blockSize) != HAL_OK)
-        return HAL_ERROR;
-    if (HAL_OTBN_HASH_Update(algo, out, get_hash_outLength(algo)) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_Init(algo) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(algo, kx, blockSize) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+    if (HAL_OTBN_HASH_Update(algo, out, get_hash_outLength(algo)) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
     return HAL_OTBN_HASH_Final(algo, out);
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HKDF_Extract(otbn_hash_algo algo,
+ls_otbn_status_t HAL_OTBN_HASH_HKDF_Extract(otbn_hash_algo algo,
                                 uint8_t *salt, uint32_t salt_len,
                                 uint8_t *ikm, uint32_t ikm_len,
                                 uint8_t *prk, uint32_t *prk_length)
@@ -220,7 +220,7 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HKDF_Extract(otbn_hash_algo algo,
     return HAL_OTBN_HASH_HMAC(algo, prk, salt, salt_len, ikm, ikm_len);
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HKDF_Expand(otbn_hash_algo algo,
+ls_otbn_status_t HAL_OTBN_HASH_HKDF_Expand(otbn_hash_algo algo,
                                uint8_t *prk, uint32_t prk_len,
                                uint8_t *info, uint32_t info_len,
                                uint8_t *okm, uint32_t okm_len)
@@ -236,39 +236,39 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HKDF_Expand(otbn_hash_algo algo,
     }
     hash_len = get_hash_outLength(algo);
     if (okm == NULL)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     if (prk_len < hash_len)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     N = okm_len / hash_len;
     if ((okm_len % hash_len) != 0)
         N++;
     if (N > 0xff)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     T_len = 0;
     where = 0;
     for (uint8_t i = 1; i <= N; i++)
     {
         uint8_t c = i;
-        if (HAL_OTBN_HASH_HMAC_SetKey(&hmac, prk, hash_len) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_HASH_HMAC_SetKey(&hmac, prk, hash_len) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         if (T_len != 0x0) {
-            if (HAL_OTBN_HASH_HMAC_Update(&hmac, T, T_len) != HAL_OK)
-                return HAL_ERROR;
+            if (HAL_OTBN_HASH_HMAC_Update(&hmac, T, T_len) != LS_OTBN_OK)
+                return LS_OTBN_ENGINE;
         }
-        if (HAL_OTBN_HASH_HMAC_Update(&hmac, info, info_len) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_HMAC_Update(&hmac, &c, 1) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_HMAC_Final(&hmac, T) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_HASH_HMAC_Update(&hmac, info, info_len) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_HMAC_Update(&hmac, &c, 1) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_HMAC_Final(&hmac, T) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         memcpy(okm + where, T, (i != N) ? hash_len : (okm_len - where));
         where += hash_len;
         T_len = hash_len;
     }
-    return HAL_OK;
+    return LS_OTBN_OK;
 }
 
-HAL_StatusTypeDef HAL_OTBN_HASH_HKDF(otbn_hash_algo algo,
+ls_otbn_status_t HAL_OTBN_HASH_HKDF(otbn_hash_algo algo,
                         uint8_t *salt, uint32_t salt_len,
                         uint8_t *ikm, uint32_t ikm_len,
                         uint8_t *info, uint32_t info_len,
@@ -289,8 +289,8 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HKDF(otbn_hash_algo algo,
         memset(salt, 0, salt_len);
     }
     uint32_t prk_len = 0;
-    if (HAL_OTBN_HASH_HKDF_Extract(algo, salt, salt_len, ikm, ikm_len, prk, &prk_len) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_HASH_HKDF_Extract(algo, salt, salt_len, ikm, ikm_len, prk, &prk_len) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
 
     if (info == NULL)
     {
@@ -298,32 +298,32 @@ HAL_StatusTypeDef HAL_OTBN_HASH_HKDF(otbn_hash_algo algo,
         info_len = 0;
     }
     if (okm == NULL)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     N = okm_len / hash_len;
     if ((okm_len % hash_len) != 0)
         N++;
     if (N > 0xff)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     T_len = 0x0;
     where = 0x0;
     for (uint8_t i = 1; i <= N; i++)
     {
         uint8_t c = i;
-        if (HAL_OTBN_HASH_HMAC_SetKey(&hmac, prk, hash_len) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_HASH_HMAC_SetKey(&hmac, prk, hash_len) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         if (T_len != 0x0) {
-            if (HAL_OTBN_HASH_HMAC_Update(&hmac, T, T_len) != HAL_OK)
-                return HAL_ERROR;
+            if (HAL_OTBN_HASH_HMAC_Update(&hmac, T, T_len) != LS_OTBN_OK)
+                return LS_OTBN_ENGINE;
         }
-        if (HAL_OTBN_HASH_HMAC_Update(&hmac, info, info_len) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_HMAC_Update(&hmac, &c, 1) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_HASH_HMAC_Final(&hmac, T) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_HASH_HMAC_Update(&hmac, info, info_len) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_HMAC_Update(&hmac, &c, 1) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_HASH_HMAC_Final(&hmac, T) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         memcpy(okm + where, T, (i != N) ? hash_len : (okm_len - where));
         where += hash_len;
         T_len = hash_len;
     }
-    return HAL_OK;
+    return LS_OTBN_OK;
 }

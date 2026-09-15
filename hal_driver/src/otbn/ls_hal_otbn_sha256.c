@@ -56,42 +56,42 @@ static uint32_t sha_idx;
 static uint32_t totasha256_hmac_cnt;
 static uint32_t remain_len;
 static uint8_t remain_data[SHA256_BLOCK_SIZE];
-HAL_StatusTypeDef HAL_OTBN_SHA256_Init()
+ls_otbn_status_t HAL_OTBN_SHA256_Init()
 {
     /* Refuse to re-program the engine mid-job: overwriting IMEM/DMEM
      * while a previous job is running would silently corrupt it. */
     if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
-        return HAL_BUSY;
+        return LS_OTBN_BUSY;
 
     totasha256_hmac_cnt = 0;
     remain_len = 0;
     sha_idx = SHA256_DMEM_MSG_OFFSET;
-    if (HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE) != HAL_OK)
-        return HAL_BUSY;
-    if (HAL_OTBN_IMEM_Write(0, (uint32_t *)sha256_text, SHA256_TEXT_LENTH) != HAL_OK)
-        return HAL_BUSY;
-    if (HAL_OTBN_DMEM_Write(SHA256_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA256_DMEM_STATE_SIZE) != HAL_OK ||
-        HAL_OTBN_DMEM_Write(SHA256_DMEM_MASK_OFFSET, (uint32_t *)bswap32_mask, SHA256_DMEM_MASK_SIZE) != HAL_OK ||
-        HAL_OTBN_DMEM_Write(SHA256_DMEM_K_OFFSET, (uint32_t *)K, SHA256_DMEM_K_SIZE) != HAL_OK)
-        return HAL_BUSY;
+    if (HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_BUSY;
+    if (HAL_OTBN_IMEM_Write(0, (uint32_t *)sha256_text, SHA256_TEXT_LENTH) != LS_OTBN_OK)
+        return LS_OTBN_BUSY;
+    if (HAL_OTBN_DMEM_Write(SHA256_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA256_DMEM_STATE_SIZE) != LS_OTBN_OK ||
+        HAL_OTBN_DMEM_Write(SHA256_DMEM_MASK_OFFSET, (uint32_t *)bswap32_mask, SHA256_DMEM_MASK_SIZE) != LS_OTBN_OK ||
+        HAL_OTBN_DMEM_Write(SHA256_DMEM_K_OFFSET, (uint32_t *)K, SHA256_DMEM_K_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_BUSY;
     Sha256_BlockNumber_Update(0x20);
-    return HAL_OK;
+    return LS_OTBN_OK;
 }
 
-static HAL_StatusTypeDef sha256_msg_write(uint8_t *msg)
+static ls_otbn_status_t sha256_msg_write(uint8_t *msg)
 {
     HAL_OTBN_DMEM_Write(sha_idx, (uint32_t *)msg, SHA256_BLOCK_SIZE);
     sha_idx += SHA256_BLOCK_SIZE;
     if (sha_idx == (SHA256_DMEM_MSG_SIZE + SHA256_DMEM_MSG_OFFSET))
     {
-        if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
-            return HAL_TIMEOUT;
+        if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
         sha_idx = SHA256_DMEM_MSG_OFFSET;
     }
-    return HAL_OK;
+    return LS_OTBN_OK;
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
+ls_otbn_status_t HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
 {
     totasha256_hmac_cnt += length;
     if (remain_len)
@@ -100,12 +100,12 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
         {
             memcpy(&remain_data[remain_len], msg, length);
             remain_len += length;
-            return HAL_OK;
+            return LS_OTBN_OK;
         }
         uint32_t wr_len = SHA256_BLOCK_SIZE - remain_len;
         memcpy(&remain_data[remain_len], msg, wr_len);
-        if (sha256_msg_write(remain_data) != HAL_OK)
-            return HAL_TIMEOUT;
+        if (sha256_msg_write(remain_data) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
         remain_len = 0;
         length -= wr_len;
         msg += wr_len;
@@ -113,8 +113,8 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
 
     for (uint32_t i = 0; i < (length / SHA256_BLOCK_SIZE); i++)
     {
-        if (sha256_msg_write(msg) != HAL_OK)
-            return HAL_TIMEOUT;
+        if (sha256_msg_write(msg) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
         msg += SHA256_BLOCK_SIZE;
     }
 
@@ -123,18 +123,18 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_Update(uint8_t *msg, uint32_t length)
         memcpy(&remain_data[remain_len], msg, length % SHA256_BLOCK_SIZE);
         remain_len = length % SHA256_BLOCK_SIZE;
     }
-    return HAL_OK;
+    return LS_OTBN_OK;
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_Final(uint8_t result[0x20])
+ls_otbn_status_t HAL_OTBN_SHA256_Final(uint8_t result[0x20])
 {
     uint64_t bit_cnt = totasha256_hmac_cnt * 8;
 
     remain_data[remain_len++] = 0x80;
     if (remain_len == SHA256_BLOCK_SIZE)
     {
-        if (sha256_msg_write(remain_data) != HAL_OK)
-            return HAL_TIMEOUT;
+        if (sha256_msg_write(remain_data) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
         remain_len = 0;
     }
 
@@ -143,8 +143,8 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_Final(uint8_t result[0x20])
         remain_data[remain_len++] = 0x0;
         if (remain_len == SHA256_BLOCK_SIZE)
         {
-            if (sha256_msg_write(remain_data) != HAL_OK)
-                return HAL_TIMEOUT;
+            if (sha256_msg_write(remain_data) != LS_OTBN_OK)
+                return LS_OTBN_TIMEOUT;
             remain_len = 0;
         }
     }
@@ -156,9 +156,9 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_Final(uint8_t result[0x20])
     HAL_OTBN_DMEM_Write(sha_idx, (uint32_t *)remain_data, SHA256_BLOCK_SIZE);
     sha_idx += SHA256_BLOCK_SIZE;
     Sha256_BlockNumber_Update((sha_idx - SHA256_DMEM_MSG_OFFSET) / SHA256_BLOCK_SIZE);
-    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK) {
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != LS_OTBN_OK) {
         memset(result, 0, SHA256_RESULT_SIZE);
-        return HAL_TIMEOUT;
+        return LS_OTBN_TIMEOUT;
     }
 
     uint32_t rs[8];
@@ -170,23 +170,23 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_Final(uint8_t result[0x20])
         *result++ = (uint8_t)(rs[7 - i] >> 8);
         *result++ = (uint8_t)(rs[7 - i] >> 0);
     }
-    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_SEC_WIPE_DMEM, 20000) != HAL_OK)
-        return HAL_TIMEOUT;
-    return HAL_OK;
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_SEC_WIPE_DMEM, 20000) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return LS_OTBN_OK;
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC_SetKey(uint8_t *key, uint32_t key_size)
+ls_otbn_status_t HAL_OTBN_SHA256_HMAC_SetKey(uint8_t *key, uint32_t key_size)
 {
     sha256_hmac_key_size = key_size;
     sha256_hmac_key = key;
     if (sha256_hmac_key_size > SHA256_BLOCK_SIZE)
     {
-        if (HAL_OTBN_SHA256_Init() != HAL_OK)
-            return HAL_TIMEOUT;
-        if (HAL_OTBN_SHA256_Update(sha256_hmac_key, sha256_hmac_key_size) != HAL_OK)
-            return HAL_TIMEOUT;
-        if (HAL_OTBN_SHA256_Final(sha256_hmac_kh) != HAL_OK)
-            return HAL_TIMEOUT;
+        if (HAL_OTBN_SHA256_Init() != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA256_Update(sha256_hmac_key, sha256_hmac_key_size) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA256_Final(sha256_hmac_kh) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
 
         sha256_hmac_key = sha256_hmac_kh;
         sha256_hmac_key_size = SHA256_RESULT_SIZE;
@@ -197,36 +197,36 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC_SetKey(uint8_t *key, uint32_t key_size)
     for (uint8_t i = sha256_hmac_key_size; i < SHA256_BLOCK_SIZE; i++)
         sha256_hmac_kx[i] = HMAC_I_PAD ^ 0;
 
-    if (HAL_OTBN_SHA256_Init() != HAL_OK)
-        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA256_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
     return HAL_OTBN_SHA256_Update(sha256_hmac_kx, SHA256_BLOCK_SIZE);
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC_Update(uint8_t *msg, uint32_t msg_size)
+ls_otbn_status_t HAL_OTBN_SHA256_HMAC_Update(uint8_t *msg, uint32_t msg_size)
 {
     return HAL_OTBN_SHA256_Update(msg, msg_size);
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC_Final(uint8_t *out)
+ls_otbn_status_t HAL_OTBN_SHA256_HMAC_Final(uint8_t *out)
 {
-    if (HAL_OTBN_SHA256_Final(out) != HAL_OK)
-        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA256_Final(out) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
 
     for (uint8_t i = 0; i < sha256_hmac_key_size; i++)
         sha256_hmac_kx[i] = HMAC_O_PAD ^ sha256_hmac_key[i];
     for (uint8_t i = sha256_hmac_key_size; i < SHA256_BLOCK_SIZE; i++)
         sha256_hmac_kx[i] = HMAC_O_PAD ^ 0;
 
-    if (HAL_OTBN_SHA256_Init() != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Update(sha256_hmac_kx, SHA256_BLOCK_SIZE) != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE) != HAL_OK)
-        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA256_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Update(sha256_hmac_kx, SHA256_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
     return HAL_OTBN_SHA256_Final(out);
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+ls_otbn_status_t HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
 {
     uint8_t kh[SHA256_RESULT_SIZE];
     uint8_t kx[SHA256_BLOCK_SIZE];
@@ -234,12 +234,12 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t 
 
     if (key_len > SHA256_BLOCK_SIZE)
     {
-        if (HAL_OTBN_SHA256_Init() != HAL_OK)
-            return HAL_TIMEOUT;
-        if (HAL_OTBN_SHA256_Update(key, key_len) != HAL_OK)
-            return HAL_TIMEOUT;
-        if (HAL_OTBN_SHA256_Final(kh) != HAL_OK)
-            return HAL_TIMEOUT;
+        if (HAL_OTBN_SHA256_Init() != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA256_Update(key, key_len) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA256_Final(kh) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
         key_len = SHA256_RESULT_SIZE;
         key = kh;
     }
@@ -249,30 +249,30 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_HMAC(uint8_t out[SHA256_RESULT_SIZE], uint8_t 
     for (i = key_len; i < SHA256_BLOCK_SIZE; i++)
         kx[i] = HMAC_I_PAD ^ 0;
 
-    if (HAL_OTBN_SHA256_Init() != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Update(kx, SHA256_BLOCK_SIZE) != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Update(data, data_len) != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Final(out) != HAL_OK)
-        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA256_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Update(kx, SHA256_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Update(data, data_len) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Final(out) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
 
     for (i = 0; i < key_len; i++)
         kx[i] = HMAC_O_PAD ^ key[i];
     for (i = key_len; i < SHA256_BLOCK_SIZE; i++)
         kx[i] = HMAC_O_PAD ^ 0;
 
-    if (HAL_OTBN_SHA256_Init() != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Update(kx, SHA256_BLOCK_SIZE) != HAL_OK)
-        return HAL_TIMEOUT;
-    if (HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE) != HAL_OK)
-        return HAL_TIMEOUT;
+    if (HAL_OTBN_SHA256_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Update(kx, SHA256_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA256_Update(out, SHA256_RESULT_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
     return HAL_OTBN_SHA256_Final(out);
 }
 
-HAL_StatusTypeDef HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
+ls_otbn_status_t HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
                           uint8_t *ikm, uint32_t ikm_len,
                           uint8_t *info, uint32_t info_len,
                           uint8_t *okm, uint32_t okm_len)
@@ -288,8 +288,8 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
         salt_len = SHA256_RESULT_SIZE;
         memset(salt, 0, salt_len);
     }
-    if (HAL_OTBN_SHA256_HMAC(prk, ikm, ikm_len, salt, salt_len) != HAL_OK)
-        return HAL_ERROR;
+    if (HAL_OTBN_SHA256_HMAC(prk, ikm, ikm_len, salt, salt_len) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
 
     if (info == NULL)
     {
@@ -297,31 +297,31 @@ HAL_StatusTypeDef HAL_OTBN_SHA256_HKDF(uint8_t *salt, uint32_t salt_len,
         info_len = 0;
     }
     if (okm == NULL)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     N = okm_len / SHA256_RESULT_SIZE;
     if ((okm_len % SHA256_RESULT_SIZE) != 0)
         N++;
     if (N > 0xff)
-        return HAL_ERROR;
+        return LS_OTBN_ENGINE;
     T_len = 0;
     where = 0;
     for (uint8_t i = 1; i <= N; i++)
     {
-        if (HAL_OTBN_SHA256_HMAC_SetKey(prk, SHA256_RESULT_SIZE) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_SHA256_HMAC_SetKey(prk, SHA256_RESULT_SIZE) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         if (T_len != 0x0) {
-            if (HAL_OTBN_SHA256_HMAC_Update(T, T_len) != HAL_OK)
-                return HAL_ERROR;
+            if (HAL_OTBN_SHA256_HMAC_Update(T, T_len) != LS_OTBN_OK)
+                return LS_OTBN_ENGINE;
         }
-        if (HAL_OTBN_SHA256_HMAC_Update(info, info_len) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_SHA256_HMAC_Update(&i, 1) != HAL_OK)
-            return HAL_ERROR;
-        if (HAL_OTBN_SHA256_HMAC_Final(T) != HAL_OK)
-            return HAL_ERROR;
+        if (HAL_OTBN_SHA256_HMAC_Update(info, info_len) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_SHA256_HMAC_Update(&i, 1) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_SHA256_HMAC_Final(T) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
         memcpy(okm + where, T, (i != N) ? SHA256_RESULT_SIZE : (okm_len - where));
         where += SHA256_RESULT_SIZE;
         T_len = SHA256_RESULT_SIZE;
     }
-    return HAL_OK;
+    return LS_OTBN_OK;
 }
