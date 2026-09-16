@@ -19,6 +19,7 @@ extern "C" {
 #define HMAC_I_PAD 0x36
 #define HMAC_O_PAD 0x5C
 
+#define SM3_RESULT_SIZE             (0x20)
 #define SHA256_RESULT_SIZE          (0x20)
 #define SHA384_RESULT_SIZE          (0x30)
 #define SHA512_RESULT_SIZE          (0x40)
@@ -68,6 +69,10 @@ ls_otbn_status_t HAL_OTBN_SHA512_HKDF(uint8_t *salt, uint32_t salt_len,
 ls_otbn_status_t HAL_OTBN_SM3_Init();
 ls_otbn_status_t HAL_OTBN_SM3_Final(uint8_t result[0x20]);
 ls_otbn_status_t HAL_OTBN_SM3_Update(uint8_t *msg, uint32_t length);
+ls_otbn_status_t HAL_OTBN_SM3_HMAC_SetKey(uint8_t *key, uint32_t key_size);
+ls_otbn_status_t HAL_OTBN_SM3_HMAC_Update(uint8_t *msg, uint32_t msg_size);
+ls_otbn_status_t HAL_OTBN_SM3_HMAC_Final(uint8_t *out);
+ls_otbn_status_t HAL_OTBN_SM3_HMAC(uint8_t out[SM3_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
 /* ============================================================
  * Algorithm-agnostic HASH / HMAC / HKDF wrapper
@@ -77,11 +82,13 @@ ls_otbn_status_t HAL_OTBN_SM3_Update(uint8_t *msg, uint32_t length);
 #define OTBN_HASH_BLOCK_SIZE_SHA256 (0x40)
 #define OTBN_HASH_BLOCK_SIZE_SHA384 (0x80)
 #define OTBN_HASH_BLOCK_SIZE_SHA512 (0x80)
+#define OTBN_HASH_BLOCK_SIZE_SM3    (0x40)
 #define OTBN_HASH_BLOCK_MAXSIZE     (0x80)
 
 #define OTBN_HASH_RESULT_SIZE_SHA256 (0x20)
 #define OTBN_HASH_RESULT_SIZE_SHA384 (0x30)
 #define OTBN_HASH_RESULT_SIZE_SHA512 (0x40)
+#define OTBN_HASH_RESULT_SIZE_SM3    (0x20)
 #define OTBN_HASH_RESULT_MAXSIZE     (0x40)
 
 typedef enum
@@ -89,6 +96,7 @@ typedef enum
     OTBN_HASH_ALGO_SHA256 = 0x1,
     OTBN_HASH_ALGO_SHA384 = 0x2,
     OTBN_HASH_ALGO_SHA512 = 0x4,
+    OTBN_HASH_ALGO_SM3    = 0x8,
 } otbn_hash_algo;
 
 typedef struct

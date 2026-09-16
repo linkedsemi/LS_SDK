@@ -10,6 +10,8 @@ static uint32_t get_hash_outLength(otbn_hash_algo algo)
         return SHA384_RESULT_SIZE;
     case OTBN_HASH_ALGO_SHA512:
         return SHA512_RESULT_SIZE;
+    case OTBN_HASH_ALGO_SM3:
+        return SM3_RESULT_SIZE;
     default:
         return 0;
     }
@@ -25,6 +27,8 @@ static uint32_t get_hash_blockSize(otbn_hash_algo algo)
         return OTBN_HASH_BLOCK_SIZE_SHA384;
     case OTBN_HASH_ALGO_SHA512:
         return OTBN_HASH_BLOCK_SIZE_SHA512;
+    case OTBN_HASH_ALGO_SM3:
+        return OTBN_HASH_BLOCK_SIZE_SM3;
     default:
         return 0;
     }
@@ -43,6 +47,9 @@ ls_otbn_status_t HAL_OTBN_HASH_Init(otbn_hash_algo algo)
         break;
     case OTBN_HASH_ALGO_SHA512:
         return_val = HAL_OTBN_SHA512_Init();
+        break;
+    case OTBN_HASH_ALGO_SM3:
+        return_val = HAL_OTBN_SM3_Init();
         break;
     default:
         return_val = LS_OTBN_ENGINE;
@@ -65,6 +72,9 @@ ls_otbn_status_t HAL_OTBN_HASH_Update(otbn_hash_algo algo, uint8_t *msg, uint32_
     case OTBN_HASH_ALGO_SHA512:
         return_val = HAL_OTBN_SHA512_Update(msg, msg_size);
         break;
+    case OTBN_HASH_ALGO_SM3:
+        return_val = HAL_OTBN_SM3_Update(msg, msg_size);
+        break;
     default:
         return_val = LS_OTBN_ENGINE;
         break;
@@ -85,6 +95,9 @@ ls_otbn_status_t HAL_OTBN_HASH_Final(otbn_hash_algo algo, uint8_t *out)
         break;
     case OTBN_HASH_ALGO_SHA512:
         return_val = HAL_OTBN_SHA512_Final(out);
+        break;
+    case OTBN_HASH_ALGO_SM3:
+        return_val = HAL_OTBN_SM3_Final(out);
         break;
     default:
         return_val = LS_OTBN_ENGINE;
