@@ -112,22 +112,31 @@ int  flashInit(){
         LOG_RAW("0x%x: jedec-id=[%02x %02x %02x]: size=%d\r\n", (uint32_t)flash[i]->reg, jedec_id[0], jedec_id[1], jedec_id[2], size);
 #endif
 
-        uint8_t status_reg_0;
-        uint8_t status_reg_1;
+        uint8_t status_reg_0 = 0;
+        uint8_t status_reg_1 = 0;
+        uint8_t status_reg_2 = 0;
         hal_flashx_read_status_register_0(flash[i], &status_reg_0);
         hal_flashx_read_status_register_1(flash[i], &status_reg_1);
+        hal_flashx_read_status_register_2(flash[i], &status_reg_2);
 #if !defined(NDEBUG)
-        LOG_RAW("status_reg_1: %02x, status_reg_0: %02x\r\n", status_reg_1, status_reg_0);
+        LOG_RAW("status_reg_0: %02x\r\n", status_reg_0);
+        LOG_RAW("status_reg_1: %02x\r\n", status_reg_1);
+        LOG_RAW("status_reg_2: %02x\r\n", status_reg_2);
 #endif
         if ((status_reg_1 & (~0xbf)) || (status_reg_0 & (~0x83))) {
             LOG_RAW("unlock flash\r\n");
             hal_flashx_write_status_register(flash[i], ((status_reg_1 & 0xbf) << 8) | (status_reg_0 & 0x83));
             hal_flashx_read_status_register_0(flash[i], &status_reg_0);
             hal_flashx_read_status_register_1(flash[i], &status_reg_1);
-            LOG_RAW("status_reg_1: %02x, status_reg_0: %02x\r\n", status_reg_1, status_reg_0);
+            hal_flashx_read_status_register_2(flash[i], &status_reg_2);
+            LOG_RAW("status_reg_0: %02x\r\n", status_reg_0);
+            LOG_RAW("status_reg_1: %02x\r\n", status_reg_1);
+            LOG_RAW("status_reg_2: %02x\r\n", status_reg_2);
         }
     }
-
+#if !defined(NDEBUG)
+    LOG_RAW("%s: exit\r\n", __func__);
+#endif
     return 0;
 }
 
@@ -140,7 +149,7 @@ int  flashInit(){
  */
 int  flashUnInit(){
 #if !defined(NDEBUG)
-    LOG_RAW("%s\r\n", __func__);
+    LOG_RAW("%s: enter\r\n", __func__);
 #endif
     return 0;
 }
@@ -155,9 +164,12 @@ int  flashUnInit(){
  */
 int  flashID(unsigned int* flashID){
 #if !defined(NDEBUG)
-    LOG_RAW("%s\r\n", __func__);
+    LOG_RAW("%s: enter\r\n", __func__);
 #endif
     hal_flashx_read_id(&flash1, (uint8_t *)flashID);
+#if !defined(NDEBUG)
+    LOG_RAW("%s: exit\r\n", __func__);
+#endif
     return 0;
 }
 
@@ -228,6 +240,9 @@ int flashProgram(char* dst, char *src, int size){
         current += length;
         data = (uint8_t *)data + length; 
     }
+#if !defined(NDEBUG)
+    LOG_RAW("%s: exit\r\n", __func__);
+#endif
     return 0;
 }
 
@@ -262,6 +277,9 @@ int flashRead(char* dst, char *src, int length){
     LOG_RAW("%s: dst:0x%x src:0x%x size:0x%x\r\n", __func__, dst, src, length);
 #endif
     hal_flashx_multi_io_read(flash, (uint32_t)src - flash_base_addr,(uint8_t *)dst,length);
+#if !defined(NDEBUG)
+    LOG_RAW("%s: exit\r\n", __func__);
+#endif
     return 0;
 }
 
@@ -314,6 +332,9 @@ int flashErase(char *dst, int size){
         }
     }
 
+#if !defined(NDEBUG)
+    LOG_RAW("%s: exit\r\n", __func__);
+#endif
     return 0;
 }
 
@@ -325,11 +346,16 @@ int flashErase(char *dst, int size){
  */
 int flashChipErase( ){
 #if !defined(NDEBUG)
-    LOG_RAW("%s\r\n", __func__);
+    LOG_RAW("%s: enter\r\n", __func__);
 #endif
+
     hal_flashx_chip_erase(&flash1);
 #if defined(LSQSPIV2_2_ENABLED)
     hal_flashx_chip_erase(&flash2);
+#endif
+
+#if !defined(NDEBUG)
+    LOG_RAW("%s: exit\r\n", __func__);
 #endif
     return 0;
 }
