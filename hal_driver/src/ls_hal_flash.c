@@ -215,6 +215,11 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_1,struct hal_fla
     hal_flashx_read_status_register_1_byte(env,status_reg_1,READ_STATUS_REGISTER_1_OPCODE);
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_2,struct hal_flash_env *env,uint8_t *status_reg_2)
+{
+    hal_flashx_read_status_register_1_byte(env,status_reg_2,READ_STATUS_REGISTER_2_OPCODE);
+}
+
 static void XIP_BANNED_FUNC(hal_flashx_read_status_register_1_byte_ram,struct hal_flash_env *env,uint8_t *buf,uint8_t opcode)
 {
     struct flash_wr_rd_reg_param param;
@@ -232,6 +237,11 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_0_ram,struct hal
 ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_1_ram,struct hal_flash_env *env,uint8_t *status_reg_1)
 {
     hal_flashx_read_status_register_1_byte_ram(env,status_reg_1,READ_STATUS_REGISTER_1_OPCODE);
+}
+
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_2_ram,struct hal_flash_env *env,uint8_t *status_reg_2)
+{
+    hal_flashx_read_status_register_1_byte_ram(env,status_reg_2,READ_STATUS_REGISTER_2_OPCODE);
 }
 
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_erase_security_area,struct hal_flash_env *env,uint8_t idx)

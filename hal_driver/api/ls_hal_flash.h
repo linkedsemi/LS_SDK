@@ -64,6 +64,18 @@ void hal_flashx_read_status_register_1_ram(struct hal_flash_env *env,uint8_t *st
  */
 void hal_flashx_read_status_register_1(struct hal_flash_env *env,uint8_t *status_reg_1);
 
+/** \brief Read Status Register 2 (can't be called during XIP)
+ *  \param[in] env
+ *  \param[out] status_reg_2
+ */
+void hal_flashx_read_status_register_2_ram(struct hal_flash_env *env,uint8_t *status_reg_2);
+
+/** \brief Read Status Register 2
+ *  \param[in] env
+ *  \param[out] status_reg_2
+ */
+void hal_flashx_read_status_register_2(struct hal_flash_env *env,uint8_t *status_reg_2);
+
 /** \brief Check WIP Status
  *  \param[in] env
  *  \return WIP status
