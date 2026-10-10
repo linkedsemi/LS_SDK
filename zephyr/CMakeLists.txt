@@ -425,7 +425,18 @@ if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN)
 endif()
 
 if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
-  add_custom_command(
+  if(CONFIG_SOC_LSQSH_DUAL_BOOT)
+    add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/bram_header.bin
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+    -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram_dualboot.bin
+    -o ${PROJECT_BINARY_DIR}/bram_header.bin
+    -a 0x10124000
+    DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram_dualboot.bin
+    VERBATIM
+    )
+  else()
+    add_custom_command(
     OUTPUT ${PROJECT_BINARY_DIR}/bram_header.bin
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
     -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
@@ -433,7 +444,9 @@ if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
     -a 0x10124000
     DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
     VERBATIM
-  )
+    )
+  endif()
+
   add_custom_command(
     OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
     COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/file_merge.py
@@ -508,6 +521,24 @@ endif()
     endif()
   endif()
   add_custom_target(qsh_bin_compress ALL DEPENDS ${QSH_COMPRESS_DEPS})
+
+  # ---------------------------------------------------------------------------
+  # Firmware update tarball (MANIFEST + image-bmc + image-rofs) for the
+  # dual-slot updater (phosphor-bmc-code-mgt). Runs after both the app
+  # flash image and the rofs image are generated. Script accepts optional
+  # version/machine arguments when invoked manually:
+  #   scripts/make_update_tar.sh v1.2.0 lsqsh_evb
+  # ---------------------------------------------------------------------------
+  if(CONFIG_OPENBMC_PHOSPHOR_BMC_CODE_MGT AND CONFIG_MK_ROFS)
+    add_custom_target(openbmc_update_tar ALL
+      COMMAND ${CMAKE_COMMAND} -E env
+              bash ${ZEPHYR_CURRENT_MODULE_DIR}/tools/make_update_tar.sh
+      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+              ${CMAKE_BINARY_DIR}/rofs_bin/flash_rofs.bin
+      COMMENT "Generating firmware update tarball"
+      VERBATIM
+    )
+  endif()
 
   zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
   zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
