@@ -17,15 +17,20 @@
 # Usage: make_update_tar.sh [version] [machine]
 #   version  MANIFEST version field           (default: v1.1.0)
 #   machine  MANIFEST MachineName/Compatible  (default: lsqsh_evb)
+#
+# All paths are supplied by the CMake target "openbmc_update_tar" (a west build
+# does not live in ${WS_ROOT}/build):
+#   UPDATE_TAR_APP_BIN    app flash image
+#   UPDATE_TAR_ROFS_BIN   rofs image
+#   UPDATE_TAR_OUT_DIR    output directory
 set -euo pipefail
 
-WS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 VERSION="${1:-${UPDATE_TAR_VERSION:-v1.1.0}}"
 MACHINE="${2:-${UPDATE_TAR_MACHINE:-lsqsh_evb}}"
 
-APP_BIN="${WS_ROOT}/build/zephyr/zephyr_flash_${MACHINE}_1os_xip_lsqsh_cpu1.bin"
-ROFS_BIN="${WS_ROOT}/build/rofs_bin/flash_rofs.bin"
-OUT_DIR="${WS_ROOT}/firmware_update"
+APP_BIN="${UPDATE_TAR_APP_BIN}"
+ROFS_BIN="${UPDATE_TAR_ROFS_BIN}"
+OUT_DIR="${UPDATE_TAR_OUT_DIR}"
 
 for f in "${APP_BIN}" "${ROFS_BIN}"; do
     if [ ! -f "${f}" ]; then

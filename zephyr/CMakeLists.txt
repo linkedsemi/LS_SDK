@@ -532,8 +532,12 @@ endif()
   if(CONFIG_OPENBMC_PHOSPHOR_BMC_CODE_MGT AND CONFIG_MK_ROFS)
     add_custom_target(openbmc_update_tar ALL
       COMMAND ${CMAKE_COMMAND} -E env
+              UPDATE_TAR_APP_BIN=${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+              UPDATE_TAR_ROFS_BIN=${CMAKE_BINARY_DIR}/rofs_bin/flash_rofs.bin
+              UPDATE_TAR_OUT_DIR=${CMAKE_BINARY_DIR}/firmware_update
               bash ${ZEPHYR_CURRENT_MODULE_DIR}/tools/make_update_tar.sh
-      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+              ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
               ${CMAKE_BINARY_DIR}/rofs_bin/flash_rofs.bin
       COMMENT "Generating firmware update tarball"
       VERBATIM
