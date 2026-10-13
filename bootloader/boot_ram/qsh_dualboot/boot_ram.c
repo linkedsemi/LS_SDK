@@ -4,6 +4,8 @@
 #include "boot.h"
 #include "log.h"
 #include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 #include "reg_sysc_sec_cpu.h"
 #include "reg_sysc_sec_awo.h"
 #include "reg_sec_pmu_rg.h"
@@ -34,7 +36,21 @@ struct boot_env
     char dual_app_active_image;
     uint32_t app_a_partition_offset;
     uint32_t app_b_partition_offset;
+    /* Boot-attempt bookkeeping, mirroring openbmc/phosphor-bmc-code-mgt/zephyr/
+     * fw_env.h. Both are optional: an environment written before this feature
+     * simply has neither key, and the defaults below keep the pre-existing
+     * behaviour (boot the selected slot, no counting) until the running image
+     * confirms itself for the first time. */
+    char dual_app_confirmed;   /* 0 when absent */
+    uint32_t dual_app_try_count;
 };
+
+/* Consecutive boots of the active slot that did not confirm before the SBL
+ * gives up on it and switches to the other one. The application resets the
+ * counter the moment it reaches its confirm point, so a healthy image always
+ * restarts from 0 and is never switched away; only an image that dies before
+ * that point accumulates, which is exactly the failure mode this guards. */
+#define BOOT_MAX_SLOT_TRIES 3
 
 /* Defaults mirror the production A/B layout: app A at 0x10000 (also the
  * legacy fixed offset) and app B at 0x1110000. The two slot regions are
@@ -46,6 +62,16 @@ struct boot_env
 #define DEFAULT_APP_B_OFFSET 0x01110000
 
 static char sbl_env_buf[BOOT_FLASH_SBL_ENV_SIZE];
+
+/* Text length held in sbl_env_buf (excluding the terminating NUL) and whether
+ * the partition actually looks like a key=value environment. Both are captured
+ * by load_boot_env() BEFORE anything is parsed, because the writer below has to
+ * see the partition exactly as code-mgt left it: the patcher looks for "\n"
+ * terminators and the writer programs "sbl_env_len + 1" bytes. Deriving either
+ * one after parsing is not safe -- see parse_boot_env(). */
+static size_t sbl_env_len;
+static bool sbl_env_ready;
+static bool sbl_env_dirty;   /* a key was staged and not yet programmed */
 
 static char *env_trim(char *s)
 {
@@ -74,24 +100,57 @@ static uint32_t env_hex(const char *s)
     return v;
 }
 
-static void parse_boot_env(char *buf, struct boot_env *env)
+/* Parse the environment text WITHOUT modifying it.
+ *
+ * This must stay read-only on `buf`: the whole writer below (env_patch_key(),
+ * env_append_key(), boot_env_store()) operates on the raw partition text in
+ * place. An earlier version split lines destructively -- *nl = '\0' on every
+ * '\n' -- which left sbl_env_buf holding just the first line plus a NUL. The
+ * consequences were silent and severe:
+ *   - env_patch_key() walked a buffer with no line terminators left, so every
+ *     key looked absent and every write silently degraded to append;
+ *   - boot_env_store() measured the length with strlen(), so it programmed
+ *     "dual_sec_active_image" + the appended key only (53 bytes observed) over
+ *     the top of the partition, erasing the other ~605 bytes of the table.
+ * code-mgt then found an unparsable environment and reset it to defaults,
+ * taking dual_app_active_image back to 'a' while the board was running slot B.
+ *
+ * So: copy one line at a time into a small scratch buffer, as code-mgt's
+ * fw_env_load() does, and leave the partition text alone.
+ *
+ * Accepts both selector spellings: code-mgt writes the app_* family and the
+ * production secureboot-rom the sec_* family, with identical values, so either
+ * may be read. */
+static void parse_boot_env(const char *buf, size_t len, struct boot_env *env)
 {
+    char line[64];
+
     env->dual_app_active_image = 'a';
     env->app_a_partition_offset = DEFAULT_APP_A_OFFSET;
     env->app_b_partition_offset = DEFAULT_APP_B_OFFSET;
+    env->dual_app_confirmed = 0;      /* absent -> main() treats it as "assume the target" */
+    env->dual_app_try_count = 0;
 
-    char *p = buf;
-    while (*p) {
-        char *nl = strchr(p, '\n');
-        if (nl) *nl = '\0';
-        char *eq = strchr(p, '=');
+    size_t i = 0;
+    while (i < len) {
+        size_t eol = i;
+        size_t n;
+
+        while (eol < len && buf[eol] != '\n') {
+            eol++;
+        }
+        n = eol - i;
+        if (n >= sizeof(line)) {
+            n = sizeof(line) - 1;
+        }
+        memcpy(line, buf + i, n);
+        line[n] = '\0';
+
+        char *eq = strchr(line, '=');
         if (eq) {
             *eq = '\0';
-            char *key = env_trim(p);
-            char *val = env_trim(eq + 1);
-            /* Accept both spellings: code-mgt writes the app_* family and the
-             * production secureboot-rom the sec_* family, with identical
-             * values, so either may be read. */
+            char *key = env_trim(line);
+            char *val = env_trim(eq + 1);   /* also drops the trailing CR */
             if ((0 == strcmp(key, "dual_app_active_image") ||
                  0 == strcmp(key, "dual_sec_active_image")) && val[0]) {
                 env->dual_app_active_image = val[0];
@@ -101,10 +160,14 @@ static void parse_boot_env(char *buf, struct boot_env *env)
             } else if (0 == strcmp(key, "app_b_partition_offset") ||
                        0 == strcmp(key, "sec_b_partition_offset")) {
                 env->app_b_partition_offset = env_hex(val);
+            } else if (0 == strcmp(key, "dual_app_confirmed")) {
+                env->dual_app_confirmed = val[0];
+            } else if (0 == strcmp(key, "dual_app_try_count")) {
+                env->dual_app_try_count = env_hex(val);
             }
         }
-        if (!nl) break;
-        p = nl + 1;
+
+        i = (eol < len) ? eol + 1 : len;
     }
 }
 
@@ -147,15 +210,194 @@ static bool boot_xip_rebase(uint32_t slot_offset)
     return true;
 }
 
+/* True when the partition holds something env-shaped. A freshly erased NOR
+ * sector reads back as all 0xFF, which contains no '=' at all; writing boot
+ * bookkeeping into that would leave code-mgt with a two-key environment it
+ * cannot use (every other field would read back as 0). */
+static bool env_has_keys(const char *buf, size_t len)
+{
+    for (size_t i = 0; i < len; i++) {
+        if (buf[i] == '=') {
+            return true;
+        }
+    }
+    return false;
+}
+
 static void load_boot_env(struct boot_env *env)
 {
+    const char *nul;
+
     boot_flash_read(BOOT_FLASH_SBL_ENV_ADDR, (uint8_t *)sbl_env_buf,
                     sizeof(sbl_env_buf));
     sbl_env_buf[sizeof(sbl_env_buf) - 1] = '\0';
-    parse_boot_env(sbl_env_buf, env);
-    LOG_I("sbl_env: dual_app=%c app_a=0x%x app_b=0x%x",
-          env->dual_app_active_image, env->app_a_partition_offset,
-          env->app_b_partition_offset);
+
+    /* Capture the text length BEFORE parsing -- parse_boot_env() deliberately
+     * leaves the text alone, and the writer below needs the real extent (not a
+     * strlen(), which an all-0xFF partition would report as ~8KB of garbage). */
+    nul = memchr(sbl_env_buf, '\0', sizeof(sbl_env_buf));
+    sbl_env_len = (nul != NULL) ? (size_t)(nul - sbl_env_buf)
+                                : sizeof(sbl_env_buf) - 1;
+    sbl_env_ready = env_has_keys(sbl_env_buf, sbl_env_len);
+    sbl_env_dirty = false;
+    if (!sbl_env_ready) {
+        sbl_env_len = 0;
+        sbl_env_buf[0] = '\0';
+    }
+
+    parse_boot_env(sbl_env_buf, sbl_env_len, env);
+    LOG_I("sbl_env: %u bytes, dual_app=%c app_a=0x%x app_b=0x%x confirmed=%c tries=%u",
+          (unsigned)sbl_env_len, env->dual_app_active_image,
+          env->app_a_partition_offset, env->app_b_partition_offset,
+          env->dual_app_confirmed ? env->dual_app_confirmed : '-',
+          env->dual_app_try_count);
+}
+
+/* ------------------------------------------------------------------
+ * Minimal sbl_env writer: patch one key in place.
+ *
+ * The SBL deliberately does NOT re-serialize the whole table. code-mgt owns
+ * that format (openbmc/phosphor-bmc-code-mgt/zephyr/fw_env.c serializes 22
+ * keys, most of which this SBL does not even model), and a second full writer
+ * here would drift from it the moment a key is added. Patching the two keys
+ * the boot logic owns keeps every other byte exactly as code-mgt wrote it.
+ *
+ * A replacement value must therefore have the same width as the one it
+ * replaces -- 1 char for a slot key, "0x%08x" for a hex key, both fixed by
+ * fw_env_store() -- so the text never grows and the rest of the partition is
+ * untouched. Returns false when the key is absent (the caller appends it).
+ * ------------------------------------------------------------------ */
+static bool env_patch_key(const char *key, const char *val)
+{
+    size_t keylen = strlen(key);
+    char *p = sbl_env_buf;
+
+    while (*p) {
+        char *nl = strchr(p, '\n');
+        char *line = p;
+
+        if (nl) {
+            *nl = '\0';
+        }
+
+        if (!strncmp(line, key, keylen) && line[keylen] == '=') {
+            char *oldval = line + keylen + 1;
+            /* Measure up to the line terminator only. sbl_env_buf keeps its
+             * "\r\n" endings (that is the whole point of parsing it
+             * non-destructively), so a plain strlen() would count the CR and
+             * report every value one byte wider than its replacement. */
+            size_t oldlen = strcspn(oldval, "\r\n");
+
+            if (oldlen == strlen(val)) {
+                memcpy(oldval, val, oldlen);
+            } else {
+                LOG_E("env: %s value width %u != %u, not patching", key,
+                      (unsigned)strlen(val), (unsigned)oldlen);
+            }
+            if (nl) {
+                *nl = '\n';
+            }
+            return true;
+        }
+
+        if (!nl) {
+            break;
+        }
+        *nl = '\n';
+        p = nl + 1;
+    }
+    return false;
+}
+
+/* Append "key=value\r\n" to the env text, keeping the trailing NUL. */
+static bool env_append_key(const char *key, const char *val)
+{
+    int n;
+
+    if (!sbl_env_ready || sbl_env_len + 1 >= sizeof(sbl_env_buf)) {
+        return false;
+    }
+    n = snprintf(sbl_env_buf + sbl_env_len, sizeof(sbl_env_buf) - sbl_env_len,
+                 "%s=%s\r\n", key, val);
+    if (n <= 0 || (size_t)n >= sizeof(sbl_env_buf) - sbl_env_len) {
+        return false;
+    }
+    sbl_env_len += (size_t)n;
+    return true;
+}
+
+/* Program the patched env text back, then read it back and compare. A failure
+ * is NOT fatal to the boot: the caller boots the slot it already picked, we
+ * only lose the fallback across the next reset. */
+static bool boot_env_store(void)
+{
+    uint32_t len = (uint32_t)sbl_env_len + 1; /* include the NUL */
+    uint32_t off = 0;
+    static uint8_t verify[BOOT_FLASH_SBL_ENV_SIZE];
+
+    hal_flash_sector_erase(BOOT_FLASH_SBL_ENV_ADDR);
+    hal_flash_sector_erase(BOOT_FLASH_SBL_ENV_ADDR + 4096);
+
+    /* One page program per 256-byte page. hal_flash_multi_io_page_program()
+     * issues exactly one program command (hal_flashx_quad_page_program() in
+     * ls_hal_flash_qspiv2.c does a single hal_flashx_program_operation()), and a
+     * page program that crosses a page boundary wraps inside the page instead
+     * of continuing -- the reference flashProgram() in
+     * examples/utility/flash_prog splits the same way. The env text is ~660
+     * bytes, so this is 3 pages, not one. */
+    while (off < len) {
+        uint32_t page = BOOT_FLASH_SBL_ENV_ADDR + off;
+        uint32_t chunk = 256u - (page & 0xffu);
+
+        if (chunk > len - off) {
+            chunk = len - off;
+        }
+        hal_flash_multi_io_page_program(page, (uint8_t *)sbl_env_buf + off,
+                                        (uint16_t)chunk);
+        off += chunk;
+    }
+
+    boot_flash_read(BOOT_FLASH_SBL_ENV_ADDR, verify, len);
+    if (0 != memcmp(verify, sbl_env_buf, len)) {
+        LOG_E("env: read-back mismatch, not trusted");
+        return false;
+    }
+    LOG_I("env: stored %u bytes", len);
+    return true;
+}
+
+/* Stage one key into the in-memory environment text: patched in place when the
+ * key already exists, appended otherwise. Nothing is programmed yet -- call
+ * boot_env_flush() after staging a group of related keys, so the group costs
+ * one erase + one program instead of one of each per key. */
+static bool boot_env_stage(const char *key, const char *val)
+{
+    if (!sbl_env_ready) {
+        /* Never build a partial environment on top of an erased/foreign
+         * partition: code-mgmt would read the keys it recognises and leave
+         * every other field at zero. Booting is unaffected -- the defaults
+         * parsed out of the empty buffer already describe slot A with the right
+         * offsets. */
+        LOG_E("env: %s not staged, sbl_env holds no environment yet", key);
+        return false;
+    }
+    if (!env_patch_key(key, val) && !env_append_key(key, val)) {
+        LOG_E("env: cannot set %s (no room)", key);
+        return false;
+    }
+    sbl_env_dirty = true;
+    return true;
+}
+
+/* Program the staged text back. Does nothing when no key was staged, which is
+ * the steady state (a confirmed image on the slot it already confirmed). A
+ * failure is not fatal: the caller boots the slot it already picked and we only
+ * lose the fallback across the next reset. */
+static void boot_env_flush(void)
+{
+    if (sbl_env_dirty) {
+        (void)boot_env_store();
+    }
 }
 
 void boot_flash_read(uint32_t offset, uint8_t *data, uint32_t length)
@@ -340,12 +582,96 @@ int main()
     g_boot_env = env;
 
     /* Boot the app slot selected by dual_app_active_image (code-mgt
-     * flashes the OPPOSITE slot and flips the env before rebooting).
-     * On failure fall back to the other slot, then to the legacy fixed
-     * offset (0x10000, the pre-dual-slot layout). */
-    uint32_t slot_off[2] = {env.app_a_partition_offset,
-                            env.app_b_partition_offset};
-    int first = (env.dual_app_active_image == 'b') ? 1 : 0;
+         * flashes the OPPOSITE slot and flips the env before rebooting).
+         * On failure fall back to the other slot, then to the legacy fixed
+         * offset (0x10000, the pre-dual-slot layout). */
+        uint32_t slot_off[2] = {env.app_a_partition_offset,
+                               env.app_b_partition_offset};
+
+        /* ---- Confirm-and-fallback ----------------------------------------
+         *
+         * The header CRC below only proves the image is INTACT. A brand new image
+         * can pass it and still die on its first instructions, and then nothing
+         * switches slots: this stage has already jumped, and on the next reset it
+         * would pick the same slot again -- a boot loop that only removing power
+         * breaks, while code-mgt already reported the update as successful.
+         *
+         * So count attempts. Every boot of the active slot that the application
+         * did not confirm (see fw_env_confirm_running_slot()) increments the
+         * counter; the application resets it as soon as it reaches its confirm
+         * point, so a healthy image restarts from 0 every single time and is never
+         * switched away. Once the counter passes BOOT_MAX_SLOT_TRIES the image is
+         * considered bad and the other slot is selected instead -- preferring the
+         * one that last confirmed, if that is not the slot we are leaving.
+         */
+        char target = env.dual_app_active_image;
+        char confirmed = env.dual_app_confirmed;
+        uint32_t tries = env.dual_app_try_count;
+
+        if (target != 'a' && target != 'b') {
+            LOG_E("sbl_env: bad dual_app_active_image '%c', assuming slot a", target);
+            target = 'a';
+        }
+        if (confirmed != 'a' && confirmed != 'b') {
+            /* No confirmed key yet: this environment predates the feature, or the
+             * image has never confirmed. Treat the current target as good so the
+             * boot behaviour is bit-for-bit what it was before these keys existed. */
+            confirmed = target;
+        }
+
+        tries++;
+        if (tries > BOOT_MAX_SLOT_TRIES) {
+            char other = (target == 'a') ? 'b' : 'a';
+            char next = (confirmed != target) ? confirmed : other;
+            char t[2];
+            char c[16];
+
+            LOG_W("slot %c did not confirm in %u attempts, switching to slot %c",
+                  target, tries, next);
+            target = next;
+            tries = 0;
+            /* t must be filled from the NEW target, after the assignment above.
+             * Initializing it from target at declaration time captured the slot
+             * being left, so both selector writes became no-ops (b -> b): the
+             * counter moved, the rollback did not stick, and the next boot went
+             * straight back into the abandoned slot. The read-back check in
+             * boot_env_store() cannot catch that -- it verifies the bytes it was
+             * handed, and those bytes were the wrong ones. */
+            t[0] = target;
+            t[1] = '\0';
+            snprintf(c, sizeof(c), "0x%08x", (unsigned int)tries);
+
+            /* Order matters. The counter is zeroed FIRST. Flipping the selector
+             * while a stale count still sits at BOOT_MAX_SLOT_TRIES means that a
+             * power cut between the two writes leaves the next boot tripping the
+             * fallback again and flipping straight back into the slot we just
+             * abandoned -- the rollback undoes itself. Zeroed first, an
+             * interruption instead lands on "fresh budget, old selector": the bad
+             * slot simply gets its full BOOT_MAX_SLOT_TRIES attempts before being
+             * left again.
+             *
+             * Both selector spellings are flipped: this SBL reads app_*, the
+             * production secureboot-rom reads sec_*, and fw_env_set_by_key() keeps
+             * them in lockstep. */
+            boot_env_stage("dual_app_try_count", c);
+            boot_env_stage("dual_app_active_image", t);
+            boot_env_stage("dual_sec_active_image", t);
+        } else if (tries > 1 || confirmed != target) {
+            /* Persist the counter even when we keep the slot: it is the only place
+             * the attempt count survives the reset we are about to take. Skipped
+             * entirely when it is still zero, i.e. once the image has confirmed. */
+            char c[16];
+
+            snprintf(c, sizeof(c), "0x%08x", (unsigned int)tries);
+            boot_env_stage("dual_app_try_count", c);
+        }
+        /* One erase + one program for the whole group; a no-op in steady state. */
+        boot_env_flush();
+
+        LOG_I("boot decision: slot %c (confirmed=%c tries=%u/%u)", target, confirmed,
+              tries, (unsigned)BOOT_MAX_SLOT_TRIES);
+
+        int first = (target == 'b') ? 1 : 0;
 
     while (1) {
         uint32_t exe_addr;
