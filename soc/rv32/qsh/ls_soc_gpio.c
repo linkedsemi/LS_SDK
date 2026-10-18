@@ -857,28 +857,21 @@ bool is_per_func_enable(uint8_t pin, uint8_t func_num)
     return true;
 }
 
-void per_func0_set(uint8_t pin,uint8_t per_func)
+static void per_func0_set(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     uint8_t pos = (x->num % 4) * 8;
     MODIFY_REG(SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4], 0xff << pos, per_func << pos);
 }
 
-void per_func0_enable(uint8_t pin,uint8_t per_func)
+static void per_func0_enable(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
     per_func_enable(pin, 0);
 }
 
-void per_func1_enable(uint8_t pin,uint8_t per_func)
-{
-    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] |= per_func << ((x->num % 4) * 8);
-    per_func_enable(pin, 0);
-}
-
-void per_func0_disable(uint8_t pin)
+static void per_func0_disable(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
     SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] &= ~(0xff << ((x->num % 4) * 8));
@@ -3284,7 +3277,7 @@ void pinmux_gptimc1_ch1_init(uint8_t pin,bool output,uint8_t default_val)
     // I2C_DBG_IO_CHECK(pin);
     *(uint8_t *)&gptimc1_ch1 = pin;
     timer_ch_io_cfg(pin,output,default_val);
-    per_func1_enable(pin,FIOF_GPTIMC1_CH1);// FIOF_GPTIMC1_CH1 pr FIOM_GPTIMC1_CH1
+    per_func0_enable(pin,FIOF_GPTIMC1_CH1);// FIOF_GPTIMC1_CH1 pr FIOM_GPTIMC1_CH1
 }
 
 void pinmux_gptimc1_ch1_deinit(void)
@@ -3308,7 +3301,7 @@ void pinmux_gptimc1_ch2_init(uint8_t pin,bool output,uint8_t default_val)
 {
     *(uint8_t *)&gptimc1_ch2 = pin;
     timer_ch_io_cfg(pin,output,default_val);
-    per_func1_enable(pin,FIOF_GPTIMC1_CH2);
+    per_func0_enable(pin,FIOF_GPTIMC1_CH2);
 }
 
 void pinmux_gptimc1_ch2_deinit(void)
