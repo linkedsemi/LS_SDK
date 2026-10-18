@@ -11,12 +11,6 @@ void per_func_enable(uint8_t pin, uint8_t func_num);
 
 void per_func_disable(uint8_t pin, uint8_t func_num);
 
-void per_func0_set(uint8_t pin,uint8_t per_func);
-
-void per_func0_enable(uint8_t pin,uint8_t per_func);
-
-void per_func0_disable(uint8_t pin);
-
 /**
   * @brief Init IO for SPI Flash (CS CLK DQ0 DQ1)
   */
