@@ -857,12 +857,6 @@ bool is_per_func_enable(uint8_t pin, uint8_t func_num)
     return true;
 }
 
-void per_func_disable(uint8_t pin, uint8_t func_num)
-{
-    gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    SYSC_APP_AWO->IO_FUNC[func_num][x->port >> 1] &= ~(1 << (((x->port % 2) * 16)+ x->num));
-}
-
 void per_func0_set(uint8_t pin,uint8_t per_func)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
@@ -887,8 +881,18 @@ void per_func1_enable(uint8_t pin,uint8_t per_func)
 void per_func0_disable(uint8_t pin)
 {
     gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
-    per_func_disable(pin, 0);
     SYSC_APP_PER->FUNC_SEL[x->port][x->num / 4] &= ~(0xff << ((x->num % 4) * 8));
+    SYSC_APP_AWO->IO_FUNC[0][x->port >> 1] &= ~(1 << (((x->port % 2) * 16)+ x->num));
+}
+
+void per_func_disable(uint8_t pin, uint8_t func_num)
+{
+    if (PINMUX_FUNC1 == func_num) {
+        per_func0_disable(pin);
+    } else {
+        gpio_port_pin_t *x = (gpio_port_pin_t *)&pin;
+        SYSC_APP_AWO->IO_FUNC[func_num][x->port >> 1] &= ~(1 << (((x->port % 2) * 16)+ x->num));
+    }
 }
 
 void per_func_disable_all(uint8_t pin)
