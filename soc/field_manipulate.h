@@ -13,11 +13,17 @@ extern "C" {
 
 #define READ_REG(REG)         (REG)
 
+#if !defined(SET_BIT)
 #define SET_BIT(REG, BIT)     (WRITE_REG(REG, (READ_REG(REG) | (BIT))))
+#endif
 
+#if !defined(CLEAR_BIT)
 #define CLEAR_BIT(REG, BIT)   (WRITE_REG(REG, (READ_REG(REG) & ~(BIT))))
+#endif
 
+#if !defined(READ_BIT)
 #define READ_BIT(REG, BIT)    ((READ_REG(REG)) & (BIT))
+#endif
 
 #define CLEAR_REG(REG)        (WRITE_REG(REG, 0x0))
 
