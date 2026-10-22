@@ -529,6 +529,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t
     uint32_t *out = (uint32_t *)output;
 
     uint32_t *u32_counter = (uint32_t *)counter;
+    bool carry_next = false;
 
     if ((counter == NULL) || ((inlen != 0) && ((input == NULL) || (output == NULL))))
     {
@@ -538,18 +539,36 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t
     end_addr = input + inlen;
     aes_config(false, true, false, false, false, NOT_SWAPPED, CTR);
 
-    LSCRYPT->IVR3 = __builtin_bswap32(*u32_counter++);
-    LSCRYPT->IVR2 = __builtin_bswap32(*u32_counter++);
-    LSCRYPT->IVR1 = __builtin_bswap32(*u32_counter++);
-    LSCRYPT->IVR0 = __builtin_bswap32(*u32_counter++);
+    LSCRYPT->IVR3 = __builtin_bswap32(u32_counter[0]);
+    LSCRYPT->IVR2 = __builtin_bswap32(u32_counter[1]);
+    LSCRYPT->IVR1 = __builtin_bswap32(u32_counter[2]);
+    LSCRYPT->IVR0 = __builtin_bswap32(u32_counter[3]);
 
     while (in < (uint32_t*)end_addr)
     {
+        /* Low 32 bits just wrapped (previous block was 0xffffffff): the hardware does not
+           carry into the upper 96 bits, so write the carried upper bits back once. */
+        if (carry_next)
+        {
+            LSCRYPT->IVR3 = __builtin_bswap32(u32_counter[0]);
+            LSCRYPT->IVR2 = __builtin_bswap32(u32_counter[1]);
+            LSCRYPT->IVR1 = __builtin_bswap32(u32_counter[2]);
+            carry_next = false;
+        }
+
         LSCRYPT->DATA3 = __builtin_bswap32(*in++);
         LSCRYPT->DATA2 = __builtin_bswap32(*in++);
         LSCRYPT->DATA1 = __builtin_bswap32(*in++);
         LSCRYPT->DATA0 = __builtin_bswap32(*in++);
         REG_FIELD_WR(LSCRYPT->CR,CRYPT_GO,1);
+
+        /* If this block's low 32 bits are 0xffffffff, the next block will wrap without a
+           carry, so set the flag to fix the upper bits on the next iteration. */
+        if (u32_counter[3] == 0xFFFFFFFFU)
+        {
+            carry_next = true;
+        }
+
         increment_counter(counter);
         while (REG_FIELD_RD(LSCRYPT->SR, CRYPT_AESRIF) == 0);
         LSCRYPT->ICFR = CRYPT_AESIF_MASK;
