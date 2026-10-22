@@ -15,6 +15,11 @@ extern "C" {
 #define MODE_RSA_4096_MODEXP      0x70b
 #define MODE_RSA_4096_MODEXP_F4   0x0ee
 
+/* Prime-sized moduli, for Miller-Rabin on p (128 B = RSA-2048, 192 B = RSA-3072).
+ * Generic exponent only: a Miller-Rabin exponent is a random value, never F4. */
+#define MODE_RSA_1024_MODEXP      0x2a7
+#define MODE_RSA_1536_MODEXP      0x7c3
+
 #define RSA_OFFSET_N              0x00000020
 #define RSA_OFFSET_MODE           0x00000000
 #define RSA_OFFSET_D              0x00000220
@@ -30,6 +35,11 @@ extern const uint32_t rsa_imem_size;
 #define MODE_RSA_KEYGEN_3072                0x4e5
 #define MODE_RSA_KEYGEN_4096                0x63a
 
+/* CHECK_PRIME modes: the host puts the candidate at RSA_KEYGEN_OFFSET_P and the
+ * mode at RSA_KEYGEN_OFFSET_MODE, then reads the verdict from
+ * RSA_KEYGEN_OFFSET_STATUS (0xFFFFFFFF = probably prime, 0 = composite).
+ * Precondition on the candidate: it must be congruent to 3 (mod 4). Any other
+ * residue is always reported composite. */
 #define MODE_RSA_KEYGEN_CHECK_PRIME_2048    0x48e
 #define MODE_RSA_KEYGEN_CHECK_PRIME_3072    0x018
 #define MODE_RSA_KEYGEN_CHECK_PRIME_4096    0x442
