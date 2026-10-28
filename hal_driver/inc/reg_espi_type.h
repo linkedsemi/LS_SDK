@@ -245,7 +245,7 @@ enum ESPI_REG_DW_NPST_ADR_FIELD
 enum ESPI_REG_UP_PSTC_LEN_M1_FIELD
 {
     // up stream posted command length minus 1; Type:RW; Reset:0x00
-    ESPI_UP_PSTC_LEN_M1_MASK = (int)0x1F,
+    ESPI_UP_PSTC_LEN_M1_MASK = (int)0x1FF,
     ESPI_UP_PSTC_LEN_M1_POS = 0
 };
 
