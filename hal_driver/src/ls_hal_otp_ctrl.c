@@ -63,7 +63,7 @@ void HAL_OTP_GET_RD_Addr(uint32_t addr[0x4])
     }
 }
 
-static void otp_single_wirte(uint32_t *buffer, uint32_t offset, uint32_t length, bool pas)
+static void otp_single_write(uint32_t *buffer, uint32_t offset, uint32_t length, bool pas)
 {
     uint32_t idx = 0;
 
@@ -114,8 +114,8 @@ static bool otp_block_write(uint32_t offset, uint8_t *data, uint32_t length)
         p_buffer[i] = data[i] | ~p_buffer[i];
     }
 
-    otp_single_wirte(buffer, offset, length, 0);// pas low
-    otp_single_wirte(buffer, offset, length, 1);// pas high
+    otp_single_write(buffer, offset, length, 0);// pas low
+    otp_single_write(buffer, offset, length, 1);// pas high
 
     return true;
 }
