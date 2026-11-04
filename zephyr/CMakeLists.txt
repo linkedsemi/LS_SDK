@@ -522,28 +522,6 @@ endif()
   endif()
   add_custom_target(qsh_bin_compress ALL DEPENDS ${QSH_COMPRESS_DEPS})
 
-  # ---------------------------------------------------------------------------
-  # Firmware update tarball (MANIFEST + image-bmc + image-rofs) for the
-  # dual-slot updater (phosphor-bmc-code-mgt). Runs after both the app
-  # flash image and the rofs image are generated. Script accepts optional
-  # version/machine arguments when invoked manually:
-  #   scripts/make_update_tar.sh v1.2.0 lsqsh_evb
-  # ---------------------------------------------------------------------------
-  if(CONFIG_OPENBMC_PHOSPHOR_BMC_CODE_MGT AND CONFIG_MK_ROFS)
-    add_custom_target(openbmc_update_tar ALL
-      COMMAND ${CMAKE_COMMAND} -E env
-              UPDATE_TAR_APP_BIN=${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
-              UPDATE_TAR_ROFS_BIN=${CMAKE_BINARY_DIR}/rofs_bin/flash_rofs.bin
-              UPDATE_TAR_OUT_DIR=${CMAKE_BINARY_DIR}/firmware_update
-              bash ${ZEPHYR_CURRENT_MODULE_DIR}/tools/make_update_tar.sh
-      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
-              ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
-              ${CMAKE_BINARY_DIR}/rofs_bin/flash_rofs.bin
-      COMMENT "Generating firmware update tarball"
-      VERBATIM
-    )
-  endif()
-
   zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
   zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
   zephyr_compile_definitions(CONFIG_INTC_CLIC)
