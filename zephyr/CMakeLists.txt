@@ -75,6 +75,9 @@ if(CONFIG_SOC_LS1010)
     ../soc
     ../soc/rv32
     ../soc/rv32/leo
+    ../soc/rv32/csi2
+    ../soc/rv32/csi2/include
+    ../soc/rv32/csi2/include/core
     ../hal_driver/inc
     ../hal_driver/api
     ../module/common
@@ -110,7 +113,6 @@ if(CONFIG_SOC_LS1010)
     ../module/common/circular_doubly_linked_list.c
     ../module/common/linked_async_framework.c
     ../module/common/async_call.c
-    ../module/common/sw_timer.c
     ../module/crc/crc16.c
     # ../module/debug/log.c
     ../module/debug/ls_dbg.c
@@ -140,8 +142,6 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_dac_dma.c
     ../hal_driver/src/ls_hal_uart_dma.c
     ../hal_driver/src/ls_hal_ssi.c
-    ../hal_driver/src/ls_hal_spi_i2s.c
-    ../hal_driver/src/ls_hal_spi_i2s_dma.c
     ../hal_driver/src/ls_hal_spis.c
     ../hal_driver/src/ls_hal_spis_dma.c
     ../hal_driver/src/ls_hal_timer.c
@@ -166,7 +166,7 @@ if(CONFIG_SOC_LS1010)
     # ../soc/rv32/int_call_asm.S
     ../soc/rv32/leo/cpu.c
     ../soc/rv32/leo/sleep_asm.S
-    ../soc/rv32/leo/exception_entry.S
+    # ../soc/rv32/leo/exception_entry.S
     ../soc/rv32/leo/delay_asm.S
     ../soc/rv32/leo/ls_msp_qspiv2.c
     ../soc/rv32/leo/ls_msp_uart.c
@@ -190,7 +190,6 @@ if(CONFIG_SOC_LS1010)
     ../soc/rv32/leo/sys_stat.c
     ../soc/rv32/leo/platform.c
     ../soc/rv32/leo/efuse.c
-    ../soc/rv32/leo/sleep.c
     ../soc/rv32/leo/ls_msp_ssi.c
     ../soc/rv32/leo/ls_msp_timer.c
     ../soc/rv32/leo/ls_msp_i2c.c
@@ -250,6 +249,10 @@ if(CONFIG_SOC_LS1010)
   zephyr_library_sources(
     ${CMAKE_CURRENT_BINARY_DIR}/__info_array.c
   )
+
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
+  zephyr_compile_definitions(CONFIG_INTC_CLIC)
 
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
 endif()
