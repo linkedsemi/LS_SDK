@@ -559,7 +559,7 @@ __ALWAYS_STATIC_INLINE unsigned long __get_SP(void)
  */
 __ALWAYS_STATIC_INLINE void __set_SP(unsigned long sp)
 {
-    __ASM volatile("mv sp, %0" : : "r"(sp): "sp");
+    __ASM volatile("mv sp, %0" : : "r"(sp): );
 }
 
 /**
