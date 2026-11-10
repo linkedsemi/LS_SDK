@@ -18,7 +18,7 @@ extern const unsigned char one_bits[];
 #define ARRAY_NB_COLUMNS(array)  (sizeof((array[0]))/sizeof((array)[0][0]))
 
 /// Macro to get a structure from one of its structure field
-#if !defined(KERNEL)
+#if !defined(__ZEPHYR__)
 #ifndef CONTAINER_OF
 #define CONTAINER_OF(ptr, type, member)    ((type *)( (char *)ptr - offsetof(type,member) ))
 #endif

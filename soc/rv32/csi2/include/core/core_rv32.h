@@ -252,8 +252,12 @@ typedef struct {
 #ifndef MSTATUS_MPP_M
 #define MSTATUS_MPP_M    (3UL << 11)     // Machine mode                     11
 #endif
+#ifndef MSTATUS_MPP_S
 #define MSTATUS_MPP_S    (1UL << 11)     // Supervisor mode                  01
+#endif
+#ifndef MSTATUS_MPP_U
 #define MSTATUS_MPP_U    (0UL << 11)     // User mode                        00
+#endif
 
 // SSTATUS Register
 #define SSTATUS_SPP_MASK (1UL << 8)      // sstatus.SPP                      [8]
