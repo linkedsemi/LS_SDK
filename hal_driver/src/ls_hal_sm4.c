@@ -200,7 +200,7 @@ static void block_crypt(uint8_t *in, uint8_t *out)
 				   (((x) & 0xff00) << 40) | \
 				   (((x) & 0xff) << 56)))
 
-#if !defined(KERNEL)
+#if !defined(__ZEPHYR__)
 #define UNALIGNED_PUT(v, p)                                             \
 do {   ;                                                                 \
 	struct __attribute__((__packed__)) {                            \
