@@ -63,10 +63,13 @@ HAL_StatusTypeDef HAL_SM4_KeyExpansion_IT(const uint8_t *key)
 static void sm4_data_length_inout_config(const uint8_t *data, uint32_t length, uint8_t *result)
 {
     LS_ASSERT(length % 16 == 0);
+    /* SM4_CALC_LEN is a 14-bit field (max 16384 blocks) */
+    LS_ASSERT(length / 16 - 1 <= (SM4_CALC_LEN_MASK >> SM4_CALC_LEN_POS));
+
     writeflag = true;
     crypt_in = data;
     crypt_out = result;
-    REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_LEN, (uint8_t)(length / 16 - 1));
+    REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_LEN, length / 16 - 1);
 }
 
 static void sm4_start()
