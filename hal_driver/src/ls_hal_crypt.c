@@ -606,7 +606,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CTR_Crypt(uint8_t counter[0x10], const uint8_t
 				   (((x) & 0xff00) << 40) | \
 				   (((x) & 0xff) << 56)))
 
-#if !defined(KERNEL)
+#if !defined(__ZEPHYR__)
 #define UNALIGNED_PUT(v, p)                                             \
 do {   ;                                                                 \
 	struct __attribute__((__packed__)) {                            \
