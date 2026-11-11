@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "log.h": "c"
-    },
-    "cmake.sourceDirectory": "D:/ble_host/zephyr4_0/modules/hal/linkedsemi/module/tinyusb/examples/device/hid_composite"
-}
