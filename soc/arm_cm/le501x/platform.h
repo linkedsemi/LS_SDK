@@ -108,6 +108,30 @@ uint32_t GenerateRandom32Bit();
 #define OSTICK_HS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step)/625)
 #define OSTICK_HUS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step) - 625*OSTICK_HS_STEP_INC(Hz,step))
 
+#if defined(__ZEPHYR__)
+#include <zephyr/sys/atomic.h>
+#else
+static inline bool atomic_cas_ram(long *ptr, long oldval, long newval)
+{
+    if(*ptr == oldval) {
+        *ptr = newval;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline long atomic_inc(long *ptr)
+{
+    return ++(*ptr);
+}
+
+static inline long atomic_dec(long *ptr)
+{
+    return --(*ptr);
+}
+#endif
+
 #ifdef __cplusplus
 }
 #endif
