@@ -1,5 +1,5 @@
+#include <stdio.h>
 #include "log.h"
-#include "mini-printf.h"
 #include "SEGGER_RTT.h"
 #include "ls_hal_uart.h"
 #include "ls_soc_gpio.h"
@@ -7,6 +7,9 @@
 #include "cpu.h"
 #if __riscv
 #include "semihosting.h"
+#endif
+#if LOG_USE_MINI_PRINTF
+#include "mini-printf.h"
 #endif
 
 #define JLINK_RTT 1
@@ -27,7 +30,9 @@
 #endif
 #endif
 #define RAM_LOG_BUF_SIZE 10000
-static const char *linefeed_value = "\r\n";
+#if LOG_USE_MINI_PRINTF
+const char *linefeed_value = "\r\n";
+#endif
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
 char ram_array[RAM_LOG_BUF_SIZE];
 bool log_en;
@@ -38,6 +43,7 @@ void ram_log_print(char *ptr, int len);
 
 #if (LOG_BACKEND&UART_LOG)
 
+#if defined(LOG_UART_INST)
 #if (LOG_UART_INST == LOG_UART1)
 #define LOG_UART  UART1
 #define LOG_PINMUX_INIT_FUNC pinmux_uart1_init
@@ -61,6 +67,15 @@ void ram_log_print(char *ptr, int len);
 #else
 #error "No This Uart Instance..."
 #endif
+#else
+/* Older SDK revisions (e.g. 24e4b459) have no LOG_UART_INST selection;
+ * they always logged on UART3. */
+#define LOG_UART  UART3
+#define LOG_PINMUX_INIT_FUNC pinmux_uart3_init
+#define LOG_PINMUX_DEINIT_FUNC pinmux_uart3_deinit
+#define LOG_LL_MSP_INIT_FUNC LL_UART3_MSP_Init
+#define LOG_LL_MSP_DEINIT_FUNC LL_UART3_MSP_DeInit
+#endif
 
 static void uart_log_tx(char *ptr,int len)
 {
@@ -78,7 +93,7 @@ static void uart_log_init()
 {
     LOG_LL_MSP_INIT_FUNC();
     LOG_PINMUX_INIT_FUNC(LOG_UART_TXD, LOG_UART_RXD);
-    
+
     REG_FIELD_WR(LOG_UART->LCR, UART_LCR_BRWEN, 1);
     LOG_UART->BRR = LOG_UART_BAUDRATE;
     REG_FIELD_WR(LOG_UART->LCR, UART_LCR_BRWEN, 0);
@@ -176,6 +191,7 @@ int __write (int fd, char *ptr, int len)
 }
 #endif
 
+#if LOG_USE_MINI_PRINTF
 int mini_puts(char* ptr, int len, void* buf)
 {
     #if(LOG_BACKEND&JLINK_RTT)
@@ -212,6 +228,30 @@ void log_output(bool linefeed,const char *format,...)
     if(linefeed)
         mini_puts((void *)linefeed_value, 2, NULL);
 }
+
+static void print_str(char *log_format_buff)
+{
+    mini_vpprintf(mini_puts, NULL, log_format_buff, "%s");
+}
+#else
+
+void log_output(bool linefeed,const char *format,...)
+{
+    va_list args;
+    va_start(args,format);
+    vprintf(format, args);
+    va_end(args);
+    if(linefeed)
+    {
+        putchar('\n');
+    }
+}
+
+static void print_str(char *log_format_buff)
+{
+    printf("%s", log_format_buff);
+}
+#endif
 
 void ls_log_init()
 {
@@ -268,7 +308,7 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     }
     *bufptr = '\n'; bufptr ++;
     *bufptr = '\0';
-    mini_vpprintf(mini_puts, NULL, log_format_buff, "%s");
+    print_str(log_format_buff);
 }
 
 void ram_log_print(char *ptr, int len)
