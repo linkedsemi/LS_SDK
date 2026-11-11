@@ -7,6 +7,8 @@
 #include "ls_dbg.h"
 #include "reg_sysc_awo_type.h"
 #include "field_manipulate.h"
+#include "common.h"
+#include "systick.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,6 +70,42 @@ void sys_init_none();
 #define SRAM_BIT_BAND_ADDR(addr,bit) (uint32_t *)(((uint32_t)(addr)-0x20000000)*32+4*(bit)+0x22000000)
 
 #define PERI_BIT_BAND_ADDR(addr,bit) (uint32_t *)(((uint32_t)(addr)-0x40000000)*32+4*(bit)+0x42000000)
+
+static inline uint32_t flash_get_current_time(void)
+{
+    uint32_t t1, t2, val;
+    do {
+        t1  = systick_get_value();
+        val = SysTick->VAL;
+        t2  = systick_get_value();
+    } while (t1 != t2);
+    return t1 * (SysTick->LOAD + 1) + (SysTick->LOAD - val);
+}
+static inline uint32_t flash_time_us2ticks(uint32_t us) { return us * SDK_HCLK_MHZ; }
+
+#if defined(__ZEPHYR__)
+#include <zephyr/sys/atomic.h>
+#else
+static inline bool atomic_cas_ram(long *ptr, long oldval, long newval)
+{
+    if(*ptr == oldval) {
+        *ptr = newval;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static inline long atomic_inc(long *ptr)
+{
+    return ++(*ptr);
+}
+
+static inline long atomic_dec(long *ptr)
+{
+    return --(*ptr);
+}
+#endif
 
 #if defined(LM3050) && defined(FLASH_PROG_ALGO)
 __attribute__((long_call)) void arm_cm_delay_asm(uint32_t);

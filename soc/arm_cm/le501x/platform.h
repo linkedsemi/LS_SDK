@@ -5,7 +5,8 @@
 #include "sdk_config.h"
 #include "compile_flag.h"
 #include "le501x.h"
-
+#include "common.h"
+#include "systick.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -107,6 +108,18 @@ uint32_t GenerateRandom32Bit();
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))
 #define OSTICK_HS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step)/625)
 #define OSTICK_HUS_STEP_INC(Hz,step) (2000*1000/(Hz)*(step) - 625*OSTICK_HS_STEP_INC(Hz,step))
+
+static inline uint32_t flash_get_current_time(void)
+{
+    uint32_t t1, t2, val;
+    do {
+        t1  = systick_get_value();
+        val = SysTick->VAL;
+        t2  = systick_get_value();
+    } while (t1 != t2);
+    return t1 * (SysTick->LOAD + 1) + (SysTick->LOAD - val);
+}
+static inline uint32_t flash_time_us2ticks(uint32_t us) { return us * SDK_HCLK_MHZ; }
 
 #if defined(__ZEPHYR__)
 #include <zephyr/sys/atomic.h>
