@@ -138,9 +138,9 @@ void HAL_PDM_PingPong_Transfer_Abort(PDM_HandleTypeDef *hpdm,bool stereo)
 #elif defined(LEO)
 #include "ls_hal_dmacv3.h"
 
-static void PDM_DMA_CH0_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void PDM_DMA_CH0_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
         hpdm->Env.DMA.Channel_Done[0] = true;
@@ -151,9 +151,9 @@ static void PDM_DMA_CH0_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t par
     }
 }
 
-static void PDM_DMA_CH1_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void PDM_DMA_CH1_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
         hpdm->Env.DMA.Channel_Done[1] = true;

@@ -2,9 +2,16 @@
 #define APP_CONFIG_H_
 
 
-
+#if defined(LEO)
 #define SDK_HCLK_MHZ (144)
+#elif defined(QSH)
+#define SDK_HCLK_MHZ (75)
+#endif
 
-
+#if !defined(NDEBUG)
+#define LOG_BACKEND (2)
+#undef LOG_TAG
+#define LOG_TAG     ""
+#endif
 
 #endif

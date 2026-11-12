@@ -8,25 +8,26 @@ extern "C" {
 
 typedef struct
 {
-    volatile uint32_t CR1;
-    volatile uint16_t CR2_0_1;
+    volatile uint32_t CR1; //0x0
+    volatile uint16_t CR2_0_1; //0x4
     volatile uint8_t CR2_2;
     volatile uint8_t CR2_3;
-    volatile uint32_t OAR1;
-    volatile uint32_t OAR2;
-    volatile uint32_t TIMINGR;
-    volatile uint32_t TIMEOUTR;
-    volatile uint32_t SR;
-    volatile uint32_t CFR;
-    volatile uint32_t PECR;
-    volatile uint32_t RXDR;
-    volatile uint32_t TXDR;
-    volatile uint32_t IER;
-    volatile uint32_t IDR;
-    volatile uint32_t IVS;
-    volatile uint32_t RIF;
-    volatile uint32_t IFM;
-    volatile uint32_t ICR;
+    volatile uint32_t OAR1; //0x8
+    volatile uint32_t OAR2; //0xc
+    volatile uint32_t TIMINGR; //0x10
+    volatile uint32_t TIMEOUTR; //0x14
+    volatile uint32_t SR; //0x18
+    volatile uint32_t CFR; //0x1c
+    volatile uint32_t PECR; //0x20
+    volatile uint32_t RXDR; //0x24
+    volatile uint32_t TXDR; //0x28
+    volatile uint32_t IER; //0x2c
+    volatile uint32_t IDR; //0x30
+    volatile uint32_t IVS; //0x34
+    volatile uint32_t RIF; //0x38
+    volatile uint32_t IFM; //0x3c
+    volatile uint32_t ICR; //0x40
+    volatile uint32_t STAT; //0x44
 }reg_i2c_t;
 
 enum I2C_REG_CR1_FIELD
@@ -249,6 +250,38 @@ enum I2C_REG_INT_FIELD
     I2C_INT_TOUT_POS = 12,
     I2C_INT_ALERT_MASK = 0x2000,
     I2C_INT_ALERT_POS = 13,
+};
+
+enum I2C_REG_STAT_FIELD
+{
+    I2C_STAT_FSM_STAT_MASK = 0xf,
+    I2C_STAT_FSM_STAT_POS = 0,
+    I2C_STAT_SMBA_OE_MASK = 0x10,
+    I2C_STAT_SMBA_OE_POS = 4,
+    I2C_STAT_SDA_OE_MASK = 0x20,
+    I2C_STAT_SDA_OE_POS = 5,
+    I2C_STAT_SCL_OE_MASK = 0x40,
+    I2C_STAT_SCL_OE_POS = 6,
+};
+
+enum I2C_REG_STAT_FSM_FIELD
+{
+    I2C_STAT_FSM_ST_IDLE,
+    I2C_STAT_FSM_M_WAIT,
+    I2C_STAT_FSM_M_START,
+    I2C_STAT_FSM_M_ADDR1,
+    I2C_STAT_FSM_M_ADDR2,
+    I2C_STAT_FSM_M_DATA,
+    I2C_STAT_FSM_M_RESTART,
+    I2C_STAT_FSM_M_HOLD,
+    I2C_STAT_FSM_M_PEC,
+    I2C_STAT_FSM_M_STOP,
+    I2C_STAT_FSM_S_START,
+    I2C_STAT_FSM_S_ADDR1,
+    I2C_STAT_FSM_S_ADDR2,
+    I2C_STAT_FSM_S_DATA,
+    I2C_STAT_FSM_S_HOLD,
+    I2C_STAT_FSM_S_PEC,
 };
 
 #ifdef __cplusplus

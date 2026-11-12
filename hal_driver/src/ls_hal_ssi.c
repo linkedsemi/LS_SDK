@@ -280,7 +280,7 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_HalfDuplex_IT(SSI_HandleTypeDef *hssi,
     return HAL_OK;
 }
 
-static inline void ssi_spi_ctrlr0_set(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg)
+void ssi_spi_ctrlr0_set(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg)
 {
     hssi->REG->SPI_CTRLR0 = *(uint32_t *)cfg;
 }
@@ -331,6 +331,40 @@ HAL_StatusTypeDef HAL_SSI_Dual_Receive(SSI_HandleTypeDef *hssi,SSI_DualQuadConf 
     return HAL_OK;
 }
 
+HAL_StatusTypeDef HAL_SSI_QPI_Transmit(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Specific_Mode;
+    conf.inst_l = Instruction_Length_8_bits;
+    tx_var_init(hssi,Data,Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only,Quad_SPI_Format);
+    ssi_spi_ctrlr0_set(hssi,&conf);
+    ssi_config_it(hssi,false,false);
+    ssi_data_tx(hssi);
+    ssi_ser_cfg(hssi);
+    while(hssi->Tx_Env.Interrupt.Count)
+    {
+        ssi_data_tx(hssi);
+    }
+    ssi_disable(hssi);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_QPI_Receive(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
+{
+    rx_var_init(hssi,Data,Count);
+    ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only,Quad_SPI_Format);
+    hssi->REG->CTRLR1 = Count - 1;
+    ssi_config_it(hssi,false,false);
+    ssi_ser_cfg(hssi);
+    hssi->DR_REG[0] = 0;
+    while(hssi->Rx_Env.Interrupt.Count)
+    {
+        ssi_data_rx(hssi);
+    }
+    ssi_disable(hssi);
+    return HAL_OK;
+}
 
 HAL_StatusTypeDef HAL_SSI_Quad_Transmit(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count)
 {
@@ -363,6 +397,116 @@ HAL_StatusTypeDef HAL_SSI_Quad_Receive(SSI_HandleTypeDef *hssi,SSI_DualQuadConf 
     }
     ssi_disable(hssi);
     return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Qcmd_Receive(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *RX_Data,uint16_t RX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Specific_Mode;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Quad_Receive(hssi, &conf, addr, inst, RX_Data, RX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Qcmd_Transmit(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *TX_Data,uint16_t TX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Specific_Mode;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Quad_Transmit(hssi, &conf, addr, inst, TX_Data, TX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Daddr_Receive(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *RX_Data,uint16_t RX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Instruction_Standard_Address_Specific;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Dual_Receive(hssi, &conf, addr, inst, RX_Data, RX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Daddr_Transmit(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *TX_Data,uint16_t TX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Instruction_Standard_Address_Specific;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Dual_Transmit(hssi, &conf, addr, inst, TX_Data, TX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Ddata_Receive(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *RX_Data,uint16_t RX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Standard_SPI_Mode;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Dual_Receive(hssi, &conf, addr, inst, RX_Data, RX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Dual_Ddata_Transmit(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *TX_Data,uint16_t TX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Standard_SPI_Mode;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Dual_Transmit(hssi, &conf, addr, inst, TX_Data, TX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Qaddr_Receive(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *RX_Data,uint16_t RX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Instruction_Standard_Address_Specific;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Quad_Receive(hssi, &conf, addr, inst, RX_Data, RX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Qaddr_Transmit(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *TX_Data,uint16_t TX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Instruction_Standard_Address_Specific;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Quad_Transmit(hssi, &conf, addr, inst, TX_Data, TX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Qdata_Receive(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *RX_Data,uint16_t RX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Standard_SPI_Mode;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Quad_Receive(hssi, &conf, addr, inst, RX_Data, RX_Count);
+}
+
+HAL_StatusTypeDef HAL_SSI_Quad_Qdata_Transmit(SSI_HandleTypeDef *hssi,uint64_t addr,SPI_CTRLR0_ADDR_L_FIELD addr_len,uint16_t inst,uint8_t wait_cycles,void *TX_Data,uint16_t TX_Count)
+{
+    SSI_DualQuadConf conf = {0};
+    conf.trans_type = Both_Standard_SPI_Mode;
+    conf.addr_l = addr_len;
+    conf.inst_l = Instruction_Length_8_bits;
+    conf.wait_cycles = wait_cycles;
+
+    return HAL_SSI_Quad_Transmit(hssi, &conf, addr, inst, TX_Data, TX_Count);
 }
 
 HAL_StatusTypeDef HAL_SSI_Dual_Transmit_IT(SSI_HandleTypeDef *hssi,SSI_DualQuadConf *cfg,uint64_t addr,uint16_t inst,void *TX_Data,uint16_t TX_Count)

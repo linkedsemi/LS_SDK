@@ -1,0 +1,260 @@
+#include "ls_hal_otbn_sha.h"
+
+#define SM3_TEXT_LENTH           (1000)
+#define SM3_DMEM_LENTH           (320)
+extern const char sm3_text[SM3_TEXT_LENTH];
+extern const char sm3_dmem[SM3_DMEM_LENTH];
+#define SM3_DMEM_BLOCKNUM_OFFSET (0x00000bc0)
+#define SM3_DMEM_BLOCKNUM_SIZE   (0x4)
+
+#define SM3_OTBN_MAX_CHUNKS    (33)  // 33*64 = 2112 btye， otbn sm3 once process
+#define SM3_DMEM_MSG_SIZE        (2112)
+#define SM3_DMEM_MSG_OFFSET      (0x00000380)
+
+#define SM3_DMEM_STATE_IV_OFFSET    (0x00000120)
+#define SM3_DMEM_STATE_IV_SIZE      (0x20)
+
+/* can be changed */
+static const uint32_t state_init[8] = {
+    0x7380166f, 0x4914b2b9, 0x172442d7, 0xda8a0600,
+    0xa96f30bc, 0x163138aa, 0xe38dee4d, 0xb0fb0e4e
+};
+static uint32_t currnt_state[8];
+
+static uint32_t totash_sm3_msg_total_len;
+static uint32_t remain_len;
+static uint8_t remain_data[SM3_BLOCK_SIZE];
+ls_otbn_status_t HAL_OTBN_SM3_Init()
+{
+    /* Refuse to re-program the engine mid-job: overwriting IMEM/DMEM
+     * while a previous job is running would silently corrupt it. */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+        return LS_OTBN_BUSY;
+
+    totash_sm3_msg_total_len = 0;
+    remain_len = 0;
+    // sha_idx = SM3_DMEM_MSG_OFFSET;
+    if (HAL_OTBN_DMEM_Set(0, 0x0, OTBN_DMEM_SIZE) != HAL_OK)
+        return LS_OTBN_BUSY;
+    if (HAL_OTBN_IMEM_Write(0, (uint32_t *)sm3_text, SM3_TEXT_LENTH) != HAL_OK)
+        return LS_OTBN_BUSY;
+    if (HAL_OTBN_DMEM_Write(0, (uint32_t *)sm3_dmem, SM3_DMEM_LENTH) != HAL_OK)
+        return LS_OTBN_BUSY;
+    memcpy32(currnt_state,state_init,8);
+    return LS_OTBN_OK;
+}
+
+static ls_otbn_status_t sm3_msg_write(uint8_t *msg,uint32_t chunks_num)
+{
+    HAL_OTBN_DMEM_Write(SM3_DMEM_STATE_IV_OFFSET,currnt_state,SM3_DMEM_STATE_IV_SIZE);
+    HAL_OTBN_DMEM_Write(SM3_DMEM_BLOCKNUM_OFFSET,&chunks_num,SM3_DMEM_BLOCKNUM_SIZE);
+    HAL_OTBN_DMEM_Write(SM3_DMEM_MSG_OFFSET, (uint32_t *)msg, SM3_BLOCK_SIZE*chunks_num);
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+        return LS_OTBN_TIMEOUT;
+    HAL_OTBN_DMEM_Read(SM3_DMEM_STATE_IV_OFFSET,currnt_state,SM3_DMEM_STATE_IV_SIZE);
+    (void)chunks_num;
+    return LS_OTBN_OK;
+}
+
+ls_otbn_status_t HAL_OTBN_SM3_Update(uint8_t *msg, uint32_t length)
+{
+    uint32_t chunks_num = (remain_len+length)/SM3_BLOCK_SIZE;
+    uint32_t remain = (remain_len+length)%SM3_BLOCK_SIZE;
+    totash_sm3_msg_total_len += length;
+    if (remain_len)
+    {
+        uint16_t copy_len = SM3_BLOCK_SIZE - remain_len;
+        if ((length + remain_len) < SM3_BLOCK_SIZE)
+        {
+            memcpy(&remain_data[remain_len], msg, length);
+            remain_len += length;
+            return LS_OTBN_OK;
+        }
+        else
+        {
+            memcpy(&remain_data[remain_len], msg, copy_len);
+            remain_len = 0;
+            msg += copy_len;
+            if (sm3_msg_write(remain_data,1) != LS_OTBN_OK)
+                return LS_OTBN_TIMEOUT;
+            chunks_num -= 1;
+        }
+    }
+
+    while(chunks_num)
+    {
+        if(chunks_num >= SM3_OTBN_MAX_CHUNKS)
+        {
+            if (sm3_msg_write(msg,SM3_OTBN_MAX_CHUNKS) != LS_OTBN_OK)
+                return LS_OTBN_TIMEOUT;
+            chunks_num -= SM3_OTBN_MAX_CHUNKS;
+            msg += SM3_BLOCK_SIZE*SM3_OTBN_MAX_CHUNKS;
+        }else
+        {
+            if (sm3_msg_write(msg,chunks_num) != LS_OTBN_OK)
+                return LS_OTBN_TIMEOUT;
+            msg += SM3_BLOCK_SIZE*chunks_num;
+            chunks_num = 0;
+        }
+    }
+
+    if(remain)
+    {
+        memcpy(remain_data,msg,remain);
+        remain_len = remain;
+    }
+    return LS_OTBN_OK;
+}
+
+ls_otbn_status_t HAL_OTBN_SM3_Final(uint8_t result[0x20])
+{
+    uint64_t bit_cnt = totash_sm3_msg_total_len * 8;
+
+    remain_data[remain_len++] = 0x80;
+    if (remain_len == SM3_BLOCK_SIZE)
+    {
+        if (sm3_msg_write(remain_data,1) != LS_OTBN_OK)
+        {
+            memset(result, 0, 0x20);
+            return LS_OTBN_TIMEOUT;
+        }
+        remain_len = 0;
+    }
+
+    while (remain_len != 0x38)
+    {
+        remain_data[remain_len++] = 0x0;
+        if (remain_len == SM3_BLOCK_SIZE)
+        {
+            if (sm3_msg_write(remain_data,1) != LS_OTBN_OK)
+            {
+                memset(result, 0, 0x20);
+                return LS_OTBN_TIMEOUT;
+            }
+            remain_len = 0;
+        }
+    }
+
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        remain_data[0x3f - i] = (uint8_t)(bit_cnt >> (8 * i));
+    }
+    if (sm3_msg_write(remain_data,1) != LS_OTBN_OK)
+    {
+        memset(result, 0, 0x20);
+        return LS_OTBN_TIMEOUT;
+    }
+
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        *result++ = (uint8_t)(currnt_state[i] >> 24);
+        *result++ = (uint8_t)(currnt_state[i] >> 16);
+        *result++ = (uint8_t)(currnt_state[i] >> 8);
+        *result++ = (uint8_t)(currnt_state[i]);
+    }
+    totash_sm3_msg_total_len = 0;
+    remain_len = 0;
+    return LS_OTBN_OK;
+}
+
+static uint8_t sm3_hmac_kx[SM3_BLOCK_SIZE];
+static uint8_t sm3_hmac_kh[SM3_RESULT_SIZE];
+static uint8_t *sm3_hmac_key;
+static uint32_t sm3_hmac_key_size;
+
+ls_otbn_status_t HAL_OTBN_SM3_HMAC_SetKey(uint8_t *key, uint32_t key_size)
+{
+    sm3_hmac_key_size = key_size;
+    sm3_hmac_key = key;
+    if (sm3_hmac_key_size > SM3_BLOCK_SIZE)
+    {
+        if (HAL_OTBN_SM3_Init() != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SM3_Update(sm3_hmac_key, sm3_hmac_key_size) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SM3_Final(sm3_hmac_kh) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+
+        sm3_hmac_key = sm3_hmac_kh;
+        sm3_hmac_key_size = SM3_RESULT_SIZE;
+    }
+
+    for (uint8_t i = 0; i < sm3_hmac_key_size; i++)
+        sm3_hmac_kx[i] = HMAC_I_PAD ^ sm3_hmac_key[i];
+    for (uint8_t i = sm3_hmac_key_size; i < SM3_BLOCK_SIZE; i++)
+        sm3_hmac_kx[i] = HMAC_I_PAD ^ 0;
+
+    if (HAL_OTBN_SM3_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return HAL_OTBN_SM3_Update(sm3_hmac_kx, SM3_BLOCK_SIZE);
+}
+
+ls_otbn_status_t HAL_OTBN_SM3_HMAC_Update(uint8_t *msg, uint32_t msg_size)
+{
+    return HAL_OTBN_SM3_Update(msg, msg_size);
+}
+
+ls_otbn_status_t HAL_OTBN_SM3_HMAC_Final(uint8_t *out)
+{
+    if (HAL_OTBN_SM3_Final(out) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+
+    for (uint8_t i = 0; i < sm3_hmac_key_size; i++)
+        sm3_hmac_kx[i] = HMAC_O_PAD ^ sm3_hmac_key[i];
+    for (uint8_t i = sm3_hmac_key_size; i < SM3_BLOCK_SIZE; i++)
+        sm3_hmac_kx[i] = HMAC_O_PAD ^ 0;
+
+    if (HAL_OTBN_SM3_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Update(sm3_hmac_kx, SM3_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Update(out, SM3_RESULT_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return HAL_OTBN_SM3_Final(out);
+}
+
+ls_otbn_status_t HAL_OTBN_SM3_HMAC(uint8_t out[SM3_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+{
+    uint8_t kh[SM3_RESULT_SIZE];
+    uint8_t kx[SM3_BLOCK_SIZE];
+    uint8_t i;
+
+    if (key_len > SM3_BLOCK_SIZE)
+    {
+        if (HAL_OTBN_SM3_Init() != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SM3_Update(key, key_len) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SM3_Final(kh) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        key_len = SM3_RESULT_SIZE;
+        key = kh;
+    }
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = HMAC_I_PAD ^ key[i];
+    for (i = key_len; i < SM3_BLOCK_SIZE; i++)
+        kx[i] = HMAC_I_PAD ^ 0;
+
+    if (HAL_OTBN_SM3_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Update(kx, SM3_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Update(data, data_len) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Final(out) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = HMAC_O_PAD ^ key[i];
+    for (i = key_len; i < SM3_BLOCK_SIZE; i++)
+        kx[i] = HMAC_O_PAD ^ 0;
+
+    if (HAL_OTBN_SM3_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Update(kx, SM3_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SM3_Update(out, SM3_RESULT_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return HAL_OTBN_SM3_Final(out);
+}

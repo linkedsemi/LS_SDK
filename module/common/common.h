@@ -18,13 +18,82 @@ extern const unsigned char one_bits[];
 #define ARRAY_NB_COLUMNS(array)  (sizeof((array[0]))/sizeof((array)[0][0]))
 
 /// Macro to get a structure from one of its structure field
+#if !defined(__ZEPHYR__)
+#ifndef CONTAINER_OF
 #define CONTAINER_OF(ptr, type, member)    ((type *)( (char *)ptr - offsetof(type,member) ))
+#endif
+#endif
 
+#ifndef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
+#endif
 
+#ifndef MAX
 #define MAX(a,b) ((a)>(b)?(a):(b))
+#endif
 
 #define CEILING(dividend,divisor) (((dividend) + ((divisor) - 1))/(divisor))
+
+#ifndef __fallthrough
+#if __GNUC__ >= 7
+#define __fallthrough        __attribute__((fallthrough))
+#else
+#define __fallthrough
+#endif /* __GNUC__ >= 7 */
+#endif
+
+/**
+ * @brief Check if @p ptr is aligned to @p align alignment
+ */
+#ifndef IS_ALIGNED
+#define IS_ALIGNED(ptr, align) (((uintptr_t)(ptr)) % (align) == 0)
+#endif
+
+/**
+ * @brief Value of @p x rounded up to the next multiple of @p align.
+ */
+#ifndef ROUND_UP
+#define ROUND_UP(x, align)                                   \
+	((((unsigned long)(x) + ((unsigned long)(align) - 1)) / \
+	  (unsigned long)(align)) * (unsigned long)(align))
+#endif
+
+/**
+ * @brief Value of @p x rounded down to the previous multiple of @p align.
+ */
+#ifndef ROUND_DOWN
+#define ROUND_DOWN(x, align)                                 \
+	(((unsigned long)(x) / (unsigned long)(align)) * (unsigned long)(align))
+#endif
+
+#if !defined(KB)
+#ifdef _LINKER
+/* This is used in linker scripts so need to avoid type casting there */
+#define KB(x) ((x) << 10)
+#else
+#define KB(x) (((size_t)(x)) << 10)
+#endif
+#endif
+
+#if !defined(MB)
+/** @brief Number of bytes in @p x mebibytes */
+#define MB(x) (KB(x) << 10)
+#endif
+
+#if !defined(GB)
+/** @brief Number of bytes in @p x gibibytes */
+#define GB(x) (MB(x) << 10)
+#endif
+
+#if !defined(KHZ)
+/** @brief Number of Hz in @p x kHz */
+#define KHZ(x) ((x) * 1000)
+#endif
+
+#if !defined(MHZ)
+/** @brief Number of Hz in @p x MHz */
+#define MHZ(x) (KHZ(x) * 1000)
+#endif
 
 __attribute__((always_inline)) static inline int32_t time_diff(uint32_t time0,uint32_t time1)
 {

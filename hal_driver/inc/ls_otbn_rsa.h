@@ -1,0 +1,90 @@
+#ifndef LS_OTBN_RSA_H_
+#define LS_OTBN_RSA_H_
+
+#include <stdint.h>
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif  // __cplusplus
+
+#define MODE_RSA_2048_MODEXP      0x76b
+#define MODE_RSA_2048_MODEXP_F4   0x565
+#define MODE_RSA_3072_MODEXP      0x378
+#define MODE_RSA_3072_MODEXP_F4   0x6d1
+#define MODE_RSA_4096_MODEXP      0x70b
+#define MODE_RSA_4096_MODEXP_F4   0x0ee
+
+/* Prime-sized moduli, for Miller-Rabin on p (128 B = RSA-2048, 192 B = RSA-3072).
+ * Generic exponent only: a Miller-Rabin exponent is a random value, never F4. */
+#define MODE_RSA_1024_MODEXP      0x2a7
+#define MODE_RSA_1536_MODEXP      0x7c3
+
+#define RSA_OFFSET_N              0x00000020
+#define RSA_OFFSET_MODE           0x00000000
+#define RSA_OFFSET_D              0x00000220
+#define RSA_OFFSET_INOUT          0x00000420
+
+extern const uint8_t rsa_imem[];
+extern const uint32_t rsa_imem_size;
+// extern const uint8_t rsa_dmem[];
+#define RSA_IMEM_SIZE             rsa_imem_size
+#define RSA_DMEM_SIZE             0
+
+#define MODE_RSA_KEYGEN_2048                0x137
+#define MODE_RSA_KEYGEN_3072                0x4e5
+#define MODE_RSA_KEYGEN_4096                0x63a
+
+/* CHECK_PRIME modes: the host puts the candidate at RSA_KEYGEN_OFFSET_P and the
+ * mode at RSA_KEYGEN_OFFSET_MODE, then reads the verdict from
+ * RSA_KEYGEN_OFFSET_STATUS (0xFFFFFFFF = probably prime, 0 = composite).
+ * Precondition on the candidate: it must be congruent to 3 (mod 4). Any other
+ * residue is always reported composite. */
+#define MODE_RSA_KEYGEN_CHECK_PRIME_2048    0x48e
+#define MODE_RSA_KEYGEN_CHECK_PRIME_3072    0x018
+#define MODE_RSA_KEYGEN_CHECK_PRIME_4096    0x442
+
+#define MODE_RSA_KEYGEN_KEY_FROM_PQ_2048    0x3aa
+#define MODE_RSA_KEYGEN_KEY_FROM_PQ_3072    0x005
+#define MODE_RSA_KEYGEN_KEY_FROM_PQ_4096    0x3fd
+
+#define RSA_KEYGEN_OFFSET_MODE              0x00000720
+#define RSA_KEYGEN_OFFSET_STATUS            0x00000740
+#define RSA_KEYGEN_OFFSET_N                 0x00000000
+#define RSA_KEYGEN_OFFSET_D                 0x00000200
+#define RSA_KEYGEN_OFFSET_P                 0x00000000
+#define RSA_KEYGEN_OFFSET_Q                 0x00000200
+#define RSA_KEYGEN_OFFSET_COFACTOR          0x00000400
+
+#define RSA_KEYGEN_DMEM_SIZE                0x00000760
+
+extern const uint8_t rsa_keygen_imem[];
+extern const uint32_t rsa_keygen_imem_size;
+#define RSA_KEYGEN_IMEM_SIZE      rsa_keygen_imem_size
+
+enum {
+  /* Length of the RSA-2048 modulus and private exponent in bits. */
+  kRsa2048NumBits = 2048,
+  /* Length of the RSA-2048 modulus in bytes */
+  kRsa2048NumBytes = kRsa2048NumBits / 8,
+  /* Length of the RSA-2048 modulus in words */
+  kRsa2048NumWords = kRsa2048NumBytes / sizeof(uint32_t),
+  /* Length of the RSA-3072 modulus and private exponent in bits. */
+  kRsa3072NumBits = 3072,
+  /* Length of the RSA-3072 modulus in bytes */
+  kRsa3072NumBytes = kRsa3072NumBits / 8,
+  /* Length of the RSA-3072 modulus in words */
+  kRsa3072NumWords = kRsa3072NumBytes / sizeof(uint32_t),
+  /* Length of the RSA-4096 modulus and private exponent in bits. */
+  kRsa4096NumBits = 4096,
+  /* Length of the RSA-4096 modulus in bytes */
+  kRsa4096NumBytes = kRsa4096NumBits / 8,
+  /* Length of the RSA-4096 modulus in words */
+  kRsa4096NumWords = kRsa4096NumBytes / sizeof(uint32_t),
+};
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif  // __cplusplus
+
+#endif

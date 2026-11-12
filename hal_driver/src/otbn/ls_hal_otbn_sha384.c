@@ -1,0 +1,359 @@
+#include "ls_hal_otbn_sha.h"
+
+#define SHA512_TEXT_LENTH           (1600)
+extern const char sha512_text[SHA512_TEXT_LENTH];
+
+/* DMEM layout of the shared SHA384/SHA512 firmware (sha512_text),
+ * verified against firmware disassembly: the firmware reads K from
+ * 0x100, N_CHUNKS from 0x380, MSG from 0x3a0 and stores the state
+ * pointer at 0xbbc / message pointer at 0xbc0.  The SHA384 HAL must
+ * use the same layout as the SHA512 HAL; only the IV differs. */
+#define SHA384_DMEM_STATE_OFFSET        (0x0)
+#define SHA384_DMEM_STATE_SIZE              (0x100)
+#define SHA384_DMEM_MSG_OFFSET          (0x3a0)
+#define SHA384_DMEM_MSG_SIZE                (0x800)
+#define SHA384_DMEM_N_CHUNKS_OFFSET     (0x380)
+#define SHA384_DMEM_PTR_STATE_OFFSET    (0xbbc)
+#define SHA384_DMEM_PTR_MSG_OFFSET      (0xbc0)
+#define SHA384_DMEM_K_OFFSET            (0x100)
+#define SHA384_DMEM_K_SIZE                  (0x280)
+
+static uint8_t sha384_hmac_kx[SHA384_BLOCK_SIZE];
+static uint8_t sha384_hmac_kh[SHA384_RESULT_SIZE];
+static uint8_t *sha384_hmac_key;
+static uint32_t sha384_hmac_key_size;
+static uint32_t sha_idx;
+static uint32_t total_cnt;
+static uint32_t remain_len;
+static uint8_t remain_data[SHA384_BLOCK_SIZE];
+
+static const uint64_t state_init[] = {
+    0xcbbb9d5dc1059ed8, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x629a292a367cd507, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x9159015a3070dd17, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x152fecd8f70e5939, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x67332667ffc00b31, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x8eb44a8768581511, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0xdb0c2e0d64f98fa7, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+    0x47b5481dbefa4fa4, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,};
+
+static const uint64_t K[] = {
+    0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
+    0x3956c25bf348b538, 0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
+    0xd807aa98a3030242, 0x12835b0145706fbe, 0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,
+    0x72be5d74f27b896f, 0x80deb1fe3b1696b1, 0x9bdc06a725c71235, 0xc19bf174cf692694,
+    0xe49b69c19ef14ad2, 0xefbe4786384f25e3, 0x0fc19dc68b8cd5b5, 0x240ca1cc77ac9c65,
+    0x2de92c6f592b0275, 0x4a7484aa6ea6e483, 0x5cb0a9dcbd41fbd4, 0x76f988da831153b5,
+    0x983e5152ee66dfab, 0xa831c66d2db43210, 0xb00327c898fb213f, 0xbf597fc7beef0ee4,
+    0xc6e00bf33da88fc2, 0xd5a79147930aa725, 0x06ca6351e003826f, 0x142929670a0e6e70,
+    0x27b70a8546d22ffc, 0x2e1b21385c26c926, 0x4d2c6dfc5ac42aed, 0x53380d139d95b3df,
+    0x650a73548baf63de, 0x766a0abb3c77b2a8, 0x81c2c92e47edaee6, 0x92722c851482353b,
+    0xa2bfe8a14cf10364, 0xa81a664bbc423001, 0xc24b8b70d0f89791, 0xc76c51a30654be30,
+    0xd192e819d6ef5218, 0xd69906245565a910, 0xf40e35855771202a, 0x106aa07032bbd1b8,
+    0x19a4c116b8d2d0c8, 0x1e376c085141ab53, 0x2748774cdf8eeb99, 0x34b0bcb5e19b48a8,
+    0x391c0cb3c5c95a63, 0x4ed8aa4ae3418acb, 0x5b9cca4f7763e373, 0x682e6ff3d6b2b8a3,
+    0x748f82ee5defb2fc, 0x78a5636f43172f60, 0x84c87814a1f0ab72, 0x8cc702081a6439ec,
+    0x90befffa23631e28, 0xa4506cebde82bde9, 0xbef9a3f7b2c67915, 0xc67178f2e372532b,
+    0xca273eceea26619c, 0xd186b8c721c0c207, 0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178,
+    0x06f067aa72176fba, 0x0a637dc5a2c898a6, 0x113f9804bef90dae, 0x1b710b35131c471b,
+    0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
+    0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817};
+
+static void SHA384_BlockNumber_Update(uint32_t number)
+{
+    uint32_t n_checks = number;
+    HAL_OTBN_DMEM_Write(SHA384_DMEM_N_CHUNKS_OFFSET, &n_checks, sizeof(uint32_t));
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_Init()
+{
+    /* Refuse to re-program the engine mid-job: overwriting IMEM/DMEM
+     * while a previous job is running would silently corrupt it. */
+    if (HAL_OTBN_Is_Busy() || !HAL_OTBN_In_Idle_State())
+        return LS_OTBN_BUSY;
+
+    total_cnt = 0;
+    remain_len = 0;
+    sha_idx = SHA384_DMEM_MSG_OFFSET;
+    uint32_t state_ptr = SHA384_DMEM_STATE_OFFSET;
+    uint32_t msg_ptr = SHA384_DMEM_MSG_OFFSET;
+    if (HAL_OTBN_DMEM_Set(0x0, 0x0, OTBN_DMEM_SIZE) != HAL_OK)
+        return LS_OTBN_BUSY;
+    if (HAL_OTBN_IMEM_Write(0, (uint32_t *)sha512_text, SHA512_TEXT_LENTH) != HAL_OK)
+        return LS_OTBN_BUSY;
+    if (HAL_OTBN_DMEM_Write(SHA384_DMEM_STATE_OFFSET, (uint32_t *)state_init, SHA384_DMEM_STATE_SIZE) != HAL_OK ||
+        HAL_OTBN_DMEM_Write(SHA384_DMEM_K_OFFSET, (uint32_t *)K, SHA384_DMEM_K_SIZE) != HAL_OK ||
+        HAL_OTBN_DMEM_Write(SHA384_DMEM_PTR_STATE_OFFSET, &state_ptr, sizeof(uint32_t)) != HAL_OK ||
+        HAL_OTBN_DMEM_Write(SHA384_DMEM_PTR_MSG_OFFSET, &msg_ptr, sizeof(uint32_t)) != HAL_OK)
+        return LS_OTBN_BUSY;
+    SHA384_BlockNumber_Update(0x10);
+    return LS_OTBN_OK;
+}
+
+static ls_otbn_status_t SHA384_msg_write(uint8_t *msg)
+{
+    uint8_t dword[8];
+    uint64_t sha384_buffer[0x10];
+    for (uint8_t i = 0; i < 0x10; i++)
+    {
+        dword[7] = *msg++;
+        dword[6] = *msg++;
+        dword[5] = *msg++;
+        dword[4] = *msg++;
+        dword[3] = *msg++;
+        dword[2] = *msg++;
+        dword[1] = *msg++;
+        dword[0] = *msg++;
+        sha384_buffer[i] = *(uint64_t *)dword;
+    }
+    HAL_OTBN_DMEM_Write(sha_idx, (uint32_t *)sha384_buffer, SHA384_BLOCK_SIZE);
+    sha_idx += SHA384_BLOCK_SIZE;
+    if (sha_idx == (SHA384_DMEM_MSG_SIZE + SHA384_DMEM_MSG_OFFSET))
+    {
+        if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK)
+            return LS_OTBN_TIMEOUT;
+        sha_idx = SHA384_DMEM_MSG_OFFSET;
+    }
+    return LS_OTBN_OK;
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_Update(uint8_t *msg, uint32_t length)
+{
+    total_cnt += length;
+    if (remain_len)
+    {
+        if ((length + remain_len) < SHA384_BLOCK_SIZE)
+        {
+            memcpy(&remain_data[remain_len], msg, length);
+            remain_len += length;
+            return LS_OTBN_OK;
+        }
+        uint32_t wr_len = SHA384_BLOCK_SIZE - remain_len;
+        memcpy(&remain_data[remain_len], msg, wr_len);
+        if (SHA384_msg_write(remain_data) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        remain_len = 0;
+        length -= wr_len;
+        msg += wr_len;
+    }
+
+    for (uint32_t i = 0; i < (length / SHA384_BLOCK_SIZE); i++)
+    {
+        if (SHA384_msg_write(msg) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        msg += SHA384_BLOCK_SIZE;
+    }
+
+    if (length % SHA384_BLOCK_SIZE)
+    {
+        memcpy(&remain_data[remain_len], msg, length % SHA384_BLOCK_SIZE);
+        remain_len = length % SHA384_BLOCK_SIZE;
+    }
+    return LS_OTBN_OK;
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_Final(uint8_t result[SHA384_RESULT_SIZE])
+{
+    uint64_t bit_cnt = total_cnt * 8;
+
+    remain_data[remain_len++] = 0x80;
+    if (remain_len == SHA384_BLOCK_SIZE)
+    {
+        if (SHA384_msg_write(remain_data) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        remain_len = 0;
+    }
+
+    while (remain_len != (SHA384_BLOCK_SIZE - 16))
+    {
+        remain_data[remain_len++] = 0x0;
+        if (remain_len == SHA384_BLOCK_SIZE)
+        {
+            if (SHA384_msg_write(remain_data) != LS_OTBN_OK)
+                return LS_OTBN_TIMEOUT;
+            remain_len = 0;
+        }
+    }
+    memset(&remain_data[remain_len], 0x0, 0x8);
+    remain_len += 8;
+
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        remain_data[SHA384_BLOCK_SIZE - 1 - i] = (uint8_t)(bit_cnt >> (8 * i));
+    }
+    if (SHA384_msg_write((uint8_t *)remain_data) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    SHA384_BlockNumber_Update((sha_idx - SHA384_DMEM_MSG_OFFSET) / SHA384_BLOCK_SIZE);
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_EXECUTE, 20000) != HAL_OK) {
+        memset(result, 0, SHA384_RESULT_SIZE);
+        return LS_OTBN_TIMEOUT;
+    }
+
+    uint64_t rs;
+    for (uint8_t i = 0; i < 6; i++)
+    {
+        HAL_OTBN_DMEM_Read(SHA384_DMEM_STATE_OFFSET + i * 0x20, (uint32_t *)&rs, sizeof(uint64_t));
+        *result++ = (uint8_t)(rs >> 56);
+        *result++ = (uint8_t)(rs >> 48);
+        *result++ = (uint8_t)(rs >> 40);
+        *result++ = (uint8_t)(rs >> 32);
+        *result++ = (uint8_t)(rs >> 24);
+        *result++ = (uint8_t)(rs >> 16);
+        *result++ = (uint8_t)(rs >> 8);
+        *result++ = (uint8_t)(rs >> 0);
+    }
+    if (HAL_OTBN_CMD_Write_Polling_Timeout(HAL_OTBN_CMD_SEC_WIPE_DMEM, 20000) != HAL_OK)
+        return LS_OTBN_TIMEOUT;
+    return LS_OTBN_OK;
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_HMAC_SetKey(uint8_t *key, uint32_t key_size)
+{
+    sha384_hmac_key_size = key_size;
+    sha384_hmac_key = key;
+    if (sha384_hmac_key_size > SHA384_BLOCK_SIZE)
+    {
+        if (HAL_OTBN_SHA384_Init() != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA384_Update(sha384_hmac_key, sha384_hmac_key_size) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA384_Final(sha384_hmac_kh) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+
+        sha384_hmac_key = sha384_hmac_kh;
+        sha384_hmac_key_size = SHA384_RESULT_SIZE;
+    }
+
+    for (uint8_t i = 0; i < sha384_hmac_key_size; i++)
+        sha384_hmac_kx[i] = HMAC_I_PAD ^ sha384_hmac_key[i];
+    for (uint8_t i = sha384_hmac_key_size; i < SHA384_BLOCK_SIZE; i++)
+        sha384_hmac_kx[i] = HMAC_I_PAD ^ 0;
+
+    if (HAL_OTBN_SHA384_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return HAL_OTBN_SHA384_Update(sha384_hmac_kx, SHA384_BLOCK_SIZE);
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_HMAC_Update(uint8_t *msg, uint32_t msg_size)
+{
+    return HAL_OTBN_SHA384_Update(msg, msg_size);
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_HMAC_Final(uint8_t *out)
+{
+    if (HAL_OTBN_SHA384_Final(out) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+
+    for (uint8_t i = 0; i < sha384_hmac_key_size; i++)
+        sha384_hmac_kx[i] = HMAC_O_PAD ^ sha384_hmac_key[i];
+    for (uint8_t i = sha384_hmac_key_size; i < SHA384_BLOCK_SIZE; i++)
+        sha384_hmac_kx[i] = HMAC_O_PAD ^ 0;
+
+    if (HAL_OTBN_SHA384_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Update(sha384_hmac_kx, SHA384_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Update(out, SHA384_RESULT_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return HAL_OTBN_SHA384_Final(out);
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_HMAC(uint8_t out[SHA384_RESULT_SIZE], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+{
+    uint8_t kh[SHA384_RESULT_SIZE];
+    uint8_t kx[SHA384_BLOCK_SIZE];
+    uint8_t i;
+
+    if (key_len > SHA384_BLOCK_SIZE)
+    {
+        if (HAL_OTBN_SHA384_Init() != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA384_Update(key, key_len) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        if (HAL_OTBN_SHA384_Final(kh) != LS_OTBN_OK)
+            return LS_OTBN_TIMEOUT;
+        key_len = SHA384_RESULT_SIZE;
+        key = kh;
+    }
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = HMAC_I_PAD ^ key[i];
+    for (i = key_len; i < SHA384_BLOCK_SIZE; i++)
+        kx[i] = HMAC_I_PAD ^ 0;
+
+    if (HAL_OTBN_SHA384_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Update(kx, SHA384_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Update(data, data_len) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Final(out) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = HMAC_O_PAD ^ key[i];
+    for (i = key_len; i < SHA384_BLOCK_SIZE; i++)
+        kx[i] = HMAC_O_PAD ^ 0;
+
+    if (HAL_OTBN_SHA384_Init() != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Update(kx, SHA384_BLOCK_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    if (HAL_OTBN_SHA384_Update(out, SHA384_RESULT_SIZE) != LS_OTBN_OK)
+        return LS_OTBN_TIMEOUT;
+    return HAL_OTBN_SHA384_Final(out);
+}
+
+ls_otbn_status_t HAL_OTBN_SHA384_HKDF(uint8_t *salt, uint32_t salt_len,
+                          uint8_t *ikm, uint32_t ikm_len,
+                          uint8_t *info, uint32_t info_len,
+                          uint8_t *okm, uint32_t okm_len)
+{
+    uint8_t T[SHA384_RESULT_SIZE];
+    uint8_t prk[SHA384_RESULT_SIZE];
+    uint8_t nullsalt[SHA384_RESULT_SIZE];
+    uint32_t N, T_len, where;
+
+    if (salt == NULL)
+    {
+        salt = nullsalt;
+        salt_len = SHA384_RESULT_SIZE;
+        memset(salt, 0, salt_len);
+    }
+    if (HAL_OTBN_SHA384_HMAC(prk, ikm, ikm_len, salt, salt_len) != LS_OTBN_OK)
+        return LS_OTBN_ENGINE;
+
+    if (info == NULL)
+    {
+        info = (uint8_t *)"";
+        info_len = 0;
+    }
+    if (okm == NULL)
+        return LS_OTBN_ENGINE;
+    N = okm_len / SHA384_RESULT_SIZE;
+    if ((okm_len % SHA384_RESULT_SIZE) != 0)
+        N++;
+    if (N > 0xff)
+        return LS_OTBN_ENGINE;
+    T_len = 0;
+    where = 0;
+    for (uint8_t i = 1; i <= N; i++)
+    {
+        if (HAL_OTBN_SHA384_HMAC_SetKey(prk, SHA384_RESULT_SIZE) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (T_len != 0x0) {
+            if (HAL_OTBN_SHA384_HMAC_Update(T, T_len) != LS_OTBN_OK)
+                return LS_OTBN_ENGINE;
+        }
+        if (HAL_OTBN_SHA384_HMAC_Update(info, info_len) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_SHA384_HMAC_Update(&i, 1) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        if (HAL_OTBN_SHA384_HMAC_Final(T) != LS_OTBN_OK)
+            return LS_OTBN_ENGINE;
+        memcpy(okm + where, T, (i != N) ? SHA384_RESULT_SIZE : (okm_len - where));
+        where += SHA384_RESULT_SIZE;
+        T_len = SHA384_RESULT_SIZE;
+    }
+    return LS_OTBN_OK;
+}

@@ -75,6 +75,9 @@ if(CONFIG_SOC_LS1010)
     ../soc
     ../soc/rv32
     ../soc/rv32/leo
+    ../soc/rv32/csi2
+    ../soc/rv32/csi2/include
+    ../soc/rv32/csi2/include/core
     ../hal_driver/inc
     ../hal_driver/api
     ../module/common
@@ -106,12 +109,10 @@ if(CONFIG_SOC_LS1010)
   )
 
   zephyr_library_sources(
-    ../soc/rv32/startup.c
     ../module/common/common.c
     ../module/common/circular_doubly_linked_list.c
     ../module/common/linked_async_framework.c
     ../module/common/async_call.c
-    ../module/common/sw_timer.c
     ../module/crc/crc16.c
     # ../module/debug/log.c
     ../module/debug/ls_dbg.c
@@ -141,8 +142,6 @@ if(CONFIG_SOC_LS1010)
     ../hal_driver/src/ls_hal_dac_dma.c
     ../hal_driver/src/ls_hal_uart_dma.c
     ../hal_driver/src/ls_hal_ssi.c
-    ../hal_driver/src/ls_hal_spi_i2s.c
-    ../hal_driver/src/ls_hal_spi_i2s_dma.c
     ../hal_driver/src/ls_hal_spis.c
     ../hal_driver/src/ls_hal_spis_dma.c
     ../hal_driver/src/ls_hal_timer.c
@@ -167,7 +166,7 @@ if(CONFIG_SOC_LS1010)
     # ../soc/rv32/int_call_asm.S
     ../soc/rv32/leo/cpu.c
     ../soc/rv32/leo/sleep_asm.S
-    ../soc/rv32/leo/exception_entry.S
+    # ../soc/rv32/leo/exception_entry.S
     ../soc/rv32/leo/delay_asm.S
     ../soc/rv32/leo/ls_msp_qspiv2.c
     ../soc/rv32/leo/ls_msp_uart.c
@@ -191,7 +190,6 @@ if(CONFIG_SOC_LS1010)
     ../soc/rv32/leo/sys_stat.c
     ../soc/rv32/leo/platform.c
     ../soc/rv32/leo/efuse.c
-    ../soc/rv32/leo/sleep.c
     ../soc/rv32/leo/ls_msp_ssi.c
     ../soc/rv32/leo/ls_msp_timer.c
     ../soc/rv32/leo/ls_msp_i2c.c
@@ -252,5 +250,282 @@ if(CONFIG_SOC_LS1010)
     ${CMAKE_CURRENT_BINARY_DIR}/__info_array.c
   )
 
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
+  zephyr_compile_definitions(CONFIG_INTC_CLIC)
+
   # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
+endif()
+
+if(CONFIG_SOC_LSQSH)
+  zephyr_include_directories(
+    . 
+    ../soc
+    ../soc/rv32
+    ../soc/rv32/qsh
+    ../soc/rv32/qsh/include
+    ../soc/rv32/csi2/
+    ../soc/rv32/csi2/include
+    ../soc/rv32/csi2/include/core
+    ../hal_driver/inc
+    ../hal_driver/api
+    ../module/common
+    ../module/debug
+    ../module/debug/semihosting/riscv
+    ../module/debug/RTT
+    ../module/static_buffer
+  )
+
+  zephyr_library_include_directories(
+        ../module/common
+        ../module/crc
+        ../module/debug
+        ../module/debug/semihosting/riscv
+        ../module/debug/RTT
+        ../module/static_buffer
+  )
+
+  zephyr_library_sources(
+    ../module/debug/ls_dbg.c
+    ../module/common/common.c
+    ../module/common/circular_doubly_linked_list.c
+    ../module/common/linked_async_framework.c
+    ../module/common/async_call.c
+    ../module/crc/crc16.c
+    ../module/debug/semihosting/riscv/semihosting.c
+    ../module/debug/RTT/SEGGER_RTT.c
+    ../module/static_buffer/linked_buffer.c
+    ../module/static_buffer/fifo.c
+    ../hal_driver/src/ls_hal_uart.c
+    ../hal_driver/src/ls_hal_dwuart.c
+    ../hal_driver/src/ls_hal_sha.c
+    ../hal_driver/src/ls_hal_sha512.c
+    ../hal_driver/src/ls_hal_sm4.c
+    ../hal_driver/src/ls_hal_crypt.c
+    ../hal_driver/src/ls_hal_otbn.c
+    ../hal_driver/src/ls_hal_crc.c
+    ../hal_driver/src/otbn/text_array/otbn_ecc_unified.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sha256.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sha384.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sha512.c
+    ../hal_driver/src/otbn/ls_hal_otbn_ecc256.c
+    ../hal_driver/src/otbn/ls_hal_otbn_ecc384.c
+    ../hal_driver/src/otbn/ls_hal_otbn_ecc_param.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sm2.c
+    ../hal_driver/src/otbn/ls_hal_otbn_sm3.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_pointops.c
+    ../hal_driver/src/otbn/text_array/otbn_p384_pointops.c
+    ../hal_driver/src/otbn/text_array/otbn_p521_pointops.c
+    ../hal_driver/src/otbn/text_array/otbn_sm2_pointops.c
+    ../hal_driver/src/otbn/text_array/otbn_sm3.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_basemult.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_verify.c
+    ../hal_driver/src/otbn/text_array/otbn_p256_scalarmult.c
+    ../hal_driver/src/otbn/text_array/otbn_p384_verify.c
+    ../hal_driver/src/otbn/text_array/otbn_sha256.c
+    ../hal_driver/src/otbn/text_array/otbn_sha512.c
+    ../hal_driver/src/otbn/text_array/otbn_sm2_ops.c
+    ../hal_driver/src/otbn/text_array/otbn_rsa.c
+    ../soc/rv32/qsh/ls_msp_otbn.c
+    ../soc/rv32/systick.c
+    # ../soc/rv32/int_call_asm.S
+    ../soc/rv32/qsh/cpu.c
+    ../soc/rv32/qsh/sleep_asm.S
+    ../soc/rv32/qsh/exception_entry.S
+    ../soc/rv32/qsh/delay_asm.S
+    ../soc/rv32/qsh/ls_msp_uart.c
+    ../soc/rv32/qsh/ls_msp_dmacv3.c
+    ../soc/rv32/qsh/ls_soc_gpio.c
+    ../soc/rv32/qsh/sys_stat.c
+    ../soc/rv32/qsh/platform.c
+    ../module/static_buffer/fifo.c
+    ../hal_driver/src/ls_hal_qspiv2.c
+    ../hal_driver/src/ls_hal_flash_qspiv2.c
+    ../hal_driver/src/ls_hal_flash.c
+    ../hal_driver/src/ls_hal_flash_swint.c
+    ../hal_driver/src/ls_hal_cache.c
+    ../hal_driver/src/ls_hal_ssi.c
+    ../hal_driver/src/ls_hal_dmacv3.c
+    ../soc/rv32/qsh/ls_msp_qspiv2.c
+    ../soc/rv32/qsh/ls_msp_cache.c
+    ../soc/rv32/qsh/ls_msp_ssi.c
+    ../hal_driver/src/ls_hal_iwdgv2.c
+    ../soc/rv32/qsh/ls_msp_iwdg.c
+    ../soc/rv32/qsh/ls_msp_sha512.c
+    ../soc/rv32/qsh/ls_msp_crypt.c
+    ../soc/rv32/qsh/ls_msp_sha.c
+    ../soc/rv32/qsh/ls_msp_sm4.c
+    ../hal_driver/src/ls_hal_otp_ctrl.c
+    ../soc/rv32/qsh/ls_msp_otp_ctrl.c
+  )
+
+  zephyr_linker_sources(
+    NOINIT
+    reset_retain.ld
+  )
+
+  zephyr_compile_definitions(QSH)
+  # riscv64-unknown-elf-objdump.exe -d -r -x  zephyr.elf > production.asm
+
+if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN)
+  string(REPLACE "/" "_" CONFIG_BOARD_TARGET_MODIFIED "${CONFIG_BOARD_TARGET}")
+  string(REPLACE "@" "_" CONFIG_BOARD_TARGET_MODIFIED_2 "${CONFIG_BOARD_TARGET_MODIFIED}")
+  # SRAM1_ADDR is 0x10000000, see soc/rv32/qsh/include/reg_base_addr.h
+  if(CONFIG_FLASH_BASE_ADDRESS LESS 0x10000000)
+    add_custom_command(
+      OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+      -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      -a 0x0
+      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      VERBATIM
+    )
+  else()
+    add_custom_command(
+      OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+      -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+      -a ${CONFIG_FLASH_BASE_ADDRESS}
+      DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}.bin
+      VERBATIM
+    )
+  endif()
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD)
+    # Compress the flash binary with zstd if the tool is available on the system
+    find_program(ZSTD_EXECUTABLE zstd)
+    if(ZSTD_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst
+        COMMAND ${ZSTD_EXECUTABLE} -f -22 --ultra --zstd=windowLog=19 --check -k
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "zstd not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP)
+    # Compress the flash binary with gzip if the tool is available on the system
+    # (-k keeps the original .bin, which is still needed by the BRAM merge below)
+    find_program(GZIP_EXECUTABLE gzip)
+    if(GZIP_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz
+        COMMAND ${GZIP_EXECUTABLE} -f -9 -k
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "gzip not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
+endif()
+
+if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
+  if(CONFIG_SOC_LSQSH_DUAL_BOOT)
+    add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/bram_header.bin
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+    -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram_dualboot.bin
+    -o ${PROJECT_BINARY_DIR}/bram_header.bin
+    -a 0x10124000
+    DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram_dualboot.bin
+    VERBATIM
+    )
+  else()
+    add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/bram_header.bin
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/header_merge_non_secure.py
+    -i ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
+    -o ${PROJECT_BINARY_DIR}/bram_header.bin
+    -a 0x10124000
+    DEPENDS ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/qsh/bin/bram.bin
+    VERBATIM
+    )
+  endif()
+
+  add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    COMMAND ${PYTHON_EXECUTABLE} ${ZEPHYR_CURRENT_MODULE_DIR}/tools/qsh/file_merge.py
+    -i ${PROJECT_BINARY_DIR}/bram_header.bin
+    -a 0x0
+    -i ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    -a 0x10000
+    -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    DEPENDS ${PROJECT_BINARY_DIR}/bram_header.bin
+            ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+    VERBATIM
+  )
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP)
+    # Compress the bram xip binary with gzip if the tool is available on the system
+    find_program(GZIP_EXECUTABLE gzip)
+    if(GZIP_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz
+        COMMAND ${GZIP_EXECUTABLE} -f -k
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "gzip not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
+
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD)
+    # Compress the bram xip binary with zstd if the tool is available on the system
+    find_program(ZSTD_EXECUTABLE zstd)
+    if(ZSTD_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst
+        COMMAND ${ZSTD_EXECUTABLE} -f -k -22 --ultra --zstd=windowLog=19 --check
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        -o ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst
+        DEPENDS ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin
+        VERBATIM
+      )
+    else()
+      message(WARNING "zstd not found, skip compressing ${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin")
+    endif()
+  endif()
+endif()
+
+  # Drive the OUTPUT-based merge/compression rules above; the .bin/.zst/.gz
+  # are only rebuilt when their inputs change
+  set(QSH_COMPRESS_DEPS
+    ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin)
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
+    list(APPEND QSH_COMPRESS_DEPS
+      ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin)
+  endif()
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD AND ZSTD_EXECUTABLE)
+    list(APPEND QSH_COMPRESS_DEPS
+      ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst)
+  endif()
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP AND GZIP_EXECUTABLE)
+    list(APPEND QSH_COMPRESS_DEPS
+      ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz)
+  endif()
+  if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN)
+    if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP AND GZIP_EXECUTABLE)
+      list(APPEND QSH_COMPRESS_DEPS
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.gz)
+    endif()
+    if(CONFIG_SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD AND ZSTD_EXECUTABLE)
+      list(APPEND QSH_COMPRESS_DEPS
+        ${PROJECT_BINARY_DIR}/${CONFIG_KERNEL_BIN_NAME}_flash_bram_xip_${CONFIG_BOARD_TARGET_MODIFIED_2}.bin.zst)
+    endif()
+  endif()
+  add_custom_target(qsh_bin_compress ALL DEPENDS ${QSH_COMPRESS_DEPS})
+
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E9XX)
+  zephyr_compile_definitions(CONFIG_CPU_XUANTIE_E906FDP)
+  zephyr_compile_definitions(CONFIG_INTC_CLIC)
 endif()

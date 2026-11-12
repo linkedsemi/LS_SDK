@@ -1,0 +1,366 @@
+
+#include "compile_flag.h"
+#include "platform.h"
+#include "cpu.h"
+#include "log.h"
+#include "swint_call_asm.h"
+#include "systick.h"
+#include "exception_isr.h"
+#include "ls_soc_gpio.h"
+#include "ls_hal_flash.h"
+#include "ls_msp_qspiv2.h"
+#include "field_manipulate.h"
+#include "per_func_mux.h"
+#include "reg_sec_pmu_rg.h"
+#include "reg_sysc_sec_awo.h"
+#include "qsh.h"
+#include "ls_msp_timer.h"
+
+#define PMU_CLK_VAL (SDK_HSE_USED << V33_RG_CLK_SET_HSE_POS | 1 << V33_RG_CLK_SET_HSI_POS | (!SDK_LSI_USED) << V33_RG_CLK_SET_LSE_POS)
+
+__attribute__((aligned(64))) void (*interrupt_vector[IRQN_MAX])();
+struct hal_flash_env flash1;
+struct hal_flash_env flash2;
+
+__attribute__((weak)) void SystemInit(){
+    e906_init();
+    // MODIFY_REG(V33_RG->TRIM0,V33_RG_HSE_CTRL_MASK,7<<V33_RG_HSE_CTRL_POS);
+    // REG_FIELD_WR(V33_RG->RST_SFT, V33_RG_CLK_SEL_LS, SDK_LSI_USED ? 1 : 2);
+    // V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
+    // V33_RG->PMU_SET_VAL = V33_RG_PMU_SET_TGGL_MASK | PMU_CLK_VAL;
+    // V33_RG->PMU_SET_VAL = PMU_CLK_VAL;
+    if(SDK_HSE_USED)
+    {//delay for hse stabilization
+        rv32_delay_asm(14400,1);
+    }
+    enable_global_irq();
+}
+
+NOINLINE void XIP_BANNED_FUNC(rom_delay, uint32_t us)
+{
+    uint32_t CLK_MHZ = 0;
+    switch (REG_FIELD_RD(SYSC_SEC_AWO->PD_AWO_CLK_CTRL0, SYSC_SEC_AWO_CLK_SEL_HBUS))
+    {
+    case SEC_AWO_REG_CLK_SEL_HSI:
+    case SEC_AWO_REG_CLK_SEL_HSE:
+    case SEC_AWO_REG_CLK_SEL_CLIKIN:
+        CLK_MHZ = 25;
+        break;
+    case SEC_AWO_REG_CLK_SEL_DPLL_DIV:
+        CLK_MHZ = 600 / (REG_FIELD_RD(SYSC_SEC_AWO->PD_AWO_CLK_CTRL0, SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1) + 1);
+        break;
+    case SEC_AWO_REG_CLK_SEL_DPLL_600M:
+        CLK_MHZ = 600;
+        break;
+    default:
+        while(1);
+        break;
+    }
+#ifdef FPGA_TEST
+    CLK_MHZ = SDK_HCLK_MHZ;
+#endif
+    rv32_delay_asm((us) * (CLK_MHZ) / 8, 1);
+}
+
+NOINLINE void XIP_BANNED_FUNC(enable_dpll,)
+{
+    SYSC_SEC_AWO->DPLL1_CTRL2 |= 1<<16;
+    SYSC_SEC_AWO->DPLL2_CTRL2 |= 1<<16;
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_CLKREF_SEL_MASK); /* clkin */
+    SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr reset */
+    rom_delay(10);
+    SET_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_RSTN_MASK); /* enable pll1 */
+    while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL1_LOCK_MASK));
+
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_CLKREF_SEL_MASK); /* clkin */
+    SET_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_EN_MASK); /* clr reset */
+    rom_delay(10);
+    SET_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_RSTN_MASK); /* enable pll2 */
+    while(0 == READ_BIT(SYSC_SEC_AWO->DPLL_LOCK, SYSC_SEC_AWO_DPLL2_LOCK_MASK));
+}
+
+NOINLINE void XIP_BANNED_FUNC(disable_dpll,)
+{
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_RSTN_MASK); /* disable pll1 */
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL1_CTRL1, SYSC_SEC_AWO_DPLL1_CTRL1_PLL1_EN_MASK); /* clr dereset */
+
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_RSTN_MASK); /* disable pll2 */
+    CLEAR_BIT(SYSC_SEC_AWO->DPLL2_CTRL1, SYSC_SEC_AWO_DPLL2_CTRL1_PLL2_EN_MASK); /* clr dereset */
+}
+
+NOINLINE void XIP_BANNED_FUNC(cpu_600M_ahb_300M_qspi_200M_init,)
+{
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL1 = FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS0, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS1, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS2, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS3, 0x0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS4, 0x3)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_HBUS, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_OTP, 0x1);
+    SYSC_SEC_AWO->CLKG_DIV_DPLL = SYSC_SEC_AWO_CLKG_DIV_DPLL_CLR_MASK;
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL0 =
+                                  // FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1, 0x1)
+                                     FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_M1, 0x1) /* set ahb_clk = 1/2 * cpu_clk */
+                                 //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
+    SYSC_SEC_AWO->CLKG_DIV_DPLL = SYSC_SEC_AWO_CLKG_DIV_DPLL_SET_MASK;
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL0 =
+                                  // FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1, 0x1)
+                                     FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS, 0x10)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_M1, 0x1)
+                                 //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x10)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
+}
+
+NOINLINE void XIP_BANNED_FUNC(cpu_25M_ahb_25M_qspi_25M_init,)
+{
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL0 =
+                                  // FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_PARA_HBUS_M1, 0x1)
+                                     FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS, 0x1) /* hsi */
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_M1, 0x0)
+                                 //| FIELD_BUILD(SYSC_SEC_AWO_HSE_DCT_EN, 0)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_HBUS_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_QSPI_FLT_CTRL, 0x9)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI, 0x1)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_HBUS_FLT, 0x2)
+                                   | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_QSPI_FLT, 0x2);
+    SYSC_SEC_AWO->PD_AWO_CLK_CTRL1 = FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS0, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS1, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS2, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS3, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_PBUS4, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_DIV_HBUS, 0x0)
+                                    | FIELD_BUILD(SYSC_SEC_AWO_CLK_SEL_OTP, 0x4);
+}
+
+void XIP_BANNED_FUNC(dpll_qspi_clk_config_and_clk_switch,)
+{
+    if ((0 == READ_BIT(SYSC_SEC_AWO->DPLL1_CTRL2, 1 << 16))
+        || (0 == READ_BIT(SYSC_SEC_AWO->DPLL2_CTRL2, 1 << 16))) {
+        cpu_25M_ahb_25M_qspi_25M_init();
+        disable_dpll();
+        enable_dpll();
+        cpu_600M_ahb_300M_qspi_200M_init();
+    }
+}
+
+NOINLINE void XIP_BANNED_FUNC(clk_flash_init,)
+{
+    dpll_qspi_clk_config_and_clk_switch();
+    MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
+                1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+}
+
+NOINLINE void XIP_BANNED_FUNC(clk_flashx_init,void *reg)
+{
+    if ((void *)LSQSPIV2 == reg) {
+        dpll_qspi_clk_config_and_clk_switch();
+        MODIFY_REG(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
+                    1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+    } else if ((void *)LSQSPIV2_2 == reg) {
+        dpll_qspi_clk_config_and_clk_switch();
+        MODIFY_REG(LSQSPIV2_2->QSPI_CTRL1,LSQSPIV2_MODE_DAC_MASK|LSQSPIV2_CAP_DLY_MASK|LSQSPIV2_CAP_NEG_MASK,
+            1<<LSQSPIV2_MODE_DAC_POS|QSPI_CAPTURE_DELAY<<LSQSPIV2_CAP_DLY_POS|QSPI_CAPTURE_NEG<<LSQSPIV2_CAP_NEG_POS);
+    }
+}
+
+// static void set_all_irq_priority_to_lowest_level()
+// {
+//     uint8_t i;
+//     for(i=0;i<IRQN_MAX;++i)
+//     {
+//         csi_vic_set_prio(i,0);
+//     }
+// }
+
+void flash_swint_init()
+{
+    rv_set_int_isr(FLASH_SWINT_NUM,FLASH_SWINT_HANDLER);
+    CLIC->CLICINT[FLASH_SWINT_NUM].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+    csi_vic_set_prio(FLASH_SWINT_NUM,0xf);
+    csi_vic_clear_pending_irq(FLASH_SWINT_NUM);
+    csi_vic_enable_irq(FLASH_SWINT_NUM);
+}
+
+void sys_init_none()
+{
+    clk_flash_init();
+    // set_all_irq_priority_to_lowest_level();
+    io_init();
+    log_en = true;
+    LOG_INIT();
+
+    // pinmux_hal_flash_init();
+    // pinmux_hal_flash_quad_init();
+    // flash_swint_init();
+    // hal_flash_drv_var_init(false, false);
+    // hal_flash_xip_func_ptr_init();
+
+    // hal_flash_init();
+    // hal_flash_xip_mode_reset();
+    // hal_flash_software_reset();
+    // hal_flash_release_from_deep_power_down();
+    // hal_flash_qe_status_read_and_set();
+    // hal_flash_xip_start();
+
+    // low_power_init();
+    systick_start();
+    // sw_timer_module_init();
+    // HAL_PIS_Init();
+}
+
+void rv_set_int_isr(uint8_t type,void (*isr)())
+{
+    interrupt_vector[type] = isr;
+}
+
+void SWINT_Handler_C(uint32_t *args)
+{
+    uint32_t (*func)(uint32_t,uint32_t,uint32_t,uint32_t) = (void *)args[11];
+    args[15] = func(args[15],args[14],args[13],args[12]);
+}
+
+__attribute__((weak)) int _close (int fildes){  return -1;}
+
+__attribute__((weak)) int _fstat (int fildes,void *st){  return -1;}
+
+__attribute__((weak)) int _isatty (int file){  return 0;}
+
+__attribute__((weak)) int _read (int file,char *ptr,int len){  return -1;}
+
+__attribute__((weak)) int _lseek (int   file,int   ptr,int   dir){  return -1;}
+
+void XIP_BANNED_FUNC(sync_for_xip_stop,struct hal_flash_env *env)
+{
+    /* wait for CS_N release */
+    while ((SEC_PMU->QSPI_PAD_DIN & 0x1) == 0);
+}
+
+#define LSQSH_LVD_ENABLE_BIT     (1U << 4)
+
+
+static void (*lvd_user_callback)(void);
+
+void lvd_isr(void)
+{
+    if (!READ_BIT(SEC_PMU->PMU_STATUS, SEC_PMU_RG_LVD33_INTR_MASK)) {
+        return;
+    }
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 1);
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 0);
+
+    if (lvd_user_callback != NULL) {
+        lvd_user_callback();
+    }
+}
+
+void lvd_init(uint8_t threshold_level)
+{
+    if (threshold_level > 0x0fU) {
+        threshold_level = 0x0fU;
+    }
+
+    REG_FIELD_WR(SEC_PMU->ANA_PMU_CTRL, SEC_PMU_RG_LVD33_CTRL,
+                 LSQSH_LVD_ENABLE_BIT | threshold_level);
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_POL, 0);
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 1);
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_CLR, 0);
+
+    REG_FIELD_WR(SEC_PMU->MISC_CTRL0, SEC_PMU_RG_LVD33_INTR_EN, 1);
+}
+
+void lvd_set_callback(void (*callback)(void))
+{
+    lvd_user_callback = callback;
+}
+
+#define LSPIS_CH0 (*(volatile uint32_t *)(APP_PIS_ADDR + 0x00U))
+#define LSPIS_OER  (*(volatile uint32_t *)(APP_PIS_ADDR + 0x40U))
+
+static void rtc_timer_periph_clk_init(void)
+{
+    /* BSTIM1*/
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_CLR_BSTIM1_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_CLR_BSTIM1_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_BSTIM1_N_MASK;
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_SET_BSTIM1_MASK;
+
+    /* GPTIMA1 */
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_CLR_GPTIMA1_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_CLR_GPTIMA1_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST0 = SYSC_APP_PER_SRST_SET_GPTIMA1_N_MASK;
+    SYSC_APP_PER->PD_PER_CLKG0 = SYSC_APP_PER_CLKG_SET_GPTIMA1_MASK;
+
+    /* PIS */
+    SYSC_APP_PER->PD_PER_CLKG4 = SYSC_APP_PER_CLKG_CLR_PIS_MASK;
+    SYSC_APP_PER->PD_PER_SRST4 = SYSC_APP_PER_SRST_CLR_PIS_N_MASK;
+    SYSC_APP_PER->PD_PER_SRST4 = SYSC_APP_PER_SRST_SET_PIS_N_MASK;
+    SYSC_APP_PER->PD_PER_CLKG4 = SYSC_APP_PER_CLKG_SET_PIS_MASK;
+}
+
+void rtc_timer_init(void)
+{
+    if(SYSC_APP_PER->PD_PER_CLKG0&SYSC_APP_PER_CLKG_SET_GPTIMA1_MASK)
+    {
+        return;
+    }
+    rtc_timer_periph_clk_init();
+    SEC_PMU->SFT_CTRL[4] = 0xFFFFFFFF;
+    /* BSTIM1 */
+    LSBSTIM->PSC = 10000 - 1;//16bit 预分频
+    LSBSTIM->ARR = 7500 - 1;//16bit 计数值
+    REG_FIELD_WR(LSBSTIM->CR2,TIMER_CR2_MMS,0x2);//触发输出选择更新事件
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,0);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_ARPE,1);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_URS,1);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_UDIS,0);
+    REG_FIELD_WR(LSBSTIM->ICR,TIMER_ICR_UIE,1);
+    REG_FIELD_WR(LSBSTIM->EGR,TIMER_EGR_UG,1);
+    /* PIS */
+    LSPIS_CH0 = 12|(28 << 8)|(1 << 18)|(0<<26);//pis 通道0
+    LSPIS_OER = 1;
+    /* GPTIMA1 */
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_CEN,0);
+    REG_FIELD_WR(LSGPTIMA->SMCR,TIMER_SMCR_SMS,7);//从模式选择
+    REG_FIELD_WR(LSGPTIMA->SMCR,TIMER_SMCR_TS,0);//触发源选择 ITR0
+    LSGPTIMA->ARR = 0xffffffff;//32bit计数值
+    LSGPTIMA->CNT = 0;
+    REG_FIELD_WR(LSGPTIMA->CCMR1,TIMER_CCMR1_CC1S,3);
+    REG_FIELD_WR(LSGPTIMA->CCER,TIMER_CCER_CC1E,1);
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_ARPE,1);
+    /* EN */
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_CEN,1);
+    REG_FIELD_WR(LSBSTIM->CR1,TIMER_CR1_CEN,1);
+}
+
+int rtc_timer_set_time(struct tm *timeptr)
+{
+    time_t t = mktime(timeptr);
+    if (t == (time_t)-1) {return -1;}
+    SEC_PMU->SFT_CTRL[4] = t - LSGPTIMA->CNT;
+    return 0;
+}
+
+int rtc_timer_get_time(struct tm *timeptr)
+{
+    if(SEC_PMU->SFT_CTRL[4] == 0xFFFFFFFF)
+    {
+        return -1;
+    }
+    time_t current_time = SEC_PMU->SFT_CTRL[4] + LSGPTIMA->CNT;
+
+    if (localtime_r(&current_time, timeptr) == NULL) { return -1; }
+    return 0;
+}

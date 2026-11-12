@@ -1,4 +1,5 @@
 #include "semihosting.h"
+#include <string.h>
 
 #define SYSOPEN     0x01
 #define SYSWRITEC   0x03
@@ -80,18 +81,6 @@ static int semihosting_errno(void)
 
 static int semihosting_infd = SBI_ENODEV;
 static int semihosting_outfd = SBI_ENODEV;
-
-size_t strlen(const char *str)
-{
-	unsigned long ret = 0;
-
-	while (*str != '\0') {
-		ret++;
-		str++;
-	}
-
-	return ret;
-}
 
 static long semihosting_open(const char *fname, enum semihosting_open_mode mode)
 {

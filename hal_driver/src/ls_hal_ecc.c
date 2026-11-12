@@ -974,10 +974,17 @@ static void verify_it(const uint8_t *const public_key[2],const uint8_t *message_
     HAL_LSECC_MSP_INT_ENABLE();
 }
 
-bool HAL_LSECC_Verify(const struct ecc_curve_param *curve,const uint8_t *const public_key[2],const uint8_t *message_hash,uint32_t hash_size,const uint8_t *signature)
+HAL_StatusTypeDef HAL_LSECC_Verify(const struct ecc_curve_param *curve,const uint8_t *const public_key[2],const uint8_t *message_hash,uint32_t hash_size,const uint8_t *signature)
 {
+    if ((curve == NULL) || (public_key == NULL) || (message_hash == NULL) || (signature == NULL))
+    {
+        return HAL_INVALIAD_PARAM;
+    }
+
     ecc_curve = curve;
-    return verify(public_key,message_hash,hash_size,signature);
+    /* verify() yields only the valid/invalid comparison; map it onto the HAL
+     * status: valid -> HAL_OK, invalid -> HAL_ERROR. */
+    return verify(public_key,message_hash,hash_size,signature) ? HAL_OK : HAL_ERROR;
 }
 
 void HAL_LSECC_Verify_IT(const struct ecc_curve_param *curve,const uint8_t *const public_key[2],const uint8_t *message_hash,uint32_t hash_size,const uint8_t *signature)

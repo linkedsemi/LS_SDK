@@ -5,6 +5,7 @@ plf = {
     'le501x': 'arm_cm',
     'taurus': 'rv32',
     'leo':'rv32',
+    'qsh':'rv32',
     'lm3050': 'arm_cm',
 }
 if env.get('IC') is None:
@@ -26,6 +27,7 @@ def inc_dirs(self,dirs):
 def image_build(self,name,src,inc,ble=False,mesh=False,usb=False,rtos = None,with_startup = True,objprefix = ''):
     self.Append(CPPPATH = self.inc_dirs(inc))
     #self.Append(CCFLAGS = ['-Werror'])
+    self.Append(CCFLAGS = ['-save-temps=obj'])
     if not 'NANO_SPECS' in self:
         env['NANO_SPECS'] = "-specs=nano.specs"
     self.Append(LINKFLAGS = ' $GC_OPTION ')

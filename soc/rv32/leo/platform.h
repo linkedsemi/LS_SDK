@@ -7,6 +7,7 @@
 #include "sdk_config.h"
 #include "reg_sysc_awo.h"
 #include "field_manipulate.h"
+#include "common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +36,7 @@ __attribute__((always_inline)) static inline void e906_init()
     MODIFY_REG(value,0x6000,0x2000); 
     __set_MSTATUS(value);//enable fpu
     value = __get_MHCR();
-    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_L0BTB_Msk);
+    value |= (CACHE_MHCR_RS_Msk | CACHE_MHCR_BPE_Msk | CACHE_MHCR_BTB_Msk);
     __set_MHCR(value);
 }
 
@@ -105,6 +106,43 @@ uint32_t GenerateRandom32Bit();
 #endif
 
 #define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
+
+static inline uint32_t flash_get_current_time(void)
+{
+    return __get_MTIME();
+}
+
+static inline uint32_t flash_time_us2ticks(uint32_t us)
+{
+#if defined(__ZEPHYR__)
+    return (CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC / 1000000U) * us;
+#else
+    return SDK_HCLK_MHZ * us;
+#endif
+}
+
+#if defined(__ZEPHYR__)
+#include <zephyr/sys/atomic.h>
+#else
+static inline bool atomic_cas_ram(long *ptr, long oldval, long newval)
+{
+    if (*ptr == oldval) {
+        *ptr = newval;
+        return true;
+    }
+    return false;
+}
+
+static inline long atomic_inc(long *ptr)
+{
+    return (*ptr)++;
+}
+
+static inline long atomic_dec(long *ptr)
+{
+    return (*ptr)--;
+}
+#endif
 
 #ifdef __cplusplus
 }

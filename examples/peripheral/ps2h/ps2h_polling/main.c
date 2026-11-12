@@ -48,10 +48,11 @@ static void ps2h_test()
     LOG_I("transmit ok");
 
     rs = HAL_PS2H_Receive(&PS2H_Config, &ps2h_data, HAL_MAX_DELAY);
-    if (rs != HAL_OK)
+    if (rs != HAL_OK){
         LOG_I("rx error code: 0x%x", rs);
-    else
+    }else {
         LOG_I("receive data: 0x%x", ps2h_data);
+    }
 }
 
 int main()

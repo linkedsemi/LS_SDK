@@ -282,6 +282,9 @@
 
 #elif TU_CHECK_MCU(OPT_MCU_LM3050,OPT_MCU_LEO)
   #define TUP_DCD_ENDPOINT_MAX    7
+
+#elif TU_CHECK_MCU(OPT_MCU_LM3050,OPT_MCU_QSH)
+  #define TUP_DCD_ENDPOINT_MAX    7
 #endif
 
 //--------------------------------------------------------------------+

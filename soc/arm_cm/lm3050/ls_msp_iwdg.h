@@ -12,9 +12,9 @@ extern "C" {
 #endif
 
 
-void HAL_IWDG_MSP_Init(void);
+void HAL_IWDG_MSP_Init(reg_iwdg_t *iwdg);
 
-void HAL_IWDG_MSP_DeInit(void);
+void HAL_IWDG_MSP_DeInit(reg_iwdg_t *iwdg);
 
 #ifdef __cplusplus
 }

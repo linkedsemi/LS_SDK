@@ -2,6 +2,7 @@
 #define LS_HAL_ECC_H_
 #include <stdbool.h>
 #include "ls_msp_ecc.h"
+#include "HAL_def.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,7 +54,16 @@ void HAL_LSECC_Sign_IT(const struct ecc_curve_param *curve,const uint8_t *privat
 
 void HAL_LSECC_Sign_Complete_Callback(void);
 
-bool HAL_LSECC_Verify(const struct ecc_curve_param *curve,const uint8_t *const public_key[2],const uint8_t *message_hash,uint32_t hash_size,const uint8_t *signature);
+/** \brief LSECC ECDSA signature verification (polling)
+ *  \param[in] curve Curve parameters
+ *  \param[in] public_key Signer public key {x, y}
+ *  \param[in] message_hash Message digest
+ *  \param[in] hash_size Digest length in bytes
+ *  \param[in] signature Signature to verify
+ *  \return HAL_OK if the signature is valid, HAL_ERROR if it is invalid,
+ *          HAL_INVALIAD_PARAM on a NULL pointer argument
+ */
+HAL_StatusTypeDef HAL_LSECC_Verify(const struct ecc_curve_param *curve,const uint8_t *const public_key[2],const uint8_t *message_hash,uint32_t hash_size,const uint8_t *signature);
 
 void HAL_LSECC_Verify_IT(const struct ecc_curve_param *curve,const uint8_t *const public_key[2],const uint8_t *message_hash,uint32_t hash_size,const uint8_t *signature);
 

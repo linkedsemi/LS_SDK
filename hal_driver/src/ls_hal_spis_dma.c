@@ -7,17 +7,17 @@
 __attribute__((weak)) void  HAL_SPIS_DMA_TxCpltCallback(){};
 __attribute__((weak)) void  HAL_SPIS_DMA_RxCpltCallback(){};
 __attribute__((weak)) void  HAL_SPIS_DMA_TxRxCpltCallback(){};
-static void SPIS_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+static void SPIS_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         HAL_SPIS_DMA_TxCpltCallback();
     }
 }
 
-static void SPIS_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, bool tfr_end)
+static void SPIS_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma, uint32_t param, uint8_t ch_idx, uint32_t *lli, uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         SPIS_HandleTypeDef *spis = (SPIS_HandleTypeDef *)param;        
         if(!READ_BIT(spis->Instance->TX_CTRL,SPIS_TX_DIS))

@@ -84,3 +84,21 @@ void memcpy_rev(uint8_t *dest, const uint8_t *src, uint32_t len)
 		*dest++ = *src--;
 	}
 }
+
+#if defined(CONFIG_FSTACK_PROTECTOR)
+
+#include <stdio.h>
+
+void __stack_chk_guard(void)
+{
+    printf("\n%s\n", __func__);
+    while(1) {;}
+}
+
+void __stack_chk_fail(void)
+{
+    printf("\n%s\n", __func__);
+    while(1) {;}
+}
+
+#endif /* CONFIG_FSTACK_PROTECTOR */

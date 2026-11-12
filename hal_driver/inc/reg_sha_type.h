@@ -10,7 +10,9 @@ typedef struct
 {
     volatile uint32_t SHA_START; //0x0
     volatile uint32_t SHA_CTRL; //0x4
-    volatile uint32_t RESERVED0[6];
+    volatile uint32_t RESERVED0[2];
+    volatile uint32_t DMA_CTRL; //0x10
+    volatile uint32_t RESERVED1[3];
     volatile uint32_t INTR_M; //0x20
     volatile uint32_t INTR_C; //0x24
     volatile uint32_t INTR_S; //0x28
@@ -18,7 +20,7 @@ typedef struct
     volatile uint32_t FIFO_DAT; //0x30
     volatile uint32_t FIFO_STAT; //0x34
     volatile uint32_t FSM_STAT; //0x38
-    volatile uint32_t RESERVED1[1];
+    volatile uint32_t RESERVED2[1];
     volatile uint32_t SHA_RSLT[8]; //0x40
 }reg_sha_t;
 

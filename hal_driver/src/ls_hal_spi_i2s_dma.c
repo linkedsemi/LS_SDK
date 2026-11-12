@@ -94,18 +94,18 @@ static void spi_dma_config(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,u
 }
 #elif DMACV3
 #include "ls_hal_dmacv3.h"
-static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void SPI_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 { 
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param;
         spi_tx_dma_cb(hspi);
     }
 }
 
-static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+static void SPI_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
        SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)param; 
        spi_rx_dma_cb(hspi);
@@ -352,18 +352,18 @@ static void i2s_dma_config(I2S_HandleTypeDef *hi2s,void *TX_Data,void *RX_Data,u
 
 #elif DMACV3
 #include "ls_hal_dmacv3.h"
-void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void I2S_Transmit_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
         i2s_tx_dma_cb(hi2s);
     }
 }
 
-void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void I2S_Receive_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         I2S_HandleTypeDef *hi2s = (I2S_HandleTypeDef *)param;
         i2s_rx_dma_cb(hi2s);

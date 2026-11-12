@@ -1,0 +1,51 @@
+#ifndef QSPIV2_CONFIG_H_
+#define QSPIV2_CONFIG_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(CONFIG_QSPI1_FREQ)
+#define QSPI_CLK_CYCLE ((200000000 / CONFIG_QSPI1_FREQ) - 1)
+#else 
+#define QSPI_CLK_CYCLE 1
+#endif
+
+#define QSPI_CS_INTERVAL 2
+#define QSPI_CS_HOLD 1
+#define QSPI_CS_SETUP 1
+
+//(neg,delay) = (0,0), (1,1),(0,1), (1,2),(0,2), (1,3),(0,3)
+#if defined(BOOT_ROM) && !defined(BOOT_RAM)
+#define QSPI_CAPTURE_DELAY 0
+#define QSPI_CAPTURE_NEG 0
+#else
+/* fail */
+// #define QSPI_CAPTURE_DELAY 0
+// #define QSPI_CAPTURE_NEG 0
+/* ok */
+// #define QSPI_CAPTURE_NEG 1
+// #define QSPI_CAPTURE_DELAY 1
+/* ok */
+// #define QSPI_CAPTURE_NEG 0
+// #define QSPI_CAPTURE_DELAY 1
+/* ok */
+#define QSPI_CAPTURE_NEG 1
+#define QSPI_CAPTURE_DELAY 2
+/* ok */
+// #define QSPI_CAPTURE_NEG 0
+// #define QSPI_CAPTURE_DELAY 2
+/* fail */
+// #define QSPI_CAPTURE_NEG 1
+// #define QSPI_CAPTURE_DELAY 3
+/* fail */
+// #define QSPI_CAPTURE_NEG 0
+// #define QSPI_CAPTURE_DELAY 3
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+

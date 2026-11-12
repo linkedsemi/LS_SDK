@@ -12,14 +12,18 @@ void ls_assert(const char *expr,const char *file,int line)
 //    iob_output_set(2);
 //    *(uint32_t *)0x50020020 = 0;
 //    *(uint32_t *)0x5002003c = 0;
+#if !defined(__ZEPHYR__)
     LOG_RAW("Assertion Failed: file %s, line %d, %s\n",file,line,expr);
+#endif
     while(1);
 }
 
+#if !defined(__ZEPHYR__)
 void __assert_func (const char *file,int line,const char *func,const char *failedexpr)
 {
     ls_assert(failedexpr,file,line);
 }
+#endif
 
 void XIP_BANNED_FUNC(ls_ram_assert,)
 {

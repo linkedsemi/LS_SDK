@@ -76,9 +76,9 @@ HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef* hdac, uint32_t Alignment,
 #elif DMACV3
 #include "ls_hal_dmacv3.h"
 
-void DAC1_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void DAC1_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         DAC_HandleTypeDef *hdac = (DAC_HandleTypeDef *)param;
         CLEAR_BIT(hdac->Instance->DAC_CR,DAC_DMA2N1_MASK);
@@ -86,9 +86,9 @@ void DAC1_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t
     }
 }
 
-void DAC2_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,bool tfr_end)
+void DAC2_DMA_Callback(DMA_Controller_HandleTypeDef *hdma,uint32_t param,uint8_t ch_idx,uint32_t *lli,uint32_t status_int)
 {
-    if(tfr_end == false)
+    if(!(status_int & DMAC_TFR_MASK))
     {
         DAC_HandleTypeDef *hdac = (DAC_HandleTypeDef *)param;
         CLEAR_BIT(hdac->Instance->DAC_CR,DAC_DMAEN2_MASK);

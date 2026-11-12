@@ -40,10 +40,11 @@ int main()
     {
         HAL_UART_Receive(&UART_Config, &uart_rxdata, 1, HAL_MAX_DELAY);
         HAL_StatusTypeDef rs = HAL_PS2H_Transmit(&PS2H_Config, uart_rxdata);
-        if (rs != HAL_OK)
-        LOG_I("tx error code: 0x%x", rs);
-        else
-        LOG_I("tx successful");
+        if (rs != HAL_OK) {
+            LOG_I("tx error code: 0x%x", rs);
+        }else {
+            LOG_I("tx successful");
+        }
     }
 }
 

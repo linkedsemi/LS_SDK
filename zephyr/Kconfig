@@ -1,0 +1,22 @@
+# Copyright (c) 2024 linkedsemi
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN
+    bool "SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN"
+    default y
+
+config SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN
+    bool "SOC_LSQSH_BUILD_OUTPUT_BRAM_BIN"
+    default y
+
+config SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD
+    bool "SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_ZSTD"
+    default y
+
+config SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP
+    bool "SOC_LSQSH_BUILD_OUTPUT_HEADER_BIN_GZIP"
+    default y
+
+config SOC_LSQSH_DUAL_BOOT
+    bool "SOC_LSQSH_DUAL_BOOT"
+    default n

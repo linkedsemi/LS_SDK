@@ -16,7 +16,11 @@ uint8_t g_board_led_rgb_idx = 0;
 void board_init(void)
 {
   sys_init_none();
+#ifdef QSH
+  pinmux_usb_init(USB_HOST, PI04, PI05);
+#else
   pinmux_usb_init(USB_HOST);
+#endif
 }
 
 void board_led_write(bool state)

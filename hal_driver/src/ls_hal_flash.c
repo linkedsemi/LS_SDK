@@ -1,4 +1,6 @@
 #include "hal_flash_int.h"
+#include "ls_hal_flash.h"
+#include "platform.h"
 #if !defined(HAL_FLASH_C_MERGED) || defined(HAL_FLASH_C_DESTINATION)
 
 ROM_SYMBOL bool XIP_BANNED_FUNC(hal_flashx_write_in_process,struct hal_flash_env *env)
@@ -10,34 +12,49 @@ ROM_SYMBOL bool XIP_BANNED_FUNC(hal_flashx_write_in_process,struct hal_flash_env
 
 static void XIP_BANNED_FUNC(hal_flashx_write_status_check,struct hal_flash_env *env)
 {
-    while(hal_flashx_write_in_process(env));
+    bool wip = true;
+    do{
+        flash_critical_key_t cpu_stat = FLASH_ENTER_CRITICAL(env);
+        if(!env->suspended)
+        {
+            wip = hal_flashx_write_in_process(env);
+        }
+        FLASH_EXIT_CRITICAL(env,cpu_stat);
+    }while(wip);
 }
 
 NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flashx_reading_critical,void (*func)(struct hal_flash_env *,void *),struct hal_flash_env *env,void *param)
 {
+	lsqsh_xip_lock_broadcast_ipi(false);
+    flash_critical_enter_sync();
+    flash_critical_key_t cpu_stat = FLASH_ENTER_CRITICAL(env);
     sync_for_xip_stop(env);
-    uint32_t cpu_stat = ENTER_CRITICAL();
     hal_flashx_continuous_mode_stop(env);
     func(env,param);
     hal_flashx_continuous_mode_start(env);
-    EXIT_CRITICAL(cpu_stat);
+    FLASH_EXIT_CRITICAL(env,cpu_stat);
+    flash_critical_exit_sync();
 }
 
 NOINLINE ROM_SYMBOL void XIP_BANNED_FUNC(flashx_writing_critical,void (*func)(struct hal_flash_env *,void *),struct hal_flash_env *env,void *param)
 {
+    lsqsh_xip_lock_broadcast_ipi(true);
+    flash_critical_enter_sync();
+    flash_critical_key_t cpu_stat = FLASH_ENTER_CRITICAL(env);
     sync_for_xip_stop(env);
-    uint32_t cpu_stat = ENTER_CRITICAL();
     hal_flashx_continuous_mode_stop(env);
     hal_flashx_write_enable(env);
     func(env,param);
     env->writing = true;
-    EXIT_CRITICAL(cpu_stat);
+    FLASH_EXIT_CRITICAL(env,cpu_stat);
+    flash_critical_exit_sync();
     hal_flashx_write_status_check(env);
-    cpu_stat = ENTER_CRITICAL();
+    flash_critical_enter_sync();
+    cpu_stat = FLASH_ENTER_CRITICAL(env);
     env->writing = false;
     hal_flashx_continuous_mode_start(env);
-    EXIT_CRITICAL(cpu_stat);
-
+    FLASH_EXIT_CRITICAL(env,cpu_stat);
+    flash_critical_exit_sync();
 }
 
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_multi_io_read,struct hal_flash_env *env,uint32_t offset,uint8_t *data,uint32_t length)
@@ -80,6 +97,26 @@ ROM_SYMBOL void FLASH_API_SECTION(do_hal_flashx_chip_erase,struct hal_flash_env 
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_chip_erase,struct hal_flash_env *env)
 {
     hal_flashx_chip_erase_operation(env,NULL);
+}
+
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register_0,struct hal_flash_env *env,uint8_t status_0)
+{
+    struct flash_wr_rd_reg_param param = {
+        .buf = &status_0,
+        .length = sizeof(status_0),
+        .opcode = WRITE_STATUS_REGISTER_0_OPCODE,
+    };
+    hal_flashx_write_reg_operation(env, &param);
+}
+
+ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register_1,struct hal_flash_env *env,uint8_t status_1)
+{
+    struct flash_wr_rd_reg_param param = {
+        .buf = &status_1,
+        .length = sizeof(status_1),
+        .opcode = WRITE_STATUS_REGISTER_1_OPCODE,
+    };
+    hal_flashx_write_reg_operation(env, &param);
 }
 
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_write_status_register,struct hal_flash_env *env,uint16_t status)
@@ -178,6 +215,11 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_1,struct hal_fla
     hal_flashx_read_status_register_1_byte(env,status_reg_1,READ_STATUS_REGISTER_1_OPCODE);
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_2,struct hal_flash_env *env,uint8_t *status_reg_2)
+{
+    hal_flashx_read_status_register_1_byte(env,status_reg_2,READ_STATUS_REGISTER_2_OPCODE);
+}
+
 static void XIP_BANNED_FUNC(hal_flashx_read_status_register_1_byte_ram,struct hal_flash_env *env,uint8_t *buf,uint8_t opcode)
 {
     struct flash_wr_rd_reg_param param;
@@ -197,6 +239,11 @@ ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_1_ram,struct hal
     hal_flashx_read_status_register_1_byte_ram(env,status_reg_1,READ_STATUS_REGISTER_1_OPCODE);
 }
 
+ROM_SYMBOL void XIP_BANNED_FUNC(hal_flashx_read_status_register_2_ram,struct hal_flash_env *env,uint8_t *status_reg_2)
+{
+    hal_flashx_read_status_register_1_byte_ram(env,status_reg_2,READ_STATUS_REGISTER_2_OPCODE);
+}
+
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_erase_security_area,struct hal_flash_env *env,uint8_t idx)
 {
     uint8_t addr[3] = {0,idx<<4,0};
@@ -206,6 +253,13 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_erase_security_area,struct hal_flas
         .opcode = ERASE_SECURITY_AREA_OPCODE,
     };
     hal_flashx_write_reg_operation(env,&param);
+}
+
+ROM_SYMBOL bool FLASH_API_SECTION(hal_flashx_qe_status_read,struct hal_flash_env *env)
+{
+    uint8_t status_reg[2];
+    hal_flashx_read_status_register_1(env,&status_reg[1]);
+    return (0x02 == (status_reg[1]&0x02));
 }
 
 ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_qe_status_read_and_set,struct hal_flash_env *env)
@@ -239,34 +293,78 @@ ROM_SYMBOL void FLASH_API_SECTION(hal_flashx_read_sfdp,struct hal_flash_env *env
 
 void XIP_BANNED_FUNC(hal_flashx_prog_erase_suspend_isr,struct hal_flash_env *env)
 {
-    if(env->writing)
+    bool writing;
+    flash_critical_key_t key = FLASH_ENTER_CRITICAL(env);
+    writing = env->writing;
+    FLASH_EXIT_CRITICAL(env,key);
+    if(writing&&env->xip)
     {
-        if(env->suspend_count==0)
+        if(atomic_cas_ram(&env->suspend_count,0,1))
         {
+            while(env->suspended);
+            if(env->suspend_after_resume)
+            {
+                while(time_diff(flash_get_current_time(),env->resume_time) < flash_time_us2ticks(MIN_RESUME_SUSPEND_LOOP_US));
+            }
+            key = FLASH_ENTER_CRITICAL(env);
             hal_flashx_prog_erase_suspend(env);
             uint8_t status_reg1;
             do{
                 hal_flashx_read_status_register_1_ram(env,&status_reg1);
             }while(hal_flashx_write_in_process(env)&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
             hal_flashx_continuous_mode_start(env);
+            env->suspended = true;
+            FLASH_EXIT_CRITICAL(env,key);
+        }else{
+            atomic_inc(&env->suspend_count);
+            while(!env->suspended);
         }
-        env->suspend_count++;
     }
 }
 
 void XIP_BANNED_FUNC(hal_flashx_prog_erase_resume_isr,struct hal_flash_env *env)
 {
-    if(env->writing)
+    bool writing;
+    flash_critical_key_t key = FLASH_ENTER_CRITICAL(env);
+    writing = env->writing;
+    FLASH_EXIT_CRITICAL(env,key);
+    if(writing&&env->xip)
     {
-        env->suspend_count--;
-        if(env->suspend_count==0)
+        if(atomic_dec(&env->suspend_count)==1)
         {
+            key = FLASH_ENTER_CRITICAL(env);
             sync_for_xip_stop(env);
             hal_flashx_continuous_mode_stop(env);
             hal_flashx_prog_erase_resume(env);
-            DELAY_US(20);
+            env->suspended = false;
+            FLASH_EXIT_CRITICAL(env,key);
+            env->resume_time = flash_get_current_time();
+            env->suspend_after_resume = true;
         }
     }
+}
+
+uint8_t hal_flashx_read_ear(struct hal_flash_env *env)
+{
+    uint8_t ear = 0;
+
+    struct flash_wr_rd_reg_param param;
+    param.buf = &ear;
+    param.opcode = RDEAR_OPCODE;
+    param.length = 1;
+    hal_flashx_read_reg_operation(env, &param);
+
+    return ear;
+}
+
+void hal_flashx_write_ear(struct hal_flash_env *env, uint8_t ear)
+{
+    struct flash_wr_rd_reg_param param = {
+        .buf = &ear,
+        .length = 1,
+        .opcode = WREAR_OPCODE,
+    };
+    hal_flashx_write_reg_operation(env, &param);
 }
 
 #endif

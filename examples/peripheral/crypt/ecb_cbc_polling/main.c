@@ -113,6 +113,7 @@ uint32_t length;
 void crypt_init(void)
 {
     HAL_LSCRYPT_Init();
+    HAL_LSCRYPT_SetRandFunc(rand);
 }
 
 void crypt_cbc_ecb_test_128(void)

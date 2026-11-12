@@ -10,6 +10,7 @@
 static uint64_t total_length;
 static uint32_t current_word;
 static uint8_t current_block_bytes;
+static bool first_update;
 
 HAL_StatusTypeDef HAL_LSSHA_Init(void)
 {
@@ -30,13 +31,12 @@ static void sha_variable_init()
     total_length = 0;
     current_block_bytes = 0;
     current_word = 0;
-    LSSHA->SHA_START = 1;
-    LSSHA->SHA_CTRL &= ~SHA_FST_DAT_MASK;
 }
 
 HAL_StatusTypeDef HAL_LSSHA_SHA256_Init()
 {
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,0);
+    first_update = false;
     sha_variable_init();
     return HAL_OK;
 }
@@ -44,6 +44,7 @@ HAL_StatusTypeDef HAL_LSSHA_SHA256_Init()
 HAL_StatusTypeDef HAL_LSSHA_SHA224_Init()
 {
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,1)|FIELD_BUILD(SHA_CALC_SM3,0);
+    first_update = false;
     sha_variable_init();
     return HAL_OK;
 }
@@ -51,6 +52,7 @@ HAL_StatusTypeDef HAL_LSSHA_SHA224_Init()
 HAL_StatusTypeDef HAL_LSSHA_SM3_Init()
 {
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,1);
+    first_update = false;
     sha_variable_init();
     return HAL_OK;
 }
@@ -92,6 +94,12 @@ static void sha_start(bool end)
 
 HAL_StatusTypeDef HAL_LSSHA_Update(const uint8_t *data,uint32_t length)
 {
+    if((!first_update))
+    {
+        LSSHA->SHA_START = 1;
+        LSSHA->SHA_CTRL &= ~SHA_FST_DAT_MASK;
+        first_update = true;
+    }
     LSSHA->INTR_M = 0;
     total_length += length*8;
     while(length)
@@ -139,12 +147,10 @@ HAL_StatusTypeDef HAL_LSSHA_Final(uint8_t *digest)
 #define B 64
 #define I_PAD 0x36
 #define O_PAD 0x5C
-#define SHA256_DIGEST_SIZE 32
-#define SHA224_DIGEST_SIZE 28
 
-HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+HAL_StatusTypeDef HAL_LSSHA_SHA256_HMAC(uint8_t out[SHA256_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
 {
-    uint32_t kh[SHA256_WORDS_NUM];
+    uint8_t kh[SHA256_BYTES_NUM];
     HAL_LSSHA_SHA256_Init();
 
     /*
@@ -154,9 +160,9 @@ HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data,
     if (key_len > B)
     {
         HAL_LSSHA_Update(key, key_len);
-        HAL_LSSHA_Final((uint8_t *)kh);
-        key_len = SHA256_DIGEST_SIZE;
-        key = (uint8_t *)kh;
+        HAL_LSSHA_Final(kh);
+        key_len = SHA256_BYTES_NUM;
+        key = kh;
     }
 
     /*
@@ -179,7 +185,7 @@ HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data,
      */
     HAL_LSSHA_Update(kx, B);
     HAL_LSSHA_Update(data, data_len);
-    HAL_LSSHA_Final((uint8_t *)out);
+    HAL_LSSHA_Final(out);
     HAL_LSSHA_SHA256_Init();
 
     /*
@@ -200,22 +206,22 @@ HAL_StatusTypeDef HAL_HMAC_SHA256(uint32_t out[SHA256_WORDS_NUM], uint8_t *data,
      *     the result
      */
     HAL_LSSHA_Update(kx, B);
-    HAL_LSSHA_Update((uint8_t *)out, SHA256_DIGEST_SIZE);
-    HAL_LSSHA_Final((uint8_t *)out);
+    HAL_LSSHA_Update(out, SHA256_BYTES_NUM);
+    HAL_LSSHA_Final(out);
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_HMAC_SHA224(uint32_t out[SHA224_WORDS_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+HAL_StatusTypeDef HAL_LSSHA_SHA224_HMAC(uint8_t out[SHA224_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
 {
-    uint32_t kh[SHA224_WORDS_NUM];
+    uint8_t kh[SHA224_BYTES_NUM];
     HAL_LSSHA_SHA224_Init();
 
     if (key_len > B)
     {
         HAL_LSSHA_Update(key, key_len);
-        HAL_LSSHA_Final((uint8_t *)kh);
-        key_len = SHA224_DIGEST_SIZE;
-        key = (uint8_t *)kh;
+        HAL_LSSHA_Final(kh);
+        key_len = SHA224_BYTES_NUM;
+        key = kh;
     }
 
     uint8_t kx[B];
@@ -235,12 +241,49 @@ HAL_StatusTypeDef HAL_HMAC_SHA224(uint32_t out[SHA224_WORDS_NUM], uint8_t *data,
         kx[i] = O_PAD ^ 0;
 
     HAL_LSSHA_Update(kx, B);
-    HAL_LSSHA_Update((uint8_t *)out, SHA224_DIGEST_SIZE);
-    HAL_LSSHA_Final((uint8_t *)out);
+    HAL_LSSHA_Update(out, SHA224_BYTES_NUM);
+    HAL_LSSHA_Final(out);
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint32_t hash_val[SHA256_WORDS_NUM])
+HAL_StatusTypeDef HAL_LSSHA_SM3_HMAC(uint8_t out[SM3_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len)
+{
+    uint8_t kh[SM3_BYTES_NUM];
+    uint8_t kx[B];
+    uint8_t i;
+
+    if (key_len > B)
+    {
+        HAL_LSSHA_SM3_Init();
+        HAL_LSSHA_Update(key, key_len);
+        HAL_LSSHA_Final(kh);
+        key_len = SM3_BYTES_NUM;
+        key = kh;
+    }
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = I_PAD ^ key[i];
+    for (i = key_len; i < B; i++)
+        kx[i] = I_PAD ^ 0;
+
+    HAL_LSSHA_SM3_Init();
+    HAL_LSSHA_Update(kx, B);
+    HAL_LSSHA_Update(data, data_len);
+    HAL_LSSHA_Final(out);
+
+    for (i = 0; i < key_len; i++)
+        kx[i] = O_PAD ^ key[i];
+    for (i = key_len; i < B; i++)
+        kx[i] = O_PAD ^ 0;
+
+    HAL_LSSHA_SM3_Init();
+    HAL_LSSHA_Update(kx, B);
+    HAL_LSSHA_Update(out, SM3_BYTES_NUM);
+    HAL_LSSHA_Final(out);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint32_t *hash_val)
 {
     HAL_LSSHA_SHA256_Init();
     HAL_LSSHA_Update(data, length);
@@ -248,7 +291,7 @@ HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint32_
     return HAL_OK;
 }
 
-bool HAL_KDF_SM3(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
+HAL_StatusTypeDef HAL_LSSHA_SM3_KDF(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
 {
     uint32_t ct = 0x1;
     uint8_t Data[4];
@@ -257,7 +300,7 @@ bool HAL_KDF_SM3(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
 	uint32_t index = (out_len + 0x1f) / 0x20;
 
     if (Z == NULL || out_len == 0 || Zlen == 0 || out == NULL)
-        return false;
+        return HAL_INVALIAD_PARAM;
 
     for (uint32_t i = 0; i < index; i++)
     {
@@ -274,7 +317,7 @@ bool HAL_KDF_SM3(uint8_t *Z, uint32_t Zlen, uint8_t *out, uint32_t out_len)
         memcpy(out + 0x20 * i, digest, digest_len);
         ct++;
     }
-    return true;
+    return HAL_OK;
 }
 
 void LSSHA_IRQHandler(void){}

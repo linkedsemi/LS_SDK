@@ -8,22 +8,22 @@ extern "C" {
 
 typedef struct
 {
-    volatile uint32_t RBR;
-    volatile uint32_t TBR;
-    volatile uint32_t BRR;
-    volatile uint32_t LCR;
-    volatile uint32_t MCR;
-    volatile uint32_t CR;
-    volatile uint32_t RTOR;
-    volatile uint32_t FCR;
-    volatile uint32_t SR;
-    volatile uint32_t IER;
-    volatile uint32_t IDR;
-    volatile uint32_t IVS;
-    volatile uint32_t RIF;
-    volatile uint32_t IFM;
-    volatile uint32_t ICR;
-}reg_uart_t;
+    volatile uint32_t RBR;  //0x0
+    volatile uint32_t TBR;  //0x4
+    volatile uint32_t BRR;  //0x8
+    volatile uint32_t LCR;  //0xc
+    volatile uint32_t MCR;  //0x10
+    volatile uint32_t CR;   //0x14
+    volatile uint32_t RTOR; //0x18
+    volatile uint32_t FCR;  //0x1c
+    volatile uint32_t SR;   //0x20
+    volatile uint32_t IER;  //0x24
+    volatile uint32_t IDR;  //0x28
+    volatile uint32_t IVS;  //0x2c
+    volatile uint32_t RIF;  //0x30
+    volatile uint32_t IFM;  //0x34
+    volatile uint32_t ICR;  //0x38
+} reg_uart_t;
 
 enum UART_REG_RBR_FIELD
 {

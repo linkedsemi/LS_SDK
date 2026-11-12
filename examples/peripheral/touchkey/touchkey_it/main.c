@@ -67,7 +67,7 @@ int main()
     }
 }
 
-void HAL_TOUCHKEY_END_Callback(uint32_t *data)
+void HAL_TOUCHKEY_END_Callback(uint32_t data[16])
 {
     for (uint8_t i = 0; i < 16; i++)
     {

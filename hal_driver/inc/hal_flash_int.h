@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "sdk_config.h"
-#include "ls_hal_flash.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"
@@ -25,10 +24,11 @@ extern "C" {
 #endif
 
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
-#define WRTIE_STATUS_REGISTER_0_OPCODE 0x01
+#define WRITE_STATUS_REGISTER_0_OPCODE 0x01
 #define WRITE_STATUS_REGISTER_1_OPCODE 0x31
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
+#define READ_STATUS_REGISTER_2_OPCODE 0x15
 #define WRITE_ENABLE_OPCODE 0x06
 #define PAGE_ERASE_OPCODE 0x81
 #define SECTOR_ERASE_OPCODE 0x20
@@ -63,10 +63,14 @@ extern "C" {
 #define PROG_ERASE_SUSPEND 0x75
 #define PROG_ERASE_RESUME 0x7a
 #define CONTINUOUS_READ_MODE_RESET 0xff
+#define RDEAR_OPCODE 0xc8 /* Read Extended Address Register  */
+#define WREAR_OPCODE 0xc5 /* Write Extended Address Register */
 
 #define XIP_MODE_BITS 0xa0
 
 #define DUMMY_BYTE_VAL 0x3c
+
+#define MIN_RESUME_SUSPEND_LOOP_US 100
 
 enum mw_wid_type
 {
@@ -80,6 +84,39 @@ struct flash_wr_rd_reg_param
     uint8_t *buf;
     uint8_t opcode;
     uint8_t length;
+};
+
+#if defined(__ZEPHYR__)&&defined(CONFIG_SMP)
+#include <zephyr/spinlock.h>
+#include "smp/lsqsh_smp.h"
+#define FLASH_ENTER_CRITICAL(env) e906_smp_spin_lock(&env->flash_lock)
+#define FLASH_EXIT_CRITICAL(env, cpu_stat) e906_smp_spin_unlock(&env->flash_lock, cpu_stat)
+typedef k_spinlock_key_t flash_critical_key_t;
+#else
+#define FLASH_ENTER_CRITICAL(env) ENTER_CRITICAL()
+#define FLASH_EXIT_CRITICAL(env, cpu_stat) EXIT_CRITICAL(cpu_stat)
+typedef uint32_t flash_critical_key_t;
+static inline void flash_critical_enter_sync(){}
+static inline void flash_critical_exit_sync(){}
+static inline void lsqsh_xip_lock_broadcast_ipi(bool is_write){}
+#endif
+
+struct hal_flash_env
+{
+    void *reg;
+    #if defined(__ZEPHYR__)&&defined(CONFIG_SMP)
+    struct k_spinlock flash_lock;
+    #endif
+    uint32_t resume_time;
+    long suspend_count;
+    bool suspended;
+    bool suspend_after_resume;
+    bool xip;
+    bool dual_mode_only;
+    bool continuous_mode_enable;
+    bool writing;
+    bool continuous_mode_on;
+    bool addr4b;
 };
 
 void hal_flashx_program_operation(struct hal_flash_env *env,void *param);
