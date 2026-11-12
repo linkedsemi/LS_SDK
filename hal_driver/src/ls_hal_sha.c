@@ -283,11 +283,11 @@ HAL_StatusTypeDef HAL_LSSHA_SM3_HMAC(uint8_t out[SM3_BYTES_NUM], uint8_t *data, 
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint8_t hash_val[SHA256_BYTES_NUM])
+HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint32_t *hash_val)
 {
     HAL_LSSHA_SHA256_Init();
     HAL_LSSHA_Update(data, length);
-    HAL_LSSHA_Final(hash_val);
+    HAL_LSSHA_Final((uint8_t *)hash_val);
     return HAL_OK;
 }
 

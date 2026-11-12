@@ -26,7 +26,7 @@ HAL_StatusTypeDef HAL_LSSHA_Update(const uint8_t *data,uint32_t length);
 
 HAL_StatusTypeDef HAL_LSSHA_Final(uint8_t *digest);
 
-HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint8_t hash_val[SHA256_BYTES_NUM]);
+HAL_StatusTypeDef HAL_LSSHA_SHA256(const uint8_t *data, uint32_t length, uint32_t *hash_val);
 
 HAL_StatusTypeDef HAL_LSSHA_SHA256_HMAC(uint8_t out[SHA256_BYTES_NUM], uint8_t *data, uint32_t data_len, uint8_t *key, uint32_t key_len);
 
