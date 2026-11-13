@@ -409,15 +409,8 @@ def range_commits(spec):
     return [line for line in output.split("\n") if line]
 
 
-def check_range(spec):
-    """The same rules over every commit a merge request would bring in.
-
-    Used by CI: the hooks only see a local commit, a merge request brings a
-    whole range, and unreviewed commits can arrive from any clone."""
-    if not spec:
-        return fail("--check-range needs BASE..HEAD or CI_MERGE_REQUEST_DIFF_BASE_SHA")
-
-    commits = range_commits(spec)
+def check_commits(commits, label):
+    """Apply every rule to each commit of a list, reporting all violations."""
     errors = []
     checked = 0
     for sha in commits:
@@ -433,8 +426,40 @@ def check_range(spec):
         return emit(errors)
 
     sys.stdout.write("%d of %d commit(s) in %s checked, no violation\n"
-                     % (checked, len(commits), spec))
+                     % (checked, len(commits), label))
     return 0
+
+
+def check_range(spec):
+    """The same rules over every commit a merge request would bring in.
+
+    Used by CI: the hooks only see a local commit, a merge request brings a
+    whole range, and unreviewed commits can arrive from any clone."""
+    if not spec:
+        return fail("--check-range needs BASE..HEAD or CI_MERGE_REQUEST_DIFF_BASE_SHA")
+    return check_commits(range_commits(spec), spec)
+
+
+def check_ci():
+    """Pick the range out of the CI environment, for any pipeline source.
+
+    A merge request pipeline compares against its diff base; a branch pipeline
+    against the commit the push started from. A new branch or a force push has
+    no usable base, so only the tip commit is checked."""
+    head = os.environ.get("CI_COMMIT_SHA", "")
+    if not head:
+        return fail("--check-ci needs CI_COMMIT_SHA")
+
+    base = os.environ.get("CI_MERGE_REQUEST_DIFF_BASE_SHA", "")
+    if not base:
+        before = os.environ.get("CI_COMMIT_BEFORE_SHA", "")
+        if before and before != head and set(before) != {"0"}:
+            base = before
+
+    if base:
+        return check_commits(range_commits("%s..%s" % (base, head)),
+                             "%s..%s" % (base, head))
+    return check_commits([head], head)
 
 
 SHIM_MARKER = "linkedsemi commit gate"
@@ -583,8 +608,9 @@ def usage():
         "       bash %s --install   install the commit gate\n"
         "       bash %s --remove    remove the commit gate\n"
         "       bash %s --check-range BASE..HEAD   check commits, for CI\n"
+        "       bash %s --check-ci  check the commits this pipeline brings in\n"
         "default BASE for --check-range: CI_MERGE_REQUEST_DIFF_BASE_SHA\n"
-        % (SELF_NAME, SELF_NAME, SELF_NAME, SELF_NAME))
+        % (SELF_NAME, SELF_NAME, SELF_NAME, SELF_NAME, SELF_NAME))
 
 
 def all_installed():
@@ -618,6 +644,8 @@ def command(argv):
         return install_verbose()
     if option in ("--remove", "-r"):
         return uninstall()
+    if option == "--check-ci":
+        return check_ci()
     if option == "--check-range":
         spec = argv[1] if len(argv) > 1 else os.environ.get(
             "CI_MERGE_REQUEST_DIFF_BASE_SHA", "")

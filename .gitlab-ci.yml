@@ -1,4 +1,5 @@
 stages:
+  - gate
   - build
   - test
   - deploy
@@ -11,6 +12,15 @@ include:
   - 'tools/le501x/ci.yml'
   - 'tools/lm3050/ci.yml'
   - 'tools/leo/ci.yml'
+
+# Runs before every build job: a failing gate stops the pipeline there.
+# No tags on purpose: any runner that accepts untagged jobs may take it.
+commit-rules:
+  stage: gate
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - python .githooks_linkedsemi.py --check-ci
 
 doxygen:
   stage: build
