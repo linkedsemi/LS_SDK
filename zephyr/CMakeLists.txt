@@ -84,7 +84,7 @@ if(CONFIG_SOC_LS1010)
     # ../module/crc
     ../module/debug
     ../module/debug/RTT
-    # ../module/static_buffer
+    ../module/static_buffer
     # ../module/tinyfs
     # ../module/tinycrypt/lib/include
   )
