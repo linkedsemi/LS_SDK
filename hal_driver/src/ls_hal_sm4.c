@@ -66,7 +66,7 @@ static void sm4_data_length_inout_config(const uint8_t *data, uint32_t length, u
     writeflag = true;
     crypt_in = data;
     crypt_out = result;
-    REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_LEN, (uint8_t)(length / 16 - 1));
+    REG_FIELD_WR(LSSM4->SM4_CTRL, SM4_CALC_LEN, length / 16 - 1);
 }
 
 static void sm4_start()
