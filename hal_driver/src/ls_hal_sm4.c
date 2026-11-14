@@ -435,16 +435,11 @@ void HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_s
 
 }
 
-void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
-                                        uint8_t *in, uint32_t in_size,
-                                        uint8_t *aad, uint32_t aad_size)
+void HAL_SM4_GCM_Decrypt_GCTR_Update(sm4_gcm_env *gcm, uint8_t *out,
+                                     uint8_t *in, uint32_t in_size)
 {
     uint8_t c[SM4_BLOCK_SIZE];
     uint32_t partial = in_size % SM4_BLOCK_SIZE;
-    const uint8_t *_in = in;
-    uint32_t blocks;
-    gcm->data_size += in_size;
-    gcm->aad_size += aad_size;
 
     /* GCTR */
     for (uint32_t i = 0; i < in_size / SM4_BLOCK_SIZE; i++)
@@ -461,6 +456,17 @@ void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
         block_crypt(gcm->counter, c);
         xor_array(c, in, out, partial);
     }
+}
+
+void HAL_SM4_GCM_Decrypt_GHASH_Update(sm4_gcm_env *gcm,
+                                      uint8_t *in, uint32_t in_size,
+                                      uint8_t *aad, uint32_t aad_size)
+{
+    const uint8_t *_in = in;
+    uint32_t blocks;
+    uint32_t partial;
+    gcm->data_size += in_size;
+    gcm->aad_size += aad_size;
     
     /* Hash in A, the Additional Authentication Data */
     if (aad_size != 0 && aad != NULL)
@@ -519,7 +525,7 @@ void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
     }
 }
 
-bool HAL_SM4_GCM_Decrypt_Final(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
+bool HAL_SM4_GCM_Decrypt_Verify_Tag(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
 {
     /* Hash in the lengths in bits of A and C */
     {

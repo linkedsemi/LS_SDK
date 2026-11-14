@@ -746,16 +746,11 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t
     gcm->big_h[1] = BSWAP_64(gcm->big_h[1]);
 }
 
-void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
-                                        uint8_t *in, uint32_t in_size,
-                                        uint8_t *aad, uint32_t aad_size)
+void HAL_LSCRYPT_AES_GCM_Decrypt_GCTR_Update(aes_gcm_env *gcm, uint8_t *out,
+                                             uint8_t *in, uint32_t in_size)
 {
     uint8_t c[AES_BLOCK_SIZE];
     uint32_t partial = in_size % AES_BLOCK_SIZE;
-    const uint8_t *_in = in;
-    uint32_t blocks;
-    gcm->data_size += in_size;
-    gcm->aad_size += aad_size;
 
     /* GCTR */
     for (uint32_t i = 0; i < in_size / AES_BLOCK_SIZE; i++)
@@ -774,6 +769,17 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
         xor_array(c, in, out, partial);
         length_out += partial;
     }
+}
+
+void HAL_LSCRYPT_AES_GCM_Decrypt_GHASH_Update(aes_gcm_env *gcm,
+                                              uint8_t *in, uint32_t in_size,
+                                              uint8_t *aad, uint32_t aad_size)
+{
+    const uint8_t *_in = in;
+    uint32_t blocks;
+    uint32_t partial;
+    gcm->data_size += in_size;
+    gcm->aad_size += aad_size;
     
     /* Hash in A, the Additional Authentication Data */
     if (aad_size != 0 && aad != NULL)
@@ -832,7 +838,7 @@ void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
     }
 }
 
-bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
+bool HAL_LSCRYPT_AES_GCM_Decrypt_Verify_Tag(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size)
 {
     /* Hash in the lengths in bits of A and C */
     {

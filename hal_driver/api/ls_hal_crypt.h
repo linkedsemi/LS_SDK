@@ -273,10 +273,12 @@ typedef struct
 } aes_gcm_env;
 
 void HAL_LSCRYPT_AES_GCM_Decrypt_Init(aes_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size);
-void HAL_LSCRYPT_AES_GCM_Decrypt_Update(aes_gcm_env *gcm, uint8_t *out,
-                                        uint8_t *in, uint32_t in_size,
-                                        uint8_t *aad, uint32_t aad_size);
-bool HAL_LSCRYPT_AES_GCM_Decrypt_Final(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
+void HAL_LSCRYPT_AES_GCM_Decrypt_GCTR_Update(aes_gcm_env *gcm, uint8_t *out,
+                                             uint8_t *in, uint32_t in_size);
+void HAL_LSCRYPT_AES_GCM_Decrypt_GHASH_Update(aes_gcm_env *gcm,
+                                              uint8_t *in, uint32_t in_size,
+                                              uint8_t *aad, uint32_t aad_size);
+bool HAL_LSCRYPT_AES_GCM_Decrypt_Verify_Tag(aes_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
 
 bool HAL_LSCRYPT_AES_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                                               uint8_t *nonce, uint32_t nonce_size,

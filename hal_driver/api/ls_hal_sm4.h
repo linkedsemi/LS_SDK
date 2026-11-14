@@ -108,10 +108,12 @@ typedef struct
 } sm4_gcm_env;
 
 void HAL_SM4_GCM_Decrypt_Init(sm4_gcm_env *gcm, uint8_t *nonce, uint32_t nonce_size);
-void HAL_SM4_GCM_Decrypt_Update(sm4_gcm_env *gcm, uint8_t *out,
-                                        uint8_t *in, uint32_t in_size,
-                                        uint8_t *aad, uint32_t aad_size);
-bool HAL_SM4_GCM_Decrypt_Final(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
+void HAL_SM4_GCM_Decrypt_GCTR_Update(sm4_gcm_env *gcm, uint8_t *out,
+                                     uint8_t *in, uint32_t in_size);
+void HAL_SM4_GCM_Decrypt_GHASH_Update(sm4_gcm_env *gcm,
+                                      uint8_t *in, uint32_t in_size,
+                                      uint8_t *aad, uint32_t aad_size);
+bool HAL_SM4_GCM_Decrypt_Verify_Tag(sm4_gcm_env *gcm, uint8_t *tag, uint32_t tag_size);
 
 bool HAL_SM4_GCM_Decrypt(uint8_t *in, uint32_t in_size,
                                               uint8_t *nonce, uint32_t nonce_size,
