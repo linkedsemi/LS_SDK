@@ -217,7 +217,9 @@ if(CONFIG_SOC_LS1010)
     reset_retain.ld
   )
 
-  zephyr_linker_sources(ROM_START SORT_KEY -1vectors leo_sbl.ld)
+  # After rom_start_offset (SORT_KEY 0x0) and before the vector table
+  # (SORT_KEY 0x0vectors). The SBL image occupies [0, 0x2060).
+  zephyr_linker_sources(ROM_START SORT_KEY 0x0sbl leo_sbl.ld)
 
   zephyr_ld_options("-T ${ZEPHYR_CURRENT_MODULE_DIR}/soc/rv32/leo/rom_sym.txt")
   
